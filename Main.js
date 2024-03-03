@@ -136,7 +136,9 @@ var quoteSeconds_Total = 0;
 
   finished();
   function finished() {
+    console.log("1");
     createCopyPartModal();
+    console.log("2");
     createCostAnalysisSummaryContainer();
     createOptionsContainer();
     createSummaryHelper();
