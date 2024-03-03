@@ -49,7 +49,7 @@ var quoteSeconds_Total = 0;
 (function() {
   "use strict";
 
-  GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/Materials/QWH.js', onload: function(response) {let e = document.createElement('script'); e.innerText = response.src; console.log(response); e.type = 'module'; document.head.appendChild(e);}});
+  GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/Materials/QWH.js', onload: function(response) {let e = document.createElement('script'); e.innerText = response.responseText; console.log(response); e.type = 'module'; document.head.appendChild(e);}});
   GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/UI/UI.js', onload: function(response) {let e = document.createElement('script'); e.innerText = response.src; e.type = 'module'; document.head.appendChild(e);}});
   GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/UI/UIContainerType3.js', onload: function(response) {let e = document.createElement('script'); e.innerText = response.src; e.type = 'module'; document.head.appendChild(e);}});
   GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Async_Functions/Async_Functions.js', onload: function(response) {let e = document.createElement('script'); e.innerText = response.src; e.type = 'module'; document.head.appendChild(e);}});
