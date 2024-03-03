@@ -129,10 +129,10 @@ var quoteSeconds_Total = 0;
     GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/LabourParts/PrintMounting.js', onload: function(response) {let e = document.createElement('script'); e.type = 'text/javascript'; e.src = 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/LabourParts/PrintMounting.js'; document.body.appendChild(e);}});
     GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Part_Specific/Transformer.js', onload: function(response) {let e = document.createElement('script'); e.type = 'text/javascript'; e.src = 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Part_Specific/Transformer.js'; document.body.appendChild(e);}});
     GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js', onload: function(response) {let e = document.createElement('script'); e.type = 'text/javascript'; e.src = 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js'; document.body.appendChild(e); finished();}});
-  
+  GM_addElement('script', {src: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Product_Components/ProductComponents.js', type: 'text/javascript'});
+
     */
 
-  GM_addElement('script', {src: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Product_Components/ProductComponents.js', type: 'text/javascript'});
 
   finished();
   function finished() {
