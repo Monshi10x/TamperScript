@@ -1,0 +1,106 @@
+{"predefinedVehicleTemplates":[["Ute", "https://cdn.gorilladash.com/images/media/5413744/ranger1-svg.svg", 10045.82, 6319.66,
+            {
+                  "name": "Single Door",
+                  "production_time": 120,
+                  "production_TE": "Each",
+                  "install_TE": "Each",
+                  "install_time": 160,
+                  "install_rate": "Install 2 Person (Min) $180/h",
+                  "template_rects": [
+                        {
+                              "x": 5260,
+                              "y": 1310.1136779785156,
+                              "w": 1050,
+                              "h": 570,
+                              "qty": 1,
+                              "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                              "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                              "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                              "description": "Driver Door",
+                              "colour": "red"
+                        }, {
+                              "x": 4090,
+                              "y": 3850.1136779785156,
+                              "w": 1050,
+                              "h": 570,
+                              "qty": 1,
+                              "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                              "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                              "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                              "description": "Pass Door",
+                              "colour": "red"
+                        }
+                  ]
+            },
+            {
+                  "name": "Double Door",
+                  "production_time": 120,
+                  "production_TE": "Each",
+                  "install_TE": "Each",
+                  "install_time": 120,
+                  "install_rate": "Install 2 Person (Min) $180/h",
+                  "template_rects": [
+                        {
+                              "x": 4450,
+                              "y": 1310.1136779785156,
+                              "w": 1860,
+                              "h": 570,
+                              "qty": 1,
+                              "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                              "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                              "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                              "description": "Driver Door",
+                              "colour": "red"
+                        }, {
+                              "x": 4090,
+                              "y": 3850.1136779785156,
+                              "w": 1870,
+                              "h": 570,
+                              "qty": 1,
+                              "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                              "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                              "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                              "description": "Pass Door",
+                              "colour": "red"
+                        }
+                  ]
+            }
+      ],
+      ["Sedan", "https://cdn.gorilladash.com/images/media/5418205/Carola-01.svg", 9204.8, 6104.156,
+            {
+                  "name": "Test33",
+                  "production_time": 120,
+                  "production_TE": "Each",
+                  "install_TE": "Each",
+                  "install_time": 120,
+                  "install_rate": "Install 2 Person (Min) $180/h",
+                  "template_rects": [
+                        {
+                              "x": 5260,
+                              "y": 1310.1136779785156,
+                              "w": 1050,
+                              "h": 570,
+                              "qty": 1,
+                              "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                              "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                              "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                              "description": "Driver Door",
+                              "colour": "red"
+                        }, {
+                              "x": 4090,
+                              "y": 3850.1136779785156,
+                              "w": 1050,
+                              "h": 570,
+                              "qty": 1,
+                              "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                              "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                              "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                              "description": "Pass Door",
+                              "colour": "red"
+                        }
+                  ]
+            }
+      ],
+      ["Van"],
+      ["Hatch"]]
+}

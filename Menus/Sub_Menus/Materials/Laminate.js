@@ -1,0 +1,219 @@
+class Laminate extends Material {
+      static DISPLAY_NAME = "LAMINATE";
+
+      #materialHeader;
+      #production;
+      #addLaminateBtn;
+      #productionHeader;
+      #sheetSplitSizes;
+      #materialTotalArea;
+      #materialContainer;
+      #material;
+      set material(value) {$(this.#material[1]).val(value).change();}
+
+      /**
+       * @Inherited
+       * @example
+       * [{parent: 'SHEET-1699952073332-95570559', data: []},
+       * {parent: 'SHEET-1699952073332-95574529', data: []}]
+       */
+      #inheritedData = [];
+      #inheritedSizes = [];
+      #inheritedSizeTable;
+
+      /**
+      * @Subscribers
+      * @Updated on table changes
+      * @example 
+      *          [{qty: 4, width: '2440', height: '1220'},
+      *           {qty: 4, width: '2440', height: '580'},
+       *           {qty: 1, width: '240', height: '1220'},
+      *           {qty: 1, width: '240', height: '580'}]
+      */
+      #dataForSubscribers = [];
+
+      /**
+       * @Output
+       */
+      #outputSizeTable;
+      #outputSizes = [];
+
+      /** @Machine */
+      #machineSetupTime;
+      get machineSetupTime() {return zeroIfNaNNullBlank(this.#machineSetupTime[1].value);}
+      #machineRunSpeed;
+      #machineLengthToRun;
+      #machineRunTime;
+      get machineRunTime() {return zeroIfNaNNullBlank(this.#machineRunTime[1].value);}
+
+      get backgroundColor() {return COLOUR.Purple;}
+      get textColor() {return COLOUR.White;}
+
+      constructor(parentObject, sizeClass, type) {
+            super(parentObject, sizeClass, type);
+
+            /**
+             * @InheritedParentSizeSplits
+             */
+            createHeadingStyle1("Inherited Parent Size Splits", null, this.container);
+            this.#inheritedSizeTable = new Table(this.container, 780, 20, 250);
+            this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
+            this.#inheritedSizeTable.addRow("-", "-", "-");
+
+
+            /**
+             * @Material
+             */
+            this.#materialHeader = createHeadingStyle1("Material", null, this.container);
+            this.#materialTotalArea = createInput_Infield("Total Area", 0, null, () => { }, this.container, false, 1);
+            setFieldDisabled(true, this.#materialTotalArea[1], this.#materialTotalArea[0]);
+
+            var laminateParts = getPredefinedParts("Laminate - ");
+            let vinylParts = getPredefinedParts(VinylLookup["Whiteback"]);
+            var laminateDropdownElements = [];
+            laminateParts.forEach(element => laminateDropdownElements.push([element.Name, "white"]));
+            vinylParts.forEach(element => laminateDropdownElements.push([element.Name, "white"]));
+
+            this.#material = createDropdown_Infield_Icons_Search("Laminate", 0, "width:60%;", 10, true, laminateDropdownElements, () => {this.UpdateFromChange();}, this.container);
+            $(this.#material).val(LaminateLookup["Gloss"]).change();
+
+            /** @Machine */
+            createHeadingStyle1("Machine", null, this.container);
+            createText("Setup", "width:100%;height:20px", this.container);
+            this.#machineSetupTime = createInput_Infield("Setup Time (min)", 2, null, () => {this.UpdateFromChange();}, this.container, false, 0.1);
+
+            createText("Run", "width:100%;height:20px", this.container);
+            this.#machineRunSpeed = createInput_Infield("Run Speed (m/min)", 3, null, () => {this.UpdateFromChange();}, this.container, false, 0.1);
+            this.#machineLengthToRun = createInput_Infield("Length to Run (m)", -1, null, () => {this.UpdateFromChange();}, this.container, false, 1);
+            setFieldDisabled(true, this.#machineLengthToRun[1], this.#machineLengthToRun[0]);
+            this.#machineRunTime = createInput_Infield("Run Time (mins)", -1, null, () => {this.UpdateFromChange();}, this.container, false, 1);
+            setFieldDisabled(true, this.#machineRunTime[1], this.#machineRunTime[0]);
+
+            /**
+             * @OutputSizes
+             */
+            createHeadingStyle1("Output Sizes", null, this.container);
+            this.#outputSizeTable = new Table(this.container, 780, 20, 250);
+            this.#outputSizeTable.setHeading("Qty", "Width", "Height");
+            this.#outputSizeTable.addRow("-", "-", "-");
+
+            /**
+             * @Production
+             */
+            this.#productionHeader = createHeadingStyle1("Production", null, this.container);
+            this.#production = new Production(this.container, null, function() { }, this.sizeClass);
+            this.#production.showContainerDiv = true;
+            this.#production.productionTime = 20;
+            this.#production.required = true;
+            this.#production.showRequiredCkb = false;
+            this.#production.requiredName = "Production Time";
+
+            this.dataToPushToSubscribers = {
+                  parent: this,
+                  data: this.#dataForSubscribers
+            };
+      }
+
+      /**@Inherited */
+      UpdateFromChange() {
+            super.UpdateFromChange();
+
+            this.UpdateInheritedSizeTable();
+
+            this.UpdateMachineTimes();
+            this.UpdateProductionTimes();
+            this.UpdateOutputSizeTable();
+            this.dataToPushToSubscribers = {
+                  parent: this,
+                  data: this.#dataForSubscribers
+            };
+            this.UpdateSubscribedLabel();
+            this.PushToSubscribers();
+      }
+
+      UpdateInheritedSizeTable = () => {
+            this.#inheritedSizes = [];
+            this.#inheritedSizeTable.deleteAllRows();
+
+            //Per Parent Subscription:
+            for(let a = 0; a < this.#inheritedData.length; a++) {
+                  if(this.#inheritedData[a].finalRollSize) {
+                        let recievedInputSizes = this.#inheritedData[a].finalRollSize;
+                        let i = 0;
+                        this.#inheritedSizes.push(recievedInputSizes[i]);
+                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, roundNumber(recievedInputSizes[i].width, 2), roundNumber(recievedInputSizes[i].height, 2));
+                  } else {
+                        let recievedInputSizes = this.#inheritedData[a].data;
+
+                        for(let i = 0; i < recievedInputSizes.length; i++) {
+                              this.#inheritedSizes.push(recievedInputSizes[i]);
+                              this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, roundNumber(recievedInputSizes[i].width, 2), roundNumber(recievedInputSizes[i].height, 2));
+                        }
+                  }
+            }
+      };
+
+      UpdateMachineTimes() {
+            let totalLength_mm = 0;
+            let runSpeed_mMin = zeroIfNaNNullBlank(this.#machineRunSpeed[1].value);
+            let setupTime = zeroIfNaNNullBlank(this.#machineSetupTime[1].value);
+            for(let i = 0; i < this.#inheritedSizes.length; i++) {
+                  totalLength_mm += this.#inheritedSizes[i].height;
+            }
+            this.#machineLengthToRun[1].value = roundNumber(mmToM(totalLength_mm), 2);
+            this.#machineRunTime[1].value = roundNumber(mmToM(totalLength_mm) / runSpeed_mMin, 2);
+      }
+
+      UpdateProductionTimes() {
+            this.#production.productionTime = this.machineSetupTime + this.machineRunTime;
+      }
+
+      UpdateOutputSizeTable() {
+            this.#outputSizes = [];
+            this.#outputSizeTable.deleteAllRows();
+
+            for(let i = 0; i < this.#inheritedSizes.length; i++) {
+                  let qtyVal = this.#inheritedSizes[i].qty;
+                  let widthVal = this.#inheritedSizes[i].width;
+                  let heightVal = this.#inheritedSizes[i].height;
+                  this.#outputSizes.push({qty: qtyVal, width: widthVal, height: heightVal});
+                  this.#outputSizeTable.addRow(qtyVal, roundNumber(widthVal, 2), roundNumber(heightVal, 2));
+            }
+            $(this.#materialTotalArea[1]).val(combinedSqm(this.#outputSizes)).change();
+
+            this.#dataForSubscribers = this.#outputSizes;
+      };
+
+      ReceiveSubscriptionData(data) {
+            let dataIsNew = true;
+            for(let i = 0; i < this.#inheritedData.length; i++) {
+                  if(data.parent == this.#inheritedData[i].parent) {
+                        dataIsNew = false;
+                        this.#inheritedData[i] = data;
+                        break;
+                  }
+            }
+
+            if(dataIsNew) {
+                  this.#inheritedData.push(data);
+            }
+
+            super.ReceiveSubscriptionData(data);
+      }
+
+      /**@Override */
+      UnSubscribeFrom(parent) {
+            for(let i = 0; i < this.#inheritedData.length; i++) {
+                  if(this.#inheritedData[i].parent == parent) {
+                        this.#inheritedData.splice(i, 1);
+                        break;
+                  }
+            }
+            super.UnSubscribeFrom(parent);
+      }
+
+      async Create(productNo, partIndex) {
+            partIndex = await super.Create(productNo, partIndex);
+            return partIndex;
+      }
+}

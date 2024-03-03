@@ -1,0 +1,363 @@
+
+{"transformers":[
+      {
+            "name": "Transformer - 1.500A 36W 24V 5yr 36W",
+            "amp": 1.5,
+            "price": 31.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 10.00A 120W 12V 7yr",
+            "amp": 10,
+            "price": 64.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 10.00A 120W 12V 7yr (Dimming)",
+            "amp": 10,
+            "price": 61.63,
+            "warranty": 7,
+            "dimming": true,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 10.00A 150W 12V 5yr",
+            "amp": 10,
+            "price": 54.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 10.00A 150W 12V 5yr (DALI)",
+            "amp": 10,
+            "price": 69.95,
+            "warranty": 5,
+            "dimming": true,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 10.00A 240W 24V 5yr",
+            "amp": 10,
+            "price": 71.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 10.00A 240W 24V 5yr (DALI)",
+            "amp": 10,
+            "price": 89.95,
+            "warranty": 5,
+            "dimming": true,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 10.00A 240W 24V 5yr 240W",
+            "amp": 10,
+            "price": 62.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 10.00A 240W 24V 7yr",
+            "amp": 10,
+            "price": 89.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 10.00A 240W 24V 7yr (Dimming)",
+            "amp": 10,
+            "price": 91.95,
+            "warranty": 7,
+            "dimming": true,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 12.50A 150W 12V 7yr",
+            "amp": 12.5,
+            "price": 59.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 12.50A 150W 12V 7yr",
+            "amp": 12.5,
+            "price": 65.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 12.50A 150W 12V 7yr (Dimming)",
+            "amp": 12.5,
+            "price": 62.37,
+            "warranty": 7,
+            "dimming": true,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 13.33A 320W 24V 7yr",
+            "amp": 13.33,
+            "price": 99.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 13.34A 320W 24V 5yr 320W",
+            "amp": 13.34,
+            "price": 87.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 13.34A 320W 24V 7yr",
+            "amp": 13.34,
+            "price": 119.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 13.34A 320W 24V 7yr (Dimming)",
+            "amp": 13.34,
+            "price": 129.95,
+            "warranty": 7,
+            "dimming": true,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 16.00A 192W 12V 7yr (Dimming)",
+            "amp": 16,
+            "price": 82.42,
+            "warranty": 7,
+            "dimming": true,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 16.00A 200W 12V 5yr (DALI)",
+            "amp": 16,
+            "price": 84.95,
+            "warranty": 5,
+            "dimming": true,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 16.00A 240W 12V 7yr",
+            "amp": 16,
+            "price": 84.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 16.00A 240W 12V 7yr (Dimming)",
+            "amp": 16,
+            "price": 92.95,
+            "warranty": 7,
+            "dimming": true,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 16.67A 200W 12V 7yr",
+            "amp": 16.67,
+            "price": 69.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 2.500A 60W 24V 3yr",
+            "amp": 2.5,
+            "price": 39.95,
+            "warranty": 3,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 2.500A 60W 24V 5yr 60W",
+            "amp": 2.5,
+            "price": 33.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 22.00A 320W 12V 7yr",
+            "amp": 22,
+            "price": 119.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 22.00A 320W 12V 7yr (Dimming no plug)",
+            "amp": 22,
+            "price": 113.61,
+            "warranty": 7,
+            "dimming": true,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 22.00A 320W 12V 7yr (Dimming)",
+            "amp": 22,
+            "price": 129.95,
+            "warranty": 7,
+            "dimming": true,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 25.00A 600W 24V 7yr",
+            "amp": 25,
+            "price": 249.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 3.125A 75W 24V 7yr",
+            "amp": 3.125,
+            "price": 38.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 3.150A 75W 24V 5yr",
+            "amp": 3.125,
+            "price": 47.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 3.150A 75W 24V 5yr (Dimming)",
+            "amp": 3.15,
+            "price": 53.95,
+            "warranty": 5,
+            "dimming": true,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 4.000A 100W 24V 5yr 100W",
+            "amp": 4,
+            "price": 39.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 4.170A 100W 12V 7yr",
+            "amp": 4.17,
+            "price": 44.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 40.00A 600W 12V 7yr",
+            "amp": 40,
+            "price": 274.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 5.000A 120W 24V 7yr",
+            "amp": 5,
+            "price": 65.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 5.000A 60W 12V 3yr",
+            "amp": 5,
+            "price": 38.95,
+            "warranty": 3,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 5.000A 60W 12V 5yr (Dimming)",
+            "amp": 5,
+            "price": 52.95,
+            "warranty": 3,
+            "dimming": true,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 5.000A 75W 12V 5yr",
+            "amp": 5,
+            "price": 39.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 6.250A 150W 24V 5yr",
+            "amp": 6.25,
+            "price": 57.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 6.250A 150W 24V 5yr (DALI)",
+            "amp": 6.25,
+            "price": 69.95,
+            "warranty": 5,
+            "dimming": true,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 6.250A 150W 24V 5yr 150W",
+            "amp": 6.25,
+            "price": 51.95,
+            "warranty": 5,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 6.250A 150W 24V 7yr",
+            "amp": 6.25,
+            "price": 59.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 6.300A 150W 24V 7yr",
+            "amp": 6.3,
+            "price": 65.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 24
+      },
+      {
+            "name": "Transformer - 8.330A 100W 12V 7yr",
+            "amp": 8.33,
+            "price": 44.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 12
+      },
+      {
+            "name": "Transformer - 8.330A 200W 24V 7yr",
+            "amp": 8.33,
+            "price": 69.95,
+            "warranty": 7,
+            "dimming": false,
+            "voltage": 24
+      }
+]}

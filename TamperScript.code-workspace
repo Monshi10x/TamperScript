@@ -1,0 +1,108 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"editor.background": "#141414",
+			"editor.selectionBackground": "#2e2e2e",
+			"editor.selectionHighlightBorder": "#0400ff",
+			"editor.selectionForeground": "#0004ff",
+			"editor.formatOnSave": true,
+			"editor.formatOnType": true
+		},
+		"json.format.enable": true,
+		"editor.tokenColorCustomizations": {
+			"comments": "#555",
+			"variables": "#ffffff",
+			"keywords": "#0051ff",
+			"strings": "#099e10",
+			"textMateRules": [
+				{
+					"scope": "storage.modifier.async.js",
+					"settings": {
+						"foreground": "#ff0000",
+						"fontStyle": "bold"
+					}
+				},
+				{
+					"scope": "constant.numeric.decimal.js",
+					"settings": {
+						"foreground": "#00ffea"
+					}
+				},
+				{
+					"scope": "keyword.control.flow.js",
+					"settings": {
+						"foreground": "#ff0000",
+						"fontStyle": "bold"
+					}
+				},
+				{
+					"scope": "entity.name.function.js",
+					"settings": {
+						"foreground": "#ae00ff"
+					}
+				},
+				{
+					"scope": "comment.line.double-slash.js",
+					"settings": {
+						"fontStyle": "italic"
+					}
+				},
+				{
+					"scope": "string.quoted.single.js",
+					"settings": {
+						"fontStyle": "italic"
+					}
+				},
+				{
+					"scope": "string.quoted.double.js",
+					"settings": {
+						"fontStyle": "italic"
+					}
+				},
+				{
+					"scope": "constant.language",
+					"settings": {
+						"foreground": "#0051ff"
+					}
+				},
+				{
+					"scope": "variable.language.this.js",
+					"settings": {
+						"foreground": "#0051ff"
+					}
+				},
+				{
+					"scope": "variable.language.super.js",
+					"settings": {
+						"foreground": "#0051ff"
+					}
+				},
+				{
+					"scope": "entity.name.type.class",
+					"settings": {
+						"foreground": "#ff4800",
+						"fontStyle": "bold"
+					}
+				},
+				{
+					"scope": "entity.name.function.member",
+					"settings": {
+						"foreground": "#ae00ff"
+					}
+				},
+				{
+					"scope": "storage.type.class.jsdoc",
+					"settings": {
+						"foreground": "#ff4800",
+						"fontStyle": "bold"
+					}
+				}
+			]
+		}
+	}
+}

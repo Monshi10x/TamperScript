@@ -1,0 +1,46 @@
+{
+      "VinylLookup" : {
+            "Air Release": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+            "Oneway Shopfront": "Vinyl - Oneway Shopfront 60/40 (Creative Graphics)",
+            "Oneway Vehicle": "Vinyl - Oneway Vehicle 60/40 (Clear Focus Auto Vue)",
+            "3M Vehicle": "Vinyl - 3M Vehicle Wrap (3M IJ180MC-10) (8 yrs vert less 70)",
+            "Translucent Printed": "Vinyl - Translucent Printed (ImagePerfect 2516)",
+            "Whiteback": "Vinyl - Polymeric Whiteback (Orajet 3650G)",
+            "Clear": "Vinyl - Polymeric Clear (Arlon YDPF4500-GC)",
+            "Blockout": "Vinyl - Polymeric Blockout (Orajet 3651G)",
+            "Frosting": "Vinyl - Frosting Light Silver (ImagePerfect 5804)",
+            "Frosting Printed": "Vinyl - Frosting Light Silver Printed (ImagePerfect 5804)",
+            "High Tack": "Vinyl - High Tac Air-Release (Image Perfect IP2572PA)"
+      },"LaminateLookup":{
+            "Translucent": "Laminate - Translucent Gloss (ImagePerfect 2810-101)",
+            "Gloss": "Laminate - Polymeric Gloss (Oraguard 215G)",
+            "Satin": "Laminate - Polymeric Satin (Oraguard 215S)",
+            "Matte": "Laminate - Polymeric Matte (Oraguard 215M)",
+            "3m Gloss (Standard)": "Laminate - 3M Vehicle Standardterm 8V, 0H (3M 8518)",
+            "Oneway Vehicle": "Laminate - 3M Vehicle Standardterm 8V, 0H (3M 8518)",
+            "Oneway Shopfront": "Laminate - 3M Vehicle Standardterm 8V, 0H (3M 8518)"
+      },"AppTapeLookup":{
+            "Medium Tack": "Tape - Application Medium Tack (TransferRite APP658293)"
+      },
+      "InstallLookup":{
+            "1P $95": "Install 1 Person (Min) $95/h",
+            "1P $135":"Install 1 Person (Min) $135/h",
+            "1P $135 Vehicles":"Install 1 Person Vehicle Graphics (Min) $135/h",
+            "1P $120 SAR":"Install 1 Person for Signarama's (Min) $120/h",
+            "2P $180":"Install 2 Person (Min) $180/h",
+            "2P $270":"Install 2 Persons (Min) $270/h",
+            "2P $200 SAR":"Install 2 Person for Signarama's (Min) $200/h"
+      },
+      "TravelLookup":{
+            "1P $95": "Travel 1 Person (Min) $95/h",
+            "1P $135":"Travel 1 Person (Min) $135/h",
+            "1P $120 SAR":"Travel 1 Person Signarama (Min) $120/h",
+            "2P $135":"Travel 2 Person (Min) $180/h",
+            "2P $270":"Travel 2 Person (Min) $270/h",
+            "2P $240 SAR":"Travel 2 Person (Min) $240/h"
+      },
+      "ACMLookup":{
+            "Standard White Gloss":"ACM - (sqm) - 2440x1220x3x0.21 White Satin/Gloss (Mulfords)",
+            "Standard Primer":"ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)"
+      }
+}

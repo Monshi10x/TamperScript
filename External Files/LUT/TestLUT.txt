@@ -1,0 +1,12 @@
+Lam Time, Layup Time, h3, h4
+r1, r2
+r1, r2, r3
+r1, r2, r3
+r1, r2
+r1, r2
+r1, r2
+1, r2, r3, r4
+1, r2, r3
+1, r2, r3
+1, r2, r3
+1, r2, r3
