@@ -1,4 +1,25 @@
 // ==UserScript==
+// @name         Corebridge Plugin (advanced) github
+// @namespace    http://tampermonkey.net/
+// @version      10.0
+// @description  Corebridge Plugin for Cost Analysis
+// @author       Tristan Cargill
+// @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
+// @match        https://sar10686.corebridge.net/SalesModule/Estimates/EditEstimate*
+// @match        https://sar10686.corebridge.net/SalesModule/Estimates/CreateEstimate*
+// @match        https://sar10686.corebridge.net/SalesModule/Orders/EditOrder*
+// @grant        unsafeWindow
+// @grant        GM_download
+// @grant        GM_addStyle
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_setClipboard
+// @grant        GM_info
+// @grant        unsafeWindow
+// @grant        window.close
+// @grant        window.focus
+// @grant        window.onurlchange
+
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
