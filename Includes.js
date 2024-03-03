@@ -1,8 +1,3 @@
-
-
-
-
-// ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
 // @version      10.0
@@ -108,4 +103,3 @@
 // @require      https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Part_Specific/Transformer.js
 // @require      https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js
 // @require      https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Main.js
-// ==/UserScript==
