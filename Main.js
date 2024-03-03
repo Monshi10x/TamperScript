@@ -2,7 +2,6 @@
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
-
 // @require      https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/Materials/QWH.js
 // @require      https://raw.githubusercontent.com/Monshi10x/TamperScript/main/UI/UI.js
 // @require      https://raw.githubusercontent.com/Monshi10x/TamperScript/main/UI/UIContainerType3.js
