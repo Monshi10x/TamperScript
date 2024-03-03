@@ -134,6 +134,7 @@ var quoteSeconds_Total = 0;
 
   GM_addElement('script', {src: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Product_Components/ProductComponents.js', type: 'text/javascript'});
 
+  finished();
   function finished() {
     createCopyPartModal();
     createCostAnalysisSummaryContainer();
