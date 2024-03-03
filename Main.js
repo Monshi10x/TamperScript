@@ -128,28 +128,29 @@ var quoteSeconds_Total = 0;
   GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/LabourParts/AppTaping.js', onload: function(response) {let e = document.createElement('script'); e.type = 'text/javascript'; e.src = 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/LabourParts/AppTaping.js'; document.head.appendChild(e);}});
   GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/LabourParts/PrintMounting.js', onload: function(response) {let e = document.createElement('script'); e.type = 'text/javascript'; e.src = 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/LabourParts/PrintMounting.js'; document.head.appendChild(e);}});
   GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Part_Specific/Transformer.js', onload: function(response) {let e = document.createElement('script'); e.type = 'text/javascript'; e.src = 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Part_Specific/Transformer.js'; document.head.appendChild(e);}});
-  GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js', onload: function(response) {let e = document.createElement('script'); e.type = 'text/javascript'; e.src = 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js'; document.head.appendChild(e);}});
+  GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js', onload: function(response) {let e = document.createElement('script'); e.type = 'text/javascript'; e.src = 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js'; document.head.appendChild(e); finished();}});
 
-  createCopyPartModal();
-  createCostAnalysisSummaryContainer();
-  createOptionsContainer();
-  createSummaryHelper();
-  installSummary = new InstallSummary();
-  initLHSMenu();
-  init();
-  updateErrors();
-  createLog();
-  hideLog();
-  keyboardTick();
+  function finished() {
+    createCopyPartModal();
+    createCostAnalysisSummaryContainer();
+    createOptionsContainer();
+    createSummaryHelper();
+    installSummary = new InstallSummary();
+    initLHSMenu();
+    init();
+    updateErrors();
+    createLog();
+    hideLog();
+    keyboardTick();
 
-  setInterval(function() {
-    tick();
-  }, 800);
-  setInterval(function() {
-    tickSecond();
-  }, 1000);
-}
-)();
+    setInterval(function() {
+      tick();
+    }, 800);
+    setInterval(function() {
+      tickSecond();
+    }, 1000);
+  }
+})();
 
 async function init() {
   document.getElementById("ctl00_RibbonsTabs").style = "position:fixed;";
