@@ -1,9 +1,3 @@
-// ==UserScript==
-// @require      http://code.jquery.com/jquery-3.4.1.min.js
-// @require      https://code.createjs.com/1.0.0/createjs.min.js
-// @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
-// ==/UserScript==
-
 var sleepMS = 300;
 var menuXOffset = 160;
 var dayHours = 8;
