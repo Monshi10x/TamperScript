@@ -1,3 +1,4 @@
+console.log("in includes");
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
