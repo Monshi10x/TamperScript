@@ -129,24 +129,36 @@ var quoteSeconds_Total = 0;
   GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Menus/Sub_Menus/LabourParts/PrintMounting.js', onload: function(response) {let e = document.createElement('script'); e.innerText = response.src; e.type = 'module'; document.head.appendChild(e);}});
   GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Part_Specific/Transformer.js', onload: function(response) {let e = document.createElement('script'); e.innerText = response.src; e.type = 'module'; document.head.appendChild(e);}});
   GM_xmlhttpRequest({method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js', onload: function(response) {let e = document.createElement('script'); e.innerText = response.src; e.type = 'module'; document.head.appendChild(e);}});
-  createCopyPartModal();
-  createCostAnalysisSummaryContainer();
-  createOptionsContainer();
-  createSummaryHelper();
-  installSummary = new InstallSummary();
-  initLHSMenu();
-  init();
-  updateErrors();
-  createLog();
-  hideLog();
-  keyboardTick();
+  GM_xmlhttpRequest({
+    method: 'GET', url: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js', onload: function(response) {
+      let e = document.createElement('script');
+      e.innerText = response.src;
+      e.type = 'module';
+      document.head.appendChild(e);
+      finished();
+    }
+  });
 
-  setInterval(function() {
-    tick();
-  }, 800);
-  setInterval(function() {
-    tickSecond();
-  }, 1000);
+  function finished() {
+    createCopyPartModal();
+    createCostAnalysisSummaryContainer();
+    createOptionsContainer();
+    createSummaryHelper();
+    installSummary = new InstallSummary();
+    initLHSMenu();
+    init();
+    updateErrors();
+    createLog();
+    hideLog();
+    keyboardTick();
+
+    setInterval(function() {
+      tick();
+    }, 800);
+    setInterval(function() {
+      tickSecond();
+    }, 1000);
+  }
 })();
 
 async function init() {
