@@ -84,9 +84,3 @@
 // @require      https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Polygon/Polygon.js
 // @require      https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Main.js
 // ==/UserScript==
-
-(function() {
-      "use strict";
-      console.log("in includes");
-      createCopyPartModal();
-})();
