@@ -4,8 +4,6 @@
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
 // ==/UserScript==
 
-import {testTest} from "./Product_Components/ProductComponents";
-
 var sleepMS = 300;
 var menuXOffset = 160;
 var dayHours = 8;
