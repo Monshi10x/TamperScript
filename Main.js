@@ -85,6 +85,8 @@
 // @require      https://raw.githubusercontent.com/Monshi10x/TamperScript/main/Main.js
 // ==/UserScript==
 
+import {testTest} from "./Product_Components/ProductComponents";
+
 var sleepMS = 300;
 var menuXOffset = 160;
 var dayHours = 8;
@@ -218,6 +220,7 @@ var quoteSeconds_Total = 0;
   finished();
   function finished() {
     console.log("1");
+    let T = new TestingTest();
     /*createCopyPartModal();
     console.log("2");
     createCostAnalysisSummaryContainer();

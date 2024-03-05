@@ -685,6 +685,15 @@ var copyPartModal_Container_RHS_NewBlankProduct;
 var copyPartModal_Container_Top;
 var copyPartModal_Container_CopyBtn;
 var copyPartModal_Container_CloseBtn;
+export function testTest() {
+
+}
+
+class TestingTest {
+	constructor() {
+		console.log("Testing Test");
+	}
+};
 function createCopyPartModal() {
 	copyPartModal_Container = document.createElement('div');
 	copyPartModal_Container.style = "display:none; width:800px;height:600px;background-color:#ddd;border:3px solid #999; position: fixed; top: 50%; left: 50%;z-index:1000;margin-top: -300px; margin-left: -400px";
