@@ -1,3 +1,7 @@
+function test5() {
+	console.log("in test5");
+}
+
 function partInfoTick() {
 	products = document.querySelectorAll('div[class^="ord-prod-model-item"]');
 
