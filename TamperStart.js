@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.2
-// @description  Corebridge Plugin for Cost Analysis
+// @version      10.3
+// @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/EditEstimate*
