@@ -1,5 +1,8 @@
 //Corebridge
 
+//GitHub
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Main.js
+
 //SSH Key
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
 1. in GitBash -> ssh-keygen -t ed25519 "monshi10x@gmail.com"
