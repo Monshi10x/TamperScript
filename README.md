@@ -9,3 +9,4 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generati
 5. pbcopy < ~/.ssh/id_ed25519.pub
 6. Add ssh-key to github https://github.com/settings/keys
 
+
