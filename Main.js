@@ -39,7 +39,7 @@ var installSummary;
 var quoteSeconds_CurrentSession = 0;
 var quoteSeconds_Stored = 0;
 var quoteSeconds_Total = 0;
-
+//hi
 (function() {
   "use strict";
   console.log("1");
