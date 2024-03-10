@@ -1,7 +1,7 @@
 function test5() {
 	console.log("in test5");
 }
-
+console.log("in productComponent");
 function partInfoTick() {
 	products = document.querySelectorAll('div[class^="ord-prod-model-item"]');
 

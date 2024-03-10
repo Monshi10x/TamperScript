@@ -141,7 +141,7 @@ var quoteSeconds_Total = 0;
   finished();
   function finished() {
     console.log("1");
-    test5();
+    //test5();
     //let T = new TestingTest();
     /*createCopyPartModal();
     console.log("2");
