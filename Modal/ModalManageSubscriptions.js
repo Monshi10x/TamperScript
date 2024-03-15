@@ -108,7 +108,7 @@ class ModalManageSubscriptions2 extends Modal {
                   }, null);
                   setFieldDisabled(isSelf || availableSubscriptionIsSubscriber, subscribedCkb, null);
                   let otherWording = (isSelf ? "Cannot subscribe to self" : "") + (availableSubscriptionIsSubscriber ? "Is a subscriber" : "");
-                  this.table.addRow(allAvailableSubscriptionObjects[i].Type + " " + allAvailableSubscriptionObjects[i].easyName, subscribedCkb, otherWording);
+                  this.table.addRow(allAvailableSubscriptionObjects[i].Type + " " + allAvailableSubscriptionObjects[i].productNumber, subscribedCkb, otherWording);
             }
 
             /*var arr = this.sizeClass.sizeRows;

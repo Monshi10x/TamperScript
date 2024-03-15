@@ -197,19 +197,16 @@ class Production extends SubMenu {
 	async Create(productNo, partIndex) {
 		partIndex = await super.Create(productNo, partIndex);
 
-		if(this.productionTotalEach == "Total") {
-			await AddPart("Production", productNo);
-			partIndex++;
-			await setProductionTime(productNo, partIndex, this.productionTimeMins);
-			await setPartDescription(productNo, partIndex, "[PRODUCTION]");
-			await savePart(productNo, partIndex);
-		} else {
-			await AddPart("Production (ea)", productNo);
-			partIndex++;
-			await setProductionTime(productNo, partIndex, this.productionTimeMins);
-			await setPartDescription(productNo, partIndex, "[PRODUCTION]");
-			await savePart(productNo, partIndex);
-		}
+		if(!this.required) return partIndex;
+
+		if(this.productionTotalEach == "Total") await AddPart("Production", productNo);
+		else await AddPart("Production (ea)", productNo);
+
+		partIndex++;
+		await setPartQty(productNo, partIndex, this.qty);
+		await setProductionTime(productNo, partIndex, this.productionTimeMins);
+		await setPartDescription(productNo, partIndex, "[PRODUCTION] " + this.headerName);
+		await savePart(productNo, partIndex);
 
 		return partIndex;
 	}

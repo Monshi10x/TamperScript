@@ -51,23 +51,24 @@ class Artwork extends SubMenu {
 	}
 
 	async Create(productNo, partIndex) {
-		if(this.required) {
-			if(this.artworkCreateInNewItem) {
-				await AddQuickProduct(" ARTWORK, PROOFING & CONVERSION TO PRINT READY FORMAT- Signage");
-				productNo = getNumProducts();
-				var newPartIndex = 1;
-				await openPart(productNo, newPartIndex);
-				await setArtworkTime(productNo, newPartIndex, this.artworkTimeMins);
-				await setPartDescription(productNo, newPartIndex, "[ARTWORK]");
-				await savePart(productNo, newPartIndex);
-				return partIndex; //return old partIndex still
-			}
-			await AddPart("Artwork and Print Files", productNo);
-			partIndex++;
-			await setArtworkTime(productNo, partIndex, this.artworkTimeMins);
-			await setPartDescription(productNo, partIndex, "[ARTWORK]");
-			await savePart(productNo, partIndex);
+		if(!this.required) return partIndex;
+
+		if(this.artworkCreateInNewItem) {
+			await AddQuickProduct(" ARTWORK, PROOFING & CONVERSION TO PRINT READY FORMAT- Signage");
+			productNo = getNumProducts();
+			var newPartIndex = 1;
+			await openPart(productNo, newPartIndex);
+			await setArtworkTime(productNo, newPartIndex, this.artworkTimeMins);
+			await setPartDescription(productNo, newPartIndex, "[ARTWORK]");
+			await savePart(productNo, newPartIndex);
+			return partIndex; //return old partIndex still
 		}
+		await AddPart("Artwork and Print Files", productNo);
+		partIndex++;
+		await setArtworkTime(productNo, partIndex, this.artworkTimeMins);
+		await setPartDescription(productNo, partIndex, "[ARTWORK]");
+		await savePart(productNo, partIndex);
+
 		return partIndex;
 	}
 

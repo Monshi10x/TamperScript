@@ -35,7 +35,7 @@ class DragZoomCanvas {
 
       constructor(canvasWidth, canvasHeight, drawFunction, parentToAppendTo) {
             this.#canvas = document.createElement('canvas');
-            this.#canvas.style = "z-index:2000; outline: 2px solid #000;outline-offset:-2px;display:block;box-sizing: border-box;";
+            this.#canvas.style = "z-index:2000; outline: 2px solid #000;outline-offset:-2px;display:block;box-sizing: border-box;max-width: 100%";
 
             this.canvasWidth = canvasWidth;
             this.canvasHeight = canvasHeight;
@@ -101,27 +101,27 @@ class DragZoomCanvas {
       updateOriginToMouseOffset(e) {
             if(this.#constrainGrabToCanvasBounds) {
                   this.#originToMouseOffset = {
-                        x: clamp(e.clientX - this.canvas.getBoundingClientRect().x, 0, this.#canvas.width) - this.#xOffset,
-                        y: clamp(e.clientY - this.canvas.getBoundingClientRect().y, 0, this.#canvas.height) - this.#yOffset
+                        x: (clamp(e.clientX - this.canvas.getBoundingClientRect().x, 0, this.#canvas.width) - this.#xOffset),
+                        y: (clamp(e.clientY - this.canvas.getBoundingClientRect().y, 0, this.#canvas.height) - this.#yOffset)
                   };
             } else {
                   this.#originToMouseOffset = {
-                        x: (e.clientX - this.canvas.getBoundingClientRect().x) - this.#xOffset,
-                        y: (e.clientY - this.canvas.getBoundingClientRect().y) - this.#yOffset
+                        x: ((e.clientX - this.canvas.getBoundingClientRect().x) - this.#xOffset),
+                        y: ((e.clientY - this.canvas.getBoundingClientRect().y) - this.#yOffset)
                   };
             }
             return this.#originToMouseOffset;
       }
 
       onMouseDown(e) {
-            this.#canvas.style.cursor = "auto";
+            this.#canvas.style.cursor = "grabbing";
             this.#holding = true;
             this.updateMouseXY(e);
             this.updateOriginToMouseOffset(e);
       }
 
       onMouseUp(e) {
-            this.#canvas.style.cursor = "grab";
+            this.#canvas.style.cursor = "auto";
             this.#holding = false;
       }
 
@@ -131,12 +131,14 @@ class DragZoomCanvas {
             this.updateMouseXY(e);
 
             const boundingRect = this.#canvas.getBoundingClientRect();
-            const xNode = e.pageX - boundingRect.left;
-            const yNode = e.pageY - boundingRect.top;
+
+            const xNode = (e.pageX - boundingRect.left);
+            const yNode = (e.pageY - boundingRect.top);
 
             const oldScale = this.#scale;
             const newScale = oldScale * Math.exp(-Math.sign(e.deltaY) * this.#scrollSpeed);
-            const scaleFactor = newScale / oldScale;
+
+            const scaleFactor = (newScale) / oldScale;
 
             this.#xOffset = xNode - scaleFactor * (xNode - this.#xOffset);
             this.#yOffset = yNode - scaleFactor * (yNode - this.#yOffset);

@@ -101,4 +101,10 @@ class InstallSubscribable extends Material {
             partIndex = await this.#installItem.Create(productNo, partIndex);
             return partIndex;
       }
+
+      Description() {
+            super.Description();
+
+            return this.#installItem.Description();
+      }
 }

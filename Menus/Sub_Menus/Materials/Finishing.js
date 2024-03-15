@@ -45,6 +45,7 @@ class Finishing extends Material {
       #eyelets_verticalSpacingField;
       #eyelets_spacingAllowanceField;
       #eyelets_offsetFromEdgeField;
+      #eyelets_productionEach;
       #standOffHelper;
       #standOffHelperBtn;
       #customRequired;
@@ -125,16 +126,17 @@ class Finishing extends Material {
                   this.#eyeletsHelper.setSizeArrays(...matrixSizeArrays);
             }, this.container, true);
             this.#eyeletsType = createDropdown_Infield("Eyelets Type", 0, "width:30%;display:none;margin-left:40px;",
-                  [createDropdownOption("Eyelet 20mm", "20,6")], () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container);
+                  [createDropdownOption("Eyelet - 20x10 Silver", "20,10")], () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container);
             this.#eyelets_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 100);
             this.#eyelets_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 100);
             this.#eyelets_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 10);
             this.#eyelets_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 1);
+            this.#eyelets_productionEach = createInput_Infield("Production per eyelet (mins)", 2, "width:400px;display:none", () => {this.UpdateFromChange();}, this.container, true, 1);
 
             makeFieldGroup("Checkbox", this.#eyeletsRequired[1], true, this.#eyeletsQty[0], this.#eyeletsHelperBtn,
                   this.#eyeletsType[0],
                   this.#eyelets_offsetFromEdgeField[0], this.#eyelets_horizontalSpacingField[0], this.#eyelets_verticalSpacingField[0],
-                  this.#eyelets_spacingAllowanceField[0]
+                  this.#eyelets_spacingAllowanceField[0], this.#eyelets_productionEach[0]
             );
 
             this.#pinsRequired = createCheckbox_Infield("Pins (Thread Rod)", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateFromChange();}, this.container, true);
@@ -171,10 +173,9 @@ class Finishing extends Material {
             }, this.container, true);
 
             this.#standOffType = createDropdown_Infield("Stand-off Type", 1, "width:30%;display:none;margin-left:40px;",
-                  [createDropdownOption("Standoff 19w 25D", "19,25"),
-                  createDropdownOption("Standoff 25w 25D", "25,25"),
-                  createDropdownOption("Standoff 25w 50D", "25,50"),
-                  createDropdownOption("Standoff 32w 50D", "32,50")], () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container);
+                  [createDropdownOption("Standoff - 19x19 Satin Silver", "19,19"),
+                  createDropdownOption("Standoff - 19x25 Satin Silver", "19,25"),
+                  createDropdownOption("Standoff - 19x50 Satin Silver", "19,50")], () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container);
             this.#standoff_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 100);
             this.#standoff_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 100);
             this.#standoff_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 10);
@@ -202,6 +203,7 @@ class Finishing extends Material {
             this.#productionHeader = createHeadingStyle1("Production", null, this.container);
             this.#production = new Production(this.container, null, function() { }, this.sizeClass);
             this.#production.showContainerDiv = true;
+            this.#production.headerName = "Finishing Production";
             this.#production.productionTime = 20;
             this.#production.required = true;
             this.#production.showRequiredCkb = false;
@@ -323,7 +325,46 @@ class Finishing extends Material {
       }
 
       async Create(productNo, partIndex) {
-            partIndex = super.Create(productNo, partIndex);
+            partIndex = await super.Create(productNo, partIndex);
+
+            if(this.#eyeletsRequired[1].checked) {
+                  partIndex = await q_AddPart_Dimensionless(productNo, partIndex, true, this.#eyeletsType[1].selectedOptions[0].innerText, this.#eyeletsQty[1].value, this.#eyeletsType[1].selectedOptions[0].innerText, "", false);
+            } if(this.#customRequired[1].checked) {
+                  await AddPart("Custom Item Cost-Markup (Ea)", productNo);
+                  partIndex++;
+                  await setPartQty(productNo, partIndex, this.#customQty[1].value);
+                  await setPartDescription(productNo, partIndex, "Supplier Cuts from " + this.#customDescription[1].value);
+                  await setPartVendorCostEa(productNo, partIndex, this.#customCost[1].value);
+                  await setPartMarkupEa(productNo, partIndex, this.#customMarkup[1].value);
+                  await savePart(productNo, partIndex);
+            } if(this.#standOffRequired[1].checked) {
+                  partIndex = await q_AddPart_Dimensionless(productNo, partIndex, true, this.#standOffType[1].selectedOptions[0].innerText, this.#standOffQty[1].value, this.#standOffType[1].selectedOptions[0].innerText, "", false);
+            } if(this.#pinsRequired[1].checked) {
+                  alert("todo pins");
+            }
+
+            partIndex = await this.#production.Create(productNo, partIndex);
+
             return partIndex;
+      }
+
+      Description() {
+            super.Description();
+
+            let desc = "";
+            if(this.#eyeletsRequired[1].checked) {
+                  desc += "Includes x" + this.#eyeletsQty[1].value + " Eyelets: " + this.#eyeletsType[1].selectedOptions[0].innerText.replace('Eyelet - ', '');
+            } if(this.#customRequired[1].checked) {
+                  desc += "<br>";
+                  desc += "Includes Custom: ";
+            } if(this.#standOffRequired[1].checked) {
+                  desc += "<br>";
+                  desc += "Includes x" + this.#standOffQty[1].value + " Stand-offs: " + this.#standOffType[1].selectedOptions[0].innerText.replace('Standoff - ', '');
+            } if(this.#pinsRequired[1].checked) {
+                  desc += "<br>";
+                  desc += "Includes Pins: ";
+            }
+
+            return desc;
       }
 }

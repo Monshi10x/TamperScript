@@ -328,6 +328,6 @@ class Router extends SubMenu {
 	}
 
 	Description() {
-
+		return "";
 	}
 }

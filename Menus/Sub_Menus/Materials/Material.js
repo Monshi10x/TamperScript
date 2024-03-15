@@ -12,10 +12,10 @@ class Material extends SubscriptionManager {
       #typeLabel;
       get typeLabel() {return this.#typeLabel;}
 
-      #easyNameLabel;
-      #easyName = -1;
-      get easyName() {return this.#easyName;}
-      set easyName(value) {this.#easyName = value; this.#easyNameLabel.innerText = value;}
+      #productNumberLabel;
+      #productNumber = -1;
+      get productNumber() {return this.#productNumber;}
+      set productNumber(value) {this.#productNumber = value; this.#productNumberLabel.innerText = value;}
 
       #subscribedToLabel;
       #subscriptionsContainer;
@@ -62,13 +62,13 @@ class Material extends SubscriptionManager {
                   ";border:2px solid;border-color: black;margin:8px;box-shadow: rgb(0 0 0 / 80%) 3px 4px 10px 0px;padding:0px;overflow:hidden;box-sizing: border-box";
             parentContainer.appendChild(this.#container);
 
-            this.#easyNameLabel = createButton(this.easyName, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
+            this.#productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
-                        this.easyName = modal.value;
+                        this.productNumber = modal.value;
                         console.log(modal.value);
-                        this.onEasyNameChange();
+                        this.onproductNumberChange();
                   });
-                  modal.value = this.easyName;
+                  modal.value = this.productNumber;
             }, this.#container);
 
             this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:150px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", this.#container);
@@ -148,9 +148,9 @@ class Material extends SubscriptionManager {
 
                   let subSlot = document.createElement("div");
                   subSlot.style = "width:20px;position:relative;height:100%;box-sizing: border-box;background-color: " + subscription_colour + ";float:left;margin-left:2px;";
-                  subSlot.title = this.subscriptions[i].Type + " " + this.subscriptions[i].easyName;
+                  subSlot.title = this.subscriptions[i].Type + " " + this.subscriptions[i].productNumber;
 
-                  let subSlotText = createText(this.subscriptions[i].easyName, "width:100%;height:100%;padding:2px;padding-top:10px;box-sizing: border-box;color: " + this.subscriptions[i].textColor, subSlot);
+                  let subSlotText = createText(this.subscriptions[i].productNumber, "width:100%;height:100%;padding:2px;padding-top:10px;box-sizing: border-box;color: " + this.subscriptions[i].textColor, subSlot);
 
                   this.#subscriptionsContainer.appendChild(subSlot);
             }
@@ -224,7 +224,7 @@ class Material extends SubscriptionManager {
             else this.Maximize();
       }
 
-      onEasyNameChange() {
+      onproductNumberChange() {
             this.UpdateFromChange();
       }
 
@@ -235,4 +235,7 @@ class Material extends SubscriptionManager {
             return partIndex;
       }
 
+      Description() {
+            return "";
+      }
 }

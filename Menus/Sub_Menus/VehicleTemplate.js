@@ -242,16 +242,16 @@ class VehicleTemplate extends SubMenu {
             if(this.required) {
                   var rows = this.l_itemsContainer.querySelectorAll("#rowContainer");
                   for(let i = 0; i < rows.length; i++) {
-                        var includesPanelYN = VehicleBuilder_Template.container.querySelectorAll("#rowContainer")[i].querySelectorAll("#panel").length > 0;
+                        var includesPanelYN = VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelectorAll("#panel").length > 0;
                         this.rowObjects.push({
-                              description: VehicleBuilder_Template.container.querySelectorAll("#rowContainer")[i].querySelector("#description").value,
-                              width: VehicleBuilder_Template.container.querySelectorAll("#rowContainer")[i].querySelector("#width").value,
-                              height: VehicleBuilder_Template.container.querySelectorAll("#rowContainer")[i].querySelector("#height").value,
-                              quantity: VehicleBuilder_Template.container.querySelectorAll("#rowContainer")[i].querySelector("#quantity").value,
-                              vinyl: VehicleBuilder_Template.container.querySelectorAll("#rowContainer")[i].querySelector("#vinyl").value,
-                              laminate: VehicleBuilder_Template.container.querySelectorAll("#rowContainer")[i].querySelector("#laminate").value,
-                              appTape: VehicleBuilder_Template.container.querySelectorAll("#rowContainer")[i].querySelector("#tape").value,
-                              includesPanel: VehicleBuilder_Template.container.querySelectorAll("#rowContainer")[i].querySelectorAll("#panel").length > 0,
+                              description: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#description").value,
+                              width: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#width").value,
+                              height: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#height").value,
+                              quantity: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#quantity").value,
+                              vinyl: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#vinyl").value,
+                              laminate: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#laminate").value,
+                              appTape: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#tape").value,
+                              includesPanel: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelectorAll("#panel").length > 0,
                               panel: (includesPanelYN ? ACMLookup["Standard Primer"] : false)
                         });
                         var uniqueItem = {};

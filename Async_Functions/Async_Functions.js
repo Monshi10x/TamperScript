@@ -338,6 +338,10 @@ function getPredefinedParts_Name_FromLimitedName(searchName) {
     }
 }
 
+function getPredefinedParts_Name_FromContains(searchName, ...args) {
+    alert("not ready");
+}
+
 async function getPart_HighDetail(partId) {
     const response = await fetch("https://sar10686.corebridge.net/Api/OrderEntryProducts/GetProductPart?partId=" + partId + "", {
         "headers": {
@@ -360,6 +364,11 @@ async function getPart_HighDetail(partId) {
     });
     const data = await response.json();
     return data.PartView;
+}
+
+async function getPart_HighDetail2(searchName) {
+    var partId = $.grep(predefinedParts_Name_Id, function(obj) {return obj.key === searchName;})[0].value;
+    return await getPart_HighDetail(partId);
 }
 
 async function AddQuickProduct(name) {
@@ -1120,6 +1129,7 @@ async function q_AddPart_Dimensionless(productNo, partNo, newOrEdit, partName, p
     if(partInnerText) await setPartText(productNo, partNo, partInnerText);
     if(tickSelectedTF) await tickSelected(productNo, partNo, tickSelectedTF);
     await savePart(productNo, partNo);
+    return partNo;
 }
 
 //ROUTER
@@ -1544,22 +1554,22 @@ var Field = {
         return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_479";
     },
     RouterSetupTimeEach: function(productNo, partNo) {
-        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_482";
+        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_543";
     },
     RouterSetupOnceOff: function(productNo, partNo) {
-        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_485";
+        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_546";
     },
     RouterRunTimeTotal: function(productNo, partNo) {
         return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_480";
     },
     RouterRunTimeEach: function(productNo, partNo) {
-        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_483";
+        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_544";
     },
     RouterPostJobTimeTotal: function(productNo, partNo) {
         return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_481";
     },
     RouterPostJobTimeEach: function(productNo, partNo) {
-        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_484";
+        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_545";
     },
     //--------SAVE PART-------//
     SavePartBtn: function(productNo, partNo) {

@@ -105,13 +105,14 @@ class MenuPanelSigns extends LHSMenuWindow {
 			/**@AddFullSuite */
 			let addFullSuiteBtn = createButton("Add Blank Product", "width:200px;height:30px;", () => {this.#addFullSuite();}, this.page1);
 
-			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:250px;", 80, false,
+			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:250px;", 100, false,
 				[["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
 				["Lightbox Face - Opal Acrylic", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv2ViepnkaCu6NWbWfFrDPb0nNn7SBQ9r7oQ&usqp=CAU"],
-				["Clear Acrylic", "https://www.imagojuniors.com/assets/imgs/ff/private-shoots/Sandwich/L2.jpg"],
+				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
 				["Foam PVC", "https://5.imimg.com/data5/RN/UM/MY-14219350/white-pvc-foam-sheet-500x500.jpg"],
 				["Signwhite", "https://img.archiexpo.com/images_ae/photo-g/158002-12419012.jpg"],
-				["Corflute", "https://cdn11.bigcommerce.com/s-iu4x16wosu/images/stencil/1280x1280/products/238/555/thFJ8AB8FS__51355.1563671713.jpg?c=2"]],
+				["Corflute", "https://cdn11.bigcommerce.com/s-iu4x16wosu/images/stencil/1280x1280/products/238/555/thFJ8AB8FS__51355.1563671713.jpg?c=2"],
+				["Wall Graphics", "https://cdn.gorilladash.com/images/media/6161323/signarama-australia-img-3113-thumbnail-638306a183cd0.jpg"]],
 				() => {this.#addQuickTemplate();},
 				this.page1, false
 			);
@@ -119,7 +120,6 @@ class MenuPanelSigns extends LHSMenuWindow {
 			this.#viewMode = createDropdown_Infield('View Mode', 0, "width:150px;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product")], () => {this.#updateViewMode();}, this.page1);
 
 			this.#numProducts = getNumProducts() - 1;
-			//this.#addFullSuite();
 		});
 
 		this.#createProductBtn = createButton("Create Product   " + "\u25BA", "width:100%;margin:0px;", () => {this.CreateProduct(this);});
@@ -206,6 +206,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.finish = "Clear";
 				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
 				vinyl.material = VinylLookup["Clear"];
+				vinyl.bleedDropdown = "Reverse Acrylics";
 				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
 				laminate.material = VinylLookup["Whiteback"];
 				appTape = null;
@@ -290,6 +291,29 @@ class MenuPanelSigns extends LHSMenuWindow {
 				artwork.artworkItem.artworkTime = 60;
 				install = this.#add(InstallSubscribable, "INSTALL", this.page1, [Sheet]);
 				break;
+			case "Wall Graphics":
+				size = this.#add(Size2, "SIZE2", this.page1, []);
+				size.width = 1000;
+				size.height = 1000;
+
+				productDetails = this.#add(ProductDetails, "PRODUCT DETAILS", this.page1, [Size2]);
+				productDetails.productLocation = "";
+				productDetails.productName = "Vinyl Wall Graphics";
+
+				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Size2]);
+				vinyl.material = VinylLookup["High Tack"];
+				vinyl.bleedDropdown = "Wall Graphics";
+				vinyl.isJoinHorizontal = false;
+
+				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
+				laminate.material = LaminateLookup["Satin"];
+				appTape = null;
+				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
+				production = null;
+				artwork = this.#add(ArtworkSubscribable, "ARTWORK", this.page1, [Size2]);
+				artwork.artworkItem.artworkTime = 60;
+				install = this.#add(InstallSubscribable, "INSTALL", this.page1, [Size2]);
+				break;
 			default:
 				break;
 		}
@@ -314,7 +338,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 	#add(classType, headingText = "", container, subscribeToClasses = []) {
 		let newItem = new classType(container, this, headingText);
-		newItem.easyName = this.#getEasyName(classType);
+		newItem.productNumber = this.#getproductNumber(classType);
 
 		for(let x = 0; x < subscribeToClasses.length; x++) {
 			objectLoop:
@@ -341,7 +365,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 		this.#updateFromChange();
 	}
 
-	#getEasyName(classType) {
+	#getproductNumber(classType) {
 		return this.#numProducts;
 	}
 
@@ -361,7 +385,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 		for(let i = 0; i < this.#allMaterials.length; i++) {
 			if(this.#allMaterials[i].constructor.name == className) {
 				counter++;
-				this.#allMaterials[i].easyName = counter;
+				this.#allMaterials[i].productNumber = counter;
 			}
 		}
 	}
@@ -373,12 +397,22 @@ class MenuPanelSigns extends LHSMenuWindow {
 		for(let i = 0; i < this.#allMaterials.length; i++) {
 			if(this.#allMaterials[i] == materialObject) {
 				this.#allMaterials.splice(i, 1);
-				//materialObject.Delete();
 				break;
 			}
 		}
-		//this.#renameAllMaterialInstancesOfClass(type);
 		this.#updateFromChange();
+	}
+
+	DeleteProduct(productNumber) {
+		let materials = this.#allMaterials;
+		let productContainer;
+		for(let i = 0; i < materials.length; i++) {
+			if(materials[i].productNumber == productNumber) {
+				materials[i].Delete();
+				i--;
+			}
+		}
+		this.#updateViewMode();
 	}
 
 	#updateFromChange() { }
@@ -415,7 +449,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 			for(let i = 0; i < creationOrder.length; i++) {
 				this.#containers.push(new UIContainerType3("max-height:450px;", creationOrder[i].DISPLAY_NAME, this.page1));
-				let addBtn = createButton("Add +", "width:20%", () => {
+				createButton("Add +", "width:20%", () => {
 					this.#addBlank(creationOrder[i], creationOrder[i].DISPLAY_NAME, this.#containers[i].contentContainer);
 				}, this.#containers[i].contentContainer);
 			}
@@ -433,29 +467,31 @@ class MenuPanelSigns extends LHSMenuWindow {
 				}
 			}
 		} else if(this.#viewMode[1].value == "Per Product") {
+			let uniqueProductNumbers = [];
 			this.#productContainers = [];
-			for(let x = 0; x < this.#numProducts; x++) {
-				this.#productContainers.push(new UIContainerType3("max-height:450px;", "PRODUCT " + (x + 1), this.page1));
+
+			for(let i = 0; i < this.#allMaterials.length; i++) {
+				let item = this.#allMaterials[i];
+				//make unique list of product numbers
+				if(!uniqueProductNumbers.includes(item.productNumber)) uniqueProductNumbers.push(item.productNumber);
 			}
+			uniqueProductNumbers.sort((a, b) => a - b);
 
-			let uniqueItems = this.#allMaterials.uniqueArrayElements("Type");
-			for(let i = 0; i < uniqueItems.length; i++) {
+			for(let i = 0; i < uniqueProductNumbers.length; i++) {
+				let currentProductNumber = uniqueProductNumbers[i];
+				//create product container
+				let newProductContainer = new UIContainerType3("max-height:450px;", "PRODUCT " + uniqueProductNumbers[i], this.page1);
+				newProductContainer.addHeadingButtons(createButton("x", "width:30px;height:30px;margin:0px;border:none;padding:2px;min-height:30px;float:right;background-color:" + COLOUR.Red + ";", () => {this.DeleteProduct(currentProductNumber);}, null));
+				this.#productContainers.push(newProductContainer);
 
-				let similarItems = this.#allMaterials.similarElements(uniqueItems[i], "Type");
-				for(let j = 0; j < similarItems.length; j++) {
-					let item = similarItems[j];
-					let itemProductIndex = item.easyName - 1;
+				//add items to it
+				for(let j = 0; j < this.#allMaterials.length; j++) {
+					let item = this.#allMaterials[j];
 					let itemContainer = item.container;
 
-					//if misc items
-					if(item.easyName < 1) {
-						if(this.#productContainers.length <= this.#numProducts) {
-							this.#productContainers.push(new UIContainerType3("max-height:450px;", "MISC", this.page1));
-						}
-						this.#productContainers[this.#productContainers.length - 1].contentContainer.appendChild(itemContainer);
-					} else {
-						this.#productContainers[itemProductIndex].contentContainer.appendChild(itemContainer);
-					}
+					if(item.productNumber != currentProductNumber) continue;
+
+					newProductContainer.contentContainer.appendChild(itemContainer);
 				}
 			}
 		} else {
@@ -469,17 +505,35 @@ class MenuPanelSigns extends LHSMenuWindow {
 		let pNo = 0;
 		let productNo = 0;
 		let partIndex = 0;
+		let productDescription = "";
+
+		let uniqueProductNumbers = [];
 		for(let i = 0; i < this.#allMaterials.length; i++) {
-			let productNumber = this.#allMaterials[i].easyName;
-			if(productNumber > pNo) {
-				pNo = productNumber;
-				await AddBlankProduct();
-				partIndex = 0;
-				productNo = getNumProducts();
+			let item = this.#allMaterials[i];
+			//make unique list of product numbers
+			if(!uniqueProductNumbers.includes(item.productNumber)) uniqueProductNumbers.push(item.productNumber);
+		}
+		uniqueProductNumbers.sort((a, b) => a - b);
+
+		for(let i = 0; i < uniqueProductNumbers.length; i++) {
+			let currentProductNumber = uniqueProductNumbers[i];
+
+			await AddBlankProduct();
+			productNo = getNumProducts();
+			partIndex = 0;
+
+			for(let j = 0; j < this.#allMaterials.length; j++) {
+				let item = this.#allMaterials[j];
+				if(item.productNumber != currentProductNumber) continue;
+
+				partIndex = await item.Create(productNo, partIndex);
+				if(item.Description() != "") productDescription += item.Description() + "<br>";
 			}
 
-			partIndex = await this.#allMaterials[i].Create(productNo, partIndex);
+			await setProductSummary(productNo, productDescription);
+			productDescription = "";
 		}
+
 		Ordui.Alert("done");
 	}
 }

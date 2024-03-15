@@ -120,6 +120,7 @@ class PrintMounting extends Material {
             this.#production = new Production(this.container, null, function() { }, this.sizeClass);
             this.#production.showContainerDiv = true;
             this.#production.productionTime = 20;
+            this.#production.headerName = "Print Mounting";
             this.#production.required = true;
             this.#production.showRequiredCkb = false;
             this.#production.requiredName = "Production Time";
@@ -261,6 +262,7 @@ class PrintMounting extends Material {
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
+            partIndex = await this.#production.Create(productNo, partIndex);
             return partIndex;
       }
 }

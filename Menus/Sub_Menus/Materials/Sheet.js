@@ -64,7 +64,6 @@ class Sheet extends Material {
        *           [1, 240, 580, 2, select, 2, 1640]]
        */
       #outputSizeTableData = [];
-      #outputSizes = [];
 
       #supplierCuts;
       #filtersHeader;
@@ -167,8 +166,6 @@ class Sheet extends Material {
             this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters('Sheet Size');}, this.container);
             this.#sheetSize[1].id = "Sheet Size";
 
-            this.#flip = createCheckbox_Infield("Flip", this.#flipSheet, "width:150px", () => {this.#flipSheet = this.#flip[1].checked; this.UpdateFromChange();}, this.container, true);
-
             this.#updateOrderBtn = createIconButton("https://cdn.gorilladash.com/images/media/6144512/signarama-australia-icons8-numeric-50-635d113e9382c.png", "Set Order", "width: 120px; height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
                   let items = this.#filterOrder;
                   items.shift();
@@ -181,17 +178,10 @@ class Sheet extends Material {
             /**
              * @Visualiser
              */
+
             this.#joinHelperHeader = createHeadingStyle1("Joins", null, this.container);
 
-            let methodContainer = createDivStyle4("width:40%;", this.container);
-            let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
-            let methodText = createText("Join Method", null, methodContainer);
-            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
-            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
-
-            checkboxesAddToSelectionGroup(true, this.#method1, this.#method2);
-
-            this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;", () => {
+            this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:40%;margin-right:55%;height:40px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#visualiser = new ModalSheetJoins("Join Helper", 100, () => {
                         this.#visualiser.Close();
                         this.UpdateFromChange();
@@ -203,8 +193,32 @@ class Sheet extends Material {
                   this.#visualiser.width = this.getQWH().width;
                   this.#visualiser.height = this.getQWH().height;
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
-
             }, this.container, true);
+
+            let flipDiagram;
+            this.#flip = createCheckbox_Infield("Flip", this.#flipSheet, "width:150px;margin-left:10px;", () => {
+                  this.#flipSheet = this.#flip[1].checked;
+                  if(this.#flipSheet) {
+                        flipDiagram.style.marginTop = "0px";
+                        flipDiagram.style.height = "30px";
+                        flipDiagram.style.width = "10px";
+                  } else {
+                        flipDiagram.style.marginTop = "10px";
+                        flipDiagram.style.height = "10px";
+                        flipDiagram.style.width = "30px";
+                  }
+                  this.UpdateFromChange();
+            }, this.container, true);
+            flipDiagram = createDiv("background-color:yellow;width:30px;height:10px;margin-top:10px;", null, this.#flip[0]);
+
+
+            let methodContainer = createDivStyle4("width:40%;margin-right:50%;", this.container);
+            let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
+            let methodText = createText("Join Method", null, methodContainer);
+            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
+            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
+
+            checkboxesAddToSelectionGroup(true, this.#method1, this.#method2);
 
             /**
              * @FinalOutputSizes
@@ -257,21 +271,6 @@ class Sheet extends Material {
             this.#cutByHandProduction.showRequiredCkb = true;
             this.#cutByHandProduction.requiredName = "Required";
             this.#cutByHandProduction.SubscribeTo(this);
-
-            /**
-             * @Finishing
-             */
-            this.#finishingHeader = createHeadingStyle1("Finishing", null, this.container);
-
-            this.#finishingProduction = new Production(this.container, null, function() { }, null);
-            this.#finishingProduction.showContainerDiv = true;
-            this.#finishingProduction.headerName = "Finishing Production";
-            this.#finishingProduction.productionTime = 0;
-            this.#finishingProduction.required = false;
-            this.#finishingProduction.showRequiredCkb = true;
-            this.#finishingProduction.requiredName = "Required";
-            this.#finishingProduction.SubscribeTo(this);
-
 
             /**
              * @Updates
@@ -365,7 +364,6 @@ class Sheet extends Material {
        */
 
       UpdateOutputTable = () => {
-            this.#outputSizes = [];
             this.#outputSizeTable.deleteAllRows();
             this.#outputSizeTableData = [];
 
@@ -895,6 +893,23 @@ class Sheet extends Material {
             partIndex = await super.Create(productNo, partIndex);
             var name = this.#material[1].value + " - (sqm) - " + this.#finish[1].value + " " + this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", "") + "x" + this.#thickness[1].value;
             var partFullName = getPredefinedParts_Name_FromLimitedName(name);
+
+            for(let i = 0; i < this.#outputSizeTableData.length; i++) {
+                  let [partQty, partWidth, partHeight, aaa, aab, aac, aad] = this.#outputSizeTableData[i];
+                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, "", false);
+            }
+
+            partIndex = await this.#guillotineProduction.Create(productNo, partIndex);
+            partIndex = await this.#router.Create(productNo, partIndex);
+            partIndex = await this.#supplierCuts.Create(productNo, partIndex);
+            partIndex = await this.#cutByHandProduction.Create(productNo, partIndex);
+
             return partIndex;
+      }
+
+      Description() {
+            super.Description();
+
+            return this.#thickness[1].value + "mm " + this.#finish[1].value + " finish " + this.#material[1].value + " panel";
       }
 }

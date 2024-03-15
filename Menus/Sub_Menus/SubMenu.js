@@ -41,6 +41,7 @@ class SubMenu extends SubscriptionManager {
       removeContainerStyles = () => {this.#container.container.style = "";};
 
       set headerName(value) {this.header.innerText = value; this.#headerText = value;}
+      get headerName() {return this.#headerText;}
       set showHeader(value) {setFieldHidden(value, this.header);}
       get header() {return this.#container.headingText;}
 

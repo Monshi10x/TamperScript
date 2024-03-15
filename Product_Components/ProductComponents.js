@@ -69,6 +69,9 @@ function partInfoTick() {
 		if(products[product].querySelectorAll(".addBreakBtn").length == 0) {
 			createAddBreakBtn(products[product].querySelector(".ord-prod-footer"), "addBreakBtn", product + 1, products[product]);
 		}
+		if(products[product].querySelectorAll(".addMissingBtn").length == 0) {
+			createAddMissingBtn(products[product].querySelector(".ord-prod-footer"), "addMissingBtn", product + 1, products[product]);
+		}
 
 		//******************************//
 		//            PART              //
@@ -117,6 +120,8 @@ function partInfoTick() {
 			}
 			if(koPartDescription.includes("@")) {
 				parts[part].querySelector(".ord-prod-part-header").style.backgroundColor = COLOUR.Yellow;
+			} else if(koPartDescription.includes("?")) {
+				parts[part].querySelector(".ord-prod-part-header").style.backgroundColor = COLOUR.Red;
 			} else {
 				parts[part].querySelector(".ord-prod-part-header").style.backgroundColor = "#eee";
 			}
@@ -426,7 +431,7 @@ function partInfoTick() {
 	}
 	function createAddKitBtn(partInstance, classN, productIndex, productInstance) {
 		var div = document.createElement("div");
-		div.style = "float: left; background-color: white;margin:0px;margin-left:10px;padding:2px;font-size:11px;";
+		div.style = "float: left; background-color: none;margin:0px;margin-left:10px;padding:2px;font-size:11px;";
 
 		var dropdown = createDropdown("Add Kit", 0, STYLE.Button, null);
 		dropdown.style = STYLE.Button + "width: 120px;margin:0px;font-size:11px;";
@@ -594,11 +599,23 @@ function partInfoTick() {
 	}
 
 	function createAddBreakBtn(partInstance, classN, productIndex, productInstance) {
-		let btn = createButton("@", "width:80px;height:31px;padding:0px;margin:2px;margin-left:10px;font-size:11px;", async function() {
+		let btn = createButton("@", "width:50px;height:31px;padding:0px;margin:2px;margin-left:10px;font-size:11px;", async function() {
 			var l_ProductIndex = getProductIndexFromRealNo(ko.contextFor(productInstance).$data.Index);
 			await AddPart("No Cost Part", l_ProductIndex);
 			var partIndex = getNumPartsInProduct(l_ProductIndex);
 			await setPartDescription(l_ProductIndex, partIndex, "@");
+			await savePart(l_ProductIndex, partIndex);
+			await ClosePartBtn(l_ProductIndex);
+		}, partInstance);
+		btn.className = classN;
+	}
+
+	function createAddMissingBtn(partInstance, classN, productIndex, productInstance) {
+		let btn = createButton("?", "width:50px;height:31px;padding:0px;margin:2px;margin-left:10px;font-size:11px;", async function() {
+			var l_ProductIndex = getProductIndexFromRealNo(ko.contextFor(productInstance).$data.Index);
+			await AddPart("No Cost Part", l_ProductIndex);
+			var partIndex = getNumPartsInProduct(l_ProductIndex);
+			await setPartDescription(l_ProductIndex, partIndex, "?");
 			await savePart(l_ProductIndex, partIndex);
 			await ClosePartBtn(l_ProductIndex);
 		}, partInstance);
@@ -685,7 +702,6 @@ var copyPartModal_Container_RHS_NewBlankProduct;
 var copyPartModal_Container_Top;
 var copyPartModal_Container_CopyBtn;
 var copyPartModal_Container_CloseBtn;
-
 function createCopyPartModal() {
 	copyPartModal_Container = document.createElement('div');
 	copyPartModal_Container.style = "display:none; width:800px;height:600px;background-color:#ddd;border:3px solid #999; position: fixed; top: 50%; left: 50%;z-index:1000;margin-top: -300px; margin-left: -400px";

@@ -109,10 +109,10 @@ class Size2 extends SubscriptionManager {
       #UNIQUEID = generateUniqueID();
       get ID() {return this.#Type + "-" + this.#UNIQUEID;}
 
-      #easyNameLabel;
-      #easyName = -1;
-      get easyName() {return this.#easyName;}
-      set easyName(value) {this.#easyName = value; this.#easyNameLabel.innerText = value;}
+      #productNumberLabel;
+      #productNumber = -1;
+      get productNumber() {return this.#productNumber;}
+      set productNumber(value) {this.#productNumber = value; this.#productNumberLabel.innerText = value;}
 
       #typeLabel;
       get typeLabel() {return this.#typeLabel;}
@@ -170,13 +170,13 @@ class Size2 extends SubscriptionManager {
                   ";border:2px solid;border-color: black;margin:8px;box-shadow: rgb(0 0 0 / 80%) 3px 4px 10px 0px;padding:0px;overflow:hidden;box-sizing: border-box;";
             parentContainer.appendChild(this.#container);
 
-            this.#easyNameLabel = createButton(this.easyName, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
+            this.#productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
-                        this.easyName = modal.value;
+                        this.productNumber = modal.value;
                         console.log(modal.value);
-                        this.onEasyNameChange();
+                        this.onproductNumberChange();
                   });
-                  modal.value = this.easyName;
+                  modal.value = this.productNumber;
             }, this.#container);
 
             this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;border:1px solid " + this.#backgroundColor + ";", this.#container);
@@ -235,7 +235,7 @@ class Size2 extends SubscriptionManager {
             }, false);
       }
 
-      onEasyNameChange() {
+      onproductNumberChange() {
             this.UpdateFromChange();
       }
 
@@ -253,5 +253,9 @@ class Size2 extends SubscriptionManager {
        */
       async Create(productNo, partIndex) {
             return partIndex;
+      }
+
+      Description() {
+            return "";
       }
 }

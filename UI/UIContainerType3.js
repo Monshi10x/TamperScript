@@ -103,4 +103,12 @@ class UIContainerType3 {
             this.#container.style = STYLE.Div3;
       }
 
+      #addedHeadingItems_combinedWidth = 0;
+      addHeadingButtons(...itemContainers) {
+            for(let i = 0; i < itemContainers.length; i++) {
+                  this.#headingContainer.appendChild(itemContainers[i]);
+                  this.#addedHeadingItems_combinedWidth += itemContainers[i].offsetWidth;
+            }
+            this.#headingText.style.width = "calc(100% - " + (this.#addedHeadingItems_combinedWidth + this.#minimizeBtn_Width + this.#popOutBtn_Width) + "px";
+      }
 }

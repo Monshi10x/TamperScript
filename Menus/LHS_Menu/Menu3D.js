@@ -77,6 +77,7 @@ class Menu3D extends LHSMenuWindow {
                   });
                   this.subType = createDropdown_Infield_Icons_Search("Sub Type", 0, "margin-left:50px;width:70%;", 100, false, subTypeOptions, () => { }, this.typeContainer);
 
+                  //this.faceMaterial = document.createElement("div");
                   this.sizeComponent = new Size(page, null);
                   //this.sizeComponent.container.style = "";
                   //sizeContainer.appendChild(this.faceMaterial);

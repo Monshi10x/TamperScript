@@ -90,7 +90,13 @@ class ProductDetails extends Material {
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
-            await setProductName(productNo, this.#productLocationField[1].value + " " + this.#productNameField[1].value);
+            await setProductName(productNo, "[" + this.#productLocationField[1].value + "] " + this.#productNameField[1].value);
             return partIndex;
+      }
+
+      Description() {
+            //todo: if show sizes in wording
+            if(this.#includeSizeInWording[1].checked) return "x" + this.qty + " @ " + this.width + "mmW x " + this.height + "mmH";
+            else return "";
       }
 }

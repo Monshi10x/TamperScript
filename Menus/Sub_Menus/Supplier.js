@@ -21,7 +21,15 @@ class Supplier extends SubMenu {
 
       async Create(productNo, partIndex) {
             if(this.required) {
+                  await AddPart("Custom Item Cost-Markup (Ea)", productNo);
+                  partIndex++;
 
+                  await setPartQty(productNo, partIndex, this.#qty[1].value);
+                  await setPartDescription(productNo, partIndex, "Supplier Cuts from " + this.#supplierName[1].value);
+                  await setPartVendorCostEa(productNo, partIndex, this.#cost[1].value);
+                  await setPartMarkupEa(productNo, partIndex, this.#markup[1].value);
+
+                  await savePart(productNo, partIndex);
             }
             return partIndex;
       }

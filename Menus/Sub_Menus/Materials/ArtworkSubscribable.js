@@ -100,4 +100,10 @@ class ArtworkSubscribable extends Material {
             partIndex = await this.#artworkItem.Create(productNo, partIndex);
             return partIndex;
       }
+
+      Description() {
+            super.Description();
+
+            return this.#artworkItem.Description();
+      }
 }

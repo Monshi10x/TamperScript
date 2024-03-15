@@ -97,16 +97,15 @@ class Laminate extends Material {
             this.#outputSizeTable.setHeading("Qty", "Width", "Height");
             this.#outputSizeTable.addRow("-", "-", "-");
 
-            /**
-             * @Production
-             */
-            this.#productionHeader = createHeadingStyle1("Production", null, this.container);
+            /** @Production */
+            createHeadingStyle1("Laminator Production", null, this.container);
             this.#production = new Production(this.container, null, function() { }, this.sizeClass);
             this.#production.showContainerDiv = true;
             this.#production.productionTime = 20;
+            this.#production.headerName = "Laminator Production";
             this.#production.required = true;
             this.#production.showRequiredCkb = false;
-            this.#production.requiredName = "Production Time";
+            this.#production.requiredName = "Required";
 
             this.dataToPushToSubscribers = {
                   parent: this,
@@ -214,6 +213,23 @@ class Laminate extends Material {
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
+            var name = this.#material[1].value;
+            var partFullName = getPredefinedParts_Name_FromLimitedName(name);
+
+            for(let i = 0; i < this.#outputSizes.length; i++) {
+                  let partQty = this.#outputSizes[i].qty;
+                  let partWidth = this.#outputSizes[i].width;
+                  let partHeight = this.#outputSizes[i].height;
+                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, "", false);
+            }
+            partIndex = await this.#production.Create(productNo, partIndex);
+
             return partIndex;
+      }
+
+      Description() {
+            super.Description();
+
+            return "Laminated in " + '___' + " for UV protection and longevity";
       }
 }

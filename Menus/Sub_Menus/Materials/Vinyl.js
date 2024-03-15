@@ -37,10 +37,24 @@ class Vinyl extends Material {
        * @Bleed
        */
       #bleedDropdown;
+      set bleedDropdown(stringValue = "") {
+            for(let i = 0; i < this.#bleedDropdown[1].options.length; i++) {
+                  if(this.#bleedDropdown[1].options[i].text == stringValue) {
+                        this.#bleedDropdown[1].selectedIndex = i;
+                        $(this.#bleedDropdown[1]).change();
+                        break;
+                  }
+                  if(i == this.#bleedDropdown[1].options.length - 1) alert("could not find bleed type");
+            }
+      }
       #bleedTop;
+      set bleedTop(value) {$(this.#bleedTop[1]).val(value).change();}
       #bleedBottom;
+      set bleedBottom(value) {$(this.#bleedBottom[1]).val(value).change();}
       #bleedLeft;
+      set bleedLeft(value) {$(this.#bleedLeft[1]).val(value).change();}
       #bleedRight;
+      set bleedRight(value) {$(this.#bleedRight[1]).val(value).change();}
 
       /** @RollUsage */
       #rollWidth;
@@ -58,6 +72,7 @@ class Vinyl extends Material {
       #visualiser;
       #joinOrientation;
       get isJoinHorizontal() {return this.#joinOrientation[1].checked;};
+      set isJoinHorizontal(value) {this.#joinOrientation[1].checked = value; $(this.#joinOrientation[1]).change();}
 
       /**
        * @Output
@@ -179,13 +194,14 @@ class Vinyl extends Material {
             setFieldDisabled(true, this.#machineRunTime[1], this.#machineRunTime[0]);
 
             /** @Production */
-            createHeadingStyle1("Production", null, this.container);
+            createHeadingStyle1("Printer Production", null, this.container);
             this.#production = new Production(this.container, null, function() { }, this.sizeClass);
             this.#production.showContainerDiv = true;
             this.#production.productionTime = 20;
+            this.#production.headerName = "Printer Production";
             this.#production.required = true;
             this.#production.showRequiredCkb = false;
-            this.#production.requiredName = "Production Time";
+            this.#production.requiredName = "Required";
 
             this.UpdateDataForSubscribers();
       }
@@ -371,9 +387,17 @@ class Vinyl extends Material {
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
-            // var name = this.l_material[1].value + " - (sqm) - " + this.l_finish[1].value + " " + this.l_size[1].value.replaceAll("mm", "").replaceAll(" ", "") + "x" + this.l_thickness[1].value;
-
+            var name = this.#material[1].value;
             var partFullName = getPredefinedParts_Name_FromLimitedName(name);
+
+            for(let i = 0; i < this.#outputSizes.length; i++) {
+                  let partQty = this.#outputSizes[i].qty;
+                  let partWidth = this.#outputSizes[i].width;
+                  let partHeight = this.#outputSizes[i].height;
+                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, "", false);
+            }
+            partIndex = await this.#production.Create(productNo, partIndex);
+
             return partIndex;
       }
 }

@@ -84,8 +84,6 @@ class ModalSheetJoins extends ModalWidthHeight {
 
             let xo = 0, yo = 0;
 
-            drawRect(canvasCtx, 0, 1000, 10, 10, "TL", COLOUR.Black, 1);
-
             for(let i = 0; i < this.#sizeArrays.length; i++) {//per parent subscriptions matrix (i.e. Sheet or Size Matrix)
                   for(let j = 0; j < this.#sizeArrays[i].length; j++) {//per sheet subscription matrix
                         let matrixSize = this.#sizeArrays[i][j];

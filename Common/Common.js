@@ -319,6 +319,14 @@ function combinedSqm(array, inMM = true) {
     return sqm;
 }
 
+/**
+ * 
+ * @returns percentage of browser window zoom as integer (100 is standard no zoom)
+ */
+function getWindowZoom() {
+    return Math.round(window.devicePixelRatio * 100);
+}
+
 //const coords = [{x: 260, y: 60}, {x: 180, y: 0}, {x: 180, y: 240}, {x: 360, y: 120}, {x: 180, y: 60}, {x: 180, y: 60}, {x: 180, y: 60}];
 
 

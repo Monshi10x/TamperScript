@@ -78,6 +78,7 @@ class HandTrimming extends Material {
             this.#production = new Production(this.container, null, function() { }, this.sizeClass);
             this.#production.showContainerDiv = true;
             this.#production.productionTime = 20;
+            this.#production.headerName = "Hand Trimming Production";
             this.#production.required = true;
             this.#production.showRequiredCkb = false;
             this.#production.requiredName = "Production Time";
@@ -174,6 +175,7 @@ class HandTrimming extends Material {
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
+            partIndex = await this.#production.Create(productNo, partIndex);
             return partIndex;
       }
 }
