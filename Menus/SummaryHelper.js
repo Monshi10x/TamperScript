@@ -88,6 +88,9 @@ function createSummaryHelper() {
     var btn4 = createButton("Includes Freight & Handling", "width:93%", function() {
         addText(this.innerText);
     });
+    var btn5 = createButton("Important", "width:93%;", function() {
+        addText("<div style='color: red;'><b>Important</b></div>");
+    });
 
     window.addEventListener('resize', function() {
         container.style.top = (window.innerHeight - height) / 2 + 100 + "px";
@@ -100,6 +103,7 @@ function createSummaryHelper() {
     container.appendChild(btn2);
     container.appendChild(btn3);
     container.appendChild(btn4);
+    container.appendChild(btn5);
 
     document.getElementsByTagName('body')[0].appendChild(container);
 }
