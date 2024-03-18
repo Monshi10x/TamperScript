@@ -33,6 +33,7 @@ class Finishing extends Material {
       #eyeletsHelperBtn;
       #pinsRequired;
       #pinsQty;
+      #pins_productionEach;
       #standOffRequired;
       #standOffQty;
       #standOffType;
@@ -40,6 +41,7 @@ class Finishing extends Material {
       #standoff_horizontalSpacingField;
       #standoff_verticalSpacingField;
       #standoff_spacingAllowanceField;
+      #standoff_productionEach;
       #eyeletsType;
       #eyelets_horizontalSpacingField;
       #eyelets_verticalSpacingField;
@@ -53,6 +55,7 @@ class Finishing extends Material {
       #customCost;
       #customMarkup;
       #customDescription;
+      #custom_productionEach;
 
       #modalIsOpen = false;
 
@@ -131,7 +134,7 @@ class Finishing extends Material {
             this.#eyelets_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 100);
             this.#eyelets_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 10);
             this.#eyelets_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 1);
-            this.#eyelets_productionEach = createInput_Infield("Production per eyelet (mins)", 2, "width:400px;display:none", () => {this.UpdateFromChange();}, this.container, true, 1);
+            this.#eyelets_productionEach = createInput_Infield("Production per eyelet (mins)", 2, "width:200px;display:none", () => {this.UpdateFromChange();}, this.container, true, 1);
 
             makeFieldGroup("Checkbox", this.#eyeletsRequired[1], true, this.#eyeletsQty[0], this.#eyeletsHelperBtn,
                   this.#eyeletsType[0],
@@ -141,7 +144,9 @@ class Finishing extends Material {
 
             this.#pinsRequired = createCheckbox_Infield("Pins (Thread Rod)", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateFromChange();}, this.container, true);
             this.#pinsQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none", () => {this.UpdateFromChange();}, this.container, false, 1);
-            makeFieldGroup("Checkbox", this.#pinsRequired[1], true, this.#pinsQty[0]);
+            this.#pins_productionEach = createInput_Infield("Production per pin (mins)", 2, "width:200px;display:none", () => {this.UpdateFromChange();}, this.container, true, 1);
+
+            makeFieldGroup("Checkbox", this.#pinsRequired[1], true, this.#pinsQty[0], this.#pins_productionEach[0]);
 
             this.#standOffRequired = createCheckbox_Infield("Stand-off", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true);
             this.#standOffQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:400px;", () => {this.UpdateFromChange();}, this.container, false, 1);
@@ -180,10 +185,11 @@ class Finishing extends Material {
             this.#standoff_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 100);
             this.#standoff_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 10);
             this.#standoff_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 1);
+            this.#standoff_productionEach = createInput_Infield("Production per standoff (mins)", 2, "width:200px;display:none", () => {this.UpdateFromChange();}, this.container, true, 1);
 
             makeFieldGroup("Checkbox", this.#standOffRequired[1], true, this.#standOffQty[0], this.#standOffType[0], this.#standOffHelperBtn,
                   this.#standoff_offsetFromEdgeField[0], this.#standoff_horizontalSpacingField[0], this.#standoff_verticalSpacingField[0],
-                  this.#standoff_spacingAllowanceField[0]);
+                  this.#standoff_spacingAllowanceField[0], this.#standoff_productionEach[0]);
 
             this.#customRequired = createCheckbox_Infield("Custom", false, "width:30%;min-width:150px;margin-right:65%;", () => {
                   setFieldHidden(!this.#customRequired[1].checked, this.#customQty[0], this.#customQty[0]);
@@ -195,7 +201,8 @@ class Finishing extends Material {
             this.#customCost = createInput_Infield("Cost", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, this.container, false, 1);
             this.#customMarkup = createInput_Infield("Markup", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, this.container, false, 0.1);
             this.#customDescription = createInput_Infield("Description", null, "width:20%;min-width:110px;display:none;", () => {this.UpdateFromChange();}, this.container, false, null);
-            makeFieldGroup("Checkbox", this.#customRequired[1], true, this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0]);
+            this.#custom_productionEach = createInput_Infield("Production per custom (mins)", 2, "width:200px;display:none", () => {this.UpdateFromChange();}, this.container, true, 1);
+            makeFieldGroup("Checkbox", this.#customRequired[1], true, this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0], this.#custom_productionEach[0]);
 
             /**
              * @Production
@@ -204,7 +211,7 @@ class Finishing extends Material {
             this.#production = new Production(this.container, null, function() { }, this.sizeClass);
             this.#production.showContainerDiv = true;
             this.#production.headerName = "Finishing Production";
-            this.#production.productionTime = 20;
+            this.#production.productionTime = 0;
             this.#production.required = true;
             this.#production.showRequiredCkb = false;
             this.#production.requiredName = "Production Time";
@@ -240,6 +247,7 @@ class Finishing extends Material {
             }
 
             this.UpdateStandoffQty();
+            this.UpdateProduction();
       }
 
       getCalcQty(fieldType) {
@@ -280,6 +288,23 @@ class Finishing extends Material {
 
       UpdateEyeletQty() {
             this.#eyeletsQty[1].value = this.getCalcQty("eyelet");
+      }
+
+      UpdateProduction() {
+            let productionMins = 0;
+            if(this.#eyeletsRequired[1].checked) {
+                  productionMins += zeroIfNaNNullBlank(this.#eyelets_productionEach[1].value) * zeroIfNaNNullBlank(this.#eyeletsQty[1].value);
+            }
+            if(this.#standOffRequired[1].checked) {
+                  productionMins += zeroIfNaNNullBlank(this.#standoff_productionEach[1].value) * zeroIfNaNNullBlank(this.#standOffQty[1].value);
+            }
+            if(this.#pinsRequired[1].checked) {
+                  productionMins += zeroIfNaNNullBlank(this.#pins_productionEach[1].value) * zeroIfNaNNullBlank(this.#pinsQty[1].value);
+            }
+            if(this.#customRequired[1].checked) {
+                  productionMins += zeroIfNaNNullBlank(this.#custom_productionEach[1].value) * zeroIfNaNNullBlank(this.#customQty[1].value);
+            }
+            this.#production.productionTime = productionMins;
       }
 
       UpdateInheritedSizes = () => {

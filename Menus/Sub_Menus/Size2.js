@@ -82,6 +82,11 @@ class Size2 extends SubscriptionManager {
                   "width": 1000,
                   "height": 1000
             },
+            "900x1220": {
+                  "show": false,
+                  "width": 900,
+                  "height": 1220
+            },
             "1220x1220": {
                   "show": false,
                   "width": 1220,
@@ -91,6 +96,36 @@ class Size2 extends SubscriptionManager {
                   "show": false,
                   "width": 2440,
                   "height": 1220
+            },
+            "3050x1220": {
+                  "show": false,
+                  "width": 3050,
+                  "height": 1220
+            },
+            "3050x1500": {
+                  "show": false,
+                  "width": 3050,
+                  "height": 1500
+            },
+            "3660x1220": {
+                  "show": false,
+                  "width": 3660,
+                  "height": 1220
+            },
+            "3050x2000": {
+                  "show": false,
+                  "width": 3050,
+                  "height": 2000
+            },
+            "4000x1500": {
+                  "show": false,
+                  "width": 4000,
+                  "height": 1500
+            },
+            "4000x2000": {
+                  "show": false,
+                  "width": 4000,
+                  "height": 2000
             },
             "10000x2550": {
                   "show": false,
