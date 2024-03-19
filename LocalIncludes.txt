@@ -24,11 +24,12 @@
 // @grant        window.onurlchange
 // @updateURL    file://C:\Users\monsh\Documents\TamperScript\TamperStart.js
 // @downloadURL  file://C:\Users\monsh\Documents\TamperScript\TamperStart.js
+// @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Charts\Chart.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\QWH.js
-// @require      file://C:\Users\monsh\Documents\TamperScript\PredefinedVehicleTemplates.json
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UI.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UIContainerType3.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Async_Functions\Async_Functions.js
