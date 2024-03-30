@@ -8,7 +8,7 @@ class ModalWidthHeightWithCalcResult extends Modal {
             this.l_calcHeightValue = 0;
             var tempThis = this;
             this.widthField = createInput_Infield(widthText, tempThis.width, "width:40%;", () => {tempThis.width = tempThis.widthField[1].value; callbackWidthChange();}, null, true, 100);
-            this.widthField[1].focus();
+
             this.addBodyElement(this.widthField[0]);
             this.calcWidthField = createInput_Infield(calcTextW, tempThis.calcWidthValue, "width:40%;", () => {tempThis.calcWidthValue = tempThis.calcWidthField[1].value;}, null, true, null);
             this.addBodyElement(this.calcWidthField[0]);
@@ -18,6 +18,8 @@ class ModalWidthHeightWithCalcResult extends Modal {
             this.addBodyElement(this.calcHeightField[0]);
             this.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {tempThis.callback(); console.log("in callback");}));
             this.addFooterElement(createButton("Cancel", "width:100px;float:right;", () => {tempThis.hide(); console.log("cancel called");}));
+
+            this.widthField[1].focus();
       }
 
       get width() {

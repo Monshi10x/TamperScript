@@ -62,6 +62,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalPopOut.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSetOrder.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInput.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalMoveProduct.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInputText.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInputCheckbox.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInputWithCalcResult.js

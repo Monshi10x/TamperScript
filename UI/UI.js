@@ -230,7 +230,8 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         }*/
         var upArrow = document.createElement('button');
         upArrow.innerHTML = "&#9650";
-        upArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.Blue + ";position:absolute;top:0px;right:0;color:white; border:0px solid " + COLOUR.Blue + ";cursor: pointer;padding:0px";
+        upArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.Blue + ";position:absolute;top:0px;right:0;color:white; border:0px solid " + COLOUR.Blue + ";cursor: pointer;padding:0px;";
+        upArrow.tabIndex = "-1";
         $(upArrow).hover(function() {
             $(this).css("background-color", "white");
             $(this).css("color", COLOUR.Blue);
@@ -246,7 +247,8 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
 
         var downArrow = document.createElement('button');
         downArrow.innerHTML = "&#9660";
-        downArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.Blue + ";position:absolute;bottom:0px;right:0;color:white; border:0px solid " + COLOUR.Blue + ";cursor: pointer;padding:0px";
+        downArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.Blue + ";position:absolute;bottom:0px;right:0;color:white; border:0px solid " + COLOUR.Blue + ";cursor: pointer;padding:0px;tabindex:-1;";
+        downArrow.tabIndex = "-1";
         $(downArrow).hover(function() {
             $(this).css("background-color", "white");
             $(this).css("color", COLOUR.Blue);

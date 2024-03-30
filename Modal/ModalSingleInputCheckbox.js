@@ -5,10 +5,12 @@ class ModalSingleInputCheckbox extends Modal {
             this.l_value = false;
             var tempThis = this;
             this.valField = createCheckbox_Infield("Value", tempThis.value, null, () => {tempThis.value = tempThis.valField[1].checked;}, null);
-            this.valField[1].focus();
+
             this.addBodyElement(this.valField[0]);
             this.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {tempThis.callback(); console.log("in callback");}));
             this.addFooterElement(createButton("Cancel", "width:100px;float:right;", () => {tempThis.hide(); console.log("cancel called");}));
+
+            this.valField[1].focus();
       }
 
       get value() {

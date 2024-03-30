@@ -280,6 +280,19 @@ window.addEventListener("load", (event) => {
         });
 });
 
+document.addEventListener("loadedPredefinedParts", (event) => {
+    var productNameElements = document.querySelectorAll("input[id^='productDescription']");
+    let isAdded = false;
+    for(let i = 0; i < productNameElements.length; i++) {
+        if(productNameElements[i].value.includes("OTHER INFORMATION")) isAdded = true;
+    }
+    async function f() {
+        await AddQuickProduct(" OTHER INFORMATION - Standard");
+    }
+
+    if(!isAdded) f();
+});
+
 function getPredefinedParts(searchName) {
     var searchedPart = $.grep(predefinedParts_obj, function(obj) {return obj.Name.includes(searchName);});
     return searchedPart;

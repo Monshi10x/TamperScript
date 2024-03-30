@@ -341,7 +341,7 @@ function partInfoTick() {
 		let btn = createButton("Move", "height:27px;min-height:27px;width:68px;padding:0px;margin:0px 5px;font-size:11px;", async function() {
 			let l_currentProductIndex = ko.contextFor(productInstance).$data.LineItemOrder() - 1;
 			let l_newProductIndex = 0;
-			let modal = new ModalSingleInput("Move Product To...", async function() {
+			let modal = new ModalMoveProduct("Move Product To...", async function() {
 				l_newProductIndex = parseInt(modal.value) - 1;
 				console.log(productInstance);
 				await MoveProduct(l_currentProductIndex, l_newProductIndex);
