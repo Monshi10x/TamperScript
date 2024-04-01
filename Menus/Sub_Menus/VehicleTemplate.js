@@ -125,7 +125,7 @@ class VehicleTemplate extends SubMenu {
       addRow = (item) => {
             this.rowID++;
             var rowContainer = document.createElement('div');
-            rowContainer.style = "width:100%;height:105px;display:block;float:left;background-color:#ddd;margin-top:10px;";
+            rowContainer.style = "width:100%;height:105px;display:block;float:left;background-color:#aaa;margin-top:10px;";
             rowContainer.id = "rowContainer";
             rowContainer.className = this.rowID;
 

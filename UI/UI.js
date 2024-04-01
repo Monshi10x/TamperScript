@@ -1036,6 +1036,18 @@ function createToken(text, selectedTF, overrideCssStyles, parentObjectToAppendTo
     }
     return [token, fakeValueContainer];
 }
+function createLink(overrideCssStyles, text, href, target = "_blank", parentObjectToAppendTo) {
+    let link = document.createElement('a');
+    link.style = STYLE.Link;
+    link.style.cssText += overrideCssStyles;
+    link.innerText = text;
+    link.href = href;
+    link.target = target;
+    if(parentObjectToAppendTo != null) {
+        parentObjectToAppendTo.appendChild(link);
+    }
+    return link;
+}
 
 function dropdownSetSelectedIndexToNextAvailable(field, leaveIfCurrentSelectedIsNotDisabled = false) {
     let fieldOptions = field.options;

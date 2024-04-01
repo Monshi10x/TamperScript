@@ -26,6 +26,7 @@ class UIContainerType3 {
             /**@Container */
             this.#container = document.createElement("div");
             this.#container.style = STYLE.Div3;
+            this.#container.style.cssText += "display:flex;flex-direction:column;";
             this.#container.style.cssText += overrideCssStyles;
             if(parentObjectToAppendTo != null) {
                   parentObjectToAppendTo.appendChild(this.#container);
@@ -62,7 +63,7 @@ class UIContainerType3 {
 
             /**@ContentContainer */
             this.#contentContainer = document.createElement("div");
-            this.#contentContainer.style = "width:100%;min-height:0px;max-height:400px;overflow-y:scroll;display:block;";
+            this.#contentContainer.style = "width:100%;max-height:calc(100% - 30px);overflow-y:scroll;display:block;";
             this.#container.appendChild(this.#contentContainer);
       }
 

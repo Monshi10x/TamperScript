@@ -88,8 +88,6 @@ class VehicleMenu extends LHSMenuWindow {
         canvasContainer.style = "width:100%;height:650px;display:block;background-color:white;position: relative;";
 
         function createCanvasContainer() {
-
-
             canvas_Vehicle = document.createElement('canvas');
             canvas_Vehicle_BG = document.createElement('canvas');
 
@@ -159,7 +157,7 @@ class VehicleMenu extends LHSMenuWindow {
         canvasContainer.appendChild(VehicleBuilder_MenuContainer);
 
         addItem(ICON.add, "Vinyl", null, null, function() {
-            rects.push({
+            var item = {
                 x: getCenterPosReal(canvasArray[0]).x - 300,
                 y: getCenterPosReal(canvasArray[0]).y - 300,
                 w: 600,
@@ -168,10 +166,12 @@ class VehicleMenu extends LHSMenuWindow {
                 vinyl: VinylLookup["Air Release"],
                 laminate: LaminateLookup["Gloss"],
                 appTape: AppTapeLookup["Medium Tack"],
-                description: null,
+                description: "Vinyl",
                 colour: "red"
-            });
-            VehicleBuilder_Template.addRow();
+            };
+            console.log(item);
+            rects.push(item);
+            VehicleBuilder_Template.addRow(item);
             refreshBackground();
             needsToUpdate = true;
         });
@@ -211,20 +211,55 @@ class VehicleMenu extends LHSMenuWindow {
             refreshBackground();
             needsToUpdate = true;
         });
+        addItem(ICON.add, "Tray Back", null, null, function() {
+            var item = {
+                x: getCenterPosReal(canvasArray[0]).x - 300,
+                y: getCenterPosReal(canvasArray[0]).y - 300,
+                w: 1800,
+                h: 300,
+                qty: 1,
+                vinyl: VinylLookup["Air Release"],
+                laminate: LaminateLookup["Gloss"],
+                appTape: "None",
+                description: "Tray Back Panel",
+                colour: "purple"
+            };
+            rects.push(item);
+            VehicleBuilder_Template.addRow(item);
+            refreshBackground();
+            needsToUpdate = true;
+        });
+        addItem(ICON.add, "Tray Sides", null, null, function() {
+            var item = {
+                x: getCenterPosReal(canvasArray[0]).x - 300,
+                y: getCenterPosReal(canvasArray[0]).y - 300,
+                w: 2500,
+                h: 300,
+                qty: 2,
+                vinyl: VinylLookup["Air Release"],
+                laminate: LaminateLookup["Gloss"],
+                appTape: "None",
+                description: "Tray Sides Panel",
+                colour: "purple"
+            };
+            rects.push(item);
+            VehicleBuilder_Template.addRow(item);
+            refreshBackground();
+            needsToUpdate = true;
+        });
 
         var imageSrcs = [];
         addFileItem(ICON.add, "Images", null, function() {
             callback_SkewableImages();
+            async function callback_SkewableImages() {
+                await addSkewableImages(null, null, imageSrcs);
+                refreshBackground();
+            }
         });
 
         addItem(ICON.convert, "SVG Convert", null, null, function() {
             window.open("https://cloudconvert.com/eps-to-svg", "_blank");
         });
-
-        async function callback_SkewableImages() {
-            await addSkewableImages(null, null, imageSrcs);
-            refreshBackground();
-        }
 
         function addItem(imageSrc, text, overrideCss, overrideImageCss, callback) {
             var itemContainer = document.createElement('div');
@@ -237,7 +272,7 @@ class VehicleMenu extends LHSMenuWindow {
                 itemContainer.style.backgroundColor = COLOUR.Blue;
             };
             itemContainer.onclick = function() {
-                if(callback) callback;
+                if(callback) callback();
                 deselectSelectorBars(true);
                 selectorBar.style.backgroundColor = "red";
             };
@@ -250,13 +285,12 @@ class VehicleMenu extends LHSMenuWindow {
             var image = document.createElement('img');
             image.src = imageSrc;
             image.style = "display:block;float:left;width:35px;height:25px;padding:7.5px 10px;filter:invert(100%);background-size:cover;";
-            image.onclick = callback;
             image.style.cssText += overrideCss;
             itemContainer.appendChild(image);
 
-            var itemText = document.createElement('div');
+            var itemText = document.createElement('p');
             itemText.innerText = text;
-            itemText.style = "display:block;float:left;width:90%;height:15px;padding:0px;color:white;font-weight:bold;font-size:12px;text-align: center;";
+            itemText.style = "display:block;float:left;width:90%;height:15px;margin:0px;padding:0px;color:white;font-weight:bold;font-size:12px;text-align: center;";
             itemContainer.appendChild(itemText);
 
             VehicleBuilder_MenuContainer.appendChild(itemContainer);
@@ -338,15 +372,6 @@ class VehicleMenu extends LHSMenuWindow {
             VehicleBuilder_MenuContainer.appendChild(itemContainer);
         }
 
-        //*****************************************************************************//
-        //                              CREATE BUTTON CONTAINER                        //
-        //*****************************************************************************//
-        var fieldCreateProduct;
-        function createButtonContainer() {
-            fieldCreateProduct = createButton('Create Product', 'width:300px;height:35px;margin:0px;display:block;float:right', createVehicleProduct);
-            footer.appendChild(fieldCreateProduct);
-        }
-
         async function createVehicleProduct() {
             thisClass.minimize();
             await AddBlankProduct();
@@ -387,13 +412,12 @@ class VehicleMenu extends LHSMenuWindow {
 
         page.appendChild(canvasContainer);
 
-        createButtonContainer();
+        var fieldCreateProduct = createButton('Create Product', 'width:300px;height:35px;margin:0px;display:block;float:right', createVehicleProduct);
+        footer.appendChild(fieldCreateProduct);
 
         //--------------INITIAL UPDATE---------------//
         initVehicleCanvas();
         update(null);
-
-
     }
 
     hide() {
@@ -790,6 +814,7 @@ async function createSkewableCanvas() {
 
         mousePos = getMousePos(canvas_Vehicle, e);
         mouseDownPosition = mousePos;
+        canvasContainer.style.cursor = "grabbing";
         console.log("in mouseDown ");
         console.log("isHoveringOnRect " + isHoveringOnRect);
         closeCustomContextMenu();
@@ -816,7 +841,6 @@ async function createSkewableCanvas() {
     $(canvasContainer).mousemove(function(e) {
         if(isHoveringOnRect && !holding.isHoldingShape) return;
         mousePos = getMousePos(canvas_Vehicle, e);
-        canvasContainer.style.cursor = "auto";
 
         if(!holding.isHoldingShape) {
             topLoop:
@@ -831,7 +855,7 @@ async function createSkewableCanvas() {
                     shapeVertsY.push(skewableRects[s][c].y);
                     holding.canGrab = false;
                     if(withinCorner) {
-                        canvasContainer.style.cursor = "pointer";
+                        canvasContainer.style.cursor = "grab";
                         holding.shapeIndex = s;
                         holding.cornerIndex = c;
                         drawFillCircle(canvasCtxLayers[1], skewableRects[s][c].x * canvasScale_Vehicle + xOffset_Vehicle, skewableRects[s][c].y * canvasScale_Vehicle + yOffset_Vehicle, selectRadius, "M", "red", 0.5);
@@ -842,7 +866,7 @@ async function createSkewableCanvas() {
                             holding.shapeIndex = s;
                             holding.cornerIndex = null;
                             holding.canGrab = true;
-                            canvasContainer.style.cursor = "move";
+                            canvasContainer.style.cursor = "grab";
                             break topLoop;
                         }
                     }
@@ -851,13 +875,13 @@ async function createSkewableCanvas() {
         }
 
         if(holding.isHoldingShape) {
+            canvasContainer.style.cursor = "grabbing";
             let holdingCorner = !holding.canGrab;
             if(holdingCorner) {
                 dirtyTriangles = true;
                 needsToUpdate = true;
                 skewableRects[holding.shapeIndex][holding.cornerIndex] = {x: mousePos.x, y: mousePos.y};
                 lockMovement = true;
-                canvasContainer.style.cursor = "pointer";
                 drawFillCircle(canvasCtxLayers[1], mousePos.x * canvasScale_Vehicle + xOffset_Vehicle, mousePos.y * canvasScale_Vehicle + yOffset_Vehicle, selectRadius, "M", "red", 0.5);
             } else {
                 dirtyTriangles = true;
@@ -877,6 +901,7 @@ async function createSkewableCanvas() {
 
     $(canvasContainer).mouseup(function(e) {
         console.log("mouseup called");
+        canvasContainer.style.cursor = "default";
         holding.isHoldingShape = false;
         holding.shapeIndex = null;
         holding.cornerIndex = null;

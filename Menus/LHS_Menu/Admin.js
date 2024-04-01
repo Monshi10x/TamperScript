@@ -28,7 +28,7 @@ class AdminPanel extends LHSMenuWindow {
         while(page.hasChildNodes()) {page.removeChild(page.lastChild);}
         while(this.footer.hasChildNodes()) {this.footer.removeChild(this.footer.lastChild);}
 
-        this.#passwordOverride = createInput_Infield("Password Override", null, "width:90%;box-sizing:border-box;", () => {this.Update();}, page, true, 1);
+        this.#passwordOverride = createInput_Infield("Password Override", null, "width:90%;box-sizing:border-box;", () => {this.Update();}, page, true, null);
         this.#passwordOverride[1].type = "password";
 
         this.#minimumPrice = createInput_Infield("Minimum Price", global_orderMinimum_Price, "width:90%;box-sizing:border-box;", () => {this.Update();}, page, true, 1);

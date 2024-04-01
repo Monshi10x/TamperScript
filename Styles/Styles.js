@@ -37,8 +37,10 @@ const STYLE = {
       TableData: "box-sizing: border-box;outline: 1px solid #000;outline-offset:-1px;text-align:left;padding: 5px;color:black;background-color:white;table-layout: fixed;",
       Div: "float:left;box-sizing:border-box;border:1px solid #000;border-collapse: collapse;background-color:" + COLOUR.MidBlue + ";",
       Div2: "display: block; float: left; width: 88%; background-color: white; min-height: 10px; margin: 10px 20px 30px; box-shadow: rgba(0, 0, 0, 0.8) 3px 4px 10px 0px; padding: 10px; accent-color: blue;overflow-y:auto;max-height:800px;",
-      Div3: "display: block; box-sizing:border-box;float: left; background-color: white; min-height: 10px; margin: 10px 20px 30px;width: calc(100% - 40px); box-shadow: rgba(0, 0, 0, 0.8) 3px 4px 10px 0px; padding: 0px; accent-color: blue;overflow-y:none;max-height:800px;"
+      Div3: "display: block; box-sizing:border-box;float: left; background-color: white; min-height: 10px; margin: 10px 20px 30px;width: calc(100% - 40px); box-shadow: rgba(0, 0, 0, 0.8) 3px 4px 10px 0px; padding: 0px; accent-color: blue;overflow-y:none;max-height:1800px;"
 };
+
+document.body.cssText += "flex-grow:1;";
 
 //background: linear-gradient(145deg, #e6e6e6, #ffffff);
 //box - shadow: 7px 7px 18px #949494,
