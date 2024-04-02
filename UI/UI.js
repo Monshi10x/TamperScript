@@ -138,14 +138,16 @@ function createButton(text, overrideCssStyles, optionalCallback, parentObjectToA
     btn.dataset.backgroundColor = btn.style.backgroundColor;
     btn.style.borderColor = btn.style.backgroundColor;
     btn.dataset.backgroundColorDisabled = COLOUR.White;
+    btn.dataset.initialTextColor = btn.style.color;
     btn.blur();
     var initialBackgroundColor = btn.style.backgroundColor;
+    var initialTextColor = btn.style.color;
     $(btn).hover(function() {
-        $(this).css("background-color", "white");
+        $(this).css("background-color", initialTextColor);
         $(this).css("color", initialBackgroundColor);
     }, function() {
         $(this).css("background-color", initialBackgroundColor);
-        $(this).css("color", "white");
+        $(this).css("color", initialTextColor);
     });
     if(optionalCallback) {
         btn.onclick = optionalCallback;
