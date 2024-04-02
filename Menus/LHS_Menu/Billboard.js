@@ -140,7 +140,7 @@ class BillboardMenu extends LHSMenuWindow {
 
             page.appendChild(infoContainer);
 
-            var fieldCreateBillboardProduct = createButton('Create Billboard Product', 'width:100%;margin:0px;', this.createBillboardProduct);
+            var fieldCreateBillboardProduct = createButton('Create Billboard Product', 'width:100%;margin:0px;', () => {this.createBillboardProduct();});
             this.footer.appendChild(fieldCreateBillboardProduct);
       }
 
