@@ -140,12 +140,13 @@ class BillboardMenu extends LHSMenuWindow {
 
             page.appendChild(infoContainer);
 
-            var fieldCreateBillboardProduct = createButton('Create Billboard Product', 'width:100%;margin:0px;', () => {this.createBillboardProduct();});
+            var fieldCreateBillboardProduct = createButton('Create Billboard Product', 'width:100%;margin:0px;', () => {this.createBillboardProduct(this);});
             this.footer.appendChild(fieldCreateBillboardProduct);
       }
 
-      async createBillboardProduct() {
-            this.minimize();
+      async createBillboardProduct(tempThis) {
+            console.log(tempThis);
+            tempThis.minimize();
 
             var productNo = 0;
             var partIndex = 0;
@@ -154,24 +155,24 @@ class BillboardMenu extends LHSMenuWindow {
             productNo = getNumProducts();
             await setProductName(productNo, "POST and PANEL SIGN");
 
-            partIndex = await this.#sign.Create(productNo, partIndex);
-            partIndex = await this.#leg.Create(productNo, partIndex);
-            partIndex = await this.#frame.Create(productNo, partIndex);
-            partIndex = await this.#baseplate.Create(productNo, partIndex);
-            partIndex = await this.#footing.Create(productNo, partIndex);
-            partIndex = await this.#production.Create(productNo, partIndex);
-            partIndex = await this.#install.Create(productNo, partIndex);
-            partIndex = await this.#artwork.Create(productNo, partIndex);
-            partIndex = await this.#totalQuantity.Create(productNo, partIndex);
+            partIndex = await tempThis.#sign.Create(productNo, partIndex);
+            partIndex = await tempThis.#leg.Create(productNo, partIndex);
+            partIndex = await tempThis.#frame.Create(productNo, partIndex);
+            partIndex = await tempThis.#baseplate.Create(productNo, partIndex);
+            partIndex = await tempThis.#footing.Create(productNo, partIndex);
+            partIndex = await tempThis.#production.Create(productNo, partIndex);
+            partIndex = await tempThis.#install.Create(productNo, partIndex);
+            partIndex = await tempThis.#artwork.Create(productNo, partIndex);
+            partIndex = await tempThis.#totalQuantity.Create(productNo, partIndex);
 
             await setProductSummary(productNo, "Post and Panel / Billboard Sign <br><br>" +
-                  this.#sign.Description() +
-                  this.#frame.Description() +
-                  this.#leg.Description() +
-                  this.#baseplate.Description() +
-                  this.#footing.Description() +
-                  this.#artwork.Description() +
-                  this.#install.Description());
+                  tempThis.#sign.Description() +
+                  tempThis.#frame.Description() +
+                  tempThis.#leg.Description() +
+                  tempThis.#baseplate.Description() +
+                  tempThis.#footing.Description() +
+                  tempThis.#artwork.Description() +
+                  tempThis.#install.Description());
 
             Ordui.Alert("Done.");
       }
