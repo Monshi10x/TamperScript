@@ -202,7 +202,7 @@ async function loadBaseplateList() {
 
 let Transformer;
 window.addEventListener("load", (event) => {
-    fetch("https://github.com/Monshi10x/TamperScript/raw/main/External%20Files/Transformers.json")
+    fetch(tamperPort + "/External%20Files/Transformers.json")
         .then(res => res.json())
         .then((data) => {
             console.log(data);
@@ -216,7 +216,7 @@ window.addEventListener("load", (event) => {
 
 var predefinedVehicleTemplates;
 window.addEventListener("load", (event) => {
-    fetch("https://github.com/Monshi10x/TamperScript/raw/main/External%20Files/PredefinedVehicleTemplates.json")
+    fetch(tamperPort + "/External%20Files/PredefinedVehicleTemplates.json")
         .then(res => res.json())
         .then((data) => {
             console.log(data);
@@ -229,7 +229,7 @@ window.addEventListener("load", (event) => {
 });
 var blankVehicleTemplates;
 window.addEventListener("load", (event) => {
-    fetch("https://github.com/Monshi10x/TamperScript/raw/main/External%20Files/External%20Files/BlankVehicleTemplates.json")
+    fetch(tamperPort + "/External%20Files/BlankVehicleTemplates.json")
         .then(res => res.json())
         .then((data) => {
             console.log(data);
@@ -249,7 +249,7 @@ var InstallLookup;
 var TravelLookup;
 var ACMLookup;
 window.addEventListener("load", (event) => {
-    fetch("https://github.com/Monshi10x/TamperScript/raw/main/External%20Files/External%20Files/PartItems.json")
+    fetch(tamperPort + "/External%20Files/PartItems.json")
         .then(res => res.json())
         .then((data) => {
             console.log(data);
@@ -268,7 +268,7 @@ window.addEventListener("load", (event) => {
 
 var RouterToolpathTimeLookup;
 window.addEventListener("load", (event) => {
-    fetch("https://github.com/Monshi10x/TamperScript/raw/main/External%20Files/RouterToolpathTimes.json")
+    fetch(tamperPort + "/External%20Files/RouterToolpathTimes.json")
         .then(res => res.json())
         .then((data) => {
             console.log(data);
