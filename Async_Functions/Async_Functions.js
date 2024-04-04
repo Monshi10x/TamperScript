@@ -219,7 +219,9 @@ window.addEventListener("load", (event) => {
         "method": "POST",
         "mode": "cors",
         "credentials": "include",
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, GET, PUT",
+        "Access-Control-Allow-Headers": "Content-Type"
     })
         .then(res => res.json())
         .then((data) => {
