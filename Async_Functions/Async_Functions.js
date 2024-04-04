@@ -218,7 +218,8 @@ window.addEventListener("load", (event) => {
         "referrerPolicy": "strict-origin-when-cross-origin",
         "method": "POST",
         "mode": "cors",
-        "credentials": "include"
+        "credentials": "include",
+        "Access-Control-Allow-Origin": "*"
     })
         .then(res => res.json())
         .then((data) => {
