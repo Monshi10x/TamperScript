@@ -202,7 +202,24 @@ async function loadBaseplateList() {
 
 let Transformer;
 window.addEventListener("load", (event) => {
-    fetch(tamperPort + "/External%20Files/Transformers.json")
+    fetch("https://github.com/Monshi10x/TamperScript/raw/main/External%20Files/Transformers.json", {
+        "headers": {
+            "accept": "application/json, text/javascript, */*; q=0.01",
+            "accept-language": "en-US,en;q=0.9",
+            "content-type": "application/json; charset=UTF-8",
+            "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "x-requested-with": "XMLHttpRequest"
+        },
+        "referrer": "https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice.aspx",
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "method": "POST",
+        "mode": "cors",
+        "credentials": "include"
+    })
         .then(res => res.json())
         .then((data) => {
             console.log(data);
