@@ -11,6 +11,13 @@ class UIContainerType3 {
       #popOutBtn;
       #popOutBtn_Width = 30;
       #popOutBtn_Height = 30;
+      #popOutModal;
+      #whenClosedReturnBorrowed = true;
+      get whenClosedReturnBorrowed() {return this.#whenClosedReturnBorrowed;}
+      set whenClosedReturnBorrowed(val) {
+            this.#whenClosedReturnBorrowed = val;
+            if(this.#popOutModal) this.#popOutModal.whenClosedReturnBorrowed = val;
+      }
 
       #minimizeBtn;
       #minimizeBtn_Width = 30;
@@ -55,11 +62,12 @@ class UIContainerType3 {
             this.#popOutBtn = createButton("\u274F", "display: block; float: right; width: " + this.#popOutBtn_Width + "px;height:" + this.#popOutBtn_Height + "px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkBlue + ";", () => {
                   setFieldDisabled(true, this.#popOutBtn);
                   this.onPopOut();
-                  new ModalPopOut("Expanded View", () => {
+                  this.#popOutModal = new ModalPopOut("Expanded View", () => {
                         setFieldDisabled(false, this.#popOutBtn);
                         this.onPopOutLeave();
                         this.callbackOverridable();
                   }, this.#container);
+                  this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
             }, this.#headingContainer);
 
             /**@ContentContainer */

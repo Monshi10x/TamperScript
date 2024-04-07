@@ -2,12 +2,19 @@ class ModalPopOut extends Modal {
       #containersToBorrow;
       #borrowedFields = [];
 
+      #whenClosedReturnBorrowed = true;
+      set whenClosedReturnBorrowed(value) {this.#whenClosedReturnBorrowed = value;}
+
       constructor(headerText, callback, ...containersToBorrow) {
             super(headerText, callback);
             this.#containersToBorrow = containersToBorrow;
             this.borrowFields(...containersToBorrow);
 
-            this.addFooterElement(createButton("Close", "width:100px;float:right;", () => {this.returnAllBorrowedFields(); console.log("in callback"); this.callback();}));
+            this.addFooterElement(createButton("Close", "width:100px;float:right;", () => {
+                  if(this.#whenClosedReturnBorrowed == true) this.returnAllBorrowedFields();
+                  console.log("in callback modal popout");
+                  this.callback();
+            }));
       }
 
       borrowFields(...fieldContainers) {
@@ -30,7 +37,6 @@ class ModalPopOut extends Modal {
       }
 
       returnAllBorrowedFields() {
-            console.trace("returnAllBorrowedFields");
             for(let i = 0; i < this.#borrowedFields.length; i++) {
                   if(this.#borrowedFields[i].returnAfterElement) insertAfter(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnAfterElement);
                   else insertBefore(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnBeforeElement);
@@ -43,7 +49,7 @@ class ModalPopOut extends Modal {
       }
 
       hide() {
-            this.returnAllBorrowedFields();
+            if(this.#whenClosedReturnBorrowed == true) this.returnAllBorrowedFields();
             super.hide();
       }
 }

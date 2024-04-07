@@ -512,12 +512,19 @@ async function updateBoard() {
       let vendorNotesBtns = [];
       for(let i = 0; i < jobs.length; i++) {
             console.log(jobs[i]);
+            //hide() {
+            //     this.returnAllBorrowedFields();
+            //super.hide();
+            //}
+            let toAppendTo;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design") toAppendTo = newDiv_InDesign.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") toAppendTo = newDiv_InDesignRevision.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && (jobs[i].QueuePrioritySettingColor == "#d9e1f2" || jobs[i].QueuePrioritySettingColor == "#4472c4")) toAppendTo = newDiv_Approved.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#47ad8b") toAppendTo = newDiv_TristanToApprove.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#ffc000") toAppendTo = newDiv_ReadyToPrint.contentContainer;
 
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design") jobContainers.push(new UIContainerType3("max-height:200px;", jobs[i].CompanyName, newDiv_InDesign.contentContainer));
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") jobContainers.push(new UIContainerType3("max-height:200px;", jobs[i].CompanyName, newDiv_InDesignRevision.contentContainer));
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && (jobs[i].QueuePrioritySettingColor == "#d9e1f2" || jobs[i].QueuePrioritySettingColor == "#4472c4")) jobContainers.push(new UIContainerType3("max-height:200px;", jobs[i].CompanyName, newDiv_Approved.contentContainer));
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#47ad8b") jobContainers.push(new UIContainerType3("max-height:200px;", jobs[i].CompanyName, newDiv_TristanToApprove.contentContainer));
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#ffc000") jobContainers.push(new UIContainerType3("max-height:200px;", jobs[i].CompanyName, newDiv_ReadyToPrint.contentContainer));
+            let newJobContainer = new UIContainerType3("max-height:200px;", jobs[i].CompanyName, toAppendTo);
+            jobContainers.push(newJobContainer);
 
             createText("Item: " + jobs[i].Description, "width:100%;height:40px;text-overflow: ellipsis; overflow: hidden;", jobContainers[i].contentContainer);
             lineItemDescriptionFields.push(createDiv("width:calc(100% - 12px);margin:6px;min-height:40px;background-color:white;", "Description", jobContainers[i].contentContainer));
@@ -594,6 +601,8 @@ async function updateBoard() {
                   dropdownOptions, async () => {
                         let loader = new Loader("", WIPStatus[0]);
                         await updateItemStatus(jobs[i].Id, WIPStatus[1].options[WIPStatus[1].dataset.currentValue].value, WIPStatus[1].options[WIPStatus[1].selectedIndex].value);
+
+                        jobContainers[i].whenClosedReturnBorrowed = false;
                         $("#imgExpander_" + jobs[i].Id).click();
                         $("#imgExpander_" + jobs[i].Id).click();
 
@@ -603,6 +612,7 @@ async function updateBoard() {
                         };
                         WIPStatus[1].dataset.currentValue = WIPStatus[1].selectedIndex;
                         loader.Delete();
+
                   }, inhouseDiv);
             WIPStatus[1].dataset.currentValue = 0;
 
