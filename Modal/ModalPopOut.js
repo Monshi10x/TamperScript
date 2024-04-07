@@ -13,13 +13,18 @@ class ModalPopOut extends Modal {
       borrowFields(...fieldContainers) {
             for(let i = 0; i < fieldContainers.length; i++) {
                   let borrowedElement = fieldContainers[i];
+
+                  let placeholder = document.createElement("div");
+                  insertAfter(placeholder, borrowedElement);
+
                   this.#borrowedFields.push({
                         fieldContainer: borrowedElement,
-                        returnAfterElement: borrowedElement.previousElementSibling,
+                        returnAfterElement: placeholder,
                         returnBeforeElement: borrowedElement.nextElementSibling,
-                        currentCssStyle: borrowedElement.style.cssText
+                        currentCssStyle: borrowedElement.style.cssText,
+                        placeholder: placeholder
                   });
-                  //borrowedElement.style.maxHeight = "100%";
+
                   this.addBodyElement(borrowedElement);
             }
       }
@@ -28,7 +33,6 @@ class ModalPopOut extends Modal {
             for(let i = 0; i < this.#borrowedFields.length; i++) {
                   if(this.#borrowedFields[i].returnAfterElement) insertAfter(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnAfterElement);
                   else insertBefore(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnBeforeElement);
-                  //this.#borrowedFields[i].style = this.#borrowedFields[i].currentCssStyle;
             }
       }
 
