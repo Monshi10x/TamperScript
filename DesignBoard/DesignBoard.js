@@ -1,6 +1,10 @@
 (function() {
       'use strict';
+      const myCss = GM_getResourceText("IMPORTED_CSS");
+      GM_addStyle(myCss);
 })();
+
+///Commonui.Alert("Done!");
 
 let allOrderProductStatuses = [
       {
@@ -336,13 +340,6 @@ let allOrderProductStatuses = [
 ];
 
 window.addEventListener("load", (event) => {
-      var x = document.createElement("LINK");
-      x.setAttribute("rel", "stylesheet");
-      x.setAttribute("type", "text/css");
-      x.setAttribute("href", "https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_DesignBoard.css");
-      console.log(x);
-      document.head.appendChild(x);
-
       getRowsData();
 });
 
@@ -597,9 +594,15 @@ async function updateBoard() {
                   dropdownOptions, async () => {
                         let loader = new Loader("", WIPStatus[0]);
                         await updateItemStatus(jobs[i].Id, WIPStatus[1].options[WIPStatus[1].dataset.currentValue].value, WIPStatus[1].options[WIPStatus[1].selectedIndex].value);
-                        Commonui.Alert("Done!");
-                        //loader.Delete();
+                        $("#imgExpander_" + jobs[i].Id).click();
+                        $("#imgExpander_" + jobs[i].Id).click();
+
+                        reorderJobContainer(jobContainers[i].container, WIPStatus[1].options[WIPStatus[1].selectedIndex].innerText, jobs[i].QueuePrioritySettingColor);
+                        jobContainers[i].callbackOverridable = function() {
+                              reorderJobContainer(jobContainers[i].container, WIPStatus[1].options[WIPStatus[1].selectedIndex].innerText, jobs[i].QueuePrioritySettingColor);
+                        };
                         WIPStatus[1].dataset.currentValue = WIPStatus[1].selectedIndex;
+                        loader.Delete();
                   }, inhouseDiv);
             WIPStatus[1].dataset.currentValue = 0;
 
@@ -722,6 +725,16 @@ async function updateBoard() {
 
       }
 
+      function reorderJobContainer(container, status, currentQueueColour) {
+            console.log(container, status, currentQueueColour);
+            console.log(status == "WIP : In Design");
+            console.log(status == "WIP : In Design Revision");
+            if(status == "WIP : In Design") newDiv_InDesign.contentContainer.appendChild(container);
+            if(status == "WIP : In Design Revision") newDiv_InDesignRevision.contentContainer.appendChild(container);
+            if(status == "WIP : Proof Approved" && (currentQueueColour == "#d9e1f2" || currentQueueColour == "#4472c4")) newDiv_Approved.contentContainer.appendChild(container);
+            if(status == "WIP : Proof Approved" && currentQueueColour == "#47ad8b") newDiv_TristanToApprove.contentContainer.appendChild(container);
+            if(status == "WIP : Proof Approved" && currentQueueColour == "#ffc000") newDiv_ReadyToPrint.contentContainer.appendChild(container);
+      }
 }
 
 function createBoardItem(parentObjectToAppendTo, customerName, jobName, invoiceNumber, lineItemNumber) {

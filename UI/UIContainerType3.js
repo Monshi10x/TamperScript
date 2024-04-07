@@ -58,6 +58,7 @@ class UIContainerType3 {
                   new ModalPopOut("Expanded View", () => {
                         setFieldDisabled(false, this.#popOutBtn);
                         this.onPopOutLeave();
+                        this.callbackOverridable();
                   }, this.#container);
             }, this.#headingContainer);
 
@@ -102,6 +103,11 @@ class UIContainerType3 {
             else this.Maximize();
             this.#contentContainer.style.maxHeight = "400px";
             this.#container.style = STYLE.Div3;
+      }
+
+      /**@Overridable */
+      callbackOverridable() {
+            console.log("callbackOverridable");
       }
 
       #addedHeadingItems_combinedWidth = 0;

@@ -11,19 +11,22 @@
 // @grant        GM_addStyle
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @grant        GM_addElement
 // @grant        GM_setClipboard
 // @grant        GM_info
 // @grant        unsafeWindow
 // @grant        window.close
 // @grant        window.focus
 // @grant        window.onurlchange
+// @grant        GM_getResourceText
+// @resource     IMPORTED_CSS file://C:\Users\monsh\Documents\TamperScript\Styles\Styles_DesignBoard.css
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Charts\Chart.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UI.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UIContainerType3.js
-// @require      file://C:\Users\monsh\Documents\TamperScript\Async_Functions\Async_Functions.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Loaders\Loader.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\Common.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\ObjectArray.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Console\Console.js
@@ -32,6 +35,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Styles\Styles.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Styles\Images.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Styles\Colour.js
+
 // @require      file://C:\Users\monsh\Documents\TamperScript\Mouse\ContextMenu.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\Modal.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInput.js
