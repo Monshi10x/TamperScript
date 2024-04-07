@@ -1,10 +1,5 @@
 (function() {
       'use strict';
-      var x = document.createElement("LINK");
-      x.setAttribute("rel", "stylesheet");
-      x.setAttribute("type", "text/css");
-      x.setAttribute("href", "styles.css");
-      document.head.appendChild(x);
 })();
 
 let allOrderProductStatuses = [
@@ -341,8 +336,14 @@ let allOrderProductStatuses = [
 ];
 
 window.addEventListener("load", (event) => {
-      getRowsData();
+      var x = document.createElement("LINK");
+      x.setAttribute("rel", "stylesheet");
+      x.setAttribute("type", "text/css");
+      x.setAttribute("href", "https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_DesignBoard.css");
+      console.log(x);
+      document.head.appendChild(x);
 
+      getRowsData();
 });
 
 var jobs;
@@ -594,8 +595,10 @@ async function updateBoard() {
             }
             let WIPStatus = createDropdown_Infield("WIP Status", 0, "width:300px;margin-right: calc(100% - 312px);",
                   dropdownOptions, async () => {
+                        let loader = new Loader("", WIPStatus[0]);
                         await updateItemStatus(jobs[i].Id, WIPStatus[1].options[WIPStatus[1].dataset.currentValue].value, WIPStatus[1].options[WIPStatus[1].selectedIndex].value);
                         Commonui.Alert("Done!");
+                        //loader.Delete();
                         WIPStatus[1].dataset.currentValue = WIPStatus[1].selectedIndex;
                   }, inhouseDiv);
             WIPStatus[1].dataset.currentValue = 0;
