@@ -498,6 +498,7 @@ async function updateBoard() {
       newDiv_ReadyToPrint.container.style.cssText += "background-color:#feffa6";
       let dataPromise = [];
       let lineItemDescriptionFields = [];
+      let lineItemDescriptionSpinners = [];
       let jobContainers = [];
       let notesSales = [];
       let notesDesign = [];
@@ -527,7 +528,12 @@ async function updateBoard() {
             jobContainers.push(newJobContainer);
 
             createText("Item: " + jobs[i].Description, "width:100%;height:40px;text-overflow: ellipsis; overflow: hidden;", jobContainers[i].contentContainer);
-            lineItemDescriptionFields.push(createDiv("width:calc(100% - 12px);margin:6px;min-height:40px;background-color:white;", "Description", jobContainers[i].contentContainer));
+            let descriptionField = createDiv("width:calc(100% - 12px);margin:6px;min-height:40px;background-color:white;position:relative;", "Description", jobContainers[i].contentContainer);
+            lineItemDescriptionFields.push(descriptionField);
+            //let loader = new Loader("", descriptionField);
+            //lineItemDescriptionSpinners.push(loader);
+
+
 
             jobContainers[i].Minimize();
 
@@ -729,9 +735,9 @@ async function updateBoard() {
              * Line Item Description
              */
             let lineItemDescription = data[i].OrderInformation.OrderInformation.H2[jobs[i].LineItemOrder - 1].I1;
-            //let lineItemDescriptionField = createInput_Infield("Description", "", "width:calc(100% - 12px);min-height:40px;text-overflow: ellipsis; ", () => { }, jobContainers[i].contentContainer, false);
-
             lineItemDescriptionFields[i].innerHTML = lineItemDescriptionFields[i].innerHTML + lineItemDescription;
+
+            //lineItemDescriptionSpinners[i].Delete();
 
       }
 
