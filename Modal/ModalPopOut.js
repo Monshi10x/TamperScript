@@ -43,7 +43,7 @@ class ModalPopOut extends Modal {
       }
 
       hide() {
-            //this.returnAllBorrowedFields();
+            this.returnAllBorrowedFields();
             super.hide();
       }
 }
