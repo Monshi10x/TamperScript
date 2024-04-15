@@ -488,14 +488,19 @@ async function updateBoard() {
 
       let newDiv_InDesign = new UIContainerType3("width:calc(20% - 24px);height:90%;flex: 0 0 auto;", "In Design", masterContainer);
       newDiv_InDesign.container.style.cssText += "background-color:#aaacff";
+      makeReceiveDraggable(newDiv_InDesign.container);
       let newDiv_InDesignRevision = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "In Design Revision", masterContainer);
       newDiv_InDesignRevision.container.style.cssText += "background-color:#aaacff";
+      makeReceiveDraggable(newDiv_InDesignRevision.container);
       let newDiv_Approved = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "Proof Approved - Setup Print Files", masterContainer);
       newDiv_Approved.container.style.cssText += "background-color:#c8c8c8";
+      makeReceiveDraggable(newDiv_Approved.container);
       let newDiv_TristanToApprove = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "Tristan To Approve", masterContainer);
       newDiv_TristanToApprove.container.style.cssText += "background-color:#a2ff9b";
+      makeReceiveDraggable(newDiv_TristanToApprove.container);
       let newDiv_ReadyToPrint = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "Ready To Print", masterContainer);
       newDiv_ReadyToPrint.container.style.cssText += "background-color:#feffa6";
+      makeReceiveDraggable(newDiv_ReadyToPrint.container);
       let dataPromise = [];
       let lineItemDescriptionFields = [];
       let lineItemDescriptionSpinners = [];
@@ -524,14 +529,16 @@ async function updateBoard() {
             if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#47ad8b") toAppendTo = newDiv_TristanToApprove.contentContainer;
             if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#ffc000") toAppendTo = newDiv_ReadyToPrint.contentContainer;
 
-            let newJobContainer = new UIContainerType3("max-height:200px;", jobs[i].CompanyName, toAppendTo);
+            let newJobContainer = new UIContainer_Design("max-height:200px;", jobs[i].CompanyName, jobs[i].Description, toAppendTo);
             jobContainers.push(newJobContainer);
 
-            createText("Item: " + jobs[i].Description, "width:100%;height:40px;text-overflow: ellipsis; overflow: hidden;", jobContainers[i].contentContainer);
+            makeDraggable(newJobContainer.container);
+
+
             let descriptionField = createDiv("width:calc(100% - 12px);margin:6px;min-height:40px;background-color:white;position:relative;", "Description", jobContainers[i].contentContainer);
             lineItemDescriptionFields.push(descriptionField);
-            //let loader = new Loader("", descriptionField);
-            //lineItemDescriptionSpinners.push(loader);
+            let loader = new Loader("", descriptionField);
+            lineItemDescriptionSpinners.push(loader);
 
 
 
@@ -684,6 +691,12 @@ async function updateBoard() {
             let jobNoBtn = createButton(jobs[i].OrderInvoiceNumber, "display: block; float: right; width: " + 80 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Orange + ";", () => { });
             jobContainers[i].addHeadingButtons(jobNoBtn);
 
+            let jobColour = createButton("", "display: block; float: right; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:2px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + (jobs[i].QueuePrioritySettingColor == null ? "white" : jobs[i].QueuePrioritySettingColor) + ";", () => {
+
+            });
+            jobContainers[i].addHeadingButtons(jobColour);
+            console.log(jobs[i].QueuePrioritySettingColor);
+
 
             //if(jobs[i].TotalPaid < jobs[i].TotalPrice) jobContainer.addHeadingButtons(paymentDueBtn);
             dataPromise.push(getOrderData_QuoteLevel(jobs[i].OrderId, jobs[i].AccountId, jobs[i].CompanyName));
@@ -737,7 +750,7 @@ async function updateBoard() {
             let lineItemDescription = data[i].OrderInformation.OrderInformation.H2[jobs[i].LineItemOrder - 1].I1;
             lineItemDescriptionFields[i].innerHTML = lineItemDescriptionFields[i].innerHTML + lineItemDescription;
 
-            //lineItemDescriptionSpinners[i].Delete();
+            lineItemDescriptionSpinners[i].Delete();
 
       }
 

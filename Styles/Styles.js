@@ -30,7 +30,7 @@ const STYLE = {
       CheckboxInfield: "float: left; min-height: 42px; border: 1px solid rgb(177, 177, 177); box-shadow: rgb(199 199 199) 4px 6px 20px 0px;position: relative; margin: 5px; background-color: white; width: 97%;padding-top: 4px;box-sizing:border-box;",
       Depictions: "float:left;width:15px;height:30px;margin: 5px;padding:4px;border:1px solid #888;box-sizing:content-box;background-color:white;",
       BillboardMenus: "display:block;float:left;box-sizing:border-box;background-color:" + COLOUR.BillboardMenus + ";min-height:30px; margin: 10px 20px 30px;width: calc(100% - 40px);box-shadow: rgb(0 0 0 / 80%) 3px 4px 10px 0px;padding:10px;accent-color:" + COLOUR.Blue + ";",
-      DropShadow: "box-shadow: rgb(98 98 98) 5px 5px 10px -3px;",
+      DropShadow: "box-shadow: rgba(0, 0, 0, 0.8) 3px 4px 10px 0px;",
       HeaderFont: "font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;font-weight:bold;font-size:14px;",
       HeadingStyle1: "height:30px;z-index:99;position: relative;margin:0px;background-color:" + COLOUR.DarkBlue + ";width:100%;box-sizing: border-box;padding:0px;font-size:10px;color:white;text-align:center;line-height:30px;box-shadow: rgb(61 61 61) 0px 6px 14px 2px;margin:20px 0px;border:1px solid " + COLOUR.DarkBlue + ";",
       Table: "float:left;width:100%;border-collapse: collapse;table-layout: auto;color:white;",

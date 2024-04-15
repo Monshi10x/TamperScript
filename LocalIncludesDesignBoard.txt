@@ -26,6 +26,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Charts\Chart.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UI.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UIContainerType3.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\UI\UIContainer_Design.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Loaders\Loader.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\Common.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\ObjectArray.js
@@ -35,7 +36,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Styles\Styles.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Styles\Images.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Styles\Colour.js
-
+// @require      file://C:\Users\monsh\Documents\TamperScript\DragAndDrop\DragAndDrop.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Mouse\ContextMenu.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\Modal.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInput.js
