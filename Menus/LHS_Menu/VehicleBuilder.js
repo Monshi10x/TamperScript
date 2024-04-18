@@ -1052,7 +1052,7 @@ function scaleSkewableRect(xPos, yPos) {
         let scaleModal = new ModalWidthHeight("Apply Scale", 1, function() {
             let scaleW = (scaleModal.width || scaleModal.width != 0) ? scaleModal.width - 1 : 0;
             let scaleH = (scaleModal.height || scaleModal.height != 0) ? scaleModal.height - 1 : 0;
-            console.log("in scaleSkewableRect", shapeIndex, xPos, yPos, scale);
+            //console.log("in scaleSkewableRect", shapeIndex, xPos, yPos, scale);
             console.log("in shapeIndex");
             console.log(skewableRects[shapeIndex]);
             let centerCoord = {
