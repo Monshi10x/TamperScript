@@ -176,6 +176,7 @@ class Sheet extends Material {
             this.#inheritedSizeTable = new Table(this.container, "100%", 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
             this.#inheritedSizeTable.addRow("-", "-", "-");
+            this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             this.#filtersHeader = createHeadingStyle1("Filters", null, this.container);
 
@@ -250,6 +251,7 @@ class Sheet extends Material {
             this.#outputSizeTable = new Table(this.container, "100%", 20, 250);
             this.#outputSizeTable.setHeading("Qty", "Width", "Height", "Cuts Each", "Machine Type", "Cuts Total", "Total Router Perimeter");
             this.#outputSizeTable.addRow("-", "-", "-", "-", "-", "-", "-", "-");
+            this.#outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /**
              * @Cutting

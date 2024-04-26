@@ -72,6 +72,8 @@ class PrintMounting extends Material {
             this.#inheritedSizeTable = new Table(this.container, 780, 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height", "Longest Side", "Rollover Can Lay");
             this.#inheritedSizeTable.addRow("-", "-", "-", "-", "-");
+            this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
+
 
             /**
              * @TimeStats

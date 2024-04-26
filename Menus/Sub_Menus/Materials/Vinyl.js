@@ -102,6 +102,7 @@ class Vinyl extends Material {
             this.#inheritedSizeTable = new Table(this.container, "100%", 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height", "Needs Joins");
             this.#inheritedSizeTable.addRow("-", "-", "-", "-");
+            this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /** @Bleeds */
             createHeadingStyle1("Bleeds", null, this.container);
@@ -175,11 +176,13 @@ class Vinyl extends Material {
             this.#outputSizeTable = new Table(this.container, "100%", 20, 250);
             this.#outputSizeTable.setHeading("Qty", "Width", "Height");
             this.#outputSizeTable.addRow("-", "-", "-");
+            this.#outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             createText("Roll Usage", "width:100%;height:20px", this.container);
             this.#outputSizeTable2 = new Table(this.container, "100%", 20, 250);
             this.#outputSizeTable2.setHeading("Qty", "Width", "Height");
             this.#outputSizeTable2.addRow("-", "-", "-");
+            this.#outputSizeTable2.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /** @Machine */
             createHeadingStyle1("Machine", null, this.container);

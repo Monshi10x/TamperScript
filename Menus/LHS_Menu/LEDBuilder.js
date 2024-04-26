@@ -56,7 +56,7 @@ class LEDMenu extends LHSMenuWindow {
         //********************************************//
         //                  LED WATT
         //********************************************//
-        var fieldLEDWatt = createDropdown_Infield("LED Brightness", 1, "width:40%",
+        var fieldLEDWatt = createDropdown_Infield("LED Brightness", 0, "width:40%",
             [createDropdownOption("1.08w (Standard Brightness)", "1.08"),
             createDropdownOption("1.50w (Premium Brightness)", "1.50")], LEDUpdate, LEDBuilderContainer_Sub);
 
@@ -114,9 +114,28 @@ class LEDMenu extends LHSMenuWindow {
         var fieldCreateLEDProductNew = createButton("Create New Product", "margin:0px;width:40%", () => {createLEDProduct(false);});
         footer.appendChild(fieldCreateLEDProductNew);
         var fieldCreateLEDProductExisting = createButton("Create Product In Existing", "margin:0px;width:40%", () => {createLEDProduct(true);});
-        footer.appendChild(fieldCreateLEDProductExisting);
+        //footer.appendChild(fieldCreateLEDProductExisting);
         var input_createInExisting = createInput("P.No", null, "width:18%;margin:0px;box-shadow:0px;height:23px;", null);
-        footer.appendChild(input_createInExisting);
+        //footer.appendChild(input_createInExisting);
+
+        let draggablePopulator = createButton("Drag and Drop Over Part to Populate", "width:60%;margin:0px;", () => { }, null);
+        draggablePopulator.draggable = true;
+        draggablePopulator.addEventListener("dragstart", function(e) {
+            //console.log(e.target);
+        });
+
+        this.onDrop = async function(e) {
+            let dropOverElement = e.dropOverElement;
+            if(!e) return;
+            input_createInExisting.value = e.detail.productNo;
+            //populatePartN.value = e.detail.partNo;
+            await createLEDProduct(true);
+        };
+        console.log("in");
+
+        document.removeEventListener("dropEvent", this.onDrop);
+        document.addEventListener("dropEvent", this.onDrop);
+        footer.appendChild(draggablePopulator);
 
         function LEDUpdate() {
             var tempDTF = 0;
@@ -204,6 +223,8 @@ class LEDMenu extends LHSMenuWindow {
     }
 
     hide() {
+        if(this.onDrop) document.removeEventListener("dropEvent", this.onDrop);
+
         super.hide();
     }
 

@@ -111,12 +111,12 @@ class MenuPanelSigns extends LHSMenuWindow {
 				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
 				["Foam PVC", "https://5.imimg.com/data5/RN/UM/MY-14219350/white-pvc-foam-sheet-500x500.jpg"],
 				["Signwhite", "https://img.archiexpo.com/images_ae/photo-g/158002-12419012.jpg"],
-				["Corflute", "https://cdn11.bigcommerce.com/s-iu4x16wosu/images/stencil/1280x1280/products/238/555/thFJ8AB8FS__51355.1563671713.jpg?c=2"],
+				["Corflute", GM_getResourceURL("Image_Corflute")],
 				["Wall Graphics", "https://cdn.gorilladash.com/images/media/6161323/signarama-australia-img-3113-thumbnail-638306a183cd0.jpg"]],
 				() => {this.#addQuickTemplate();},
 				this.page1, false
 			);
-
+			//"https://cdn.gorilladash.com/images/media/12526805/Corflute-Resized.jpg"
 			this.#viewMode = createDropdown_Infield('View Mode', 0, "width:150px;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product")], () => {this.#updateViewMode();}, this.page1);
 
 			this.#numProducts = getNumProducts() - 1;

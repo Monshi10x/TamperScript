@@ -92,7 +92,7 @@ class ModalManageSubscriptions2 extends Modal {
 
       createRows() {
             let allAvailableSubscriptionObjects = this.parentClass.allMaterials;
-
+            createHr("height:10px;background-color:white;border:0px solid white", this.getBodyElement());
             this.table = new Table(this.getBodyElement(), "100%", 20, "800px");
             this.table.setHeading("ID", "Subscribed", "Notes");
             for(let i = 0; i < allAvailableSubscriptionObjects.length; i++) {
@@ -110,6 +110,7 @@ class ModalManageSubscriptions2 extends Modal {
                   let otherWording = (isSelf ? "Cannot subscribe to self" : "") + (availableSubscriptionIsSubscriber ? "Is a subscriber" : "");
                   this.table.addRow(allAvailableSubscriptionObjects[i].Type + " " + allAvailableSubscriptionObjects[i].productNumber, subscribedCkb, otherWording);
             }
+            this.table.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /*var arr = this.sizeClass.sizeRows;
             for(var i = 0; i < arr.length; i++) {

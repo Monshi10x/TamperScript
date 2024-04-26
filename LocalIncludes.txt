@@ -25,6 +25,7 @@
 // @updateURL    file://C:\Users\monsh\Documents\TamperScript\TamperStart.js
 // @downloadURL  file://C:\Users\monsh\Documents\TamperScript\TamperStart.js
 // @resource     IMPORTED_CSS file://C:\Users\monsh\Documents\TamperScript\Styles\Styles_Sales.css
+// @resource     Image_Corflute file://C:\Users\monsh\Documents\TamperScript\Images\Corflute-Resized.jpg
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js

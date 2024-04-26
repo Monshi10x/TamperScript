@@ -63,6 +63,7 @@ class Laminate extends Material {
             this.#inheritedSizeTable = new Table(this.container, 780, 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
             this.#inheritedSizeTable.addRow("-", "-", "-");
+            this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
 
             /**
@@ -100,6 +101,8 @@ class Laminate extends Material {
             this.#outputSizeTable = new Table(this.container, 780, 20, 250);
             this.#outputSizeTable.setHeading("Qty", "Width", "Height");
             this.#outputSizeTable.addRow("-", "-", "-");
+            this.#outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
+
 
             /** @Production */
             createHeadingStyle1("Laminator Production", null, this.container);
