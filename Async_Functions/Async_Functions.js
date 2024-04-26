@@ -680,6 +680,7 @@ async function setProductQty(productNo, value) {
 
     console.log("set product quantity " + productNo);
     await sleep(sleepMS);
+    return productNo;
 }
 async function setProductName(productNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.ProductQtyField(productNo))).$data;
@@ -704,6 +705,7 @@ async function setProductName(productNo, value) {
 
     console.log("set product name " + productNo);
     await sleep(sleepMS);
+    return productNo;
 }
 async function setProductSummary(productNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo))).$data;
@@ -711,6 +713,7 @@ async function setProductSummary(productNo, value) {
     productContext.ProductSummary(value);
     console.log("set product summary " + productNo);
     await sleep(sleepMS);
+    return productNo;
 }
 async function setPartMarkup(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.MarkupField(productNo, partNo)));
@@ -718,6 +721,7 @@ async function setPartMarkup(productNo, partNo, value) {
     productContext.$data.Value(value);
     console.log("set markup " + partNo + " to " + value);
     await sleep(sleepMS);
+    return productNo;
 }
 async function setPartMarkupEa(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.MarkupFieldEach(productNo, partNo)));
@@ -725,6 +729,7 @@ async function setPartMarkupEa(productNo, partNo, value) {
     productContext.$data.Value(value);
     console.log("set markup " + partNo + " to " + value);
     await sleep(sleepMS);
+    return productNo;
 }
 async function setPartDescription(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
@@ -734,6 +739,7 @@ async function setPartDescription(productNo, partNo, value) {
     part.PartDescription(value);
     console.log("set part description " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPartText(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
@@ -743,6 +749,7 @@ async function setPartText(productNo, partNo, value) {
     part.PartText(value);
     console.log("set part text " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPartVendorCostEa(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
@@ -751,6 +758,7 @@ async function setPartVendorCostEa(productNo, partNo, value) {
     part.VendorCost(value);
     console.log("set part vendor cost " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPartPriceEa(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PriceFieldEach(productNo, partNo)));
@@ -758,6 +766,7 @@ async function setPartPriceEa(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set part price to " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPartPrice(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PriceFieldTotal(productNo, partNo)));
@@ -765,6 +774,7 @@ async function setPartPrice(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set part price to " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 //ARTWORK
 async function setArtworkTime(productNo, partNo, value) {
@@ -776,6 +786,7 @@ async function setArtworkTime(productNo, partNo, value) {
 
     console.log("set minutes " + partNo + " to " + time);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setArtworkTimeEa(productNo, partNo, value) {
     var time = getMHD(value);
@@ -786,6 +797,7 @@ async function setArtworkTimeEa(productNo, partNo, value) {
 
     console.log("set minutes ea " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 //PRODUCTION
 async function setProductionTime(productNo, partNo, value) {
@@ -797,6 +809,7 @@ async function setProductionTime(productNo, partNo, value) {
 
     console.log("set minutes " + partNo + " to " + time);
     await sleep(sleepMS);
+    return partNo;
 }
 //INSTALL
 async function setInstallTime(productNo, partNo, value) {
@@ -810,6 +823,7 @@ async function setInstallTime(productNo, partNo, value) {
 
     console.log("set install minutes " + partNo + " to " + time);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setInstallTimeEa(productNo, partNo, value) {
     var time = getMHD(value);
@@ -821,6 +835,7 @@ async function setInstallTimeEa(productNo, partNo, value) {
 
     console.log("set install ea minutes " + partNo + " to " + time);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setInstallTimeMHD(productNo, partNo, minutes, hours, days) {
     var fields = Field.InstallTimeTotal(productNo, partNo);
@@ -831,6 +846,7 @@ async function setInstallTimeMHD(productNo, partNo, minutes, hours, days) {
 
     console.log("set install minutes " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setInstallTimeMHDEa(productNo, partNo, minutes, hours, days) {
     var fields = Field.InstallTimeEach(productNo, partNo);
@@ -841,6 +857,7 @@ async function setInstallTimeMHDEa(productNo, partNo, minutes, hours, days) {
 
     console.log("set install ea minutes " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setInstallPartType(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.InstallTypeTotal(productNo, partNo)));
@@ -848,6 +865,7 @@ async function setInstallPartType(productNo, partNo, value) {
     productContext.$data.ListDataItemChangeValue(value);
     console.log("set install type of " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setInstallPartTypeEa(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.InstallTypeEach(productNo, partNo)));
@@ -855,6 +873,7 @@ async function setInstallPartTypeEa(productNo, partNo, value) {
     productContext.$data.ListDataItemChangeValue(value);
     console.log("set install type ea of " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setTravelTime(productNo, partNo, value) {
     var time = getMHD(value);
@@ -866,6 +885,7 @@ async function setTravelTime(productNo, partNo, value) {
 
     console.log("set travel minutes " + partNo + " to " + time);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setTravelTimeEa(productNo, partNo, value) {
     var time = getMHD(value);
@@ -877,6 +897,7 @@ async function setTravelTimeEa(productNo, partNo, value) {
 
     console.log("set travel ea minutes " + partNo + " to " + time);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setTravelTimeMHD(productNo, partNo, minutes, hours, days) {
     var fields = Field.TravelTimeTotal(productNo, partNo);
@@ -887,6 +908,7 @@ async function setTravelTimeMHD(productNo, partNo, minutes, hours, days) {
 
     console.log("set travel minutes " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setTravelTimeMHDEa(productNo, partNo, minutes, hours, days) {
     var fields = Field.TravelTimeEach(productNo, partNo);
@@ -897,6 +919,7 @@ async function setTravelTimeMHDEa(productNo, partNo, minutes, hours, days) {
 
     console.log("set travel ea minutes " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setTravelType(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.TravelTypeTotal(productNo, partNo)));
@@ -904,6 +927,7 @@ async function setTravelType(productNo, partNo, value) {
     productContext.$data.ListDataItemChangeValue(value);
     console.log("set travel type of " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setTravelTypeEa(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.TravelTypeEach(productNo, partNo)));
@@ -911,6 +935,7 @@ async function setTravelTypeEa(productNo, partNo, value) {
     productContext.$data.ListDataItemChangeValue(value);
     console.log("set travel type ea of " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 //PAINT
 async function setPaintLitresEach(productNo, partNo, value) {
@@ -919,6 +944,7 @@ async function setPaintLitresEach(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintLitresTotal(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintLitresTotal(productNo, partNo)));
@@ -926,6 +952,7 @@ async function setPaintLitresTotal(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintColourMatchTimeEach(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintColourMatchTimeEach(productNo, partNo)));
@@ -933,6 +960,7 @@ async function setPaintColourMatchTimeEach(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintColourMatchTimeTotal(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintColourMatchTimeTotal(productNo, partNo)));
@@ -940,6 +968,7 @@ async function setPaintColourMatchTimeTotal(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintNumberCoatsEach(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintNumberCoatsEach(productNo, partNo)));
@@ -947,6 +976,7 @@ async function setPaintNumberCoatsEach(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintNumberCoatsTotal(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintNumberCoatsTotal(productNo, partNo)));
@@ -954,6 +984,7 @@ async function setPaintNumberCoatsTotal(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintSetupTimeEach(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintSetupTimeEach(productNo, partNo)));
@@ -961,6 +992,7 @@ async function setPaintSetupTimeEach(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintSetupTimeTotal(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintSetupTimeTotal(productNo, partNo)));
@@ -968,6 +1000,7 @@ async function setPaintSetupTimeTotal(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintFlashTimeEach(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintFlashTimeEach(productNo, partNo)));
@@ -975,6 +1008,7 @@ async function setPaintFlashTimeEach(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintFlashTimeTotal(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintFlashTimeTotal(productNo, partNo)));
@@ -982,6 +1016,7 @@ async function setPaintFlashTimeTotal(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintSprayTimeEach(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintSprayTimeEach(productNo, partNo)));
@@ -989,6 +1024,7 @@ async function setPaintSprayTimeEach(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setPaintSprayTimeTotal(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.PaintSprayTimeTotal(productNo, partNo)));
@@ -996,6 +1032,7 @@ async function setPaintSprayTimeTotal(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 //***********************************************************************//
 //          newOrEdit: True if new part, false if edit
@@ -1036,6 +1073,8 @@ async function q_AddPart_Painting(productNo, partNo, newOrEdit, totalOrEach, par
             await setPaintSprayTimeEach(productNo, partNo, sprayTime);
         }
     }
+
+    return partNo;
 }
 //***********************************************************************//
 //          newOrEdit: True if new part, false if edit
@@ -1068,6 +1107,8 @@ async function q_AddPart_CostMarkup(productNo, partNo, newOrEdit, totalOrEach, p
             await setPartMarkupEa(productNo, partNo, partMarkup);
         }
     }
+
+    return partNo;
 }
 //***********************************************************************//
 //          newOrEdit: True if new part, false if edit
@@ -1101,6 +1142,8 @@ async function q_AddPart_CostPrice(productNo, partNo, newOrEdit, totalOrEach, pa
             await setPartPriceEa(productNo, partNo, partPrice);
         }
     }
+
+    return partNo;
 }
 //***********************************************************************//
 //          newOrEdit: True if new part, false if edit
@@ -1152,6 +1195,7 @@ async function setRouterSetupTimeEach(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setRouterSetupTimeTotal(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.RouterSetupTimeTotal(productNo, partNo)));
@@ -1159,6 +1203,7 @@ async function setRouterSetupTimeTotal(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setRouterSetupOnceOff(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.RouterSetupOnceOff(productNo, partNo)));
@@ -1166,6 +1211,7 @@ async function setRouterSetupOnceOff(productNo, partNo, value) {
     productContext.$data.ValueDisplay(value);
     console.log("setRouterSetupOnceOff " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setRouterRunTimeEach(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.RouterRunTimeEach(productNo, partNo)));
@@ -1173,6 +1219,7 @@ async function setRouterRunTimeEach(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("setRouterRunTime " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setRouterRunTimeTotal(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.RouterRunTimeTotal(productNo, partNo)));
@@ -1180,6 +1227,7 @@ async function setRouterRunTimeTotal(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("setRouterRunTime " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setRouterPostJobTimeEach(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.RouterPostJobTimeEach(productNo, partNo)));
@@ -1187,6 +1235,7 @@ async function setRouterPostJobTimeEach(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("setRouterPostJobTime " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 async function setRouterPostJobTimeTotal(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.RouterPostJobTimeTotal(productNo, partNo)));
@@ -1194,6 +1243,7 @@ async function setRouterPostJobTimeTotal(productNo, partNo, value) {
     productContext.$data.Value(parseFloat(value));
     console.log("setRouterPostJobTime " + partNo + " to " + value);
     await sleep(sleepMS);
+    return partNo;
 }
 //PARTS
 async function switchPart(productNo, partNo, newPartName) {
@@ -1226,6 +1276,7 @@ async function switchPart(productNo, partNo, newPartName) {
     });
     console.log("successfully switched part " + newPartName + " on item " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function savePart(productNo, partNo) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
@@ -1251,6 +1302,7 @@ async function savePart(productNo, partNo) {
     });
     console.log("save part " + partNo);
     await sleep(sleepMS);
+    return partNo;
 }
 async function copyPart(currentProductNo, currentPartNo, newProductNo) {
     console.log(currentProductNo + " " + newProductNo);
@@ -1283,6 +1335,7 @@ async function copyPart(currentProductNo, currentPartNo, newProductNo) {
     });
     console.log("copy part from " + currentProductNo + "(" + getRealProductNo(currentProductNo) + ") to " + newProductNo + "(" + getRealProductNo(newProductNo) + ")");
     await sleep(sleepMS);
+    return partNo;
 }
 
 function getRealProductNo(productNo) {
@@ -1303,6 +1356,15 @@ function getRealPartNo(productNo, partNo) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo))).$data;
     var parts = productContext.Parts();
     var realPartNo = parts[partNo - 1].Index;
+    return realPartNo;
+}
+function getPartIndexFromReal(productNo, realPartNo) {
+    var productContext = ko.contextFor(document.querySelector(Field.Product(productNo))).$data;
+    var parts = productContext.Parts();
+    for(let i = 0; i < parts.length; i++) {
+        if(parts[i].Index == realPartNo) return i + 1;
+    }
+
     return realPartNo;
 }
 function getProductNames() {

@@ -29,7 +29,27 @@ class Sheet extends Material {
       static guillotineMaxCutWidth = 2500;
       static guillotineMaxRunLength = 20000;
       static guillotinePerCutTime = 5;
-      static guillotineMaterialsCanCut = ["ACM", "Signwhite", "Polycarb"];
+      static guillotineMaterialsCanCut = [
+            "ACM",
+            "Signwhite",
+            "Polycarb"
+      ];
+      static routerMaterialsCanCut = [
+            "ACM",
+            "Acrylic",
+            "Aluminium",
+            "Mondoclad",
+            "Foamed PVC",
+            "Polycarb",
+            "HDPE"
+      ];
+      static handMaterialsCanCut = [
+            "ACM",
+            "Foamed PVC",
+            "Corflute",
+            "Polycarb",
+            "HDPE"
+      ];
       static handPerCutTime = 10;
       static joinMethod = {
             "Full Sheet + Offcut": "Use Full Sheets + End Offcut",
@@ -94,6 +114,9 @@ class Sheet extends Material {
              * {parent: 'SHEET-1699952073332-95574529', data: []}]
              */
       #inheritedData = [];
+      /**
+       * @example [QWH(), QWH(),...]
+       */
       #inheritedSizes = [];
       #inheritedSizeTable;
 
@@ -289,7 +312,6 @@ class Sheet extends Material {
             super.UpdateFromChange();
 
             this.UpdateInheritedTable();
-
             this.UpdateOutputTable();
             this.UpdateVisualizer();
             this.UpdateDataForSubscribers();
@@ -354,8 +376,14 @@ class Sheet extends Material {
                   let recievedInputSizes = this.#inheritedData[a].data;
                   for(let i = 0; i < recievedInputSizes.length; i++) {
                         this.#inheritedSizes.push(recievedInputSizes[i]);
+                        console.log(recievedInputSizes[i]);
                         this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, recievedInputSizes[i].width, recievedInputSizes[i].height);
                   }
+            }
+
+            if(this.#inheritedData.length == 0) {
+                  this.#inheritedSizes.push(new QWH(this.qty, this.width, this.height));
+                  this.#inheritedSizeTable.addRow(this.qty, this.width, this.height);
             }
       };
 
@@ -521,7 +549,9 @@ class Sheet extends Material {
       createCuttingOptions = (width, height, sheetWidth, sheetHeight, material) => {
             let returnArray = [];
             let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet";
-            let guillotineCanCut = Sheet.guillotineCanCutSheet(width, height, sheetWidth, sheetHeight, material);
+            let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material);
+            let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material);
+            let canHandCutSheet = Sheet.canHandCutSheet(width, height, sheetWidth, sheetHeight, material);
             if(width === null && height === null && sheetWidth === null && sheetHeight === null) {
                   returnArray = [
                         createDropdownOption("None - (standard sheet)", "None"),
@@ -533,9 +563,9 @@ class Sheet extends Material {
             } else {
                   returnArray = [
                         setFieldDisabled(!isStandardSheet, createDropdownOption("None - (standard sheet)", "None")),
-                        setFieldDisabled(!guillotineCanCut, createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine")),
-                        createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router"),
-                        createDropdownOption("Cut By Hand - (PVC, Corflute)", "Cut By Hand"),
+                        setFieldDisabled(!canGuillotineSheet, createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine")),
+                        setFieldDisabled(!canRouterSheet, createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router")),
+                        setFieldDisabled(!canHandCutSheet, createDropdownOption("Cut By Hand - (PVC, Corflute)", "Cut By Hand")),
                         createDropdownOption("Cut By Supplier", "Cut By Supplier")
                   ];
             }
@@ -656,7 +686,7 @@ class Sheet extends Material {
        * @Guillotine
        */
 
-      static guillotineCanCutSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
+      static canGuillotineSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
             let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
             let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
 
@@ -676,6 +706,29 @@ class Sheet extends Material {
 
       static getNumberOfGuillotineCuts = (width, height, sheetWidth, sheetHeight) => {
             return Sheet.guillotineCutsPerType[Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight)];
+      };
+
+      /**
+       * @Router
+       */
+      static canRouterSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
+            if(!Sheet.routerMaterialsCanCut.includes(material)) {
+                  return false;
+            }
+            let [maxCutW, maxCutH] = convertDimensionsToLandscape(Router.maxCutSize.width, Router.maxCutSize.height);
+            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
+            let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
+
+            if(sw > maxCutW || sh > maxCutH || w > maxCutW || h > maxCutH) return false;
+      };
+
+      /**
+       * @HandCutting
+       */
+      static canHandCutSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
+            if(!Sheet.handMaterialsCanCut.includes(material)) {
+                  return false;
+            }
       };
 
       /**

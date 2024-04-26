@@ -6,6 +6,8 @@ class ModalToggleTokens extends Modal {
       constructor(headerText, optionPairs, callbackFunction, allowMultiple = true) {
             super(headerText, callbackFunction);
 
+            this.setContainerSize(500, 500);
+
             for(const [key, value] of Object.entries(optionPairs)) {
                   let token = createToken(key, value["show"], null, null);
                   this.addBodyElement(token[0]);

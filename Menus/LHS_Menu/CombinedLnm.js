@@ -63,7 +63,7 @@ class LnmMenu extends LHSMenuWindow {
         combinedLnmContainer_display.innerHTML = "Stats";
         combinedLnmContainer_display.style = "background-color:#444;color:white;margin-top:10px;margin-left:10px;margin-right:10px;margin-bottom:10px;min-height:30px;min-width:260px;padding:5px;float:left;display:block;color:white;cursor: pointer;";
 
-        var populateButton = createButton("Populate", "width:60%;margin:0px;", populate);
+        var populateButton = createButton("Populate", "width:40%;margin:0px;", populate);
         async function populate() {
             var productNo = parseFloat(populateProductN.value);
             await openPart(productNo, populatePartN.value);
@@ -75,18 +75,39 @@ class LnmMenu extends LHSMenuWindow {
         var populateProductN = createInput("P.No", null, "width:15%;margin:0px;height:24px", null);
         var populatePartN = createInput("Part", 1, "width:15%;margin:0px;height:24px", null);
 
+        let draggablePopulator = createButton("Drag and Drop Over Part to Populate", "width:100%;margin:0px;", () => { }, null);
+        draggablePopulator.draggable = true;
+        draggablePopulator.addEventListener("dragstart", function(e) {
+            //console.log(e.target);
+        });
+
+        this.onDrop = async function(e) {
+            console.log(e);
+            let dropOverElement = e.dropOverElement;
+            if(!e) return;
+            populateProductN.value = e.detail.productNo;
+            populatePartN.value = e.detail.partNo;
+            await populate();
+        };
+        console.log("in");
+
+        document.removeEventListener("dropEvent", this.onDrop);
+        document.addEventListener("dropEvent", this.onDrop);
+
 
         page.appendChild(combinedLnmContainer_display);
         page.appendChild(combinedLnmContainer_addBtn);
         page.appendChild(combinedLnmContainer_rowsContainer);
 
-        this.footer.appendChild(populateButton);
-        this.footer.appendChild(populateProductN);
-        this.footer.appendChild(populatePartN);
+        //this.footer.appendChild(populateButton);
+        //this.footer.appendChild(populateProductN);
+        //this.footer.appendChild(populatePartN);
+        this.footer.appendChild(draggablePopulator);
         //this.interval = setInterval(() => {this.tick();}, 1000 / 2);
     }
 
     hide() {
+        if(this.onDrop) document.removeEventListener("dropEvent", this.onDrop);
         super.hide();
         //clearInterval(this.interval);
     }

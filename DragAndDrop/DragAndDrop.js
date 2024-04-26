@@ -5,6 +5,8 @@
 <img id="drag1" src="img_logo.gif" draggable="true" ondragstart="drag(event)" width="336" height="69">
  */
 
+
+
 /**ondragover="allowDrop(event)" */
 function allowDrop(e) {
       e.preventDefault();
@@ -42,7 +44,7 @@ function makeReceiveDraggable(element) {
       };
 }
 
-class Sortable {
+class Sortable2 {
       constructor() {
 
       }

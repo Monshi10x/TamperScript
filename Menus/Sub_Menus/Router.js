@@ -1,5 +1,7 @@
 class Router extends SubMenu {
 
+	static maxCutSize = {width: 4100, height: 2100};
+
 	perShapeTime = secondsToMinutes(30);
 	runRows = [];
 	#showIDInContainer = true;

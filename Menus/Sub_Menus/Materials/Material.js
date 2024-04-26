@@ -177,7 +177,7 @@ class Material extends SubscriptionManager {
 
             for(let i = 0; i < this.subscriptions.length; i++) {
                   if(this.subscriptions[i].qty && this.subscriptions[i].width && this.subscriptions[i].height) {
-                        return new QWH(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);
+                        return this.subscriptions[i].getQWH();//new QWH(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);
                   }
             }
             return new QWH(0, 0, 0);

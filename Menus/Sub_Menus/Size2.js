@@ -158,6 +158,9 @@ class Size2 extends SubscriptionManager {
       #heading;
       #minimizeBtn;
       #deleteBtn;
+      #setting_KeepQty1;
+      #setting_IncludeSizeInDescription;
+      #includeSizeInDescription = false;
       #showIDInContainer = true;
       #rowName;
       #lhsMenuWindow;
@@ -169,6 +172,7 @@ class Size2 extends SubscriptionManager {
       /**
        * @SIZES
        */
+      #qtyIsEmbeddedInProduct = false;
       #qty;
       get qty() {return zeroIfNaNNullBlank(this.#qty[1].value);}
       set qty(value) {$(this.#qty[1]).val(value).change();};
@@ -214,7 +218,7 @@ class Size2 extends SubscriptionManager {
                   modal.value = this.productNumber;
             }, this.#container);
 
-            this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;border:1px solid " + this.#backgroundColor + ";", this.#container);
+            this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;position:relative;border:1px solid " + this.#backgroundColor + ";", this.#container);
 
             this.#qty = createInput_Infield("Qty", 1, "width:100px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 1);
 
@@ -222,9 +226,21 @@ class Size2 extends SubscriptionManager {
 
             this.#height = createInput_Infield("Height", null, "width:150px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100);
 
-            let commonSizeButton = createButton("Common", "width:100px;height:40px;margin:0px;margin-left:5px;margin-right:10px", () => {
+            let commonSizeButton = createButton("A4,...", "width:60px;height:40px;margin:0px;margin-left:5px;margin-right:10px", () => {
                   this.#openCommonSizeModal();
             }, this.#container);
+
+            let settingsButton = createButton("", "width:40px;height:40px;margin:0px;margin-left:5px;margin-right:10px;font-size:20px;", () => {
+                  this.#openSettingsModal();
+            }, this.#container);
+            settingsButton.innerHTML = "&#9881";
+
+            this.#setting_KeepQty1 = createCheckbox_Infield("Keep Product Quantity as 1 when created (embed quantities)", false, "width: 450px;", () => {this.onKeepQty1Change();}, null, () => {this.onKeepQty1Change();});
+            this.#setting_IncludeSizeInDescription = createCheckbox_Infield("Include Size In Description", false, "width: 450px;", () => {
+                  this.#includeSizeInDescription = this.#setting_IncludeSizeInDescription[1].checked;
+            }, null, () => {
+                  this.#includeSizeInDescription = this.#setting_IncludeSizeInDescription[1].checked;
+            });
 
             this.#deleteBtn = createButton("X", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
             this.#container.appendChild(this.#deleteBtn);
@@ -253,7 +269,15 @@ class Size2 extends SubscriptionManager {
       }
 
       getQWH() {
-            return new QWH(this.qty, this.width, this.height);
+            let qty;
+            if(this.#qtyIsEmbeddedInProduct) qty = this.qty;
+            else qty = 1;
+            return new QWH(qty, this.width, this.height);
+      }
+
+      getProductQuantity() {
+            if(this.#qtyIsEmbeddedInProduct) return 1;
+            else return this.qty;
       }
 
       #openCommonSizeModal() {
@@ -270,7 +294,21 @@ class Size2 extends SubscriptionManager {
             }, false);
       }
 
+      #openSettingsModal() {
+            let modal = new Modal("Settings", () => { });
+            modal.setContainerSize(500, 500);
+            modal.addBodyElement(this.#setting_KeepQty1[0]);
+            modal.addBodyElement(this.#setting_IncludeSizeInDescription[0]);
+      }
+
       onproductNumberChange() {
+            this.UpdateFromChange();
+      }
+
+      onKeepQty1Change() {
+            let isTicked = this.#setting_KeepQty1[1].checked;
+            console.log(isTicked);
+            this.#qtyIsEmbeddedInProduct = isTicked;
             this.UpdateFromChange();
       }
 
@@ -287,10 +325,13 @@ class Size2 extends SubscriptionManager {
        * @CorebridgeCreate
        */
       async Create(productNo, partIndex) {
+            await setProductQty(productNo, this.getProductQuantity());
             return partIndex;
       }
 
       Description() {
+            let qwh = this.getQWH();
+            if(this.#includeSizeInDescription) return "x" + qwh.qty + " @ " + qwh.width + "mmW x " + qwh.height + "mmH";
             return "";
       }
 }

@@ -89,6 +89,7 @@ class BillboardMenu extends LHSMenuWindow {
                         item.onclick = function() {
                               toggleSelectedType(this);
                               thisClass.draw();
+                              thisClass.updateFromFields();
                         };
                         item.onmouseover = function() {
                               this.style.boxShadow = "0 4px 8px 0 black";
@@ -103,12 +104,12 @@ class BillboardMenu extends LHSMenuWindow {
 
                   function toggleSelectedType(item) {
                         attachmentType = item.id;
-                        console.log(attachmentType);
 
                         for(var t = 0; t < items.length; t++) {
                               items[t].style.border = "2px solid white";
                         }
                         item.style.border = "2px solid black";
+
                   }
 
                   container.appendChild(headerLabel);
@@ -145,7 +146,6 @@ class BillboardMenu extends LHSMenuWindow {
       }
 
       async createBillboardProduct(tempThis) {
-            console.log(tempThis);
             tempThis.minimize();
 
             var productNo = 0;
@@ -325,7 +325,6 @@ class BillboardMenu extends LHSMenuWindow {
        * @CalledBy DragZoomCanvas
        */
       draw = () => {
-            console.log("draw");
             this.#leg.Update();
             this.#baseplate.Update();
             this.#frame.Update();

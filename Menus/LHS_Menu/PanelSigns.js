@@ -282,6 +282,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.thickness = "5.0";
 
 				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
+				vinyl.bleedDropdown = "Corflutes";
 				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
 				appTape = null;
 				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);

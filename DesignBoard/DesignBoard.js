@@ -488,19 +488,19 @@ async function updateBoard() {
 
       let newDiv_InDesign = new UIContainerType3("width:calc(20% - 24px);height:90%;flex: 0 0 auto;", "In Design", masterContainer);
       newDiv_InDesign.container.style.cssText += "background-color:#aaacff";
-      makeReceiveDraggable(newDiv_InDesign.container);
+      //makeReceiveDraggable(newDiv_InDesign.container);
       let newDiv_InDesignRevision = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "In Design Revision", masterContainer);
       newDiv_InDesignRevision.container.style.cssText += "background-color:#aaacff";
-      makeReceiveDraggable(newDiv_InDesignRevision.container);
+      //makeReceiveDraggable(newDiv_InDesignRevision.container);
       let newDiv_Approved = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "Proof Approved - Setup Print Files", masterContainer);
       newDiv_Approved.container.style.cssText += "background-color:#c8c8c8";
-      makeReceiveDraggable(newDiv_Approved.container);
+      //makeReceiveDraggable(newDiv_Approved.container);
       let newDiv_TristanToApprove = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "Tristan To Approve", masterContainer);
       newDiv_TristanToApprove.container.style.cssText += "background-color:#a2ff9b";
-      makeReceiveDraggable(newDiv_TristanToApprove.container);
+      //makeReceiveDraggable(newDiv_TristanToApprove.container);
       let newDiv_ReadyToPrint = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "Ready To Print", masterContainer);
       newDiv_ReadyToPrint.container.style.cssText += "background-color:#feffa6";
-      makeReceiveDraggable(newDiv_ReadyToPrint.container);
+      //makeReceiveDraggable(newDiv_ReadyToPrint.container);
       let dataPromise = [];
       let lineItemDescriptionFields = [];
       let lineItemDescriptionSpinners = [];
@@ -517,6 +517,7 @@ async function updateBoard() {
       let customerNotesBtns = [];
       let vendorNotesBtns = [];
       for(let i = 0; i < jobs.length; i++) {
+
             console.log(jobs[i]);
             //hide() {
             //     this.returnAllBorrowedFields();
@@ -532,7 +533,9 @@ async function updateBoard() {
             let newJobContainer = new UIContainer_Design("max-height:200px;", jobs[i].CompanyName, jobs[i].Description, toAppendTo);
             jobContainers.push(newJobContainer);
 
-            makeDraggable(newJobContainer.container);
+            //makeDraggable(newJobContainer.container);
+            newJobContainer.container.id = "sortablelist";
+
 
 
             let descriptionField = createDiv("width:calc(100% - 12px);margin:6px;min-height:40px;background-color:white;position:relative;", "Description", jobContainers[i].contentContainer);
@@ -544,7 +547,10 @@ async function updateBoard() {
 
             jobContainers[i].Minimize();
 
-
+            new Sortable(jobContainers[i].container, {
+                  animation: 150,
+                  ghostClass: 'sortable-ghost'
+            });
 
             let customerContactDiv = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:block;", "Customer Contact", jobContainers[i].contentContainer);
 
@@ -577,7 +583,8 @@ async function updateBoard() {
 
             /*
             allOrderProductStatuses
- {
+ 
+            {
                   "Id": 7,
                   "Name": "IN DESIGN",
                   "CbText": "WIP : In Design",
@@ -701,6 +708,8 @@ async function updateBoard() {
             //if(jobs[i].TotalPaid < jobs[i].TotalPrice) jobContainer.addHeadingButtons(paymentDueBtn);
             dataPromise.push(getOrderData_QuoteLevel(jobs[i].OrderId, jobs[i].AccountId, jobs[i].CompanyName));
       }
+
+
 
       //Notes
       for(let i = 0; i < jobs.length; i++) {

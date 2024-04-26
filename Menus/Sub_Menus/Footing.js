@@ -246,7 +246,6 @@ class Footing {
             var totalCubic = this.qty * ((this.depth / 1000) * Math.PI * radius * radius);
             var legsCubic = this.qty * (this.legClass.legWidth / 1000) * (this.legClass.legDepth / 1000) * (this.depth / 1000);
             var cubicExLegs = totalCubic - legsCubic;
-            console.log(radius + " " + totalCubic + " " + legsCubic + " " + cubicExLegs);
             this.suggestedBags = roundNumber(getSuggestedNumber20kgConcreteBags(cubicExLegs), 2);
       }
 

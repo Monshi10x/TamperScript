@@ -9,13 +9,15 @@ class Laminate extends Material {
       #materialTotalArea;
       #materialContainer;
       #material;
+      #useRollLength = false;
+      #useRollLengthField;
       set material(value) {$(this.#material[1]).val(value).change();}
 
       /**
        * @Inherited
        * @example
-       * [{parent: 'SHEET-1699952073332-95570559', data: []},
-       * {parent: 'SHEET-1699952073332-95574529', data: []}]
+       * [{parent: Object, data: [], finalRollSize:[]},
+       * {parent: Object, data: [], finalRollSize:[]}]
        */
       #inheritedData = [];
       #inheritedSizes = [];
@@ -56,6 +58,8 @@ class Laminate extends Material {
              * @InheritedParentSizeSplits
              */
             createHeadingStyle1("Inherited Parent Size Splits", null, this.container);
+            this.#useRollLengthField = createCheckbox_Infield("Use Approx. Roll Length", this.#useRollLength, "width:300px;", () => {this.#useRollLength = this.#useRollLengthField[1].checked; this.UpdateFromChange();}, this.container);
+
             this.#inheritedSizeTable = new Table(this.container, 780, 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
             this.#inheritedSizeTable.addRow("-", "-", "-");
@@ -80,7 +84,7 @@ class Laminate extends Material {
             /** @Machine */
             createHeadingStyle1("Machine", null, this.container);
             createText("Setup", "width:100%;height:20px", this.container);
-            this.#machineSetupTime = createInput_Infield("Setup Time (min)", 2, null, () => {this.UpdateFromChange();}, this.container, false, 0.1);
+            this.#machineSetupTime = createInput_Infield("Setup Time Average (min)", 3, null, () => {this.UpdateFromChange();}, this.container, false, 0.1);
 
             createText("Run", "width:100%;height:20px", this.container);
             this.#machineRunSpeed = createInput_Infield("Run Speed (m/min)", 3, null, () => {this.UpdateFromChange();}, this.container, false, 0.1);
@@ -136,7 +140,7 @@ class Laminate extends Material {
 
             //Per Parent Subscription:
             for(let a = 0; a < this.#inheritedData.length; a++) {
-                  if(this.#inheritedData[a].finalRollSize) {
+                  if(this.#inheritedData[a].finalRollSize && this.#useRollLength) {
                         let recievedInputSizes = this.#inheritedData[a].finalRollSize;
                         let i = 0;
                         this.#inheritedSizes.push(recievedInputSizes[i]);

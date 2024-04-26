@@ -1,3 +1,23 @@
+var onPartOverDrop_Options = {
+	dropOverElement: null,
+	productNo: -1,
+	partNo: -1
+};
+var onPartOverDrop = function(e) {
+	e.preventDefault();
+	let dropEvent = new CustomEvent("dropEvent",
+		{
+			bubbles: false,
+			detail: {
+				dropOverElement: onPartOverDrop_Options.dropOverElement,
+				productNo: onPartOverDrop_Options.productNo,
+				partNo: onPartOverDrop_Options.partNo
+			}
+		}
+	);
+	document.dispatchEvent(dropEvent);
+	onPartOverDrop_Options.dropOverElement.style.cssText += "border: 1px solid rgb(102, 102, 102);";
+};
 function partInfoTick() {
 	products = document.querySelectorAll('div[class^="ord-prod-model-item"]');
 
@@ -91,6 +111,32 @@ function partInfoTick() {
 			let koPartHeight = (koPart.Height()) * 25.4;
 			var partHasInstall = false;
 			let koPartDescription = koPart.PartDescription();
+
+			let p1 = parts[part];
+
+			p1.addEventListener("dragover", function(e) {
+				e.preventDefault();
+			});
+			p1.addEventListener("dragenter", function(e) {
+				e.preventDefault();
+				p1.style.cssText += "border:5px solid blue;";
+				onPartOverDrop_Options = {
+					dropOverElement: p1,
+					productNo: koProductNumber,
+					partNo: getPartIndexFromReal(koProductNumber, koPart.Index)
+				};
+
+			});
+			p1.addEventListener("dragleave", function(e) {
+				e.preventDefault();
+				/** @INFO: stops flickering **/
+				if(!this.contains(document.elementFromPoint(e.clientX, e.clientY))) {
+					p1.style.cssText += "border: 1px solid rgb(102, 102, 102);";
+				}
+			});
+
+			p1.removeEventListener("drop", onPartOverDrop);
+			p1.addEventListener("drop", onPartOverDrop);
 
 			partCost = 0;
 			partCostElement = parts[part].querySelectorAll("span[id^='viewModeLblPartTotalCostTotal']");

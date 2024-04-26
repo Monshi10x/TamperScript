@@ -41,8 +41,6 @@ class ProductDetails extends Material {
             this.#productNameField = createInput_Infield("Product Name", null, "width:30%", null, this.container, false, null);
             this.#productNameField[1].placeholder = "i.e. ACM Panel";
 
-            this.#includeSizeInWording = createCheckbox_Infield("Include Size In Wording", false, "width:250px", () => {this.UpdateFromChange();}, this.container, true);
-
             this.dataToPushToSubscribers = {
                   parent: this,
                   data: this.#dataForSubscribers
@@ -95,8 +93,6 @@ class ProductDetails extends Material {
       }
 
       Description() {
-            //todo: if show sizes in wording
-            if(this.#includeSizeInWording[1].checked) return "x" + this.qty + " @ " + this.width + "mmW x " + this.height + "mmH";
-            else return "";
+            return "";
       }
 }

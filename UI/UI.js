@@ -708,6 +708,16 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
 
     return [containerDiv, dummyInput, textDescription, dropdownBody];
 }
+function createFloatingTag(text, overrideCssStyles, parentObjectToAppendTo) {
+    let floatingTag = document.createElement("div");
+    floatingTag.innerText = text;
+    floatingTag.style = STYLE.FloatingTag;
+    if(overrideCssStyles) floatingTag.style.cssText += overrideCssStyles;
+    if(parentObjectToAppendTo != null) {
+        parentObjectToAppendTo.appendChild(floatingTag);
+    }
+    return floatingTag;
+}
 function resetDropdownOption_Icon(options, dropdownText, dropdownBody, optionalCallback) {
     for(var o = 0; o < options.length; o++) {
         var nullFunc = function() {
@@ -891,7 +901,7 @@ function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalC
     input.name = "checkbox";
     var containerDiv = document.createElement('div');
     var textDescription = document.createElement('p');
-    textDescription.style = "min-width: 40%;max-width:75%;height: 10px;color: rgb(102, 102, 102);font-size: 12px;float: left;display: block;margin: 8px;";
+    textDescription.style = "width:calc(100% - 48x);height: 10px;color: rgb(102, 102, 102);font-size: 12px;float: left;display: block;margin: 8px;";
     textDescription.innerText = text;
     input.autocomplete = 'off';
     input.style = "float: left;width: 20px;height: 18px;margin: 6px 6px 6px;background: none;text-align: right;display: block;padding: 5px;";

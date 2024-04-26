@@ -17,8 +17,8 @@ class AreaMenu extends LHSMenuWindow {
         //combinedSqmContainer_calcSqmBtn=document.createElement('button');
         var combinedSqmContainer_display = document.createElement('div');
 
-        var combinerSqmContainer_rowsContainer = document.createElement("div");
-        combinerSqmContainer_rowsContainer.style = "background-color:white;margin-top:5px;margin-left:0px;margin-right:0px;margin-bottom:0px;min-height:100px;max-height:600px;width:95%;padding:5px;float:left;display:block;color:white;cursor: pointer;border-style:none;overflow-y:scroll";
+        var combinedSqmContainer_rowsContainer = document.createElement("div");
+        combinedSqmContainer_rowsContainer.style = "background-color:white;margin-top:5px;margin-left:0px;margin-right:0px;margin-bottom:0px;min-height:100px;max-height:600px;width:95%;padding:5px;float:left;display:block;color:white;cursor: pointer;border-style:none;overflow-y:scroll";
 
         combinedSqmContainer_addBtn.innerHTML = "Add Row";
         combinedSqmContainer_addBtn.style = "background-color:" + COLOUR.Blue + ";margin-top:0px;margin-left:10px;margin-right:0px;margin-bottom:0px;min-height:20px;min-width:120px;padding:5px;float:left;display:block;color:white;cursor: pointer;border-style:none;";
@@ -44,7 +44,7 @@ class AreaMenu extends LHSMenuWindow {
             cab.appendChild(c1);
             cab.appendChild(c2);
             cab.appendChild(c3);
-            combinerSqmContainer_rowsContainer.appendChild(cab);
+            combinedSqmContainer_rowsContainer.appendChild(cab);
         });
 
         combinedSqmContainer_display.innerHTML = "Stats";
@@ -53,9 +53,9 @@ class AreaMenu extends LHSMenuWindow {
         var area_sqSide;
         var totalDescription;
         function updateStats() {
-            var allWidth = combinerSqmContainer_rowsContainer.getElementsByClassName("combinedSqm_Width");
-            var allHeight = combinerSqmContainer_rowsContainer.getElementsByClassName("combinedSqm_Height");
-            var allQty = combinerSqmContainer_rowsContainer.getElementsByClassName("combinedSqm_Qty");
+            var allWidth = combinedSqmContainer_rowsContainer.getElementsByClassName("combinedSqm_Width");
+            var allHeight = combinedSqmContainer_rowsContainer.getElementsByClassName("combinedSqm_Height");
+            var allQty = combinedSqmContainer_rowsContainer.getElementsByClassName("combinedSqm_Qty");
             areas = 0;
             var description = '';
             for(var w = 0; w < allWidth.length; w++) {
@@ -86,17 +86,36 @@ class AreaMenu extends LHSMenuWindow {
         var populateProductN = createInput("P.No", null, "width:15%;margin:0px;height:24px", null);
         var populatePartN = createInput("Part", 1, "width:15%;margin:0px;height:24px", null);
 
+
+        let draggablePopulator = createButton("Drag and Drop Over Part to Populate", "width:100%;margin:0px;", () => { }, null);
+        draggablePopulator.draggable = true;
+        draggablePopulator.addEventListener("dragstart", function(e) {
+            //console.log(e.target);
+        });
+
+        this.onDrop = async function(e) {
+            console.log(e);
+            let dropOverElement = e.dropOverElement;
+            if(!e) return;
+            populateProductN.value = e.detail.productNo;
+            populatePartN.value = e.detail.partNo;
+            await populate();
+        };
+        document.removeEventListener("dropEvent", this.onDrop);
+        document.addEventListener("dropEvent", this.onDrop);
+
         page.appendChild(combinedSqmContainer_display);
         page.appendChild(combinedSqmContainer_addBtn);
-        page.appendChild(combinerSqmContainer_rowsContainer);
-        this.footer.appendChild(populateButton);
-        this.footer.appendChild(populateProductN);
-        this.footer.appendChild(populatePartN);
+        page.appendChild(combinedSqmContainer_rowsContainer);
+
+        this.footer.appendChild(draggablePopulator);
+
 
         //this.interval = setInterval(() => {this.tick();}, 1000 / 2);
     }
 
     hide() {
+        if(this.onDrop) document.removeEventListener("dropEvent", this.onDrop);
         super.hide();
         //clearInterval(this.interval);
     }

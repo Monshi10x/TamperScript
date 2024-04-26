@@ -16,6 +16,11 @@ class Modal {
       get callbackFunction() {return this.#callbackFunction;}
       set callbackFunction(value) {this.#callbackFunction = value;}
 
+      setContainerSize(width = 300, height = 300) {
+            this.#modalContainer.style.width = width + 'px';
+            this.#modalContainer.style.height = height + 'px';
+      }
+
       constructor(headerText, callbackFunction) {
             this.#headerText = headerText;
             this.#callbackFunction = callbackFunction;

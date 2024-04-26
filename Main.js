@@ -43,6 +43,9 @@ var quoteSeconds_Total = 0;
 (function() {
   "use strict";
 
+  const myCss = GM_getResourceText("IMPORTED_CSS");
+  GM_addStyle(myCss);
+
   createCopyPartModal();
   createCostAnalysisSummaryContainer();
   createOptionsContainer();
@@ -93,6 +96,7 @@ function tickSecond() {
 }
 
 const event_testing = new Event("testingEvent");
+
 function keyboardTick() {
   $(document.body).keyup(function(e) {
     if(e.keyCode == 188) {
