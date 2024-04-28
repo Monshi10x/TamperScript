@@ -1,3 +1,6 @@
+/**
+ * @see https://github.com/SortableJS/Sortable
+ */
 (function() {
       'use strict';
       const myCss = GM_getResourceText("IMPORTED_CSS");
@@ -5,6 +8,8 @@
 })();
 
 ///Commonui.Alert("Done!");
+
+let defaultView = "Card View";
 
 let allOrderProductStatuses = [
       {
@@ -476,31 +481,293 @@ async function updateItemStatus(orderProductId, currentStatusID, newStatusId) {
       return data;
 }
 
+async function updateItemPriority(orderProductId, orderId, priority, colour, QueuePrioritizationSettingId) {
+      const response = await fetch("https://sar10686.corebridge.net/ManagementModule/GlobalSettings/ProductionSettings.asmx/SaveQueuePrioritization", {
+            "headers": {
+                  "accept": "*/*",
+                  "accept-language": "en-US,en;q=0.9",
+                  "content-type": "application/json; charset=UTF-8",
+                  "priority": "u=1, i",
+                  "sec-ch-ua": "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
+                  "sec-ch-ua-mobile": "?0",
+                  "sec-ch-ua-platform": "\"Windows\"",
+                  "sec-fetch-dest": "empty",
+                  "sec-fetch-mode": "cors",
+                  "sec-fetch-site": "same-origin",
+                  "x-requested-with": "XMLHttpRequest"
+            },
+            "referrer": "https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx",
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": "{\"QueuePrioritizationSettingId\":\"" + QueuePrioritizationSettingId + "\",\"Priority\":" + priority + ",\"Color\":\"" + colour + "\",\"OrderId\":\"" + orderId + "\",\"OrderProductId\":\"" + orderProductId + "\"}",
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+      });
+      const data = await response.json();
+
+      PrivateWeb.ManagementModule.ProductionSettingsWebService.SaveQueuePrioritization(QueuePrioritizationSettingId, priority, colour,
+            orderId, orderProductId, QueuePrioritization.DoneSaving, QueuePrioritization.OnError, QueuePrioritization.OnTimeOut);
+
+      return data;
+}
+
 async function updateBoard() {
       console.log(jobs);
-
+      // multiDrag: true, // Enable multi-drag
+      //selectedClass: 'selected', // The class applied to the selected items
+      //fallbackTolerance: 3, // So that we can select items on mobile
       //let table = document.querySelector("#tblQueue");
       //let tableRows = document.querySelectorAll(".queue-parentrow")
       let parentContainer = document.body;
+
+      let existingJobBoard = document.querySelector("#MainContent");
+      let existingJobBoardFooter = document.querySelector("#divFooterLogoWrapper");
+
       let masterContainer = document.createElement("div");
       parentContainer.appendChild(masterContainer);
-      masterContainer.style = "display:flex;float:left;width:100%;height:800px;background-color:white;flex-wrap: nowrap;overflow: auto;";
+      masterContainer.style = "display:flex;float:left;width:100vw;height:calc(100vh - 157px);background-color:white;flex-wrap: nowrap;overflow: auto;overflow-x:scroll;margin-bottom:0px;";
+      masterContainer.classList.add("x-scrollable");
 
-      let newDiv_InDesign = new UIContainerType3("width:calc(20% - 24px);height:90%;flex: 0 0 auto;", "In Design", masterContainer);
-      newDiv_InDesign.container.style.cssText += "background-color:#aaacff";
-      //makeReceiveDraggable(newDiv_InDesign.container);
-      let newDiv_InDesignRevision = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "In Design Revision", masterContainer);
-      newDiv_InDesignRevision.container.style.cssText += "background-color:#aaacff";
-      //makeReceiveDraggable(newDiv_InDesignRevision.container);
-      let newDiv_Approved = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "Proof Approved - Setup Print Files", masterContainer);
-      newDiv_Approved.container.style.cssText += "background-color:#c8c8c8";
-      //makeReceiveDraggable(newDiv_Approved.container);
-      let newDiv_TristanToApprove = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "Tristan To Approve", masterContainer);
-      newDiv_TristanToApprove.container.style.cssText += "background-color:#a2ff9b";
-      //makeReceiveDraggable(newDiv_TristanToApprove.container);
-      let newDiv_ReadyToPrint = new UIContainerType3("width:calc(20% - 24px);margin-left:0px;height:90%;flex: 0 0 auto;", "Ready To Print", masterContainer);
-      newDiv_ReadyToPrint.container.style.cssText += "background-color:#feffa6";
-      //makeReceiveDraggable(newDiv_ReadyToPrint.container);
+
+      let optionsHeader = document.createElement("div");
+      optionsHeader.style = "width:100%;height:75px;display:block;float: left;background-color:" + COLOUR.White;
+      //parentContainer.appendChild(optionsHeader);
+      insertBefore(optionsHeader, existingJobBoard);
+
+      let option_viewType = createDropdown_Infield("View", 1, "width:200px;box-shadow:none;",
+            [createDropdownOption("List View", "List View"),
+            createDropdownOption("Card View", "Card View"),
+            createDropdownOption("All", "All")], () => {
+                  if(option_viewType[1].value == "List View") {
+                        $(existingJobBoard).show();
+                        $(existingJobBoardFooter).show();
+                        $(masterContainer).hide();
+                  } else if(option_viewType[1].value == "Card View") {
+                        $(existingJobBoard).hide();
+                        $(existingJobBoardFooter).hide();
+                        $(masterContainer).show();
+                  } else if(option_viewType[1].value == "All") {
+                        $(existingJobBoard).show();
+                        $(existingJobBoardFooter).show();
+                        $(masterContainer).show();
+                  }
+            }, optionsHeader);
+
+      if(defaultView == "List View") {
+            $(existingJobBoard).show();
+            $(existingJobBoardFooter).show();
+            $(masterContainer).hide();
+      } else if(defaultView == "Card View") {
+            $(existingJobBoard).hide();
+            $(existingJobBoardFooter).hide();
+            $(masterContainer).show();
+      } if(defaultView == "All") {
+            $(existingJobBoard).show();
+            $(existingJobBoardFooter).show();
+            $(masterContainer).show();
+      }
+
+      let columnContainers = [];
+
+
+      let newDiv_Urgent = new UIContainerType3("width:calc(17% - 24px);min-width:350px;height:calc(100% - 40px);;flex: 0 0 auto;", "Urgent", masterContainer);
+      newDiv_Urgent.container.style.cssText += "background-color:#ff0000;";
+      new Sortable(newDiv_Urgent.contentContainer, {
+            animation: 120,
+            group: 'shared',
+            swapThreshold: 1,
+            ghostClass: 'sortable-ghost',
+            direction: 'vertical',
+            onEnd: function(/**Event*/evt) {
+                  onMoveEnd();
+            }
+      });
+      columnContainers.push(newDiv_Urgent);
+      newDiv_Urgent.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
+      newDiv_Urgent.contentContainer.classList.add("x-scrollable");
+      newDiv_Urgent.headingContainer.classList.add("x-scrollable");
+      for(let x = 0; x < newDiv_Urgent.headingContainer.children.length; x++) {
+            newDiv_Urgent.headingContainer.children[x].classList.add("x-scrollable");
+      }
+
+
+      let newDiv_DesignHold = new UIContainerType3("width:calc(17% - 24px);min-width:350px;height:calc(100% - 40px);;flex: 0 0 auto;", "Design Hold", masterContainer);
+      newDiv_DesignHold.container.style.cssText += "background-color:#a5a5a5;";
+      new Sortable(newDiv_DesignHold.contentContainer, {
+            animation: 120,
+            group: 'shared',
+            swapThreshold: 1,
+            ghostClass: 'sortable-ghost',
+            direction: 'vertical',
+            onEnd: function(/**Event*/evt) {
+                  onMoveEnd();
+            }
+      });
+      columnContainers.push(newDiv_DesignHold);
+      newDiv_DesignHold.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
+      newDiv_DesignHold.contentContainer.classList.add("x-scrollable");
+      newDiv_DesignHold.headingContainer.classList.add("x-scrollable");
+      for(let x = 0; x < newDiv_DesignHold.headingContainer.children.length; x++) {
+            newDiv_DesignHold.headingContainer.children[x].classList.add("x-scrollable");
+      }
+
+
+
+
+
+
+
+
+      let newDiv_InDesign = new UIContainerType3("width:calc(17% - 24px);min-width:350px;height:calc(100% - 40px);;flex: 0 0 auto;", "In Design", masterContainer);
+      newDiv_InDesign.container.style.cssText += "background-color:rgb(68, 114, 196);";
+      new Sortable(newDiv_InDesign.contentContainer, {
+            animation: 120,
+            group: 'shared',
+            swapThreshold: 1,
+            ghostClass: 'sortable-ghost',
+            direction: 'vertical',
+            onEnd: function(/**Event*/evt) {
+                  onMoveEnd();
+            }
+      });
+      columnContainers.push(newDiv_InDesign);
+      newDiv_InDesign.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
+      newDiv_InDesign.contentContainer.classList.add("x-scrollable");
+      newDiv_InDesign.headingContainer.classList.add("x-scrollable");
+      for(let x = 0; x < newDiv_InDesign.headingContainer.children.length; x++) {
+            newDiv_InDesign.headingContainer.children[x].classList.add("x-scrollable");
+      }
+
+
+      let newDiv_InDesignRevision = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "In Design Revision", masterContainer);
+      newDiv_InDesignRevision.container.style.cssText += "background-color:#a9d08e";
+      new Sortable(newDiv_InDesignRevision.contentContainer, {
+            animation: 120,
+            group: 'shared',
+            swapThreshold: 1,
+            ghostClass: 'sortable-ghost',
+            direction: 'vertical',
+            onEnd: function(/**Event*/evt) {
+                  onMoveEnd();
+            }
+      });
+      columnContainers.push(newDiv_InDesignRevision);
+      newDiv_InDesignRevision.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
+      newDiv_InDesignRevision.contentContainer.classList.add("x-scrollable");
+      for(let x = 0; x < newDiv_InDesignRevision.headingContainer.children.length; x++) {
+            newDiv_InDesignRevision.headingContainer.children[x].classList.add("x-scrollable");
+      }
+
+      let newDiv_Approved = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Proof Approved - Setup Print Files", masterContainer);
+      newDiv_Approved.container.style.cssText += "background-color:rgb(217, 225, 242)";
+      new Sortable(newDiv_Approved.contentContainer, {
+            animation: 120,
+            group: 'shared',
+            swapThreshold: 1,
+            ghostClass: 'sortable-ghost',
+            direction: 'vertical',
+            onEnd: function(/**Event*/evt) {
+                  onMoveEnd();
+            }
+      });
+      columnContainers.push(newDiv_Approved);
+      newDiv_Approved.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
+      newDiv_Approved.contentContainer.classList.add("x-scrollable");
+      for(let x = 0; x < newDiv_Approved.headingContainer.children.length; x++) {
+            newDiv_Approved.headingContainer.children[x].classList.add("x-scrollable");
+      }
+
+
+      let newDiv_TristanToApprove = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Tristan To Approve", masterContainer);
+      newDiv_TristanToApprove.container.style.cssText += "background-color:rgb(71, 173, 139);";
+      new Sortable(newDiv_TristanToApprove.contentContainer, {
+            animation: 120,
+            group: 'shared',
+            swapThreshold: 1,
+            ghostClass: 'sortable-ghost',
+            direction: 'vertical',
+            onEnd: function(/**Event*/evt) {
+                  onMoveEnd();
+            }
+      });
+      columnContainers.push(newDiv_TristanToApprove);
+      newDiv_TristanToApprove.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
+      newDiv_TristanToApprove.contentContainer.classList.add("x-scrollable");
+      for(let x = 0; x < newDiv_TristanToApprove.headingContainer.children.length; x++) {
+            newDiv_TristanToApprove.headingContainer.children[x].classList.add("x-scrollable");
+      }
+
+      let newDiv_ReadyToPrint = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Ready To Print", masterContainer);
+      newDiv_ReadyToPrint.container.style.cssText += "background-color:rgb(255, 192, 0);";
+      new Sortable(newDiv_ReadyToPrint.contentContainer, {
+            animation: 120,
+            group: 'shared',
+            swapThreshold: 1,
+            ghostClass: 'sortable-ghost',
+            direction: 'vertical',
+            onEnd: function(/**Event*/evt) {
+                  onMoveEnd();
+            }
+      });
+      columnContainers.push(newDiv_ReadyToPrint);
+      newDiv_ReadyToPrint.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
+      newDiv_ReadyToPrint.contentContainer.classList.add("x-scrollable");
+      for(let x = 0; x < newDiv_ReadyToPrint.headingContainer.children.length; x++) {
+            newDiv_ReadyToPrint.headingContainer.children[x].classList.add("x-scrollable");
+      }
+
+      let newDiv_Production = new UIContainerType3("width:calc(15% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Printed -> Production", masterContainer);
+      newDiv_Production.container.style.cssText += "background-color:rgb(68, 114, 196);";
+      new Sortable(newDiv_Production.contentContainer, {
+            animation: 120,
+            group: 'shared',
+            swapThreshold: 1,
+            ghostClass: 'sortable-ghost',
+            direction: 'vertical',
+            onEnd: function(/**Event*/evt) {
+                  onMoveEnd();
+            }
+      });
+      columnContainers.push(newDiv_Production);
+      newDiv_Production.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
+      newDiv_Production.contentContainer.classList.add("x-scrollable");
+      for(let x = 0; x < newDiv_Production.headingContainer.children.length; x++) {
+            newDiv_Production.headingContainer.children[x].classList.add("x-scrollable");
+      }
+
+      const slider = masterContainer;
+      let isDown = false;
+      let startX;
+      let scrollLeft;
+
+      slider.addEventListener('mousedown', (e) => {
+            if(e.target.classList.contains("x-scrollable")) {
+                  e.preventDefault();
+                  isDown = true;
+                  slider.classList.add('active');
+                  startX = e.pageX - slider.offsetLeft;
+                  scrollLeft = slider.scrollLeft;
+            }
+      });
+      slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.classList.remove('active');
+      });
+      slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.classList.remove('active');
+      });
+      slider.addEventListener('mousemove', (e) => {
+            if(!isDown) return;
+            if(e.target.classList.contains("x-scrollable")) {
+                  e.preventDefault();
+                  const x = e.pageX - slider.offsetLeft;
+                  const walk = (x - startX) * 1; //scroll-fast
+                  slider.scrollLeft = scrollLeft - walk;
+            }
+      });
+
+
       let dataPromise = [];
       let lineItemDescriptionFields = [];
       let lineItemDescriptionSpinners = [];
@@ -516,41 +783,54 @@ async function updateBoard() {
       let productionNotesBtns = [];
       let customerNotesBtns = [];
       let vendorNotesBtns = [];
+      let placeHolderPaymentDueBtns = [];
+      let placeHolderPaymentDueLoaders = [];
+
+      let queuePriority = [];
+
       for(let i = 0; i < jobs.length; i++) {
 
-            console.log(jobs[i]);
             //hide() {
             //     this.returnAllBorrowedFields();
             //super.hide();
             //}
             let toAppendTo;
             if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design") toAppendTo = newDiv_InDesign.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design" && jobs[i].QueuePrioritySettingColor == "#a5a5a5") toAppendTo = newDiv_DesignHold.contentContainer;
             if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") toAppendTo = newDiv_InDesignRevision.contentContainer;
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && (jobs[i].QueuePrioritySettingColor == "#d9e1f2" || jobs[i].QueuePrioritySettingColor == "#4472c4")) toAppendTo = newDiv_Approved.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && (jobs[i].QueuePrioritySettingColor == "#d9e1f2" || jobs[i].QueuePrioritySettingColor == "#4472c4" || jobs[i].QueuePrioritySettingColor == null || jobs[i].QueuePrioritySettingColor == "#ffffff")) toAppendTo = newDiv_Approved.contentContainer;
             if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#47ad8b") toAppendTo = newDiv_TristanToApprove.contentContainer;
             if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#ffc000") toAppendTo = newDiv_ReadyToPrint.contentContainer;
+            if(jobs[i].QueuePrioritySettingColor == "#ff0000") toAppendTo = newDiv_Urgent.contentContainer;
 
             let newJobContainer = new UIContainer_Design("max-height:200px;", jobs[i].CompanyName, jobs[i].Description, toAppendTo);
-            jobContainers.push(newJobContainer);
+            newJobContainer.container.dataset.cb_id = jobs[i].Id;
+            newJobContainer.Id = jobs[i].Id;
+            newJobContainer.OrderId = jobs[i].OrderId;
+            newJobContainer.Priority = jobs[i].QueuePriority;
+            newJobContainer.JobColour = jobs[i].QueuePrioritySettingColor;
+            newJobContainer.QueuePrioritySettingId = jobs[i].QueuePrioritySettingId;
 
-            //makeDraggable(newJobContainer.container);
+            jobContainers.push(newJobContainer);
+            jobs[i].jobContainer = newJobContainer;
             newJobContainer.container.id = "sortablelist";
 
+            let tempSpinnerDiv = document.createElement("div");
+            tempSpinnerDiv.style = "display: block;position:relative; text-align: center;font-size:8px;line-height:30px;float: right; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:0px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; background-color:" + COLOUR.MediumGrey + ";";
+            tempSpinnerDiv.innerHTML = "  $";
+            placeHolderPaymentDueBtns.push(tempSpinnerDiv);
+            newJobContainer.addHeadingButtons(tempSpinnerDiv);
+            let placeholderLoader = new Loader("", tempSpinnerDiv);
 
+            placeHolderPaymentDueLoaders.push(placeholderLoader);
+            placeholderLoader.setSize(10);
 
             let descriptionField = createDiv("width:calc(100% - 12px);margin:6px;min-height:40px;background-color:white;position:relative;", "Description", jobContainers[i].contentContainer);
             lineItemDescriptionFields.push(descriptionField);
             let loader = new Loader("", descriptionField);
             lineItemDescriptionSpinners.push(loader);
 
-
-
             jobContainers[i].Minimize();
-
-            new Sortable(jobContainers[i].container, {
-                  animation: 150,
-                  ghostClass: 'sortable-ghost'
-            });
 
             let customerContactDiv = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:block;", "Customer Contact", jobContainers[i].contentContainer);
 
@@ -559,7 +839,7 @@ async function updateBoard() {
             createLabel("Contact Ph2: " + jobs[i].OrderContactCellPhone, null, customerContactDiv);
 
             let inhouseDiv = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:block;", "Inhouse Items", jobContainers[i].contentContainer);
-            let designer = createDropdown_Infield("Designer", 2, "width:300px;margin-right: calc(100% - 312px);",
+            let designer = createDropdown_Infield("Designer", 2, "max-width:30%;min-width:150px;margin-right: 70%;",
                   [createDropdownOption("Darren Frankish", "Darren Frankish"),
                   createDropdownOption("Leandri Hayward", "Leandri Hayward"),
                   createDropdownOption("null", "null")], () => {alert("TODO: Designer On Change");}, inhouseDiv);
@@ -614,10 +894,9 @@ async function updateBoard() {
                               WIPID = allOrderProductStatuses[k]['Id'];
                         }
                   }
-                  console.log(WIPID);
                   dropdownOptions.push(createDropdownOption(WIPOptions[j], WIPID));
             }
-            let WIPStatus = createDropdown_Infield("WIP Status", 0, "width:300px;margin-right: calc(100% - 312px);",
+            let WIPStatus = createDropdown_Infield("WIP Status", 0, "max-width:30%;min-width:150px;margin-right: 70%;",
                   dropdownOptions, async () => {
                         let loader = new Loader("", WIPStatus[0]);
                         await updateItemStatus(jobs[i].Id, WIPStatus[1].options[WIPStatus[1].dataset.currentValue].value, WIPStatus[1].options[WIPStatus[1].selectedIndex].value);
@@ -638,7 +917,6 @@ async function updateBoard() {
 
             for(let x = 0; x < WIPStatus[1].options.length; x++) {
                   //WIPStatus[1].options.length
-                  console.log(jobs[i].OrderProductStatusTextWithOrderStatus + "/" + WIPStatus[1].options[x].value);
                   if(jobs[i].OrderProductStatusTextWithOrderStatus == WIPStatus[1].options[x].innerText) {
                         WIPStatus[1].selectedIndex = x;
                         WIPStatus[1].dataset.currentValue = x;
@@ -691,27 +969,120 @@ async function updateBoard() {
             //
 
 
-            let itemNoBtn = createButton(jobs[i].LineItemOrder + "/" + jobs[i].TotalProductsInOrder, "display: block; float: right; width: " + 60 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:rgb(255 111 63);", () => { });
+
+
+            let jobNoBtn = createButton(jobs[i].OrderInvoiceNumber, "display: block; float: left; width: " + 80 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Black + ";", () => { });
+            jobContainers[i].addHeadingButtons(jobNoBtn);
+
+            let itemNoBtn = createButton(jobs[i].LineItemOrder + "/" + jobs[i].TotalProductsInOrder, "display: block; float: left; width: " + 40 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, () => { });
             jobContainers[i].addHeadingButtons(itemNoBtn);
 
 
-            let jobNoBtn = createButton(jobs[i].OrderInvoiceNumber, "display: block; float: right; width: " + 80 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Orange + ";", () => { });
-            jobContainers[i].addHeadingButtons(jobNoBtn);
+            let jobColour = document.createElement("div");
+            jobColour.style = "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:0px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + (jobs[i].QueuePrioritySettingColor == null ? "white" : jobs[i].QueuePrioritySettingColor) + ";";
 
-            let jobColour = createButton("", "display: block; float: right; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:2px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + (jobs[i].QueuePrioritySettingColor == null ? "white" : jobs[i].QueuePrioritySettingColor) + ";", () => {
+            jobContainers[i].addHeadingButtons(jobColour);
+            jobColour.id = "jobColour";
+
+            //QueuePriority
+            //let queuePriority = jobs[i].QueuePriority;
+            //if(jobs[i].QueuePriority == null) {
+            //      console.log("i " + i);
+            //      queuePriority = (i + 1);
+            //}
+            let jobOrder = createButton(jobs[i].QueuePriority, "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:2px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.White + ";", () => {
 
             });
-            jobContainers[i].addHeadingButtons(jobColour);
-            console.log(jobs[i].QueuePrioritySettingColor);
+            jobOrder.id = "queuePriority";
+            queuePriority.push(jobOrder);
+            jobContainers[i].addHeadingButtons(jobOrder);
 
 
             //if(jobs[i].TotalPaid < jobs[i].TotalPrice) jobContainer.addHeadingButtons(paymentDueBtn);
             dataPromise.push(getOrderData_QuoteLevel(jobs[i].OrderId, jobs[i].AccountId, jobs[i].CompanyName));
       }
 
+      onMoveEnd();
+
+      async function onMoveEnd() {
+            for(let c = 0; c < columnContainers.length; c++) {
+                  let jobContainers_c = columnContainers[c].contentContainer.querySelectorAll(".UIContainer_Design");
+                  let jobContainer_Colour = columnContainers[c].container.style.backgroundColor;
+
+                  for(let j = 0; j < jobContainers_c.length; j++) {
+                        let requiresUpdate = false;
+
+                        //Number Priority
+                        let priority = jobContainers_c[j].querySelector("#queuePriority");
+                        let previousPriority = priority.innerHTML;
+                        priority.innerHTML = (j + 1);
+                        let newPriority = priority.innerHTML;
+                        if(previousPriority != newPriority) requiresUpdate = true;
+
+                        //Colour
+                        let jobColour = jobContainers_c[j].querySelector("#jobColour");
+                        let prevColour = jobColour.style.backgroundColor;
+                        jobColour.style.backgroundColor = jobContainer_Colour;
+                        let newColour = jobColour.style.backgroundColor;
+
+                        if(prevColour != newColour) requiresUpdate = true;
+
+                        //newJobContainer.container.dataset.cb_id
+
+                        for(let x = 0; x < jobs.length; x++) {
+                              if(jobs[x].Id == jobContainers_c[j].dataset.cb_id) {
+                                    let newQueuePrioritySettingId = "9";//default hold
+                                    //enforce Colouring
+                                    if(jobs[x].QueuePrioritySettingColor != "#ff0000") {
+                                          if(jobs[x].QueuePrioritySettingColor == "#ffffff") {
+                                                requiresUpdate = true;
+                                          } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") {
+                                                if(jobs[x].QueuePrioritySettingColor != "#a9d08e") {
+                                                      requiresUpdate = true;
+                                                      newQueuePrioritySettingId = "14";
+                                                }
+                                          } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design") {
+                                                if(jobs[x].QueuePrioritySettingColor != "#4472c4" && jobs[x].QueuePrioritySettingColor != "#a5a5a5") {
+                                                      requiresUpdate = true;
+                                                      newQueuePrioritySettingId = "5";
+                                                }
+                                          } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved") {
+                                                if(jobs[x].QueuePrioritySettingColor != "#d9e1f2" && jobs[x].QueuePrioritySettingColor != "#ffc000" && jobs[x].QueuePrioritySettingColor != "#47ad8b") {
+                                                      requiresUpdate = true;
+                                                      newQueuePrioritySettingId = "13";
+                                                }
+                                          }
+                                    }
+
+                                    if(requiresUpdate) {
+                                          //background-color:rgb(68, 114, 196);
+                                          //#a9d08e
+                                          var a = jobColour.style.backgroundColor.split("(")[1].split(")")[0];
+                                          a = a.split(",");
+                                          var b = a.map(function(r) {             //For each array element
+                                                r = parseInt(r).toString(16);      //Convert to a base16 string
+                                                return (r.length == 1) ? "0" + r : r;  //Add zero if we get only one character
+                                          });
+                                          b = "#" + b.join("");
+                                          let colourAsHex = b;
+
+                                          console.log(jobs[x].CompanyName, jobs[x].Id, jobs[x].OrderId, (j + 1), colourAsHex, jobs[x].QueuePrioritySettingId == null ? newQueuePrioritySettingId : jobs[x].QueuePrioritySettingId);
+
+                                          await updateItemPriority("" + jobs[x].Id, "" + jobs[x].OrderId, (j + 1), "" + colourAsHex, jobs[x].QueuePrioritySettingId == null ? newQueuePrioritySettingId : jobs[x].QueuePrioritySettingId);
+                                          break;
+                                    }
+                              }
+                        }
+                  }
+            }
+            console.log("done");
+      }
 
 
-      //Notes
+
+      /**
+       * @Notes
+       */
       for(let i = 0; i < jobs.length; i++) {
             let productNotesDesign = await getProductNotes(jobs[i].Id, 2);
             let numOfNotes = productNotesDesign.ProductionNotes.length;
@@ -734,16 +1105,24 @@ async function updateBoard() {
       let data = await Promise.all(dataPromise);
 
 
+      /**
+       * @AfterFetch
+       */
+      for(let j = 0; j < placeHolderPaymentDueBtns.length; j++) {
+            deleteElement(placeHolderPaymentDueBtns[j]);
+            placeHolderPaymentDueLoaders[j].Delete();
+      }
       for(let i = 0; i < jobs.length; i++) {
-            console.log(data[i]);
             /**
              * Payment
              */
             let amountPaid = data[i].OrderInformation.OrderInformation.G0;
             let amountDue = data[i].OrderInformation.OrderInformation.F9;
+
             let paymentDueBtn = createButton("$", "display: block; float: right; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:2px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Yellow + ";", () => {
                   let paymentModal = new ModalSingleInput("Payment Due - " + jobs[i].CompanyName + " - " + jobs[i].OrderInvoiceNumber, () => { });
                   paymentModal.value = amountDue;
+                  paymentModal.setContainerSize(400, 300);
             });
             let paymentNotDueBtn = createButton("&#10003", "display: block; float: right; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Green + ";", () => { });
             paymentNotDueBtn.innerHTML = "&#10003";
@@ -764,14 +1143,12 @@ async function updateBoard() {
       }
 
       function reorderJobContainer(container, status, currentQueueColour) {
-            console.log(container, status, currentQueueColour);
-            console.log(status == "WIP : In Design");
-            console.log(status == "WIP : In Design Revision");
             if(status == "WIP : In Design") newDiv_InDesign.contentContainer.appendChild(container);
             if(status == "WIP : In Design Revision") newDiv_InDesignRevision.contentContainer.appendChild(container);
             if(status == "WIP : Proof Approved" && (currentQueueColour == "#d9e1f2" || currentQueueColour == "#4472c4")) newDiv_Approved.contentContainer.appendChild(container);
             if(status == "WIP : Proof Approved" && currentQueueColour == "#47ad8b") newDiv_TristanToApprove.contentContainer.appendChild(container);
             if(status == "WIP : Proof Approved" && currentQueueColour == "#ffc000") newDiv_ReadyToPrint.contentContainer.appendChild(container);
+            if(currentQueueColour == "#ff0000") newDiv_Urgent.contentContainer.appendChild(container);
       }
 }
 

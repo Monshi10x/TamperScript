@@ -314,6 +314,16 @@ class Solver {
       }
 }
 
+
+function componentToHex(c) {
+      var hex = c.toString(16);
+      return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+      return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
 /**
  * Expand shorthand form(e.g. "03F") to full form(e.g. "0033FF")
  * @param {string} hex - hex string

@@ -3,6 +3,8 @@ class UIContainerType3 {
       get container() {return this.#container;}
 
       #headingContainer;
+      get headingContainer() {return this.#headingContainer;}
+
       #headingContainer_Height = 30;
 
       #headingText;

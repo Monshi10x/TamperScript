@@ -23,6 +23,7 @@
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
+// @require      https://raw.githack.com/SortableJS/Sortable/master/Sortable.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Charts\Chart.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UI.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UIContainerType3.js

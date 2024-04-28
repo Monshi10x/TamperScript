@@ -430,7 +430,7 @@ function createDropdown_Infield_Icons(text, selectedIndex, overrideCssStyles, wi
     containerDiv.appendChild(textDescription);
 
     var dropdownText = document.createElement('div');
-    dropdownText.style = "width:97%;height:10px;margin: 0px;padding:4px;color:black;font-size:14px;background:none;overflow: hidden;text-overflow: ellipsis;";
+    dropdownText.style = "width:97%;height:10px;margin: 0px;padding:4px;color:black;font-size:14px;background:none;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;";
     dropdownText.style.cursor = "pointer";
     dropdownText.innerText = "test123";
     dropdownText.onclick = function() {
@@ -533,7 +533,7 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
     containerDiv.appendChild(textDescription);
 
     var dropdownText = document.createElement('div');
-    dropdownText.style = "width:97%;height:15px;margin: 0px;padding:4px;color:black;font-size:14px;background:none;overflow: hidden;text-overflow: ellipsis;";
+    dropdownText.style = "width:97%;height:15px;margin: 0px;padding:4px;color:black;font-size:14px;background:none;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;";
     dropdownText.style.cursor = "pointer";
     dropdownText.innerText = "test123";
     dropdownText.onclick = toggleMenu;

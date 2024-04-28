@@ -14,7 +14,7 @@ class Loader {
       }
 
       setSize(widthNumber) {
-            this.#container.style.cssText += "width:" + widthNumber + "px;height:" + widthNumber + "px;margin:-" + widthNumber - 5 + "px 0 0 -" + widthNumber - 5 + "px;";
+            this.#container.style.cssText += ";width:" + widthNumber + "px;height:" + widthNumber + "px;margin:-" + (widthNumber) + "px 0px 0px -" + (widthNumber) + "px;";
       }
 
       Delete() {

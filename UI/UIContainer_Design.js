@@ -3,6 +3,8 @@ class UIContainer_Design {
       get container() {return this.#container;}
 
       #headingContainer;
+      get headingContainer() {return this.#headingContainer;}
+
       #headingContainer_Height = 30;
       #customerNameHeadingContainer;
       #customerNameHeadingContainer_Height = 30;
@@ -34,6 +36,29 @@ class UIContainer_Design {
       #contentContainer;
       get contentContainer() {return this.#contentContainer;}
 
+
+
+      #Id;
+      set Id(value) {this.#Id = value;}
+      get Id() {return this.#Id;}
+      #OrderId;
+      set OrderId(value) {this.#OrderId = value;}
+      get OrderId() {return this.#OrderId;}
+      #Priority;
+      set Priority(value) {this.#Priority = value;}
+      get Priority() {return this.#Priority;}
+      #JobColour;
+      set JobColour(value) {this.#JobColour = value;}
+      get JobColour() {return this.#JobColour;}
+      #QueuePrioritySettingId;
+      set QueuePrioritySettingId(value) {this.#QueuePrioritySettingId = value;}
+      get QueuePrioritySettingId() {return this.#QueuePrioritySettingId;}
+
+
+      #jobData;
+      set jobData(value) {this.#jobData = value;}
+      get jobData() {return this.#jobData;}
+
       constructor(overrideCssStyles, customerNameText, jobNameText, parentObjectToAppendTo) {
             this.#customerNameText = customerNameText;
             this.#jobNameText = jobNameText;
@@ -56,7 +81,6 @@ class UIContainer_Design {
             }
 
             /**@HeadingContainer */
-
             this.#headingContainer = document.createElement("div");
             this.#headingContainer.style = "width:100%;height:" + this.#headingContainer_Height + "px;box-sizing:border-box;";
             this.#container.appendChild(this.#headingContainer);
@@ -69,7 +93,7 @@ class UIContainer_Design {
 
                   this.#customerNameText = document.createElement("h3");
                   this.#customerNameText.innerText = customerNameText;
-                  this.#customerNameText.style = "float: left; height: 30px; margin: 0px 0px 0px 0px; background-color: " + COLOUR.DarkGrey + "; width: calc(100%); box-sizing: border-box; padding: 0px; font-size: 10px; color: white; text-align: center; line-height: 30px; border: 1px solid " + COLOUR.DarkGrey + ";";
+                  this.#customerNameText.style = "float: left; height: 30px; margin: 0px 0px 0px 0px; background-color: " + COLOUR.White + "; width: calc(100%); box-sizing: border-box; padding: 0px; font-size: 16px; color: " + COLOUR.Black + "; text-align: center; line-height: 30px; border: 1px solid " + COLOUR.White + ";overflow: hidden;text-overflow: ellipsis;white-space: nowrap;padding-left: 4px;padding-right: 4px;";
                   this.#customerNameHeadingContainer.appendChild(this.#customerNameText);
             }
 
@@ -81,7 +105,7 @@ class UIContainer_Design {
 
                   this.#jobNameText = document.createElement("h3");
                   this.#jobNameText.innerText = jobNameText;
-                  this.#jobNameText.style = "float: left; height: 30px; margin: 0px 0px 0px 0px; background-color: " + COLOUR.DarkGrey + "; width: calc(100%); box-sizing: border-box; padding: 0px; font-size: 10px; color: white; text-align: center; line-height: 30px; border: 1px solid " + COLOUR.DarkGrey + ";";
+                  this.#jobNameText.style = "float: left; height: 30px; margin: 0px 0px 0px 0px; background-color: " + COLOUR.White + "; width: calc(100%); box-sizing: border-box; padding: 0px; font-size: 10px; color: " + COLOUR.DarkGrey + "; text-align: center; line-height: 30px; border: 1px solid " + COLOUR.White + ";overflow: hidden;text-overflow: ellipsis;white-space: nowrap;padding-left: 4px;padding-right: 4px;";
                   this.#jobNameHeadingContainer.appendChild(this.#jobNameText);
             }
 
