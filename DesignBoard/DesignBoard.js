@@ -1004,6 +1004,15 @@ async function updateBoard() {
 
       onMoveEnd();
 
+      /*
+Print files to be done: "13"
+none: ""
+todo:"5"
+redesign :"14"
+hold:"9"
+urgent: "3"
+      */
+
       async function onMoveEnd() {
             for(let c = 0; c < columnContainers.length; c++) {
                   let jobContainers_c = columnContainers[c].contentContainer.querySelectorAll(".UIContainer_Design");
@@ -1025,18 +1034,19 @@ async function updateBoard() {
                         jobColour.style.backgroundColor = jobContainer_Colour;
                         let newColour = jobColour.style.backgroundColor;
 
-                        if(prevColour != newColour) requiresUpdate = true;
+                        if(prevColour != newColour) {
+                              requiresUpdate = true;
+                        }
 
                         //newJobContainer.container.dataset.cb_id
 
                         for(let x = 0; x < jobs.length; x++) {
+                              //if job container holds this item
                               if(jobs[x].Id == jobContainers_c[j].dataset.cb_id) {
-                                    let newQueuePrioritySettingId = "9";//default hold
+                                    let newQueuePrioritySettingId = "3";//default urgent
                                     //enforce Colouring
                                     if(jobs[x].QueuePrioritySettingColor != "#ff0000") {
-                                          if(jobs[x].QueuePrioritySettingColor == "#ffffff") {
-                                                requiresUpdate = true;
-                                          } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") {
+                                          if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") {
                                                 if(jobs[x].QueuePrioritySettingColor != "#a9d08e") {
                                                       requiresUpdate = true;
                                                       newQueuePrioritySettingId = "14";
@@ -1051,6 +1061,9 @@ async function updateBoard() {
                                                       requiresUpdate = true;
                                                       newQueuePrioritySettingId = "13";
                                                 }
+                                          } if(jobs[x].QueuePrioritySettingColor == "#ffffff") {
+                                                requiresUpdate = true;
+                                                newQueuePrioritySettingId = "9";
                                           }
                                     }
 
@@ -1066,9 +1079,9 @@ async function updateBoard() {
                                           b = "#" + b.join("");
                                           let colourAsHex = b;
 
-                                          console.log(jobs[x].CompanyName, jobs[x].Id, jobs[x].OrderId, (j + 1), colourAsHex, jobs[x].QueuePrioritySettingId == null ? newQueuePrioritySettingId : jobs[x].QueuePrioritySettingId);
+                                          console.log(jobs[x].CompanyName, jobs[x].Id, jobs[x].OrderId, (j + 1), colourAsHex, newQueuePrioritySettingId);
 
-                                          await updateItemPriority("" + jobs[x].Id, "" + jobs[x].OrderId, (j + 1), "" + colourAsHex, jobs[x].QueuePrioritySettingId == null ? newQueuePrioritySettingId : jobs[x].QueuePrioritySettingId);
+                                          await updateItemPriority("" + jobs[x].Id, "" + jobs[x].OrderId, (j + 1), "" + colourAsHex, newQueuePrioritySettingId);
                                           break;
                                     }
                               }
