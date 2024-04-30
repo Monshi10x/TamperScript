@@ -1005,15 +1005,27 @@ async function updateBoard() {
       onMoveEnd();
 
       /*
-Print files to be done: "13"
+
 none: ""
 todo:"5"
 redesign :"14"
 hold:"9"
 urgent: "3"
+Print files to be done: "13"
+files approved by T: "8"
+to to approved print files: "6"
       */
 
       async function onMoveEnd() {
+            let colour_Urgent = "#ff0000";
+            let colour_Design = "#4472c4";
+            let colour_Hold = "#a5a5a5";
+            let colour_DesignRevision = "#a9d08e";
+            let colour_PrintFilesToBeDone = "#d9e1f2";
+            let colour_TToApprovePrintFiles = "#47ad8b";
+            let colour_PrintFilesApproved = "#ffc000";
+            //let colour_ToProduction=
+
             for(let c = 0; c < columnContainers.length; c++) {
                   let jobContainers_c = columnContainers[c].contentContainer.querySelectorAll(".UIContainer_Design");
                   let jobContainer_Colour = columnContainers[c].container.style.backgroundColor;
@@ -1033,6 +1045,13 @@ urgent: "3"
                         let prevColour = jobColour.style.backgroundColor;
                         jobColour.style.backgroundColor = jobContainer_Colour;
                         let newColour = jobColour.style.backgroundColor;
+                        let y = jobColour.style.backgroundColor.split("(")[1].split(")")[0].split(",");
+                        let t = y.map(function(r) {             //For each array element
+                              r = parseInt(r).toString(16);      //Convert to a base16 string
+                              return (r.length == 1) ? "0" + r : r;  //Add zero if we get only one character
+                        });
+                        t = "#" + t.join("");
+                        let newColourAsHex = t;
 
                         if(prevColour != newColour) {
                               requiresUpdate = true;
@@ -1043,35 +1062,58 @@ urgent: "3"
                         for(let x = 0; x < jobs.length; x++) {
                               //if job container holds this item
                               if(jobs[x].Id == jobContainers_c[j].dataset.cb_id) {
-                                    let newQueuePrioritySettingId = "3";//default urgent
+                                    let newQueuePrioritySettingId = "";
+                                    console.log(jobs[x].OrderProductStatusTextWithOrderStatus, jobs[x].CompanyName);
                                     //enforce Colouring
-                                    if(jobs[x].QueuePrioritySettingColor != "#ff0000") {
-                                          if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") {
-                                                if(jobs[x].QueuePrioritySettingColor != "#a9d08e") {
-                                                      requiresUpdate = true;
-                                                      newQueuePrioritySettingId = "14";
-                                                }
-                                          } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design") {
-                                                if(jobs[x].QueuePrioritySettingColor != "#4472c4" && jobs[x].QueuePrioritySettingColor != "#a5a5a5") {
-                                                      requiresUpdate = true;
-                                                      newQueuePrioritySettingId = "5";
-                                                }
-                                          } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved") {
-                                                if(jobs[x].QueuePrioritySettingColor != "#d9e1f2" && jobs[x].QueuePrioritySettingColor != "#ffc000" && jobs[x].QueuePrioritySettingColor != "#47ad8b") {
-                                                      requiresUpdate = true;
-                                                      newQueuePrioritySettingId = "13";
-                                                }
-                                          } if(jobs[x].QueuePrioritySettingColor == "#ffffff") {
+                                    if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") {
+                                          if(newColourAsHex != colour_DesignRevision) {
+                                                requiresUpdate = true;
+                                                newQueuePrioritySettingId = "14"; //redesign
+                                          }
+                                    } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design") {
+                                          //default to #5
+                                          if(newColourAsHex != colour_Design && newColourAsHex != colour_Hold) {
+                                                requiresUpdate = true;
+                                                newQueuePrioritySettingId = "5";//todo
+                                          }
+                                          if(newColourAsHex == colour_Design && jobs[x].QueuePrioritySettingId != "5") {
+                                                requiresUpdate = true;
+                                                newQueuePrioritySettingId = "5";
+                                          }
+                                          if(newColourAsHex == colour_Hold && jobs[x].QueuePrioritySettingId != "9") {
                                                 requiresUpdate = true;
                                                 newQueuePrioritySettingId = "9";
                                           }
+                                    } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved") {
+                                          //default to #13
+                                          if(newColourAsHex != colour_PrintFilesToBeDone && newColourAsHex != colour_TToApprovePrintFiles && newColourAsHex != colour_PrintFilesApproved) {
+                                                requiresUpdate = true;
+                                                newQueuePrioritySettingId = "13";
+                                          }
+                                          if(newColourAsHex == colour_PrintFilesToBeDone && jobs[x].QueuePrioritySettingId != "13") {
+                                                requiresUpdate = true;
+                                                newQueuePrioritySettingId = "13";
+                                          }
+                                          if(newColourAsHex == colour_TToApprovePrintFiles && jobs[x].QueuePrioritySettingId != "6") {
+                                                requiresUpdate = true;
+                                                newQueuePrioritySettingId = "6";
+                                          }
+                                          if(newColourAsHex == colour_PrintFilesApproved && jobs[x].QueuePrioritySettingId != "8") {
+                                                requiresUpdate = true;
+                                                newQueuePrioritySettingId = "8";
+                                          }
+                                    }
+                                    //if(jobs[x].QueuePrioritySettingColor == "#ffffff") {
+                                    //      requiresUpdate = true;
+                                    //      newQueuePrioritySettingId = "9";//hold
+                                    //}
+                                    if(newColourAsHex == colour_Urgent) {
+                                          requiresUpdate = true;
+                                          newQueuePrioritySettingId = "3";
                                     }
 
                                     if(requiresUpdate) {
-                                          //background-color:rgb(68, 114, 196);
-                                          //#a9d08e
-                                          var a = jobColour.style.backgroundColor.split("(")[1].split(")")[0];
-                                          a = a.split(",");
+                                          var a = jobColour.style.backgroundColor.split("(")[1].split(")")[0].split(",");
                                           var b = a.map(function(r) {             //For each array element
                                                 r = parseInt(r).toString(16);      //Convert to a base16 string
                                                 return (r.length == 1) ? "0" + r : r;  //Add zero if we get only one character
@@ -1079,9 +1121,9 @@ urgent: "3"
                                           b = "#" + b.join("");
                                           let colourAsHex = b;
 
-                                          console.log(jobs[x].CompanyName, jobs[x].Id, jobs[x].OrderId, (j + 1), colourAsHex, newQueuePrioritySettingId);
+                                          console.log(jobs[x].CompanyName, jobs[x].Id, jobs[x].OrderId, (j + 1), colourAsHex, newQueuePrioritySettingId == "" ? jobs[x].QueuePrioritySettingId : newQueuePrioritySettingId);
 
-                                          await updateItemPriority("" + jobs[x].Id, "" + jobs[x].OrderId, (j + 1), "" + colourAsHex, newQueuePrioritySettingId);
+                                          await updateItemPriority("" + jobs[x].Id, "" + jobs[x].OrderId, (j + 1), "" + colourAsHex, newQueuePrioritySettingId == "" ? jobs[x].QueuePrioritySettingId : newQueuePrioritySettingId);
                                           break;
                                     }
                               }
