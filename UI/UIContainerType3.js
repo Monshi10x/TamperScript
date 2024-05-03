@@ -50,7 +50,7 @@ class UIContainerType3 {
             if(headingText !== null) {
                   this.#headingText = document.createElement("h3");
                   this.#headingText.innerText = headingText;
-                  this.#headingText.style = "float: left; height: 30px; margin: 0px 0px 0px 0px; background-color: " + COLOUR.DarkGrey + "; width: calc(100% - " + (this.#minimizeBtn_Width + this.#popOutBtn_Width) + "px); box-sizing: border-box; padding: 0px; font-size: 10px; color: white; text-align: center; line-height: 30px; border: 1px solid " + COLOUR.DarkGrey + ";";
+                  this.#headingText.style = "float: left; height: 30px; margin: 0px 0px 0px 0px; background-color: " + COLOUR.DarkGrey + "; width: calc(100% - " + (this.#minimizeBtn_Width + this.#popOutBtn_Width) + "px); box-sizing: border-box; padding: 0px; font-size: 14px; color: white; text-align: center; line-height: 30px; border: 1px solid " + COLOUR.DarkGrey + ";";
                   this.#headingContainer.appendChild(this.#headingText);
             }
 

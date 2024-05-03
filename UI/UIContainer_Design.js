@@ -95,6 +95,17 @@ class UIContainer_Design {
                   this.#customerNameText.innerText = customerNameText;
                   this.#customerNameText.style = "float: left; height: 30px; margin: 0px 0px 0px 0px; background-color: " + COLOUR.White + "; width: calc(100%); box-sizing: border-box; padding: 0px; font-size: 16px; color: " + COLOUR.Black + "; text-align: center; line-height: 30px; border: 1px solid " + COLOUR.White + ";overflow: hidden;text-overflow: ellipsis;white-space: nowrap;padding-left: 4px;padding-right: 4px;";
                   this.#customerNameHeadingContainer.appendChild(this.#customerNameText);
+
+                  this.#customerNameHeadingContainer.addEventListener("click", () => {
+                        setFieldDisabled(true, this.#popOutBtn);
+                        this.onPopOut();
+                        this.#popOutModal = new ModalPopOut("Expanded View", () => {
+                              setFieldDisabled(false, this.#popOutBtn);
+                              this.onPopOutLeave();
+                              this.callbackOverridable();
+                        }, this.#container);
+                        this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
+                  });
             }
 
             /**@jobNameText */
@@ -107,6 +118,17 @@ class UIContainer_Design {
                   this.#jobNameText.innerText = jobNameText;
                   this.#jobNameText.style = "float: left; height: 30px; margin: 0px 0px 0px 0px; background-color: " + COLOUR.White + "; width: calc(100%); box-sizing: border-box; padding: 0px; font-size: 10px; color: " + COLOUR.DarkGrey + "; text-align: center; line-height: 30px; border: 1px solid " + COLOUR.White + ";overflow: hidden;text-overflow: ellipsis;white-space: nowrap;padding-left: 4px;padding-right: 4px;";
                   this.#jobNameHeadingContainer.appendChild(this.#jobNameText);
+
+                  this.#jobNameHeadingContainer.addEventListener("click", () => {
+                        setFieldDisabled(true, this.#popOutBtn);
+                        this.onPopOut();
+                        this.#popOutModal = new ModalPopOut("Expanded View", () => {
+                              setFieldDisabled(false, this.#popOutBtn);
+                              this.onPopOutLeave();
+                              this.callbackOverridable();
+                        }, this.#container);
+                        this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
+                  });
             }
 
             /**@MinimizeBtn */
