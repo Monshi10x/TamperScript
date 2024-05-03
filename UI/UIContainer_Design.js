@@ -83,6 +83,18 @@ class UIContainer_Design {
             /**@HeadingContainer */
             this.#headingContainer = document.createElement("div");
             this.#headingContainer.style = "width:100%;height:" + this.#headingContainer_Height + "px;box-sizing:border-box;";
+            this.#headingContainer.addEventListener("click", (e) => {
+                  if(e.target == this.#headingContainer) {
+                        setFieldDisabled(true, this.#popOutBtn);
+                        this.onPopOut();
+                        this.#popOutModal = new ModalPopOut("Expanded View", () => {
+                              setFieldDisabled(false, this.#popOutBtn);
+                              this.onPopOutLeave();
+                              this.callbackOverridable();
+                        }, this.#container);
+                        this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
+                  }
+            });
             this.#container.appendChild(this.#headingContainer);
 
             /**@customerNameText */
