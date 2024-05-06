@@ -1053,8 +1053,17 @@ function createLink(overrideCssStyles, text, href, target = "_blank", parentObje
     link.style = STYLE.Link;
     link.style.cssText += overrideCssStyles;
     link.innerText = text;
-    link.href = href;
-    link.target = target;
+
+    if(target == "_blank") {
+        link.target = target;
+        link.href = href;
+    } else if(target == "new window") {
+        link.addEventListener("click", (e) => {
+            // e.stopPropagation();
+            window.open(href, '_blank', 'location=yes,height=800,width=1200,scrollbars=yes,status=yes');
+        });
+    }
+
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(link);
     }
