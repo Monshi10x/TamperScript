@@ -7,9 +7,16 @@
       GM_addStyle(myCss);
 })();
 
-///Commonui.Alert("Done!");
-
 let defaultView = "Card View";
+
+let colour_Urgent = "#ff0000";
+let colour_Design = "#4472c4";
+let colour_Hold = "#a5a5a5";
+let colour_DesignRevision = "#a9d08e";
+let colour_PrintFilesToBeDone = "#d9e1f2";
+let colour_TToApprovePrintFiles = "#47ad8b";
+let colour_PrintFilesApproved = "#ffc000";
+let colour_InProduction = "#000000";
 
 let allOrderProductStatuses = [
       {
@@ -344,6 +351,9 @@ let allOrderProductStatuses = [
       }
 ];
 
+//Darren: 20
+//Lee: 31
+
 window.addEventListener("load", (event) => {
       getRowsData();
 });
@@ -510,6 +520,47 @@ async function updateItemPriority(orderProductId, orderId, priority, colour, Que
 
       return data;
 }
+
+/**
+ * 
+ * @param {BigInteger} OrderId i.e. 14777
+ * @param {BigInteger} OrderProductId i.e. 56762
+ * @param {String} UserIds i.e. "31,20" (ensure no spaces)
+ * @returns JSON Data Object
+ */
+async function AssignUsersToOrderProduct(OrderId, OrderProductId, UserIds) {
+      const response = await fetch("https://sar10686.corebridge.net/Api/OrderProduct/AssignUsersToOrderProduct", {
+            "headers": {
+                  "accept": "application/json, text/javascript, */*; q=0.01",
+                  "accept-language": "en-US,en;q=0.9",
+                  "content-type": "application/json; charset=UTF-8",
+                  "priority": "u=1, i",
+                  "sec-ch-ua": "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
+                  "sec-ch-ua-mobile": "?0",
+                  "sec-ch-ua-platform": "\"Windows\"",
+                  "sec-fetch-dest": "empty",
+                  "sec-fetch-mode": "cors",
+                  "sec-fetch-site": "same-origin",
+                  "x-requested-with": "XMLHttpRequest"
+            },
+            "referrer": "https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx",
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": "{\"OrderId\":" + OrderId + ",\"OrderProductId\":" + OrderProductId + ",\"UserIds\":\"" + UserIds + "\"}",
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+      });
+      const data = await response.json();
+      await OrderProductAssignedTo.ShowModal(OrderId, OrderProductId);
+      await sleep(500);
+      await OrderProductAssignedTo.Save(OrderId, OrderProductId);
+      await OrderProductAssignedTo.Close();
+      return data;
+}
+
+const sleep = (milliseconds) => {
+      return new Promise(resolve => setTimeout(resolve, milliseconds));
+};
 
 async function updateBoard() {
       console.log(jobs);
@@ -717,7 +768,7 @@ async function updateBoard() {
       }
 
       let newDiv_Production = new UIContainerType3("width:calc(15% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Printed -> Production", masterContainer);
-      newDiv_Production.container.style.cssText += "background-color:rgb(68, 114, 196);";
+      newDiv_Production.container.style.cssText += "background-color:rgb(0,0,0);";
       new Sortable(newDiv_Production.contentContainer, {
             animation: 120,
             group: 'shared',
@@ -789,19 +840,15 @@ async function updateBoard() {
       let queuePriority = [];
 
       for(let i = 0; i < jobs.length; i++) {
-
-            //hide() {
-            //     this.returnAllBorrowedFields();
-            //super.hide();
-            //}
             let toAppendTo;
             if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design") toAppendTo = newDiv_InDesign.contentContainer;
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design" && jobs[i].QueuePrioritySettingColor == "#a5a5a5") toAppendTo = newDiv_DesignHold.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design" && jobs[i].QueuePrioritySettingColor == colour_Hold) toAppendTo = newDiv_DesignHold.contentContainer;
             if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") toAppendTo = newDiv_InDesignRevision.contentContainer;
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && (jobs[i].QueuePrioritySettingColor == "#d9e1f2" || jobs[i].QueuePrioritySettingColor == "#4472c4" || jobs[i].QueuePrioritySettingColor == null || jobs[i].QueuePrioritySettingColor == "#ffffff")) toAppendTo = newDiv_Approved.contentContainer;
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#47ad8b") toAppendTo = newDiv_TristanToApprove.contentContainer;
-            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == "#ffc000") toAppendTo = newDiv_ReadyToPrint.contentContainer;
-            if(jobs[i].QueuePrioritySettingColor == "#ff0000") toAppendTo = newDiv_Urgent.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && (jobs[i].QueuePrioritySettingColor == colour_PrintFilesToBeDone || jobs[i].QueuePrioritySettingColor == colour_Design || jobs[i].QueuePrioritySettingColor == null || jobs[i].QueuePrioritySettingColor == "#ffffff")) toAppendTo = newDiv_Approved.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == colour_TToApprovePrintFiles) toAppendTo = newDiv_TristanToApprove.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved" && jobs[i].QueuePrioritySettingColor == colour_PrintFilesApproved) toAppendTo = newDiv_ReadyToPrint.contentContainer;
+            if(jobs[i].OrderProductStatusTextWithOrderStatus == "WIP : In Production" && jobs[i].QueuePrioritySettingColor == colour_InProduction) toAppendTo = newDiv_Production.contentContainer;
+            if(jobs[i].QueuePrioritySettingColor == colour_Urgent) toAppendTo = newDiv_Urgent.contentContainer;
 
             let newJobContainer = new UIContainer_Design("max-height:200px;", jobs[i].CompanyName, jobs[i].Description, toAppendTo);
             newJobContainer.container.dataset.cb_id = jobs[i].Id;
@@ -840,18 +887,24 @@ async function updateBoard() {
 
             let inhouseDiv = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:block;", "Inhouse Items", jobContainers[i].contentContainer);
             let designer = createDropdown_Infield("Designer", 2, "max-width:30%;min-width:150px;margin-right: 70%;",
-                  [createDropdownOption("Darren Frankish", "Darren Frankish"),
-                  createDropdownOption("Leandri Hayward", "Leandri Hayward"),
-                  createDropdownOption("null", "null")], () => {alert("TODO: Designer On Change");}, inhouseDiv);
+                  [createDropdownOption("Darren Frankish", "20"),
+                  createDropdownOption("Leandri Hayward", "31"),
+                  createDropdownOption("null", "")], async () => {
+                        let loader = new Loader("", designer[0]);
+
+                        await AssignUsersToOrderProduct(jobs[i].OrderId, jobs[i].Id, designer[1].value);
+                        loader.Delete();
+                  }, inhouseDiv);
 
             for(let x = 0; x < designer[1].options.length; x++) {
 
-                  let val1 = "" + designer[1].options[x].value.toString().replaceAll(" ", "");
+                  let val1 = "" + designer[1].options[x].innerText.toString().replaceAll(" ", "");
 
                   let val2 = "";
                   if(jobs[i].AssignedUsers == null) val2 += "null";
                   else val2 += jobs[i].AssignedUsers.toString().replaceAll(" ", "");
 
+                  console.log(val1, val2);
                   if(val1 == val2) {
                         designer[1].selectedIndex = x;
                         break;
@@ -914,6 +967,7 @@ async function updateBoard() {
 
                   }, inhouseDiv);
             WIPStatus[1].dataset.currentValue = 0;
+            WIPStatus[1].id = "WIPStatus";
 
             for(let x = 0; x < WIPStatus[1].options.length; x++) {
                   //WIPStatus[1].options.length
@@ -960,11 +1014,11 @@ async function updateBoard() {
             }
 
             //createLabel("Item " + jobs[i].LineItemOrder + " of " + jobs[i].TotalProductsInOrder, null, jobContainers[i].contentContainer);
-            createLink("display: block; float: left; width: 45%; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;"
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;"
                   , "view item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
-            createLink("display: block; float: left; width: 45%; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;", "view order", "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "view order", "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
             if(jobs[i].ProofFileName != "") {
-                  createLink("display: block; float: left; width: 45%; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;", "proof", "../../ShowImage.aspx?LoadLocalProof=proof_" + jobs[i].OrderId + "_" + jobs[i].Id + "_0.pdf", "new window", jobContainers[i].contentContainer);
+                  createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "proof", "../../ShowImage.aspx?LoadLocalProof=proof_" + jobs[i].OrderId + "_" + jobs[i].Id + "_0.pdf", "_blank", jobContainers[i].contentContainer);
             }
             //
 
@@ -979,7 +1033,7 @@ async function updateBoard() {
 
 
             let jobColour = document.createElement("div");
-            jobColour.style = "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:0px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + (jobs[i].QueuePrioritySettingColor == null ? "white" : jobs[i].QueuePrioritySettingColor) + ";";
+            jobColour.style = "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:0px; position:relative;color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + (jobs[i].QueuePrioritySettingColor == null ? "white" : jobs[i].QueuePrioritySettingColor) + ";";
 
             jobContainers[i].addHeadingButtons(jobColour);
             jobColour.id = "jobColour";
@@ -1014,120 +1068,127 @@ urgent: "3"
 Print files to be done: "13"
 files approved by T: "8"
 to to approved print files: "6"
+production: 7
       */
 
+
       async function onMoveEnd() {
-            let colour_Urgent = "#ff0000";
-            let colour_Design = "#4472c4";
-            let colour_Hold = "#a5a5a5";
-            let colour_DesignRevision = "#a9d08e";
-            let colour_PrintFilesToBeDone = "#d9e1f2";
-            let colour_TToApprovePrintFiles = "#47ad8b";
-            let colour_PrintFilesApproved = "#ffc000";
-            //let colour_ToProduction=
 
             for(let c = 0; c < columnContainers.length; c++) {
                   let jobContainers_c = columnContainers[c].contentContainer.querySelectorAll(".UIContainer_Design");
                   let jobContainer_Colour = columnContainers[c].container.style.backgroundColor;
 
                   for(let j = 0; j < jobContainers_c.length; j++) {
-                        let requiresUpdate = false;
-
-                        //Number Priority
-                        let priority = jobContainers_c[j].querySelector("#queuePriority");
-                        let previousPriority = priority.innerHTML;
-                        priority.innerHTML = (j + 1);
-                        let newPriority = priority.innerHTML;
-                        if(previousPriority != newPriority) requiresUpdate = true;
-
-                        //Colour
-                        let jobColour = jobContainers_c[j].querySelector("#jobColour");
-                        let prevColour = jobColour.style.backgroundColor;
-                        jobColour.style.backgroundColor = jobContainer_Colour;
-                        let newColour = jobColour.style.backgroundColor;
-                        let y = jobColour.style.backgroundColor.split("(")[1].split(")")[0].split(",");
-                        let t = y.map(function(r) {             //For each array element
-                              r = parseInt(r).toString(16);      //Convert to a base16 string
-                              return (r.length == 1) ? "0" + r : r;  //Add zero if we get only one character
-                        });
-                        t = "#" + t.join("");
-                        let newColourAsHex = t;
-
-                        if(prevColour != newColour) {
-                              requiresUpdate = true;
-                        }
-
-                        //newJobContainer.container.dataset.cb_id
-
+                        let requiresUpdatePriority = false;
+                        let requiresUpdateStatus = false;
+                        let jobContainer = jobContainers_c[j];
+                        let jobArrayElement;
                         for(let x = 0; x < jobs.length; x++) {
                               //if job container holds this item
-                              if(jobs[x].Id == jobContainers_c[j].dataset.cb_id) {
-                                    let newQueuePrioritySettingId = "";
-                                    console.log(jobs[x].OrderProductStatusTextWithOrderStatus, jobs[x].CompanyName);
-                                    //enforce Colouring
-                                    if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design Revision") {
-                                          if(newColourAsHex != colour_DesignRevision) {
-                                                requiresUpdate = true;
-                                                newQueuePrioritySettingId = "14"; //redesign
-                                          }
-                                    } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : In Design") {
-                                          //default to #5
-                                          if(newColourAsHex != colour_Design && newColourAsHex != colour_Hold) {
-                                                requiresUpdate = true;
-                                                newQueuePrioritySettingId = "5";//todo
-                                          }
-                                          if(newColourAsHex == colour_Design && jobs[x].QueuePrioritySettingId != "5") {
-                                                requiresUpdate = true;
-                                                newQueuePrioritySettingId = "5";
-                                          }
-                                          if(newColourAsHex == colour_Hold && jobs[x].QueuePrioritySettingId != "9") {
-                                                requiresUpdate = true;
-                                                newQueuePrioritySettingId = "9";
-                                          }
-                                    } if(jobs[x].OrderProductStatusTextWithOrderStatus == "WIP : Proof Approved") {
-                                          //default to #13
-                                          if(newColourAsHex != colour_PrintFilesToBeDone && newColourAsHex != colour_TToApprovePrintFiles && newColourAsHex != colour_PrintFilesApproved) {
-                                                requiresUpdate = true;
-                                                newQueuePrioritySettingId = "13";
-                                          }
-                                          if(newColourAsHex == colour_PrintFilesToBeDone && jobs[x].QueuePrioritySettingId != "13") {
-                                                requiresUpdate = true;
-                                                newQueuePrioritySettingId = "13";
-                                          }
-                                          if(newColourAsHex == colour_TToApprovePrintFiles && jobs[x].QueuePrioritySettingId != "6") {
-                                                requiresUpdate = true;
-                                                newQueuePrioritySettingId = "6";
-                                          }
-                                          if(newColourAsHex == colour_PrintFilesApproved && jobs[x].QueuePrioritySettingId != "8") {
-                                                requiresUpdate = true;
-                                                newQueuePrioritySettingId = "8";
-                                          }
-                                    }
-                                    //if(jobs[x].QueuePrioritySettingColor == "#ffffff") {
-                                    //      requiresUpdate = true;
-                                    //      newQueuePrioritySettingId = "9";//hold
-                                    //}
-                                    if(newColourAsHex == colour_Urgent) {
-                                          requiresUpdate = true;
-                                          newQueuePrioritySettingId = "3";
-                                    }
-
-                                    if(requiresUpdate) {
-                                          var a = jobColour.style.backgroundColor.split("(")[1].split(")")[0].split(",");
-                                          var b = a.map(function(r) {             //For each array element
-                                                r = parseInt(r).toString(16);      //Convert to a base16 string
-                                                return (r.length == 1) ? "0" + r : r;  //Add zero if we get only one character
-                                          });
-                                          b = "#" + b.join("");
-                                          let colourAsHex = b;
-
-                                          console.log(jobs[x].CompanyName, jobs[x].Id, jobs[x].OrderId, (j + 1), colourAsHex, newQueuePrioritySettingId == "" ? jobs[x].QueuePrioritySettingId : newQueuePrioritySettingId);
-
-                                          await updateItemPriority("" + jobs[x].Id, "" + jobs[x].OrderId, (j + 1), "" + colourAsHex, newQueuePrioritySettingId == "" ? jobs[x].QueuePrioritySettingId : newQueuePrioritySettingId);
-                                          break;
-                                    }
+                              if(jobs[x].Id == jobContainer.dataset.cb_id) {
+                                    jobArrayElement = jobs[x];
+                                    break;
                               }
                         }
+
+
+                        //Number Priority
+                        let priority = jobContainer.querySelector("#queuePriority");
+                        let previousPriority = priority.innerHTML;
+                        let newPriority = priority.innerHTML = (j + 1);
+                        if(previousPriority != newPriority) requiresUpdatePriority = true;
+
+                        //Colour
+                        let jobColour = jobContainer.querySelector("#jobColour");
+                        let prevColour = jobColour.style.backgroundColor;
+                        let newColour = jobColour.style.backgroundColor = jobContainer_Colour;
+                        let newColourAsHex = RGBToHex(jobColour.style.backgroundColor);
+                        if(prevColour != newColour) requiresUpdatePriority = true;
+                        let loader = new Loader("", jobColour);
+
+                        //state
+                        let currentState = jobArrayElement.OrderProductStatusTextWithOrderStatus;
+                        let newState;
+                        let currentStateId = jobArrayElement.OrderProductStatusId;
+                        let newStateId;
+                        let currentQueueID = jobArrayElement.QueuePrioritySettingId;
+                        let newQueueID;
+                        switch(newColourAsHex) {
+                              case colour_Urgent:
+                                    //newState = can be any state
+                                    newQueueID = "3";
+                                    break;
+                              case colour_Design:
+                                    newState = "WIP : In Design";
+                                    newQueueID = "5";
+                                    newStateId = "7";
+                                    break;
+                              case colour_Hold:
+                                    newState = "WIP : In Design";
+                                    newQueueID = "9";
+                                    newStateId = "7";
+                                    break;
+                              case colour_DesignRevision:
+                                    newState = "WIP : In Design Revision";
+                                    newQueueID = "14";
+                                    newStateId = "10";
+                                    break;
+                              case colour_PrintFilesToBeDone:
+                                    newState = "WIP : Proof Approved";
+                                    newQueueID = "13";
+                                    newStateId = "14";
+                                    break;
+                              case colour_TToApprovePrintFiles:
+                                    newState = "WIP : Proof Approved";
+                                    newQueueID = "6";
+                                    newStateId = "14";
+                                    break;
+                              case colour_PrintFilesApproved:
+                                    newState = "WIP : Proof Approved";
+                                    newQueueID = "8";
+                                    newStateId = "14";
+                                    break;
+                              case colour_InProduction:
+                                    newState = "WIP : In Production";
+                                    newQueueID = "5";
+                                    newStateId = "8";
+
+                                    let wipStatusField = jobContainer.querySelector("#WIPStatus");
+                                    for(let a = 0; a < wipStatusField.options.length; a++) {
+                                          if(wipStatusField.options[a].innerText === "WIP : In Production") {
+                                                wipStatusField.selectedIndex = a;
+                                          }
+                                    }
+                                    $(wipStatusField).change();
+                                    wipStatusField.dataset.currentValue = "WIP : In Production";
+
+                                    break;
+                              default /*No Colour*/:
+                                    newState = "WIP : In Design";
+                                    newQueueID = "5";
+                                    break;
+                        }
+                        if(newState != currentState) {
+                              requiresUpdatePriority = true;
+                              requiresUpdateStatus = true;
+                        }
+                        if(currentQueueID != newQueueID) requiresUpdatePriority = true;
+
+                        if(requiresUpdatePriority) {
+                              console.log("" + jobArrayElement.Id, "" + jobArrayElement.OrderId, (j + 1), "" + newColourAsHex, newQueueID == null ? currentQueueID : newQueueID);
+                              jobArrayElement.QueuePrioritySettingId = newQueueID == null ? currentQueueID : newQueueID;
+
+                              await updateItemPriority("" + jobArrayElement.Id, "" + jobArrayElement.OrderId, (j + 1), "" + newColourAsHex, newQueueID == null ? currentQueueID : newQueueID);
+
+                        }
+                        if(requiresUpdateStatus) {
+                              console.log("requires status: " + jobArrayElement.Id, currentStateId, newStateId);
+                              jobArrayElement.OrderProductStatusId = newStateId == null ? currentStateId : newStateId;
+                              await updateItemStatus(jobArrayElement.Id, currentQueueID, newStateId == null ? currentStateId : newStateId);
+                              $("#imgExpander_" + jobArrayElement.Id).click();
+                              $("#imgExpander_" + jobArrayElement.Id).click();
+                        }
+                        loader.Delete();
                   }
             }
             console.log("done");
@@ -1200,10 +1261,11 @@ to to approved print files: "6"
       function reorderJobContainer(container, status, currentQueueColour) {
             if(status == "WIP : In Design") newDiv_InDesign.contentContainer.appendChild(container);
             if(status == "WIP : In Design Revision") newDiv_InDesignRevision.contentContainer.appendChild(container);
-            if(status == "WIP : Proof Approved" && (currentQueueColour == "#d9e1f2" || currentQueueColour == "#4472c4")) newDiv_Approved.contentContainer.appendChild(container);
-            if(status == "WIP : Proof Approved" && currentQueueColour == "#47ad8b") newDiv_TristanToApprove.contentContainer.appendChild(container);
-            if(status == "WIP : Proof Approved" && currentQueueColour == "#ffc000") newDiv_ReadyToPrint.contentContainer.appendChild(container);
-            if(currentQueueColour == "#ff0000") newDiv_Urgent.contentContainer.appendChild(container);
+            if(status == "WIP : Proof Approved" && (currentQueueColour == colour_PrintFilesToBeDone || currentQueueColour == colour_Design)) newDiv_Approved.contentContainer.appendChild(container);
+            if(status == "WIP : Proof Approved" && currentQueueColour == colour_TToApprovePrintFiles) newDiv_TristanToApprove.contentContainer.appendChild(container);
+            if(status == "WIP : Proof Approved" && currentQueueColour == colour_PrintFilesApproved) newDiv_ReadyToPrint.contentContainer.appendChild(container);
+            if(status == "WIP : In Production" && currentQueueColour == colour_InProduction) newDiv_Production.contentContainer.appendChild(container);
+            if(currentQueueColour == colour_Urgent) newDiv_Urgent.contentContainer.appendChild(container);
       }
 }
 

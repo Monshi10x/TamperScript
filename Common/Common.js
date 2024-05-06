@@ -327,6 +327,16 @@ function getWindowZoom() {
     return Math.round(window.devicePixelRatio * 100);
 }
 
+function RGBToHex(RGBString) {
+    let y = RGBString.split("(")[1].split(")")[0].split(",");
+    let t = y.map(function(r) {             //For each array element
+        r = parseInt(r).toString(16);      //Convert to a base16 string
+        return (r.length == 1) ? "0" + r : r;  //Add zero if we get only one character
+    });
+    t = "#" + t.join("");
+    return t;
+}
+
 //const coords = [{x: 260, y: 60}, {x: 180, y: 0}, {x: 180, y: 240}, {x: 360, y: 120}, {x: 180, y: 60}, {x: 180, y: 60}, {x: 180, y: 60}];
 
 

@@ -69,7 +69,7 @@ class UIContainer_Design {
             this.#container.style = STYLE.Div3;
             this.#container.style.cssText += "display:flex;flex-direction:column;";
             this.#container.style.cssText += overrideCssStyles;
-            console.log(this.#container.style.boxShadow);
+
             $(this.#container).hover(function() {
                   this.style.boxShadow = "rgb(0 0 0) 10px 10px 15px -3px";
             }, function() {
