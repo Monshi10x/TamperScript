@@ -144,13 +144,13 @@ class UIContainer_Design {
             }
 
             /**@MinimizeBtn */
-            this.#minimizeBtn = createButton("-", "display: block; float: right; width: " + this.#minimizeBtn_Width + "px;height:" + this.#minimizeBtn_Height + "px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.LightBlue + ";", () => {this.toggleMinimize();});
+            /*this.#minimizeBtn = createButton("-", "display: block; float: right; width: " + this.#minimizeBtn_Width + "px;height:" + this.#minimizeBtn_Height + "px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.LightBlue + ";", () => {this.toggleMinimize();});
             this.#minimizeBtn.id = "minimizeBtn";
             this.#minimizeBtn.dataset.minimizedState = "maximized";
-            this.#headingContainer.appendChild(this.#minimizeBtn);
+            this.#headingContainer.appendChild(this.#minimizeBtn);*/
 
             /**@PopOutBtn */
-            this.#popOutBtn = createButton("\u274F", "display: block; float: right; width: " + this.#popOutBtn_Width + "px;height:" + this.#popOutBtn_Height + "px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkBlue + ";", () => {
+            /*this.#popOutBtn = createButton("\u274F", "display: block; float: right; width: " + this.#popOutBtn_Width + "px;height:" + this.#popOutBtn_Height + "px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkBlue + ";", () => {
                   setFieldDisabled(true, this.#popOutBtn);
                   this.onPopOut();
                   this.#popOutModal = new ModalPopOut("Expanded View", () => {
@@ -159,7 +159,7 @@ class UIContainer_Design {
                         this.callbackOverridable();
                   }, this.#container);
                   this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
-            }, this.#headingContainer);
+            }, this.#headingContainer);*/
 
             /**@ContentContainer */
             this.#contentContainer = document.createElement("div");
@@ -178,15 +178,15 @@ class UIContainer_Design {
       Minimize() {
             this.#isMinimized = true;
             this.#contentContainer.style.display = "none";
-            this.#minimizeBtn.innerText = "▭";
-            this.#minimizeBtn.dataset.minimizedState = "minimized";
+            //this.#minimizeBtn.innerText = "▭";
+            //this.#minimizeBtn.dataset.minimizedState = "minimized";
       }
 
       Maximize() {
             this.#isMinimized = false;
             this.#contentContainer.style.display = "block";
-            this.#minimizeBtn.innerText = "-";
-            this.#minimizeBtn.dataset.minimizedState = "maximized";
+            //this.#minimizeBtn.innerText = "-";
+            //this.#minimizeBtn.dataset.minimizedState = "maximized";
       }
 
       onPopOut() {

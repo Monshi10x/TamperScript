@@ -354,8 +354,11 @@ let allOrderProductStatuses = [
 //Darren: 20
 //Lee: 31
 
-window.addEventListener("load", (event) => {
-      getRowsData();
+window.addEventListener("load", async (event) => {
+      await getRowsData();
+      //await getRowsData_awaitingApproval();
+
+      await init();
 });
 
 var jobs;
@@ -375,15 +378,40 @@ async function getRowsData() {
             },
             "referrer": "https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx",
             "referrerPolicy": "strict-origin-when-cross-origin",
-            "body": "{\"sEcho\":2,\"iColumns\":21,\"sColumns\":\"\",\"iDisplayStart\":0,\"iDisplayLength\":\"250\",\"iSortCol_0\":0,\"sSortDir_0\":\"asc\",\"viewType\":\"design\",\"queueType\":\"design_wip\",\"txSearch\":\"\",\"pageIndex\":1,\"arrQueueFilters\":[null,\"\",null,\"\",\"\",\"\",null,\"\",null,null,\"\",\"\",null,null]}",
+            "body": "{\"sEcho\":2,\"iColumns\":21,\"sColumns\":\"\",\"iDisplayStart\":0,\"iDisplayLength\":\"500\",\"iSortCol_0\":0,\"sSortDir_0\":\"asc\",\"viewType\":\"design\",\"queueType\":\"design_wip\",\"txSearch\":\"\",\"pageIndex\":1,\"arrQueueFilters\":[null,\"\",null,\"\",\"\",\"\",null,\"\",null,null,\"\",\"\",null,null]}",
             "method": "POST",
             "mode": "cors",
             "credentials": "include"
       });
       const data = await response.json();
       jobs = data.d.QueueEntries;
+}
 
-      await updateBoard();
+var awaitingApprovalJobs;
+async function getRowsData_awaitingApproval() {
+      const response = await fetch("https://sar10686.corebridge.net/SalesModule/Orders/OrderProduct.asmx/GetOrderProductQueueEntriesPaged", {
+            "headers": {
+                  "accept": "application/json, text/javascript, */*; q=0.01",
+                  "accept-language": "en-US,en;q=0.9",
+                  "content-type": "application/json; charset=UTF-8",
+                  "priority": "u=1, i",
+                  "sec-ch-ua": "\"Chromium\";v=\"124\", \"Google Chrome\";v=\"124\", \"Not-A.Brand\";v=\"99\"",
+                  "sec-ch-ua-mobile": "?0",
+                  "sec-ch-ua-platform": "\"Windows\"",
+                  "sec-fetch-dest": "empty",
+                  "sec-fetch-mode": "cors",
+                  "sec-fetch-site": "same-origin",
+                  "x-requested-with": "XMLHttpRequest"
+            },
+            "referrer": "https://sar10686.corebridge.net/DesignModule/DesignAwaitingApproval.aspx",
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": "{\"sEcho\":2,\"iColumns\":21,\"sColumns\":\"\",\"iDisplayStart\":0,\"iDisplayLength\":500,\"iSortCol_0\":6,\"sSortDir_0\":\"asc\",\"viewType\":\"design\",\"queueType\":\"design_awaiting_approval\",\"txSearch\":\"\",\"pageIndex\":1,\"arrQueueFilters\":[null,\"\",null,\"\",\"\",\"\",null,\"\",null,null,\"\",\"\",null,null]}",
+            "method": "POST",
+            "mode": "cors",
+            "credentials": "include"
+      });
+      const data = await response.json();
+      awaitingApprovalJobs = data.d.QueueEntries;
 }
 
 async function getOrderData(CB_OrderID, CB_AccountID) {
@@ -562,13 +590,13 @@ const sleep = (milliseconds) => {
       return new Promise(resolve => setTimeout(resolve, milliseconds));
 };
 
-async function updateBoard() {
+async function init() {
       console.log(jobs);
+      console.log(awaitingApprovalJobs);
       // multiDrag: true, // Enable multi-drag
       //selectedClass: 'selected', // The class applied to the selected items
       //fallbackTolerance: 3, // So that we can select items on mobile
-      //let table = document.querySelector("#tblQueue");
-      //let tableRows = document.querySelectorAll(".queue-parentrow")
+
       let parentContainer = document.body;
 
       let existingJobBoard = document.querySelector("#MainContent");
@@ -582,7 +610,7 @@ async function updateBoard() {
 
       let optionsHeader = document.createElement("div");
       optionsHeader.style = "width:100%;height:75px;display:block;float: left;background-color:" + COLOUR.White;
-      //parentContainer.appendChild(optionsHeader);
+
       insertBefore(optionsHeader, existingJobBoard);
 
       let option_viewType = createDropdown_Infield("View", 1, "width:200px;box-shadow:none;",
@@ -708,6 +736,31 @@ async function updateBoard() {
       for(let x = 0; x < newDiv_InDesignRevision.headingContainer.children.length; x++) {
             newDiv_InDesignRevision.headingContainer.children[x].classList.add("x-scrollable");
       }
+
+
+
+
+      /* let newDiv_AwaitingApproval = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Awaiting Approval", masterContainer);
+       newDiv_AwaitingApproval.container.style.cssText += "background-color:#ba78ee";
+       new Sortable(newDiv_AwaitingApproval.contentContainer, {
+             animation: 120,
+             group: 'shared',
+             swapThreshold: 1,
+             ghostClass: 'sortable-ghost',
+             direction: 'vertical',
+             onEnd: function(evt) {
+                   onMoveEnd();
+             }
+       });
+       columnContainers.push(newDiv_AwaitingApproval);
+       newDiv_AwaitingApproval.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
+       newDiv_AwaitingApproval.contentContainer.classList.add("x-scrollable");
+       for(let x = 0; x < newDiv_AwaitingApproval.headingContainer.children.length; x++) {
+             newDiv_AwaitingApproval.headingContainer.children[x].classList.add("x-scrollable");
+       }*/
+
+
+
 
       let newDiv_Approved = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Proof Approved - Setup Print Files", masterContainer);
       newDiv_Approved.container.style.cssText += "background-color:rgb(217, 225, 242)";
@@ -1014,22 +1067,25 @@ async function updateBoard() {
             }
 
             //createLabel("Item " + jobs[i].LineItemOrder + " of " + jobs[i].TotalProductsInOrder, null, jobContainers[i].contentContainer);
-            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;"
-                  , "view item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
-            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "view order", "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
-            if(jobs[i].ProofFileName != "") {
-                  createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "proof", "../../ShowImage.aspx?LoadLocalProof=proof_" + jobs[i].OrderId + "_" + jobs[i].Id + "_0.pdf", "new window", jobContainers[i].contentContainer);
-            }
+
             //
 
 
 
 
-            let jobNoBtn = createButton(jobs[i].OrderInvoiceNumber, "display: block; float: left; width: " + 80 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Black + ";", () => { });
-            jobContainers[i].addHeadingButtons(jobNoBtn);
+            //let jobNoBtn = createButton(jobs[i].OrderInvoiceNumber, "display: block; float: left; width: " + 80 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Black + ";", () => { });
+            let jobNoBtn = createLink("display: block; float: left; width: " + 80 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Black + ";", jobs[i].OrderInvoiceNumber, "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
 
-            let itemNoBtn = createButton(jobs[i].LineItemOrder + "/" + jobs[i].TotalProductsInOrder, "display: block; float: left; width: " + 40 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, () => { });
+            jobContainers[i].addHeadingButtons(jobNoBtn);
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out order", "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "new window", jobContainers[i].contentContainer);
+
+
+            //let itemNoBtn = createButton(jobs[i].LineItemOrder + "/" + jobs[i].TotalProductsInOrder, "display: block; float: left; width: " + 40 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, () => { });
+            let itemNoBtn = createLink("display: block; float: left; width: " + 40 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, jobs[i].LineItemOrder + "/" + jobs[i].TotalProductsInOrder, "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
             jobContainers[i].addHeadingButtons(itemNoBtn);
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "new window", jobContainers[i].contentContainer);
+
+
 
 
             let jobColour = document.createElement("div");
@@ -1044,14 +1100,20 @@ async function updateBoard() {
             //      console.log("i " + i);
             //      queuePriority = (i + 1);
             //}
-            let jobOrder = createButton(jobs[i].QueuePriority, "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:2px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.White + ";", () => {
+            let jobOrder = createButton(jobs[i].QueuePriority, "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;pointer-events:none;padding:2px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.White + ";", () => {
 
             });
+
             jobOrder.id = "queuePriority";
             queuePriority.push(jobOrder);
             jobContainers[i].addHeadingButtons(jobOrder);
 
-
+            if(jobs[i].ProofFileName != "") {
+                  let proofLink = createLink("display: block; float: right; width: 30px; background-color: " + COLOUR.White + "; color:white;min-height: 30px; margin: 0px; border:0px solid " + COLOUR.Blue + ";cursor: pointer;font-size:10px;text-align:center;line-height:30px;", "", "../../ShowImage.aspx?LoadLocalProof=proof_" + jobs[i].OrderId + "_" + jobs[i].Id + "_0.pdf", "new window", jobContainers[i].contentContainer);
+                  proofLink.style.backgroundImage = "url(/Themes/Images/icon_view_proof.png)";
+                  proofLink.style.cssText += "background-repeat: no-repeat;background-size:100%;background-position:center center";
+                  jobContainers[i].addHeadingButtons(proofLink);
+            }
             //if(jobs[i].TotalPaid < jobs[i].TotalPrice) jobContainer.addHeadingButtons(paymentDueBtn);
             dataPromise.push(getOrderData_QuoteLevel(jobs[i].OrderId, jobs[i].AccountId, jobs[i].CompanyName));
       }
@@ -1207,7 +1269,6 @@ production: 7
                   newNote.innerText = productNotesDesign.ProductionNotes[x].Note;
             }
 
-            //let btns = [salesNotesBtns[i], designNotesBtns[i], productionNotesBtns[i], customerNotesBtns[i], vendorNotesBtns[i]];
             if(numOfNotes > 0) {
                   let numberDisplayDiv = document.createElement("div");
                   numberDisplayDiv.innerText = numOfNotes;
