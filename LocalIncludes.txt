@@ -58,6 +58,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\CreditSurchargeMenu.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\Menu3D.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\PanelSigns.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\ChartMenu.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\TogglePartsMenu.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\Modal.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalManageSubscriptions.js

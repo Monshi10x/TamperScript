@@ -316,6 +316,7 @@ var menu_Vehicle;
 var menu_creditCardSurcharge;
 var menu_3D;
 var menu_PanelSigns;
+var menu_Charts;
 async function initLHSMenu() {
     var container = document.createElement('div');
     container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + COLOUR.Blue + ";box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
@@ -344,6 +345,7 @@ async function initLHSMenu() {
     menu_creditCardSurcharge = new CreditSurchargeMenu(400, 600, "CreditSurchargeMenu", "Credit Card Surcharge");
     menu_3D = new Menu3D(900, 600, "3DLetterMenu", "3D Letters");
     menu_PanelSigns = new MenuPanelSigns(900, 700, "PanelSignsMenu", "Panel Signs");
+    menu_Charts = new ChartMenu(900, 700, "ChartsMenu", "Charts");
 
     addItem(ICON.find, "Find", "finder");
     addItem(ICON.area, "Area", "m2");
@@ -359,6 +361,7 @@ async function initLHSMenu() {
     addItem(ICON.admin, "Admin", "admin", "position:absolute;bottom:0px;");
     addItem(ICON.creditCard, "Surcharge", "surcharge");
     addItem(ICON._3D, "3D Letters", "3D", null, "loadedPredefinedParts");
+    addItem(ICON.find, "Charts", "Charts", null, "loadedPredefinedParts");
 
     function addItem(imageSrc, text, openMenuName, overrideCss, unlockListenEvent) {
         var itemContainer = document.createElement('div');
@@ -422,6 +425,7 @@ function hideAllMenu() {
     menu_creditCardSurcharge.hide();
     menu_3D.hide();
     menu_PanelSigns.hide();
+    menu_Charts.hide();
 }
 
 function openMenu(menu) {
@@ -468,6 +472,9 @@ function openMenu(menu) {
         }
         if(menu == "3D") {
             menu_3D.show();
+        }
+        if(menu == "Charts") {
+            menu_Charts.show();
         }
     }
 }

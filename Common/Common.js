@@ -337,6 +337,10 @@ function RGBToHex(RGBString) {
     return t;
 }
 
+function getSideMargins(element) {
+    return parseInt(element.style.marginLeft) + parseInt(element.style.marginRight);
+}
+
 //const coords = [{x: 260, y: 60}, {x: 180, y: 0}, {x: 180, y: 240}, {x: 360, y: 120}, {x: 180, y: 60}, {x: 180, y: 60}, {x: 180, y: 60}];
 
 
