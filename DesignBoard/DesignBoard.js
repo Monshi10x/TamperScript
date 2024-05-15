@@ -1085,6 +1085,8 @@ async function init() {
             jobContainers[i].addHeadingButtons(itemNoBtn);
             createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "new window", jobContainers[i].contentContainer);
 
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "open order in sales", "/SalesModule/Orders/Order.aspx?OrderId=" + jobs[i].OrderId, "new window", jobContainers[i].contentContainer);
+
 
 
 
@@ -1177,7 +1179,7 @@ production: 7
                         let newQueueID;
                         switch(newColourAsHex) {
                               case colour_Urgent:
-                                    //newState = can be any state
+                                    newState = currentState;
                                     newQueueID = "3";
                                     break;
                               case colour_Design:

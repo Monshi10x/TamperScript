@@ -404,7 +404,7 @@ async function AddQuickProduct(name) {
         }, sleepMS);
     });
     console.log("successfully added quick product " + name);
-    await sleep(2000);
+    await sleep(sleepMS);
 }
 async function AddBlankProduct() {
     OrderStep2.CreateProduct({});
@@ -476,14 +476,7 @@ async function MoveProduct(currentIndex, newIndex) {
 
     var orderProductBody = document.querySelector("#orderProductBody");
 
-    //var productSummaryWrapper = document.getElementById("divProductSummaryWrapper");
-    //var brAfter = table[currentIndex].nextElementSibling;
-    //var productSummaryWrapperRow = table[currentIndex];
-
     var element = products[currentIndex];
-    //listProducts[currentIndex].classList.add("sortable");
-    //listProducts[currentIndex].dispatchEvent(new Event('mousedown'));
-    //listProducts[currentIndex].dispatchEvent(new Event('mousemove'));
 
     newIndex = clamp(newIndex, 0, getNumProducts() - 1);
 
@@ -512,15 +505,12 @@ async function MoveProduct(currentIndex, newIndex) {
     products = ko.contextFor(document.querySelector(".ord-prod-body")).$parent.OrderProducts();
     listProducts = document.getElementsByClassName("ord-prod-model-item");
 
-    //products[i].Index = i+1;
     $(products[newIndex].LineItemOrder(newIndex + 1)).change();
 
-    //listProducts[newIndex].dispatchEvent(new Event('mousemove'));
     order.OrderProductsMoveEvent({
         item: products[newIndex], sourceIndex: newIndex, sourceParentNode: document.querySelector("div#orderProductBody.ko_container.ui-sortable"), targetIndex: 1, cancelDrop: false
     });
-    //listProducts[newIndex].classList.remove("sortable");
-    //listProducts[newIndex].dispatchEvent(new Event('mouseup'));
+
     await AddBlankProduct();
     await DeleteProduct(getNumProducts());
     Ordui.Alert("Move Successful");
@@ -721,7 +711,7 @@ async function setPartMarkup(productNo, partNo, value) {
     productContext.$data.Value(value);
     console.log("set markup " + partNo + " to " + value);
     await sleep(sleepMS);
-    return productNo;
+    return partNo;
 }
 async function setPartMarkupEa(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.MarkupFieldEach(productNo, partNo)));
@@ -729,7 +719,7 @@ async function setPartMarkupEa(productNo, partNo, value) {
     productContext.$data.Value(value);
     console.log("set markup " + partNo + " to " + value);
     await sleep(sleepMS);
-    return productNo;
+    return partNo;
 }
 async function setPartDescription(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
@@ -1335,7 +1325,7 @@ async function copyPart(currentProductNo, currentPartNo, newProductNo) {
     });
     console.log("copy part from " + currentProductNo + "(" + getRealProductNo(currentProductNo) + ") to " + newProductNo + "(" + getRealProductNo(newProductNo) + ")");
     await sleep(sleepMS);
-    return partNo;
+    return newProductNo;
 }
 
 function getRealProductNo(productNo) {

@@ -17,6 +17,7 @@
 // @grant        GM_info
 // @grant        GM_xmlhttpRequest
 // @grant        GM_getResourceText
+// @grant        GM_getResourceURL
 // @grant        GM_addElement
 // @grant        unsafeWindow
 // @grant        window.close

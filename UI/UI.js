@@ -1054,15 +1054,15 @@ function createLink(overrideCssStyles, text, href, target = "_blank", parentObje
     link.style.cssText += overrideCssStyles;
     link.innerText = text;
 
-    let windowWidth = 1200, windowHeight = 800, offsetX, offsetY;
+    let windowWidth = 1500, windowHeight = 1000, offsetX, offsetY;
 
     if(target == "_blank") {
         link.target = target;
         link.href = href;
     } else if(target == "new window") {
         link.addEventListener("click", (e) => {
-            offsetX = (window.innerWidth - windowWidth) / 2;
-            offsetY = (window.innerHeight - windowHeight) / 2;
+            offsetX = (window.outerWidth - windowWidth) / 2;
+            offsetY = (window.innerHeight - windowHeight) / 2 + (window.outerHeight - window.innerHeight) / 2;
             window.open(href, '_blank', 'location=yes,top=' + offsetY + ',left=' + offsetX + ',height=' + windowHeight + ',width=' + windowWidth + ',scrollbars=yes,status=yes');
         });
     }
