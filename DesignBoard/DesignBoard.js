@@ -649,7 +649,7 @@ async function init() {
       let columnContainers = [];
 
 
-      let newDiv_Urgent = new UIContainerType3("width:calc(17% - 24px);min-width:350px;height:calc(100% - 40px);;flex: 0 0 auto;", "Urgent", masterContainer);
+      let newDiv_Urgent = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;height:calc(100% - 40px);;flex: 0 0 auto;", "Urgent", masterContainer);
       newDiv_Urgent.container.style.cssText += "background-color:#ff0000;";
       new Sortable(newDiv_Urgent.contentContainer, {
             animation: 120,
@@ -670,7 +670,7 @@ async function init() {
       }
 
 
-      let newDiv_DesignHold = new UIContainerType3("width:calc(17% - 24px);min-width:350px;height:calc(100% - 40px);;flex: 0 0 auto;", "Design Hold", masterContainer);
+      let newDiv_DesignHold = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;height:calc(100% - 40px);;flex: 0 0 auto;", "Design Hold", masterContainer);
       newDiv_DesignHold.container.style.cssText += "background-color:#a5a5a5;";
       new Sortable(newDiv_DesignHold.contentContainer, {
             animation: 120,
@@ -697,7 +697,7 @@ async function init() {
 
 
 
-      let newDiv_InDesign = new UIContainerType3("width:calc(17% - 24px);min-width:350px;height:calc(100% - 40px);;flex: 0 0 auto;", "In Design", masterContainer);
+      let newDiv_InDesign = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;height:calc(100% - 40px);;flex: 0 0 auto;", "In Design", masterContainer);
       newDiv_InDesign.container.style.cssText += "background-color:rgb(68, 114, 196);";
       new Sortable(newDiv_InDesign.contentContainer, {
             animation: 120,
@@ -718,7 +718,7 @@ async function init() {
       }
 
 
-      let newDiv_InDesignRevision = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "In Design Revision", masterContainer);
+      let newDiv_InDesignRevision = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "In Design Revision", masterContainer);
       newDiv_InDesignRevision.container.style.cssText += "background-color:#a9d08e";
       new Sortable(newDiv_InDesignRevision.contentContainer, {
             animation: 120,
@@ -762,7 +762,7 @@ async function init() {
 
 
 
-      let newDiv_Approved = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Proof Approved - Setup Print Files", masterContainer);
+      let newDiv_Approved = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Proof Approved - Setup Print Files", masterContainer);
       newDiv_Approved.container.style.cssText += "background-color:rgb(217, 225, 242)";
       new Sortable(newDiv_Approved.contentContainer, {
             animation: 120,
@@ -782,7 +782,7 @@ async function init() {
       }
 
 
-      let newDiv_TristanToApprove = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Tristan To Approve", masterContainer);
+      let newDiv_TristanToApprove = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Tristan To Approve", masterContainer);
       newDiv_TristanToApprove.container.style.cssText += "background-color:rgb(71, 173, 139);";
       new Sortable(newDiv_TristanToApprove.contentContainer, {
             animation: 120,
@@ -801,7 +801,7 @@ async function init() {
             newDiv_TristanToApprove.headingContainer.children[x].classList.add("x-scrollable");
       }
 
-      let newDiv_ReadyToPrint = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Ready To Print", masterContainer);
+      let newDiv_ReadyToPrint = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Ready To Print", masterContainer);
       newDiv_ReadyToPrint.container.style.cssText += "background-color:rgb(255, 192, 0);";
       new Sortable(newDiv_ReadyToPrint.contentContainer, {
             animation: 120,
@@ -820,7 +820,7 @@ async function init() {
             newDiv_ReadyToPrint.headingContainer.children[x].classList.add("x-scrollable");
       }
 
-      let newDiv_Production = new UIContainerType3("width:calc(15% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Printed -> Production", masterContainer);
+      let newDiv_Production = new UIContainerType3("width:calc(15% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Printed -> Production", masterContainer);
       newDiv_Production.container.style.cssText += "background-color:rgb(0,0,0);";
       new Sortable(newDiv_Production.contentContainer, {
             animation: 120,

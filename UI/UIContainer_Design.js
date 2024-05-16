@@ -67,7 +67,7 @@ class UIContainer_Design {
             this.#container = document.createElement("div");
             this.#container.className = "UIContainer_Design";
             this.#container.style = STYLE.Div3;
-            this.#container.style.cssText += "display:flex;flex-direction:column;";
+            this.#container.style.cssText += "display:flex;flex-direction:column;margin-bottom:10px;";
             this.#container.style.cssText += overrideCssStyles;
 
             $(this.#container).hover(function() {
