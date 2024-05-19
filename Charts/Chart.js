@@ -25,7 +25,7 @@ class Chart {
       layoutOptions = {};
 
       //@override
-      settingOptions = {scrollZoom: true};
+      settingOptions = {};
 
       #data = [{
             x: this.#xArray,
@@ -38,6 +38,7 @@ class Chart {
             yaxis: {range: [0, 100], title: this.#yAxisTitle},
             title: this.#title
       };
+      #settings = {scrollZoom: true};
 
       constructor(points = [{x: 0, y: 0}], xAxisTitle = "", yAxisTitle = "", title = "", width = "100%", height = "500px", parentToAppendTo, overrideCssStyle = "") {
             this.#xArray = points.map((element) => element.x);
@@ -74,7 +75,9 @@ class Chart {
 
             this.#layout = Object.assign(this.#layout, this.layoutOptions);
 
-            Plotly.newPlot(this.#wrapperContainer, this.#data, this.#layout, this.settingOptions);
+            this.#settings = Object.assign(this.#settings, this.settingOptions);
+
+            Plotly.newPlot(this.#wrapperContainer, this.#data, this.#layout, this.#settings);
       }
 }
 
