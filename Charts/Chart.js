@@ -1,35 +1,30 @@
+/**
+ * @see https://plotly.com/javascript/
+ */
 class Chart {
       #xArray = [/*0, 0, 0, 0,...*/];
       #yArray = [/*0, 0, 0, 0,...*/];
       #xAxisTitle;
       #yAxisTitle;
       #title = "";
+      #defaultWidth = "100%";
+      #defaultHeight = "500px";
 
       #wrapperContainer;
 
-      /**
-       * @override
-       */
+      //@override
       mode;
 
-      /**
-       * @override
-       */
+      //@override
       type;
 
-      /**
-       * @override
-       */
+      //@override
       dataOptions = {};
 
-      /**
-       * @override
-       */
+      //@override
       layoutOptions = {};
 
-      /**
-       * @override
-       */
+      //@override
       settingOptions = {scrollZoom: true};
 
       #data = [{
@@ -44,16 +39,19 @@ class Chart {
             title: this.#title
       };
 
-      constructor(points = [{x: 0, y: 0}], xAxisTitle = "", yAxisTitle = "", title = "", parentToAppendTo, overrideCssStyle = "") {
+      constructor(points = [{x: 0, y: 0}], xAxisTitle = "", yAxisTitle = "", title = "", width = "100%", height = "500px", parentToAppendTo, overrideCssStyle = "") {
             this.#xArray = points.map((element) => element.x);
             this.#yArray = points.map((element) => element.y);
             this.#xAxisTitle = xAxisTitle;
             this.#yAxisTitle = yAxisTitle;
             this.#title = title;
+            if(!width) width = this.#defaultWidth;
+            if(!height) height = this.#defaultHeight;
 
             this.#wrapperContainer = document.createElement("div");
             this.#wrapperContainer.style = STYLE.Div3;
-            this.#wrapperContainer.style.cssText += "width:calc(100% - " + getSideMargins(this.#wrapperContainer) + "px);box-sizing:border-box;height:300px;float:right:display:block;";
+            this.#wrapperContainer.style.cssText += "width:calc(" + width + " - " + getSideMargins(this.#wrapperContainer) + "px);box-sizing:border-box;" +
+                  "height:calc(" + height + " - " + getTopBottomMargins(this.#wrapperContainer) + "px);float:right:display:block;";
             if(overrideCssStyle) this.#wrapperContainer.style.cssText += overrideCssStyle;
             parentToAppendTo.appendChild(this.#wrapperContainer);
       }
@@ -70,8 +68,10 @@ class Chart {
             this.#layout = {
                   xaxis: {range: [Math.min(...this.#xArray) - 10, Math.max(...this.#xArray) + 10], title: this.#xAxisTitle},
                   yaxis: {range: [Math.min(...this.#yArray) - 10, Math.max(...this.#yArray) + 10], title: this.#yAxisTitle},
-                  title: this.#title
+                  title: this.#title,
+                  dragmode: "pan"
             };
+
             this.#layout = Object.assign(this.#layout, this.layoutOptions);
 
             Plotly.newPlot(this.#wrapperContainer, this.#data, this.#layout, this.settingOptions);
@@ -81,7 +81,7 @@ class Chart {
 class ScatterPlot extends Chart {
       mode = "markers";
 
-      constructor(points = [{x: 0, y: 0}], xAxisTitle = "", yAxisTitle = "", title = "", parentToAppendTo, overrideCssStyle = "") {
+      constructor(points = [{x: 0, y: 0}], xAxisTitle = "", yAxisTitle = "", title = "", width = "100%", height = "500px", parentToAppendTo, overrideCssStyle = "") {
             super(...arguments);
 
             this.Create();
@@ -93,7 +93,7 @@ class BarGraph extends Chart {
       layoutOptions = {
             bargap: 0.05
       };
-      constructor(points = [{x: 0, y: 0}], xAxisTitle = "", yAxisTitle = "", title = "", parentToAppendTo, overrideCssStyle = "") {
+      constructor(points = [{x: 0, y: 0}], xAxisTitle = "", yAxisTitle = "", title = "", width = "100%", height = "500px", parentToAppendTo, overrideCssStyle = "") {
             super(...arguments);
 
             this.Create();

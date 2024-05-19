@@ -9,14 +9,14 @@
 
 let defaultView = "Card View";
 
-let colour_Urgent = "#ff0000";
-let colour_Design = "#4472c4";
-let colour_Hold = "#a5a5a5";
-let colour_DesignRevision = "#a9d08e";
-let colour_PrintFilesToBeDone = "#d9e1f2";
-let colour_TToApprovePrintFiles = "#47ad8b";
-let colour_PrintFilesApproved = "#ffc000";
-let colour_InProduction = "#000000";
+var colour_Urgent = "#ff0000";
+var colour_Design = "#4472c4";
+var colour_Hold = "#a5a5a5";
+var colour_DesignRevision = "#a9d08e";
+var colour_PrintFilesToBeDone = "#d9e1f2";
+var colour_TToApprovePrintFiles = "#47ad8b";
+var colour_PrintFilesApproved = "#ffc000";
+var colour_InProduction = "#000000";
 
 let allOrderProductStatuses = [
       {
@@ -350,13 +350,9 @@ let allOrderProductStatuses = [
             "IsDisabled": false
       }
 ];
-
-//Darren: 20
-//Lee: 31
-
 window.addEventListener("load", async (event) => {
       await getRowsData();
-      //await getRowsData_awaitingApproval();
+      TODO("await getRowsData_awaitingApproval()");
 
       await init();
 });
@@ -555,6 +551,7 @@ async function updateItemPriority(orderProductId, orderId, priority, colour, Que
  * @param {BigInteger} OrderProductId i.e. 56762
  * @param {String} UserIds i.e. "31,20" (ensure no spaces)
  * @returns JSON Data Object
+ * @function asynchronous function that assignes user(s) to line item
  */
 async function AssignUsersToOrderProduct(OrderId, OrderProductId, UserIds) {
       const response = await fetch("https://sar10686.corebridge.net/Api/OrderProduct/AssignUsersToOrderProduct", {
@@ -590,12 +587,17 @@ const sleep = (milliseconds) => {
       return new Promise(resolve => setTimeout(resolve, milliseconds));
 };
 
+var newDiv_Urgent;
+var newDiv_DesignHold;
+var newDiv_InDesign;
+var newDiv_InDesignRevision;
+var newDiv_Approved;
+var newDiv_TristanToApprove;
+var newDiv_ReadyToPrint;
+var newDiv_Production;
 async function init() {
       console.log(jobs);
       console.log(awaitingApprovalJobs);
-      // multiDrag: true, // Enable multi-drag
-      //selectedClass: 'selected', // The class applied to the selected items
-      //fallbackTolerance: 3, // So that we can select items on mobile
 
       let parentContainer = document.body;
 
@@ -648,7 +650,7 @@ async function init() {
 
       let columnContainers = [];
 
-
+      //Urgent
       let newDiv_Urgent = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;height:calc(100% - 40px);;flex: 0 0 auto;", "Urgent", masterContainer);
       newDiv_Urgent.container.style.cssText += "background-color:#ff0000;";
       new Sortable(newDiv_Urgent.contentContainer, {
@@ -657,7 +659,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(/**Event*/evt) {
+            onEnd: function(event) {
                   onMoveEnd();
             }
       });
@@ -669,8 +671,8 @@ async function init() {
             newDiv_Urgent.headingContainer.children[x].classList.add("x-scrollable");
       }
 
-
-      let newDiv_DesignHold = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;height:calc(100% - 40px);;flex: 0 0 auto;", "Design Hold", masterContainer);
+      //Hold
+      let newDiv_DesignHold = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);;flex: 0 0 auto;", "Design Hold", masterContainer);
       newDiv_DesignHold.container.style.cssText += "background-color:#a5a5a5;";
       new Sortable(newDiv_DesignHold.contentContainer, {
             animation: 120,
@@ -678,7 +680,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(/**Event*/evt) {
+            onEnd: function(event) {
                   onMoveEnd();
             }
       });
@@ -690,14 +692,8 @@ async function init() {
             newDiv_DesignHold.headingContainer.children[x].classList.add("x-scrollable");
       }
 
-
-
-
-
-
-
-
-      let newDiv_InDesign = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;height:calc(100% - 40px);;flex: 0 0 auto;", "In Design", masterContainer);
+      //Design
+      let newDiv_InDesign = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);;flex: 0 0 auto;", "In Design", masterContainer);
       newDiv_InDesign.container.style.cssText += "background-color:rgb(68, 114, 196);";
       new Sortable(newDiv_InDesign.contentContainer, {
             animation: 120,
@@ -705,7 +701,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(/**Event*/evt) {
+            onEnd: function(event) {
                   onMoveEnd();
             }
       });
@@ -717,7 +713,7 @@ async function init() {
             newDiv_InDesign.headingContainer.children[x].classList.add("x-scrollable");
       }
 
-
+      //Design Revision
       let newDiv_InDesignRevision = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "In Design Revision", masterContainer);
       newDiv_InDesignRevision.container.style.cssText += "background-color:#a9d08e";
       new Sortable(newDiv_InDesignRevision.contentContainer, {
@@ -726,7 +722,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(/**Event*/evt) {
+            onEnd: function(event) {
                   onMoveEnd();
             }
       });
@@ -737,31 +733,7 @@ async function init() {
             newDiv_InDesignRevision.headingContainer.children[x].classList.add("x-scrollable");
       }
 
-
-
-
-      /* let newDiv_AwaitingApproval = new UIContainerType3("width:calc(17% - 24px);min-width:350px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Awaiting Approval", masterContainer);
-       newDiv_AwaitingApproval.container.style.cssText += "background-color:#ba78ee";
-       new Sortable(newDiv_AwaitingApproval.contentContainer, {
-             animation: 120,
-             group: 'shared',
-             swapThreshold: 1,
-             ghostClass: 'sortable-ghost',
-             direction: 'vertical',
-             onEnd: function(evt) {
-                   onMoveEnd();
-             }
-       });
-       columnContainers.push(newDiv_AwaitingApproval);
-       newDiv_AwaitingApproval.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
-       newDiv_AwaitingApproval.contentContainer.classList.add("x-scrollable");
-       for(let x = 0; x < newDiv_AwaitingApproval.headingContainer.children.length; x++) {
-             newDiv_AwaitingApproval.headingContainer.children[x].classList.add("x-scrollable");
-       }*/
-
-
-
-
+      //Proof Approved - Setup Print Files
       let newDiv_Approved = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Proof Approved - Setup Print Files", masterContainer);
       newDiv_Approved.container.style.cssText += "background-color:rgb(217, 225, 242)";
       new Sortable(newDiv_Approved.contentContainer, {
@@ -770,7 +742,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(/**Event*/evt) {
+            onEnd: function(event) {
                   onMoveEnd();
             }
       });
@@ -781,7 +753,7 @@ async function init() {
             newDiv_Approved.headingContainer.children[x].classList.add("x-scrollable");
       }
 
-
+      //Proof Approved - Tristan To Approve
       let newDiv_TristanToApprove = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Tristan To Approve", masterContainer);
       newDiv_TristanToApprove.container.style.cssText += "background-color:rgb(71, 173, 139);";
       new Sortable(newDiv_TristanToApprove.contentContainer, {
@@ -790,7 +762,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(/**Event*/evt) {
+            onEnd: function(event) {
                   onMoveEnd();
             }
       });
@@ -801,6 +773,7 @@ async function init() {
             newDiv_TristanToApprove.headingContainer.children[x].classList.add("x-scrollable");
       }
 
+      //Proof Approved - Ready To Print
       let newDiv_ReadyToPrint = new UIContainerType3("width:calc(17% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Ready To Print", masterContainer);
       newDiv_ReadyToPrint.container.style.cssText += "background-color:rgb(255, 192, 0);";
       new Sortable(newDiv_ReadyToPrint.contentContainer, {
@@ -809,7 +782,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(/**Event*/evt) {
+            onEnd: function(event) {
                   onMoveEnd();
             }
       });
@@ -820,6 +793,7 @@ async function init() {
             newDiv_ReadyToPrint.headingContainer.children[x].classList.add("x-scrollable");
       }
 
+      //Production
       let newDiv_Production = new UIContainerType3("width:calc(15% - 24px);min-width:350px;max-width:450px;margin-left:0px;height:calc(100% - 40px);flex: 0 0 auto;", "Printed -> Production", masterContainer);
       newDiv_Production.container.style.cssText += "background-color:rgb(0,0,0);";
       new Sortable(newDiv_Production.contentContainer, {
@@ -828,7 +802,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(/**Event*/evt) {
+            onEnd: function(event) {
                   onMoveEnd();
             }
       });
@@ -839,12 +813,13 @@ async function init() {
             newDiv_Production.headingContainer.children[x].classList.add("x-scrollable");
       }
 
+      //Scroll Container
       const slider = masterContainer;
       let isDown = false;
       let startX;
       let scrollLeft;
 
-      slider.addEventListener('mousedown', (e) => {
+      window.addEventListener('mousedown', (e) => {
             if(e.target.classList.contains("x-scrollable")) {
                   e.preventDefault();
                   isDown = true;
@@ -853,25 +828,23 @@ async function init() {
                   scrollLeft = slider.scrollLeft;
             }
       });
-      slider.addEventListener('mouseleave', () => {
+      window.addEventListener('mouseleave', () => {
+
+      });
+      window.addEventListener('mouseup', () => {
             isDown = false;
             slider.classList.remove('active');
       });
-      slider.addEventListener('mouseup', () => {
-            isDown = false;
-            slider.classList.remove('active');
-      });
-      slider.addEventListener('mousemove', (e) => {
+      window.addEventListener('mousemove', (e) => {
             if(!isDown) return;
-            if(e.target.classList.contains("x-scrollable")) {
-                  e.preventDefault();
-                  const x = e.pageX - slider.offsetLeft;
-                  const walk = (x - startX) * 1; //scroll-fast
-                  slider.scrollLeft = scrollLeft - walk;
-            }
+
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 1;
+            slider.scrollLeft = scrollLeft - walk;
       });
 
-
+      //Loop Through Jobs
       let dataPromise = [];
       let lineItemDescriptionFields = [];
       let lineItemDescriptionSpinners = [];
@@ -881,7 +854,6 @@ async function init() {
       let notesProduction = [];
       let notesCustomer = [];
       let notesVendor = [];
-
       let salesNotesBtns = [];
       let designNotesBtns = [];
       let productionNotesBtns = [];
@@ -889,7 +861,6 @@ async function init() {
       let vendorNotesBtns = [];
       let placeHolderPaymentDueBtns = [];
       let placeHolderPaymentDueLoaders = [];
-
       let queuePriority = [];
 
       for(let i = 0; i < jobs.length; i++) {
@@ -965,22 +936,6 @@ async function init() {
             }
 
             //WIP Status
-
-
-            /*
-            allOrderProductStatuses
- 
-            {
-                  "Id": 7,
-                  "Name": "IN DESIGN",
-                  "CbText": "WIP : In Design",
-                  "CustomerText": "In Design",
-                  "Sequence": 80,
-                  "AllowCustomization": null,
-                  "OrderStatusId": 4,
-                  "IsDisabled": false
-            }
-            */
             let WIPOptions = [
                   "WIP : In Design",
                   "WIP : Awaiting Proof Approval",
@@ -1023,7 +978,6 @@ async function init() {
             WIPStatus[1].id = "WIPStatus";
 
             for(let x = 0; x < WIPStatus[1].options.length; x++) {
-                  //WIPStatus[1].options.length
                   if(jobs[i].OrderProductStatusTextWithOrderStatus == WIPStatus[1].options[x].innerText) {
                         WIPStatus[1].selectedIndex = x;
                         WIPStatus[1].dataset.currentValue = x;
@@ -1031,12 +985,11 @@ async function init() {
                   }
             }
 
-            // createLabel("#: " + jobs[i].OrderInvoiceNumber, null, jobContainers[i].contentContainer);
+            //Info
             createLabel("Sales Person: " + jobs[i].SalesPersonName, null, inhouseDiv);
-            //createLabel("Total Paid: $" + jobs[i].TotalPaid, null, jobContainers[i].contentContainer);
             createLabel("Item Price: $" + jobs[i].TotalPrice, null, inhouseDiv);
 
-            /* Notes */
+            //Notes
             let ns, nd, np, nc, nv;
             let btnContainer = document.createElement("div");
             btnContainer.style = "padding-left:6px;width:100%;box-sizing:border-box;display:block;min-height: 10px;float:left;margin-top:12px;";
@@ -1066,42 +1019,24 @@ async function init() {
                   $(elementToShow).show();
             }
 
-            //createLabel("Item " + jobs[i].LineItemOrder + " of " + jobs[i].TotalProductsInOrder, null, jobContainers[i].contentContainer);
-
-            //
-
-
-
-
-            //let jobNoBtn = createButton(jobs[i].OrderInvoiceNumber, "display: block; float: left; width: " + 80 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Black + ";", () => { });
+            //Job Buttons
             let jobNoBtn = createLink("display: block; float: left; width: " + 80 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Black + ";", jobs[i].OrderInvoiceNumber, "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
 
             jobContainers[i].addHeadingButtons(jobNoBtn);
             createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out order", "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "new window", jobContainers[i].contentContainer);
 
-
-            //let itemNoBtn = createButton(jobs[i].LineItemOrder + "/" + jobs[i].TotalProductsInOrder, "display: block; float: left; width: " + 40 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, () => { });
             let itemNoBtn = createLink("display: block; float: left; width: " + 40 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, jobs[i].LineItemOrder + "/" + jobs[i].TotalProductsInOrder, "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
             jobContainers[i].addHeadingButtons(itemNoBtn);
+
+            //Buttons
             createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "new window", jobContainers[i].contentContainer);
-
             createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "open order in sales", "/SalesModule/Orders/Order.aspx?OrderId=" + jobs[i].OrderId, "new window", jobContainers[i].contentContainer);
-
-
-
 
             let jobColour = document.createElement("div");
             jobColour.style = "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:0px; position:relative;color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + (jobs[i].QueuePrioritySettingColor == null ? "white" : jobs[i].QueuePrioritySettingColor) + ";";
-
-            jobContainers[i].addHeadingButtons(jobColour);
             jobColour.id = "jobColour";
+            jobContainers[i].addHeadingButtons(jobColour);
 
-            //QueuePriority
-            //let queuePriority = jobs[i].QueuePriority;
-            //if(jobs[i].QueuePriority == null) {
-            //      console.log("i " + i);
-            //      queuePriority = (i + 1);
-            //}
             let jobOrder = createButton(jobs[i].QueuePriority, "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;pointer-events:none;padding:2px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.White + ";", () => {
 
             });
@@ -1116,25 +1051,11 @@ async function init() {
                   proofLink.style.cssText += "background-repeat: no-repeat;background-size:100%;background-position:center center";
                   jobContainers[i].addHeadingButtons(proofLink);
             }
-            //if(jobs[i].TotalPaid < jobs[i].TotalPrice) jobContainer.addHeadingButtons(paymentDueBtn);
+
             dataPromise.push(getOrderData_QuoteLevel(jobs[i].OrderId, jobs[i].AccountId, jobs[i].CompanyName));
       }
 
       onMoveEnd();
-
-      /*
-
-none: ""
-todo:"5"
-redesign :"14"
-hold:"9"
-urgent: "3"
-Print files to be done: "13"
-files approved by T: "8"
-to to approved print files: "6"
-production: 7
-      */
-
 
       async function onMoveEnd() {
 
@@ -1154,7 +1075,6 @@ production: 7
                                     break;
                               }
                         }
-
 
                         //Number Priority
                         let priority = jobContainer.querySelector("#queuePriority");
@@ -1227,7 +1147,7 @@ production: 7
                                     wipStatusField.dataset.currentValue = "WIP : In Production";
 
                                     break;
-                              default /*No Colour*/:
+                              default:
                                     newState = "WIP : In Design";
                                     newQueueID = "5";
                                     break;
@@ -1258,11 +1178,7 @@ production: 7
             console.log("done");
       }
 
-
-
-      /**
-       * @Notes
-       */
+      //Notes
       for(let i = 0; i < jobs.length; i++) {
             let productNotesDesign = await getProductNotes(jobs[i].Id, 2);
             let numOfNotes = productNotesDesign.ProductionNotes.length;
@@ -1278,23 +1194,19 @@ production: 7
 
                   designNotesBtns[i].appendChild(numberDisplayDiv);
             }
-
       }
 
       let data = await Promise.all(dataPromise);
 
+      //After All Jobs Data Fetched
 
-      /**
-       * @AfterFetch
-       */
       for(let j = 0; j < placeHolderPaymentDueBtns.length; j++) {
             deleteElement(placeHolderPaymentDueBtns[j]);
             placeHolderPaymentDueLoaders[j].Delete();
       }
+
       for(let i = 0; i < jobs.length; i++) {
-            /**
-             * Payment
-             */
+            //Payment
             let amountPaid = data[i].OrderInformation.OrderInformation.G0;
             let amountDue = data[i].OrderInformation.OrderInformation.F9;
 
@@ -1311,25 +1223,23 @@ production: 7
             } else {
                   jobContainers[i].addHeadingButtons(paymentNotDueBtn);
             }
-            /**
-             * Line Item Description
-             */
+
+            //Line Item Description
             let lineItemDescription = data[i].OrderInformation.OrderInformation.H2[jobs[i].LineItemOrder - 1].I1;
             lineItemDescriptionFields[i].innerHTML = lineItemDescriptionFields[i].innerHTML + lineItemDescription;
 
             lineItemDescriptionSpinners[i].Delete();
-
       }
+}
 
-      function reorderJobContainer(container, status, currentQueueColour) {
-            if(status == "WIP : In Design") newDiv_InDesign.contentContainer.appendChild(container);
-            if(status == "WIP : In Design Revision") newDiv_InDesignRevision.contentContainer.appendChild(container);
-            if(status == "WIP : Proof Approved" && (currentQueueColour == colour_PrintFilesToBeDone || currentQueueColour == colour_Design)) newDiv_Approved.contentContainer.appendChild(container);
-            if(status == "WIP : Proof Approved" && currentQueueColour == colour_TToApprovePrintFiles) newDiv_TristanToApprove.contentContainer.appendChild(container);
-            if(status == "WIP : Proof Approved" && currentQueueColour == colour_PrintFilesApproved) newDiv_ReadyToPrint.contentContainer.appendChild(container);
-            if(status == "WIP : In Production" && currentQueueColour == colour_InProduction) newDiv_Production.contentContainer.appendChild(container);
-            if(currentQueueColour == colour_Urgent) newDiv_Urgent.contentContainer.appendChild(container);
-      }
+function reorderJobContainer(container, status, currentQueueColour) {
+      if(status == "WIP : In Design") newDiv_InDesign.contentContainer.appendChild(container);
+      if(status == "WIP : In Design Revision") newDiv_InDesignRevision.contentContainer.appendChild(container);
+      if(status == "WIP : Proof Approved" && (currentQueueColour == colour_PrintFilesToBeDone || currentQueueColour == colour_Design)) newDiv_Approved.contentContainer.appendChild(container);
+      if(status == "WIP : Proof Approved" && currentQueueColour == colour_TToApprovePrintFiles) newDiv_TristanToApprove.contentContainer.appendChild(container);
+      if(status == "WIP : Proof Approved" && currentQueueColour == colour_PrintFilesApproved) newDiv_ReadyToPrint.contentContainer.appendChild(container);
+      if(status == "WIP : In Production" && currentQueueColour == colour_InProduction) newDiv_Production.contentContainer.appendChild(container);
+      if(currentQueueColour == colour_Urgent) newDiv_Urgent.contentContainer.appendChild(container);
 }
 
 function createBoardItem(parentObjectToAppendTo, customerName, jobName, invoiceNumber, lineItemNumber) {

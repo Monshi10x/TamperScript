@@ -13,7 +13,7 @@ class ChartMenu extends LHSMenuWindow {
             while(page.hasChildNodes()) {page.removeChild(page.lastChild);}
             while(this.footer.hasChildNodes()) {this.footer.removeChild(this.footer.lastChild);}
 
-            let testChart = new BarGraph([{x: 10, y: 10}, {x: 15, y: 20}, {x: 40, y: 30}], "x", "y", "title", page);
+            let testChart = new BarGraph([{x: 10, y: 10}, {x: 15, y: 20}, {x: 40, y: 30}], "x", "y", "title", null, null, page);
       }
 
       hide() {
@@ -24,7 +24,5 @@ class ChartMenu extends LHSMenuWindow {
             this.tickUpdate();
       }
 
-      tickUpdate() {
-
-      }
+      tickUpdate() { }
 }

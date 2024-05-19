@@ -17,7 +17,16 @@ class LHSMenuWindow {
     #previousPageBtn;
     #nextPageBtn;
     #pages = [];
+
     #doesTick = false;
+
+    get doesTick() {
+        return this.#doesTick;
+    }
+    set doesTick(value) {
+        this.#doesTick = value;
+    }
+
     #tickMS = 1000;
     #tickTimer;
 
@@ -56,8 +65,6 @@ class LHSMenuWindow {
         this.#container.appendChild(this.#body);
         this.#container.appendChild(this.#pageButtonContainer);
         this.#container.appendChild(this.#footer);
-
-        //createWindowDragZones(this.#container, 10, (event) => this.onWindowResize(event));
 
         window.addEventListener("resize", (event) => {this.onWindowResize(event);});
 
@@ -207,16 +214,7 @@ class LHSMenuWindow {
         this.maximize();
     }
 
-    get doesTick() {
-        return this.#doesTick;
-    }
-    set doesTick(value) {
-        this.#doesTick = value;
-    }
-
-    tick() {
-
-    }
+    tick() { }
 
     hide() {
         clearInterval(this.#tickTimer);
@@ -483,7 +481,7 @@ function createDragableHeaderAndClose(parentContainer, closeFunction, minimizeFu
     var parentContainerHeader = document.createElement('div');
     parentContainerHeader.id = parentContainer.id + "header";
     parentContainerHeader.style = "z-index:100;background-color:" + COLOUR.Blue + ";color:white;width:100%;min-height:30px;display:block;";
-    //      CLOSE BUTTON         //
+
     var closeBtn = createButton("X", "background-color:red;width:30px;max-height:30px;min-height:30px;float:right;margin:0px;border:0px;padding:2px;", function() {deselectSelectorBars(); closeFunction();});
     $(closeBtn).hover(function() {
         $(this).css("background-color", "white");
@@ -494,7 +492,6 @@ function createDragableHeaderAndClose(parentContainer, closeFunction, minimizeFu
     });
     parentContainerHeader.appendChild(closeBtn);
 
-    //     MAXIMIZE BUTTON         //
     if(maximizeFunction) {
         var maximizeBtn = createButton("+", "background-color:#00a8ff;width:30px;max-height:30px;min-height:30px;float:right;margin:0px;border:0px;padding:2px;", function() {maximizeFunction();});
         maximizeBtn.innerHTML = "&#9645";
@@ -508,7 +505,6 @@ function createDragableHeaderAndClose(parentContainer, closeFunction, minimizeFu
         parentContainerHeader.appendChild(maximizeBtn);
     }
 
-    //     MINIMIZE BUTTON         //
     if(minimizeFunction) {
         var minimizeBtn = createButton("-", "background-color:#0085ff;width:30px;max-height:30px;min-height:30px;float:right;margin:0px;border:0px;padding:2px;", function() {minimizeFunction();});
         minimizeBtn.innerHTML = "&#9644";

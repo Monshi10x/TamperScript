@@ -209,8 +209,7 @@ window.addEventListener("load", (event) => {
             Transformer = data.transformers;
         })
         .catch((error) => {
-            console.log(error);
-            alert(error);
+            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
         });
 });
 
@@ -223,8 +222,7 @@ window.addEventListener("load", (event) => {
             predefinedVehicleTemplates = data.predefinedVehicleTemplates;
         })
         .catch((error) => {
-            console.log(error);
-            alert(error);
+            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
         });
 });
 var blankVehicleTemplates;
@@ -236,8 +234,7 @@ window.addEventListener("load", (event) => {
             blankVehicleTemplates = data.blankVehicleTemplates;
         })
         .catch((error) => {
-            console.log(error);
-            alert(error);
+            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
         });
 });
 
@@ -261,8 +258,7 @@ window.addEventListener("load", (event) => {
             ACMLookup = data.ACMLookup;
         })
         .catch((error) => {
-            console.log(error);
-            alert(error);
+            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
         });
 });
 
@@ -276,7 +272,7 @@ window.addEventListener("load", (event) => {
         })
         .catch((error) => {
             console.log(error);
-            alert(error);
+            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
         });
 });
 
