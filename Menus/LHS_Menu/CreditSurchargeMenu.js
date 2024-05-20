@@ -9,8 +9,8 @@ class CreditSurchargeMenu extends LHSMenuWindow {
 
             while(this.footer.hasChildNodes()) {this.footer.removeChild(this.footer.lastChild);}
 
-            this.l_balanceDue = createInput_Infield("Balance Due (inc GST)", this.balanceDue, "width:200px;margin-left:100px", () => { }, page, false, null);
-            setFieldDisabled(true, this.l_balanceDue[1], this.l_balanceDue[0]);
+            this.l_balanceDueIncGst = createInput_Infield("Balance Due (inc GST)", this.balanceDueIncGst, "width:200px;margin-left:100px", () => { }, page, false, null);
+            setFieldDisabled(true, this.l_balanceDueIncGst[1], this.l_balanceDueIncGst[0]);
 
             this.price_incGst = createInput_Infield("Order Price (inc GST)", this.priceIncGst, "width:200px;margin-left:100px", () => { }, page, false, null);
             setFieldDisabled(true, this.price_incGst[1], this.price_incGst[0]);
@@ -57,23 +57,21 @@ class CreditSurchargeMenu extends LHSMenuWindow {
 
             this.createProductBtn = createButton("Create Product   " + "\u25BA", "width:100%;margin:0px;", () => {this.createProduct(this);});
             this.footer.appendChild(this.createProductBtn);
-
       }
 
-      get balanceDue() {
+      get balanceDueIncGst() {
             if(document.querySelector("#ord_prod_model_item_1") == null) return null;
             var product1 = ko.contextFor(document.querySelector("#ord_prod_model_item_1"));
-            console.log(product1.$parent.BalanceDue());
-            return product1.$parent.BalanceDue();
+            console.log(product1.$parent.balanceDueIncGst());
+            return product1.$parent.balanceDueIncGst();
       }
 
       get priceIncGst() {
             return Math.round((totalOrderPriceIncGst) * 100) / 100;
       }
 
-      //here
       get adjustedAmountIncGst() {
-            if(this.percent_remaining_Ckb[1].checked) return zeroIfNaN(zeroIfNull(parseFloat(this.balanceDue)));
+            if(this.percent_remaining_Ckb[1].checked) return zeroIfNaN(zeroIfNull(parseFloat(this.balanceDueIncGst)));
             if(this.percent_custom_Ckb[1].checked) return zeroIfNaN(zeroIfNull(parseFloat(this.customAmount[1].value)));
             if(this.percent_50_Ckb[1].checked) return this.priceExcludingPreviousSurchargesIncGst * 0.5;
             if(this.percent_100_Ckb[1].checked) return this.priceExcludingPreviousSurchargesIncGst * 1.0;
@@ -115,11 +113,11 @@ class CreditSurchargeMenu extends LHSMenuWindow {
       }
 
       fieldChangeUpdate() {
-            this.l_balanceDue[1].value = this.balanceDue;
+            this.l_balanceDueIncGst[1].value = this.balanceDueIncGst;
             this.price_incGst[1].value = this.priceIncGst;
             this.adjustedAmount_IncGst[1].value = this.adjustedAmountIncGst;
             this.creditSurcharge_IncGst[1].value = this.creditSurchargeIncGst;
-            this.priceExcludingPreviousSurcharges_incGst[1].value = this.priceIncGst - this.amountToExcludeIncGst;//check
+            this.priceExcludingPreviousSurcharges_incGst[1].value = this.priceIncGst - this.amountToExcludeIncGst;
             this.amountToTake_incGst[1].value = this.amountToTakeIncGst;
       };
 
