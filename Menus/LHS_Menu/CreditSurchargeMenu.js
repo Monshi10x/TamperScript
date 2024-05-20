@@ -9,16 +9,16 @@ class CreditSurchargeMenu extends LHSMenuWindow {
 
             while(this.footer.hasChildNodes()) {this.footer.removeChild(this.footer.lastChild);}
 
-            this.l_balanceDue = createInput_Infield("Balance Due (inc GST)", this.balanceDue, "width:200px;margin-left:100px", () => {}, page, false, null);
+            this.l_balanceDue = createInput_Infield("Balance Due (inc GST)", this.balanceDue, "width:200px;margin-left:100px", () => { }, page, false, null);
             setFieldDisabled(true, this.l_balanceDue[1], this.l_balanceDue[0]);
 
-            this.price_preGst = createInput_Infield("Order Price (+GST)", this.pricePreGst, "width:200px;margin-left:100px", () => {}, page, false, null);
-            setFieldDisabled(true, this.price_preGst[1], this.price_preGst[0]);
+            this.price_incGst = createInput_Infield("Order Price (inc GST)", this.priceIncGst, "width:200px;margin-left:100px", () => { }, page, false, null);
+            setFieldDisabled(true, this.price_incGst[1], this.price_incGst[0]);
 
             createText("", "width:95%;height:30px;font-size:20px;font-weight:bold;color:black;text-align:center", page).innerHTML = "&#8681";
 
-            this.priceExcludingPreviousSurcharges_preGst = createInput_Infield("Price Excluding Previous Surcharges (+GST)", this.pricePreGst, "width:300px;margin-left:50px", () => {}, page, false, null);
-            setFieldDisabled(true, this.priceExcludingPreviousSurcharges_preGst[1], this.priceExcludingPreviousSurcharges_preGst[0]);
+            this.priceExcludingPreviousSurcharges_incGst = createInput_Infield("Price Excluding Previous Surcharges (inc GST)", this.priceIncGst, "width:300px;margin-left:50px", () => { }, page, false, null);
+            setFieldDisabled(true, this.priceExcludingPreviousSurcharges_incGst[1], this.priceExcludingPreviousSurcharges_incGst[0]);
 
             createText("", "width:95%;height:30px;font-size:20px;font-weight:bold;color:black;text-align:center", page).innerHTML = "&#8681";
 
@@ -37,8 +37,8 @@ class CreditSurchargeMenu extends LHSMenuWindow {
 
             createText("", "width:95%;height:30px;font-size:20px;font-weight:bold;color:black;text-align:center", page).innerHTML = "&#8681";
 
-            this.adjustedAmount_preGst = createInput_Infield("adjusted amount (+GST)", this.adjustedAmountPreGst, "width:200px;margin-left:100px", () => {this.fieldChangeUpdate();}, page, false, null);
-            setFieldDisabled(true, this.adjustedAmount_preGst[1], this.adjustedAmount_preGst[0]);
+            this.adjustedAmount_IncGst = createInput_Infield("adjusted amount (inc GST)", this.adjustedAmountIncGst, "width:200px;margin-left:100px", () => {this.fieldChangeUpdate();}, page, false, null);
+            setFieldDisabled(true, this.adjustedAmount_IncGst[1], this.adjustedAmount_IncGst[0]);
 
             createText("X", "width:95%;height:30px;font-size:20px;font-weight:bold;color:black;text-align:center", page);
 
@@ -47,10 +47,10 @@ class CreditSurchargeMenu extends LHSMenuWindow {
 
             createText("=", "width:95%;height:30px;font-size:20px;font-weight:bold;color:black;text-align:center", page);
 
-            this.creditSurcharge_preGst = createInput_Infield("Credit Surcharge (+GST)", this.creditSurchargePreGst, "width:200px;margin-left:100px", () => {this.fieldChangeUpdate();}, page, false, null);
-            setFieldDisabled(true, this.creditSurcharge_preGst[1], this.creditSurcharge_preGst[0]);
+            this.creditSurcharge_IncGst = createInput_Infield("Credit Surcharge (inc GST)", this.creditSurchargeIncGst, "width:200px;margin-left:100px", () => {this.fieldChangeUpdate();}, page, false, null);
+            setFieldDisabled(true, this.creditSurcharge_IncGst[1], this.creditSurcharge_IncGst[0]);
 
-            this.amountToTake_incGst = createInput_Infield("Amount To Take (Inc GST)", this.amountToTakeIncGst, "width:200px;margin-left:100px;border:3px solid " + COLOUR.Blue + "", () => {this.fieldChangeUpdate();}, page, false, null);
+            this.amountToTake_incGst = createInput_Infield("Amount To Take (inc GST)", this.amountToTakeIncGst, "width:200px;margin-left:100px;border:3px solid " + COLOUR.Blue + "", () => {this.fieldChangeUpdate();}, page, false, null);
             setFieldDisabled(true, this.amountToTake_incGst[1], this.amountToTake_incGst[0]);
 
             this.note = createText("NOTE: Do not change product name", "width:95%;font-weight:bold;", page);
@@ -63,26 +63,27 @@ class CreditSurchargeMenu extends LHSMenuWindow {
       get balanceDue() {
             if(document.querySelector("#ord_prod_model_item_1") == null) return null;
             var product1 = ko.contextFor(document.querySelector("#ord_prod_model_item_1"));
+            console.log(product1.$parent.BalanceDue());
             return product1.$parent.BalanceDue();
       }
 
-      get pricePreGst() {
-            return Math.round(totalOrderPrice * 100) / 100;
+      get priceIncGst() {
+            return Math.round((totalOrderPriceIncGst) * 100) / 100;
       }
 
-      get adjustedAmountPreGst() {
-            if(this.percent_remaining_Ckb[1].checked) return zeroIfNaN(zeroIfNull(parseFloat(this.balanceDue / 1.1)));
+      //here
+      get adjustedAmountIncGst() {
+            if(this.percent_remaining_Ckb[1].checked) return zeroIfNaN(zeroIfNull(parseFloat(this.balanceDue)));
             if(this.percent_custom_Ckb[1].checked) return zeroIfNaN(zeroIfNull(parseFloat(this.customAmount[1].value)));
-            if(this.percent_50_Ckb[1].checked) return this.priceExcludingPreviousSurchargesPreGst * 0.5;
-            if(this.percent_100_Ckb[1].checked) return this.priceExcludingPreviousSurchargesPreGst * 1.0;
+            if(this.percent_50_Ckb[1].checked) return this.priceExcludingPreviousSurchargesIncGst * 0.5;
+            if(this.percent_100_Ckb[1].checked) return this.priceExcludingPreviousSurchargesIncGst * 1.0;
       }
 
-      get creditSurchargePreGst() {
-            return parseFloat(this.adjustedAmountPreGst * (this.surchargePercentage / 100));
+      get creditSurchargeIncGst() {
+            return parseFloat(this.adjustedAmountIncGst * (this.surchargePercentage / 100));
       }
 
-
-      get amountToExcludePreGst() {
+      get amountToExcludeIncGst() {
             var productsWithName = getProductsWithName("Credit Card Surcharge - 2.5%");
             var amount = 0;
             for(var n = 0; n < productsWithName.length; n++) {
@@ -91,17 +92,16 @@ class CreditSurchargeMenu extends LHSMenuWindow {
             return amount;
       }
 
-      get priceExcludingPreviousSurchargesPreGst() {
-            return zeroIfNaN(zeroIfNull(parseFloat(this.priceExcludingPreviousSurcharges_preGst[1].value)));
+      get priceExcludingPreviousSurchargesIncGst() {
+            return zeroIfNaN(zeroIfNull(parseFloat(this.priceExcludingPreviousSurcharges_incGst[1].value)));
       }
 
       get amountToTakeIncGst() {
-            return roundNumber((this.adjustedAmountPreGst + this.creditSurchargePreGst) * 1.1, 2);
+            return roundNumber((this.adjustedAmountIncGst + this.creditSurchargeIncGst), 2);
       }
 
       show() {
             super.show();
-
             this.interval = setInterval(() => {this.tick();}, 1000 / 2);
       }
 
@@ -116,10 +116,10 @@ class CreditSurchargeMenu extends LHSMenuWindow {
 
       fieldChangeUpdate() {
             this.l_balanceDue[1].value = this.balanceDue;
-            this.price_preGst[1].value = this.pricePreGst;
-            this.adjustedAmount_preGst[1].value = this.adjustedAmountPreGst;
-            this.creditSurcharge_preGst[1].value = this.creditSurchargePreGst;
-            this.priceExcludingPreviousSurcharges_preGst[1].value = this.pricePreGst - this.amountToExcludePreGst;
+            this.price_incGst[1].value = this.priceIncGst;
+            this.adjustedAmount_IncGst[1].value = this.adjustedAmountIncGst;
+            this.creditSurcharge_IncGst[1].value = this.creditSurchargeIncGst;
+            this.priceExcludingPreviousSurcharges_incGst[1].value = this.priceIncGst - this.amountToExcludeIncGst;//check
             this.amountToTake_incGst[1].value = this.amountToTakeIncGst;
       };
 
@@ -129,8 +129,8 @@ class CreditSurchargeMenu extends LHSMenuWindow {
             await AddQuickProduct("Credit Card Surcharge - 2.5%");
             var productNo = getNumProducts();
             await DeletePart(productNo, 1);
-            console.log(this.creditSurchargePreGst);
-            await q_AddPart_CostPrice(productNo, 0, true, false, 1, parent.creditSurchargePreGst, parent.creditSurchargePreGst, "Credit card surcharge");
+            console.log(this.creditSurchargeIncGst);
+            await q_AddPart_CostPrice(productNo, 0, true, false, 1, parent.creditSurchargeIncGst, parent.creditSurchargeIncGst, "Credit card surcharge");
             Ordui.Alert("done");
       }
 

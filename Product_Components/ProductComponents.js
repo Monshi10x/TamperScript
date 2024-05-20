@@ -321,9 +321,10 @@ function partInfoTick() {
 	//******************************//
 	//            ORDER             //
 	//******************************//
-	totalOrderPrice = parseFloat(document.querySelector('#newSubtotalValue').innerText.replace(/\$|,/g, ''));
-	orderMinimum_Price = totalOrderPrice;
-	totalOrderProfit = totalOrderPrice - totalOrderCost;
+	totalOrderPricePreGst = parseFloat(document.querySelector('#newSubtotalValue').innerText.replace(/\$|,/g, ''));
+	totalOrderPriceIncGst = totalOrderPricePreGst * 1.1;
+	orderMinimum_Price = totalOrderPricePreGst;
+	totalOrderProfit = totalOrderPricePreGst - totalOrderCost;
 	orderMinimum_Profit = totalOrderProfit;
 	global_containsOtherInformation = containsOtherInformation;
 	if(containsAnyInstall) {

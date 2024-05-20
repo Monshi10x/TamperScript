@@ -112,19 +112,19 @@ function costAnalysisSummaryTick() {
         markupPercentage = (totalOrderProfit / totalOrderCost) * 100;
         markupDecimal = 1 + (markupPercentage / 100);
         newPanelContent_MarkupContainer_TotalMarkup.innerHTML = Math.round(markupPercentage * 100) / 100 + "% / " + Math.round(markupDecimal * 100) / 100 + "x";
-    } else if(totalOrderCost == 0 && totalOrderPrice != 0) {
+    } else if(totalOrderCost == 0 && totalOrderPricePreGst != 0) {
         markupPercentage = "Inf";
         markupDecimal = "Inf";
         newPanelContent_MarkupContainer_TotalMarkup.innerHTML = "Inf % / Inf x";
     }
 
     newPanelContent_CostContainer_TotalCosts.innerHTML = "$" + Math.round(totalOrderCost * 100) / 100;
-    newPanelContent_PriceContainer_TotalPrices.innerHTML = "$" + Math.round(totalOrderPrice * 100) / 100;
+    newPanelContent_PriceContainer_TotalPrices.innerHTML = "$" + Math.round(totalOrderPricePreGst * 100) / 100;
     newPanelContent_ProfitContainer_TotalProfit.innerHTML = "$" + Math.round(totalOrderProfit * 100) / 100;
     let secondsToUse = quoteSeconds_Total == 0 ? quoteSeconds_CurrentSession : quoteSeconds_Total;
     let smhd = getSMHD(secondsToUse);
     newPanelContent_TimeClock_Time.innerHTML = smhd[0] + "d " + smhd[1] + "h " + smhd[2] + "m " + smhd[3] + "s";
     //totalOrderCost = 0;
-    // totalOrderPrice = 0;
+    // totalOrderPricePreGst = 0;
     //totalOrderProfit = 0;
 }
