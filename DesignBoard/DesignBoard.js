@@ -862,6 +862,8 @@ async function init() {
       let placeHolderPaymentDueBtns = [];
       let placeHolderPaymentDueLoaders = [];
       let queuePriority = [];
+      let productQtyFields = [];
+      let productQtySpinners = [];
 
       for(let i = 0; i < jobs.length; i++) {
             let toAppendTo;
@@ -910,6 +912,14 @@ async function init() {
             createLabel("Contact Ph2: " + jobs[i].OrderContactCellPhone, null, customerContactDiv);
 
             let inhouseDiv = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:block;", "Inhouse Items", jobContainers[i].contentContainer);
+
+            let productQty = createInput_Infield("product Qty", null, null, null, inhouseDiv, false, null);
+            setFieldDisabled(true, productQty[1], productQty[0]);
+            productQtyFields.push(productQty);
+            let productQtyLoader = new Loader("", productQty[0]);
+            productQtySpinners.push(productQtyLoader);
+            productQtySpinners;
+
             let designer = createDropdown_Infield("Designer", 2, "max-width:30%;min-width:150px;margin-right: 70%;",
                   [createDropdownOption("Darren Frankish", "20"),
                   createDropdownOption("Leandri Hayward", "31"),
@@ -1031,6 +1041,8 @@ async function init() {
             //Buttons
             createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "new window", jobContainers[i].contentContainer);
             createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "open order in sales", "/SalesModule/Orders/Order.aspx?OrderId=" + jobs[i].OrderId, "new window", jobContainers[i].contentContainer);
+
+
 
             let jobColour = document.createElement("div");
             jobColour.style = "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:0px; position:relative;color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + (jobs[i].QueuePrioritySettingColor == null ? "white" : jobs[i].QueuePrioritySettingColor) + ";";
@@ -1197,25 +1209,77 @@ async function init() {
       }
 
       let data = await Promise.all(dataPromise);
+      console.log(data);
 
       //After All Jobs Data Fetched
 
       for(let j = 0; j < placeHolderPaymentDueBtns.length; j++) {
-            deleteElement(placeHolderPaymentDueBtns[j]);
-            placeHolderPaymentDueLoaders[j].Delete();
+
       }
 
+
+      //OrderTitle = data[i].OrderDescription;
+      //BillingAddr = data[i].OrderInformation.OrderInformation.J1.[G0-G9],[H0-H7];
+      //customerEmail = data[i].OrderInformation.OrderInformation.J1.E8
+
       for(let i = 0; i < jobs.length; i++) {
-            //Payment
+
+            let lineItemOrder = jobs[i].LineItemOrder;
+            let productQty = data[i].OrderInformation.OrderInformation.H2[lineItemOrder - 1].B0;
+            let lineItemDescription = data[i].OrderInformation.OrderInformation.H2[lineItemOrder - 1].I1;
             let amountPaid = data[i].OrderInformation.OrderInformation.G0;
             let amountDue = data[i].OrderInformation.OrderInformation.F9;
+            let companyName = jobs[i].CompanyName;
+            let invoiceNumber = jobs[i].OrderInvoiceNumber;
+            let orderContact = jobs[i].OrderContactName;
+            let phone1 = jobs[i].OrderContactWorkPhone;
+            let phone2 = jobs[i].OrderContactCellPhone;
+            let salesPerson = jobs[i].SalesPersonName;
+            let itemDescription = jobs[i].Description;
+            let partPreviewsArray = data[i].OrderInformation.OrderInformation.H2[lineItemOrder - 1].PartPeekViews;
 
-            let paymentDueBtn = createButton("$", "display: block; float: right; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:2px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Yellow + ";", () => {
-                  let paymentModal = new ModalSingleInput("Payment Due - " + jobs[i].CompanyName + " - " + jobs[i].OrderInvoiceNumber, () => { });
-                  paymentModal.value = amountDue;
-                  paymentModal.setContainerSize(400, 300);
-            });
-            let paymentNotDueBtn = createButton("&#10003", "display: block; float: right; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Green + ";", () => { });
+            //Placeholder Btns
+            deleteElement(placeHolderPaymentDueBtns[i]);
+            placeHolderPaymentDueLoaders[i].Delete();
+
+            //Qty
+            $(productQtyFields[i][1]).val(productQty).change();
+            productQtySpinners[i].Delete();
+
+            //Illustrator Clipboard
+            createButton("Copy to Clipboard", "width:200px;", async () => {
+                  saveToClipboard(
+                        "Company Name: " + companyName + "\n" +
+                        "Item Description: " + itemDescription + "\n" +
+                        "Description: " + lineItemDescription + "\n" +
+                        "Invoice Number: " + invoiceNumber + "\n" +
+                        "Item #: " + lineItemOrder + "\n" +
+                        "Product Qty: " + productQty + "\n" +
+                        "Customer Name: " + orderContact + "\n" +
+                        "Contact Phone 1: " + phone1 + "\n" +
+                        "Contact Phone 2: " + phone2 + "\n" +
+                        "Sales Person: " + salesPerson + "\n"
+                  );
+            }, jobContainers[i].contentContainer);
+
+            //Parts
+            partContainer = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:block;", "Parts", jobContainers[i].contentContainer);
+            let partsString = "";
+            for(let a = 0; a < partPreviewsArray.length; a++) {
+                  let partName = partPreviewsArray[a].O2;
+                  partsString += (a + 1) + ": " + partName + "\n";
+            }
+            createText(partsString, "width:100%;height:fit-content;float:left;display:block;", partContainer);
+
+            //Payment
+            let paymentDueBtn = createButton("$", "display: block; float: right; width: " + 30 + "px;height:" + 30 +
+                  "px; border:none;padding:2px; color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Yellow + ";", () => {
+                        let paymentModal = new ModalSingleInput("Payment Due - " + companyName + " - " + invoiceNumber, () => { });
+                        paymentModal.value = amountDue;
+                        paymentModal.setContainerSize(400, 300);
+                  });
+            let paymentNotDueBtn = createButton("&#10003", "display: block; float: right; width: " + 30 + "px;height:" + 30 +
+                  "px; border:none;padding:2px; color:White;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Green + ";", () => { });
             paymentNotDueBtn.innerHTML = "&#10003";
 
             if(amountDue > 0) {
@@ -1225,9 +1289,7 @@ async function init() {
             }
 
             //Line Item Description
-            let lineItemDescription = data[i].OrderInformation.OrderInformation.H2[jobs[i].LineItemOrder - 1].I1;
             lineItemDescriptionFields[i].innerHTML = lineItemDescriptionFields[i].innerHTML + lineItemDescription;
-
             lineItemDescriptionSpinners[i].Delete();
       }
 }

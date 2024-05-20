@@ -88,6 +88,11 @@ function convertClipboardToMeasure() {
         });
 }
 
+async function saveToClipboard(string) {
+    await navigator.clipboard.writeText(string);
+    console.log("string copied to clipboard");
+}
+
 function StringCombine(...args) {
     let str = '';
     for(var i = 0; i < args.length; i++) {
