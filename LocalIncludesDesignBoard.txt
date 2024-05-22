@@ -19,7 +19,9 @@
 // @grant        window.focus
 // @grant        window.onurlchange
 // @grant        GM_getResourceText
+// @grant        GM_getResourceURL
 // @resource     IMPORTED_CSS file://C:\Users\monsh\Documents\TamperScript\Styles\Styles_DesignBoard.css
+// @resource     Icon_AdobeIllustrator file://C:\Users\monsh\Documents\TamperScript\Images\IllustratorIcon.png
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
