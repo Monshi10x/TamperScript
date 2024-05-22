@@ -158,17 +158,15 @@ function createButton(text, overrideCssStyles, optionalCallback, parentObjectToA
     return btn;
 }
 function createIconButton(src, text, overrideCssStyles, optionalCallback, parentObjectToAppendTo, invertOff) {
-    var btn = document.createElement('button');
+    let btn = document.createElement('button');
+    let icon = document.createElement("img");
+    let textField = document.createElement("p");
+    let height;
 
-    var icon = document.createElement("img");
-    icon.style = "height:100%;padding:0px;filter:invert(100%);float:left;";
-    if(invertOff) icon.style.filter = "invert(0%)";
-    icon.src = src;
-
-    btn.appendChild(icon);
-    btn.appendChild(document.createTextNode(text));
-    btn.style = STYLE.Button + ";line-height:30px;";
+    btn.style = STYLE.Button + ";line-height:30px";
     btn.style.cssText += overrideCssStyles;
+    height = btn.style.height ? "" + btn.style.height : "30px";
+    console.log(height);
     btn.dataset.backgroundColor = btn.style.backgroundColor;
     btn.style.borderColor = btn.style.backgroundColor;
     btn.dataset.backgroundColorDisabled = COLOUR.White;
@@ -177,12 +175,24 @@ function createIconButton(src, text, overrideCssStyles, optionalCallback, parent
     $(btn).hover(() => {
         $(btn).css("background-color", "white");
         $(btn).css("color", initialBackgroundColor);
+        $(textField).css("color", initialBackgroundColor);
         if(!invertOff) icon.style.filter = "invert(2%)";
     }, () => {
         $(btn).css("background-color", initialBackgroundColor);
         $(btn).css("color", "white");
+        $(textField).css("color", "white");
         if(!invertOff) icon.style.filter = "invert(100%)";
     });
+
+    icon.style = "height:100%;padding:0px;filter:invert(100%);float:left;";
+    if(invertOff) icon.style.filter = "invert(0%)";
+    icon.src = src;
+    btn.appendChild(icon);
+
+    textField.style = "color:white;font-size:13px;margin:0px;margin-top:-4px;text-align:center;vertical-align:center;line-height:" + height;
+    textField.innerText = text;
+    btn.appendChild(textField);
+
     if(optionalCallback) {
         btn.onclick = optionalCallback;
     }

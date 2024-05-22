@@ -354,3 +354,10 @@ _todo = [];
 function TODO(element) {
     _todo.push(element);
 }
+
+function HTMLToText(htmlString) {
+    let tempDivElement = document.createElement("div");
+    tempDivElement.innerHTML = htmlString;
+
+    return tempDivElement.textContent || tempDivElement.innerText || "";
+}

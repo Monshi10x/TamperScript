@@ -7,7 +7,7 @@
 	],
 	"settings": {
 		"workbench.colorCustomizations": {
-			"editor.background": "#111111",
+			"editor.background": "#181818",
 			"editor.selectionBackground": "#2e2e2e",
 			"editor.selectionHighlightBorder": "#0400ff",
 			"editor.selectionForeground": "#0004ff",
@@ -142,6 +142,8 @@
 					}
 				}
 			]
-		}
+		},
+		"editor.fontFamily": "Consolas, 'Courier New', monospace",
+		"editor.fontSize": 12
 	}
 }

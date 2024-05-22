@@ -1225,6 +1225,7 @@ async function init() {
       for(let i = 0; i < jobs.length; i++) {
 
             let lineItemOrder = jobs[i].LineItemOrder;
+            let jobName = jobs[i].OrderDescription;
             let productQty = data[i].OrderInformation.OrderInformation.H2[lineItemOrder - 1].B0;
             let lineItemDescription = data[i].OrderInformation.OrderInformation.H2[lineItemOrder - 1].I1;
             let amountPaid = data[i].OrderInformation.OrderInformation.G0;
@@ -1246,30 +1247,44 @@ async function init() {
             $(productQtyFields[i][1]).val(productQty).change();
             productQtySpinners[i].Delete();
 
-            //Illustrator Clipboard
-            createButton("Copy to Clipboard", "width:200px;", async () => {
-                  saveToClipboard(
-                        "Company Name: " + companyName + "\n" +
-                        "Item Description: " + itemDescription + "\n" +
-                        "Description: " + lineItemDescription + "\n" +
-                        "Invoice Number: " + invoiceNumber + "\n" +
-                        "Item #: " + lineItemOrder + "\n" +
-                        "Product Qty: " + productQty + "\n" +
-                        "Customer Name: " + orderContact + "\n" +
-                        "Contact Phone 1: " + phone1 + "\n" +
-                        "Contact Phone 2: " + phone2 + "\n" +
-                        "Sales Person: " + salesPerson + "\n"
-                  );
-            }, jobContainers[i].contentContainer);
-
             //Parts
             partContainer = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:block;", "Parts", jobContainers[i].contentContainer);
             let partsString = "";
             for(let a = 0; a < partPreviewsArray.length; a++) {
                   let partName = partPreviewsArray[a].O2;
-                  partsString += (a + 1) + ": " + partName + "\n";
+                  partsString += (a + 1) + ': ' + partName + '\n';
             }
             createText(partsString, "width:100%;height:fit-content;float:left;display:block;", partContainer);
+
+            //Illustrator Clipboard
+            createIconButton(GM_getResourceURL("Icon_AdobeIllustrator"), "Copy For Illustrator", "width:200px;height:35px;", async () => {
+                  let x = '<?xml version="1.0" encoding="UTF-8"?>' +
+                        '<svg id = "Layer_1" data-name="Layer 1" xmlns = "http://www.w3.org/2000/svg" width = "210mm" height = "297mm" viewBox = "0 0 595.28 841.89">' +
+                        '<g>' +
+                        '<text x="0" y="15" fill="black">' + ('Client: ' + companyName.replace("&", "and")) + '</text>' +
+                        '<text x="0" y="30" fill="black">' + ('Job: ' + jobName.replace("&", "and")) + '</text>' +
+                        '<text x="0" y="45" fill="black">' + 'Description: ' + lineItemDescription.replace("<br>", "      ").replace("&nbsp;", "         ").replace(/<[^>]+>/g, '') + '</text>' +
+                        '<text x="0" y="60" fill="black">' + 'Invoice Number: ' + invoiceNumber + '</text>' +
+                        '<text x="0" y="75" fill="black">' + 'Line Item: ' + lineItemOrder + '</text>' +
+                        '<text x="0" y="90" fill="black">' + 'Product Qty: ' + productQty + '</text>' +
+                        '<text x="0" y="105" fill="black">' + 'Customer Name: ' + orderContact.replace("&", "and") + '</text>' +
+                        '<text x="0" y="120" fill="black">' + 'Contact Phone 1: ' + phone1 + '</text>' +
+                        '<text x="0" y="135" fill="black">' + 'Contact Phone 2: ' + phone2 + '</text>' +
+                        '<text x="0" y="150" fill="black">' + 'Sales Person: ' + salesPerson + '</text>' +
+                        '<text x="0" y="165" fill="black">' + 'Item Description: ' + itemDescription.replace("&", "and") + '</text>' +
+                        '<text x="0" y="180" fill="black">' + 'Parts: ' + partsString.replace("&", "and") + '</text>' +
+                        '<rect x="0" y="180" width = "595.28" height = "841.89" fill = "none" stroke = "#969696" stroke-miterlimit="10"/>' +
+                        '</g>' +
+                        '</svg>';
+                  saveToClipboard(x);
+                  console.log(x);
+
+                  var parser = new DOMParser();
+                  var doc = parser.parseFromString(x, "image/svg+xml");
+                  console.log(doc);
+
+            }, jobContainers[i].contentContainer, true);
+
 
             //Payment
             let paymentDueBtn = createButton("$", "display: block; float: right; width: " + 30 + "px;height:" + 30 +
