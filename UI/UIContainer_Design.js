@@ -67,13 +67,15 @@ class UIContainer_Design {
             this.#container = document.createElement("div");
             this.#container.className = "UIContainer_Design";
             this.#container.style = STYLE.Div3;
-            this.#container.style.cssText += "display:flex;flex-direction:column;margin-bottom:10px;";
+            this.#container.style.cssText += "display:flex;flex-direction:column;margin-bottom:10px;border:1px solid rgb(0,0,0,0.6);cursor:auto;";
+            this.#container.style.boxShadow = "rgb(0, 0, 0, 0.5) 0px 0px 20px 0px";
             this.#container.style.cssText += overrideCssStyles;
 
+
             $(this.#container).hover(function() {
-                  this.style.boxShadow = "rgb(0 0 0) 10px 10px 15px -3px";
+                  this.style.boxShadow = "rgb(0, 0, 0, 0.9) 0px 0px 20px 0.5px";
             }, function() {
-                  this.style.boxShadow = "rgb(0 0 0) 5px 5px 10px -3px";
+                  this.style.boxShadow = "rgb(0, 0, 0, 0.5) 0px 0px 20px 0px";
             });
 
             if(parentObjectToAppendTo != null) {

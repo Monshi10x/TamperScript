@@ -66,7 +66,6 @@ class Modal {
                         event.stopPropagation();
                         //TODO: Half working, window still enters
                         this.hide();
-
                   }
             }, {bubbles: false});
       }

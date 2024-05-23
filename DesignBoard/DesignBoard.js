@@ -659,6 +659,12 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
+            start: function(evt) {
+                  $('html').addClass("draggable-cursor");
+            },
+            stop: function(evt) {
+                  $('html').removeClass("draggable-cursor");
+            },
             onEnd: function(event) {
                   onMoveEnd();
             }
@@ -680,6 +686,12 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
+            start: function(evt) {
+                  $('html').addClass("draggable-cursor");
+            },
+            stop: function(evt) {
+                  $('html').removeClass("draggable-cursor");
+            },
             onEnd: function(event) {
                   onMoveEnd();
             }
@@ -701,8 +713,47 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(event) {
+            forceFallback: true,
+            dragoverBubble: false,
+            onChoose: function(evt) {
+                  console.log("onChoose");
+                  $(evt.item).css('cursor', 'grabbing');
+                  $(evt.from).css('cursor', 'grabbing');
+                  $(evt.to).css('cursor', 'grabbing');
+                  $(evt.related).css('cursor', 'grabbing');
+                  $(evt.dragged).css('cursor', 'grabbing');
+            }, // Run when you click
+            onMove: function(evt) {
+                  $(evt.item).css('cursor', 'grabbing');
+                  $(evt.from).css('cursor', 'grabbing');
+                  $(evt.to).css('cursor', 'grabbing');
+                  $(evt.related).css('cursor', 'auto');
+                  $(evt.dragged).css('cursor', 'grabbing');
+            }, // Run when you click
+            onStart: function(evt) {
+                  console.log("onStart");
+                  $(evt.item).css('cursor', 'grabbing');
+                  $(evt.from).css('cursor', 'grabbing');
+                  $(evt.to).css('cursor', 'grabbing');
+                  $(evt.related).css('cursor', 'grabbing');
+                  $(evt.dragged).css('cursor', 'grabbing');
+            }, // Dragging started
+            onSort: function(/**Event*/evt) {
+                  console.log("onSort");
+                  $(evt.item).css('cursor', 'grabbing');
+                  // $(evt.related).css('cursor', 'auto');
+            },
+            onEnd: function(evt) {
+                  console.log("onEnd");
+                  $(evt.item).css('cursor', 'auto');
+                  $(evt.from).css('cursor', 'auto');
+                  $(evt.to).css('cursor', 'auto');
+                  //$(evt.related).css('cursor', 'auto');
+                  $(evt.dragged).css('cursor', 'auto');
                   onMoveEnd();
+            }, onChange: function(/**Event*/evt) {
+                  console.log("onChange");
+                  $(evt.item).css('cursor', 'auto');
             }
       });
       columnContainers.push(newDiv_InDesign);
@@ -722,8 +773,47 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            onEnd: function(event) {
+            forceFallback: true,
+            dragoverBubble: false,
+            onChoose: function(evt) {
+                  console.log("onChoose");
+                  $(evt.item).css('cursor', 'grabbing');
+                  $(evt.from).css('cursor', 'grabbing');
+                  $(evt.to).css('cursor', 'grabbing');
+                  $(evt.related).css('cursor', 'grabbing');
+                  $(evt.dragged).css('cursor', 'grabbing');
+            }, // Run when you click
+            onMove: function(evt) {
+                  $(evt.item).css('cursor', 'grabbing');
+                  $(evt.from).css('cursor', 'grabbing');
+                  $(evt.to).css('cursor', 'grabbing');
+                  $(evt.related).css('cursor', 'auto');
+                  $(evt.dragged).css('cursor', 'grabbing');
+            }, // Run when you click
+            onStart: function(evt) {
+                  console.log("onStart");
+                  $(evt.item).css('cursor', 'grabbing');
+                  $(evt.from).css('cursor', 'grabbing');
+                  $(evt.to).css('cursor', 'grabbing');
+                  $(evt.related).css('cursor', 'grabbing');
+                  $(evt.dragged).css('cursor', 'grabbing');
+            }, // Dragging started
+            onSort: function(/**Event*/evt) {
+                  console.log("onSort");
+                  $(evt.item).css('cursor', 'grabbing');
+                  // $(evt.related).css('cursor', 'auto');
+            },
+            onEnd: function(evt) {
+                  console.log("onEnd");
+                  $(evt.item).css('cursor', 'auto');
+                  $(evt.from).css('cursor', 'auto');
+                  $(evt.to).css('cursor', 'auto');
+                  //$(evt.related).css('cursor', 'auto');
+                  $(evt.dragged).css('cursor', 'auto');
                   onMoveEnd();
+            }, onChange: function(/**Event*/evt) {
+                  console.log("onChange");
+                  $(evt.item).css('cursor', 'auto');
             }
       });
       columnContainers.push(newDiv_InDesignRevision);
@@ -741,6 +831,7 @@ async function init() {
             group: 'shared',
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
+            dragClass: "sortable-drag",
             direction: 'vertical',
             onEnd: function(event) {
                   onMoveEnd();
@@ -761,6 +852,7 @@ async function init() {
             group: 'shared',
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
+            dragClass: "sortable-drag",
             direction: 'vertical',
             onEnd: function(event) {
                   onMoveEnd();
@@ -781,6 +873,7 @@ async function init() {
             group: 'shared',
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
+            dragClass: "sortable-drag",
             direction: 'vertical',
             onEnd: function(event) {
                   onMoveEnd();
@@ -801,6 +894,7 @@ async function init() {
             group: 'shared',
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
+            dragClass: "sortable-drag",
             direction: 'vertical',
             onEnd: function(event) {
                   onMoveEnd();

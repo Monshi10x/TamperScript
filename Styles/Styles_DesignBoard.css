@@ -22,6 +22,10 @@
 
 .sortable-ghost{
       opacity: 0;
+      pointer-events: none;
+}
+.sortable-ghost, .sortable-chosen {
+    cursor: grabbing !important;
 }
 
 /* Chrome, Edge, and Safari */
@@ -38,4 +42,13 @@
     background-color: rgb(0, 0, 149);
     border-radius: 8px;
     border: 13px none #ffffff;
+  }
+
+  .UIContainer_Design:hover{
+      transform: scale(1.01,1.01);
+
+  }
+
+ .UIContainer_Design:not(:hover){
+      
   }
