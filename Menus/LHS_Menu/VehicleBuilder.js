@@ -1049,10 +1049,10 @@ function scaleSkewableRect(xPos, yPos) {
     console.log("in scale");
     let shapeIndex = getSkewRectAtPosition(xPos, yPos);
     if(shapeIndex != null && shapeIndex !== false) {
-        let scaleModal = new ModalWidthHeight("Apply Scale", 1, function() {
-            let scaleW = (scaleModal.width || scaleModal.width != 0) ? scaleModal.width - 1 : 0;
-            let scaleH = (scaleModal.height || scaleModal.height != 0) ? scaleModal.height - 1 : 0;
-            //console.log("in scaleSkewableRect", shapeIndex, xPos, yPos, scale);
+        let modal = new ModalWidthHeight("Apply Scale", 1, function() {
+            let scaleW = (modal.width || modal.width != 0) ? modal.width - 1 : 0;
+            let scaleH = (modal.height || modal.height != 0) ? modal.height - 1 : 0;
+
             console.log("in shapeIndex");
             console.log(skewableRects[shapeIndex]);
             let centerCoord = {
@@ -1073,6 +1073,7 @@ function scaleSkewableRect(xPos, yPos) {
             dirtyTriangles = true;
             needsToUpdate = true;
         });
+        modal.setContainerSize(300, 300);
     }
 }
 
@@ -1251,6 +1252,7 @@ function setQtyRect(xPos, yPos) {
             rects[shapeIndex].qty = parseFloat(modal.value);
             update(null);
         });
+        modal.setContainerSize(300, 300);
         $(modal.valField[1]).val(rects[shapeIndex].qty).change();
     }
 }
@@ -1263,6 +1265,7 @@ function setSizeRect(xPos, yPos) {
             rects[shapeIndex].h = parseFloat(modal.height);
             update(null);
         });
+        modal.setContainerSize(300, 300);
         $(modal.widthField[1]).val(rects[shapeIndex].w).change();
         $(modal.heightField[1]).val(rects[shapeIndex].h).change();
     }
@@ -1275,6 +1278,7 @@ function setDescriptionRect(xPos, yPos) {
             rects[shapeIndex].description = modal.value;
             update(null);
         });
+        modal.setContainerSize(300, 300);
         $(modal.valField[1]).val(rects[shapeIndex].description).change();
     }
 }
@@ -1286,6 +1290,7 @@ function setIsRTARect(xPos, yPos) {
             console.log(modal.value);
             modal.value == true ? rects[shapeIndex].appTape = AppTapeLookup["Medium Tack"] : rects[shapeIndex].appTape = "None";
         });
+        modal.setContainerSize(300, 300);
         $(modal.valField[1]).prop("checked", rects[shapeIndex].appTape == "None" ? false : true).change();
     }
 }
@@ -1300,6 +1305,7 @@ function getScaleRect(xPos, yPos) {
         }, function() {
             $(modal.calcHeightField[1]).val(modal.height / rectHeight).change();
         }, null);
+        modal.setContainerSize(300, 300);
         //$(modal.valField[1]).prop("checked", rects[shapeIndex].appTape == "None" ? false : true).change();
     }
 }

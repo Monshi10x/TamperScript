@@ -57,6 +57,18 @@ class Modal {
             window.addEventListener("mousedown", (event) => this.onMouseDown(event));
             window.addEventListener("resize", (event) => this.onWindowResize(event));
             window.addEventListener("mousemove", (event) => this.onMouseMove(event));
+            window.addEventListener("keyup", (event) => {
+                  console.trace("here");
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if(event.key === "Enter") {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        //TODO: Half working, window still enters
+                        this.hide();
+
+                  }
+            }, {bubbles: false});
       }
 
       show() {
