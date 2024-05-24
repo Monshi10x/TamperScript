@@ -659,12 +659,6 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            start: function(evt) {
-                  $('html').addClass("draggable-cursor");
-            },
-            stop: function(evt) {
-                  $('html').removeClass("draggable-cursor");
-            },
             onEnd: function(event) {
                   onMoveEnd();
             }
@@ -686,12 +680,6 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            start: function(evt) {
-                  $('html').addClass("draggable-cursor");
-            },
-            stop: function(evt) {
-                  $('html').removeClass("draggable-cursor");
-            },
             onEnd: function(event) {
                   onMoveEnd();
             }
@@ -713,7 +701,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            forceFallback: true,
+            /*forceFallback: true,
             dragoverBubble: false,
             onChoose: function(evt) {
                   console.log("onChoose");
@@ -738,23 +726,23 @@ async function init() {
                   $(evt.related).css('cursor', 'grabbing');
                   $(evt.dragged).css('cursor', 'grabbing');
             }, // Dragging started
-            onSort: function(/**Event*/evt) {
+            onSort: function(evt) {
                   console.log("onSort");
                   $(evt.item).css('cursor', 'grabbing');
                   // $(evt.related).css('cursor', 'auto');
-            },
+            },*/
             onEnd: function(evt) {
-                  console.log("onEnd");
+                  /*console.log("onEnd");
                   $(evt.item).css('cursor', 'auto');
                   $(evt.from).css('cursor', 'auto');
                   $(evt.to).css('cursor', 'auto');
                   //$(evt.related).css('cursor', 'auto');
-                  $(evt.dragged).css('cursor', 'auto');
+                  $(evt.dragged).css('cursor', 'auto');*/
                   onMoveEnd();
-            }, onChange: function(/**Event*/evt) {
+            }/*, onChange: function(evt) {
                   console.log("onChange");
                   $(evt.item).css('cursor', 'auto');
-            }
+            }*/
       });
       columnContainers.push(newDiv_InDesign);
       newDiv_InDesign.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
@@ -773,7 +761,7 @@ async function init() {
             swapThreshold: 1,
             ghostClass: 'sortable-ghost',
             direction: 'vertical',
-            forceFallback: true,
+            /*forceFallback: true,
             dragoverBubble: false,
             onChoose: function(evt) {
                   console.log("onChoose");
@@ -798,23 +786,23 @@ async function init() {
                   $(evt.related).css('cursor', 'grabbing');
                   $(evt.dragged).css('cursor', 'grabbing');
             }, // Dragging started
-            onSort: function(/**Event*/evt) {
+            onSort: function(evt) {
                   console.log("onSort");
                   $(evt.item).css('cursor', 'grabbing');
                   // $(evt.related).css('cursor', 'auto');
-            },
+            },*/
             onEnd: function(evt) {
-                  console.log("onEnd");
+                  /*console.log("onEnd");
                   $(evt.item).css('cursor', 'auto');
                   $(evt.from).css('cursor', 'auto');
                   $(evt.to).css('cursor', 'auto');
                   //$(evt.related).css('cursor', 'auto');
-                  $(evt.dragged).css('cursor', 'auto');
+                  $(evt.dragged).css('cursor', 'auto');*/
                   onMoveEnd();
-            }, onChange: function(/**Event*/evt) {
+            }/*, onChange: function(evt) {
                   console.log("onChange");
                   $(evt.item).css('cursor', 'auto');
-            }
+            }*/
       });
       columnContainers.push(newDiv_InDesignRevision);
       newDiv_InDesignRevision.contentContainer.style.cssText += "min-height:calc(100% - 30px)";
