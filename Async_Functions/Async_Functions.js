@@ -583,8 +583,30 @@ async function openPart(productNo, partNo) {
     var partList = productContext.$data.Parts();
     var part = partList[partNo - 1];
 
+    $('#partExpander_' + productNo + '_' + (partNo)).not('.partExpander.collapse').click();
+    $('#partExpander_' + productNo + '_' + (partNo) + ".collapse").show();
+
+    await (sleep(100));
+
+    await new Promise(resolve => {
+        var resolvedStatus = 'reject';
+        var pragmaOnce = true;
+        var timer = setInterval(() => {
+            if(isLoading() == false && isSaveInProgress() == false) {
+                resetExecuted();
+                resolvedStatus = 'fulfilled';
+                resolve();
+                clearInterval(timer);
+                timer = undefined;
+            } else {
+                resolvedStatus = 'reject';
+            }
+        }, sleepMS);
+    });
+
     part.ModeId(1);
     console.log("open part " + partNo);
+
     await sleep(sleepMS);
 }
 async function tickSelected(productNo, partNo, value) {

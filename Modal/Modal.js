@@ -50,6 +50,8 @@ class Modal {
 
             this.#modalOpaqueBackground.appendChild(this.#modalContainer);
 
+            $("#btnGoToOrderStep2").hide();
+
             createWindowDragZones(this.container, 10, (event) => this.onWindowResize(event));
 
             this.show();
@@ -58,14 +60,9 @@ class Modal {
             window.addEventListener("resize", (event) => this.onWindowResize(event));
             window.addEventListener("mousemove", (event) => this.onMouseMove(event));
             window.addEventListener("keyup", (event) => {
-                  console.trace("here");
-                  event.preventDefault();
-                  event.stopPropagation();
                   if(event.key === "Enter") {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        //TODO: Half working, window still enters
                         this.hide();
+                        $("#btnGoToOrderStep2").show();
                   }
             }, {bubbles: false});
       }
@@ -79,6 +76,7 @@ class Modal {
             this.#modalOpaqueBackground.style.display = 'none';
             removeAllChildrenFromParent(this.#modalOpaqueBackground);
             deleteElement(this.#modalOpaqueBackground);
+
       }
 
       addFooterElement(element) {

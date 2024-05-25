@@ -5,8 +5,6 @@
 <img id="drag1" src="img_logo.gif" draggable="true" ondragstart="drag(event)" width="336" height="69">
  */
 
-
-
 /**ondragover="allowDrop(event)" */
 function allowDrop(e) {
       e.preventDefault();
@@ -43,6 +41,21 @@ function makeReceiveDraggable(element) {
             allowDrop(e);
       };
 }
+
+var onPartOverDrop = function(e, dropOverElement, productNo, partNo) {
+      e.preventDefault();
+      let dropEvent = new CustomEvent("dropEvent",
+            {
+                  bubbles: false,
+                  detail: {
+                        dropOverElement: dropOverElement,
+                        productNo: productNo,
+                        partNo: partNo
+                  }
+            }
+      );
+      document.dispatchEvent(dropEvent);
+};
 
 class Sortable2 {
       constructor() {

@@ -66,6 +66,7 @@ class LnmMenu extends LHSMenuWindow {
         var populateButton = createButton("Populate", "width:40%;margin:0px;", populate);
         async function populate() {
             var productNo = parseFloat(populateProductN.value);
+
             await openPart(productNo, populatePartN.value);
             await setPartWidth(productNo, populatePartN.value, lengths);
             await setPartText(productNo, populatePartN.value, partText);
@@ -99,17 +100,12 @@ class LnmMenu extends LHSMenuWindow {
         page.appendChild(combinedLnmContainer_addBtn);
         page.appendChild(combinedLnmContainer_rowsContainer);
 
-        //this.footer.appendChild(populateButton);
-        //this.footer.appendChild(populateProductN);
-        //this.footer.appendChild(populatePartN);
         this.footer.appendChild(draggablePopulator);
-        //this.interval = setInterval(() => {this.tick();}, 1000 / 2);
     }
 
     hide() {
         if(this.onDrop) document.removeEventListener("dropEvent", this.onDrop);
         super.hide();
-        //clearInterval(this.interval);
     }
 
     tick() {

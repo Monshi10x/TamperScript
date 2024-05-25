@@ -1,23 +1,3 @@
-var onPartOverDrop_Options = {
-	dropOverElement: null,
-	productNo: -1,
-	partNo: -1
-};
-var onPartOverDrop = function(e) {
-	e.preventDefault();
-	let dropEvent = new CustomEvent("dropEvent",
-		{
-			bubbles: false,
-			detail: {
-				dropOverElement: onPartOverDrop_Options.dropOverElement,
-				productNo: onPartOverDrop_Options.productNo,
-				partNo: onPartOverDrop_Options.partNo
-			}
-		}
-	);
-	document.dispatchEvent(dropEvent);
-	onPartOverDrop_Options.dropOverElement.style.cssText += "border: 1px solid rgb(102, 102, 102);";
-};
 function partInfoTick() {
 	products = document.querySelectorAll('div[class^="ord-prod-model-item"]');
 
@@ -114,29 +94,37 @@ function partInfoTick() {
 
 			let p1 = parts[part];
 
-			p1.addEventListener("dragover", function(e) {
-				e.preventDefault();
-			});
-			p1.addEventListener("dragenter", function(e) {
-				e.preventDefault();
-				p1.style.cssText += "border:5px solid blue;";
-				onPartOverDrop_Options = {
-					dropOverElement: p1,
-					productNo: koProductNumber,
-					partNo: getPartIndexFromReal(koProductNumber, koPart.Index)
-				};
+			if(!p1.classList.contains("itemDragOver")) {
+				p1.classList.add("itemDragOver");
+				p1.addEventListener("dragover", (e) => {
+					e.preventDefault();
 
-			});
-			p1.addEventListener("dragleave", function(e) {
-				e.preventDefault();
-				/** @INFO: stops flickering **/
-				if(!this.contains(document.elementFromPoint(e.clientX, e.clientY))) {
-					p1.style.cssText += "border: 1px solid rgb(102, 102, 102);";
-				}
-			});
+					if(!p1.classList.contains("dragOver")) {
+						p1.classList.add("dragOver");
+					}
+				});
+			}
+			if(!p1.classList.contains("itemDragLeave")) {
+				console.log("in shouldnt");
+				p1.classList.add("itemDragLeave");
+				p1.addEventListener("dragleave", (e) => {
+					e.preventDefault();
 
-			p1.removeEventListener("drop", onPartOverDrop);
-			p1.addEventListener("drop", onPartOverDrop);
+					if(p1.contains(document.elementFromPoint(e.clientX, e.clientY))) {
+						return;
+					}
+
+					p1.classList.remove("dragOver");
+				});
+			}
+
+			if(!p1.classList.contains("itemDrop")) {
+				p1.classList.add("itemDrop");
+				p1.addEventListener("drop", (e) => {
+					p1.classList.remove("dragOver");
+					onPartOverDrop(e, p1, koProductNumber, getPartIndexFromReal(koProductNumber, koPart.Index));
+				});
+			}
 
 			partCost = 0;
 			partCostElement = parts[part].querySelectorAll("span[id^='viewModeLblPartTotalCostTotal']");
