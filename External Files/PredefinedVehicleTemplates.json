@@ -17,7 +17,7 @@
                               "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
                               "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
                               "description": "Driver Door",
-                              "colour": "red"
+                              "colour": "#FF5A5A"
                         }, {
                               "x": 4090,
                               "y": 3850.1136779785156,
@@ -28,7 +28,7 @@
                               "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
                               "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
                               "description": "Pass Door",
-                              "colour": "red"
+                              "colour": "#FF5A5A"
                         }
                   ]
             },
@@ -50,7 +50,7 @@
                               "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
                               "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
                               "description": "Driver Door",
-                              "colour": "red"
+                              "colour": "#FF5A5A"
                         }, {
                               "x": 4090,
                               "y": 3850.1136779785156,
@@ -61,7 +61,7 @@
                               "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
                               "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
                               "description": "Pass Door",
-                              "colour": "red"
+                              "colour": "#FF5A5A"
                         }
                   ]
             }
@@ -85,7 +85,7 @@
                               "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
                               "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
                               "description": "Driver Door",
-                              "colour": "red"
+                              "colour": "#FF5A5A"
                         }, {
                               "x": 4090,
                               "y": 3850.1136779785156,
@@ -96,7 +96,7 @@
                               "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
                               "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
                               "description": "Pass Door",
-                              "colour": "red"
+                              "colour": "#FF5A5A"
                         }
                   ]
             }

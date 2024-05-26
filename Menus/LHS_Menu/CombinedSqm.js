@@ -94,7 +94,6 @@ class AreaMenu extends LHSMenuWindow {
         });
 
         this.onDrop = async function(e) {
-            console.log(e);
             let dropOverElement = e.dropOverElement;
             if(!e) return;
             populateProductN.value = e.detail.productNo;

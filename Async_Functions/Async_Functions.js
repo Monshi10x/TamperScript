@@ -586,7 +586,7 @@ async function openPart(productNo, partNo) {
     $('#partExpander_' + productNo + '_' + (partNo)).not('.partExpander.collapse').click();
     $('#partExpander_' + productNo + '_' + (partNo) + ".collapse").show();
 
-    await (sleep(100));
+    await sleep(100);
 
     await new Promise(resolve => {
         var resolvedStatus = 'reject';
@@ -604,7 +604,14 @@ async function openPart(productNo, partNo) {
         }, sleepMS);
     });
 
+    await sleep(100);
+
     part.ModeId(1);
+
+    await sleep(100);
+
+    part.ModeId(1);
+
     console.log("open part " + partNo);
 
     await sleep(sleepMS);

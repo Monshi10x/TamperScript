@@ -23,6 +23,10 @@ var canvasCtxLayers = [];
 } 
  */
 var rects = [];
+var lastX = 0, lastY = 0;
+var mouseDownX = 0, mouseDownY = 0;
+var mouseOffsetFromShapeX = 0;
+var mouseOffsetFromShapeY = 0;
 var canvasWidth_Vehicle;
 var canvasHeight_Vehicle;
 var canvasScale_Vehicle = 0.1;
@@ -38,7 +42,13 @@ var selectRadius = 10;
 var fps = 30;
 var mousePos;
 var dirtyTriangles = true;
-var holding = {isHoldingShape: false, shapeIndex: null, cornerIndex: null, canGrab: false};
+var holding = {
+    isGrabbingShape: false,
+    shapeIndex: null,
+    cornerIndex: null,
+    hoveringOverShape: false,
+    hoveringOverCorner: false
+};
 var p = Point.prototype;
 var VehicleBuilder_Template;
 var VehicleBuilder_MenuContainer;
@@ -51,7 +61,7 @@ var img;
 var tem;
 
 var handlesSize = 8;
-var drag = false;
+var dragging = false;
 var speed = 0.15;
 
 var showMeasures = false;
@@ -167,7 +177,7 @@ class VehicleMenu extends LHSMenuWindow {
                 laminate: LaminateLookup["Gloss"],
                 appTape: AppTapeLookup["Medium Tack"],
                 description: "Vinyl",
-                colour: "red"
+                colour: "#FF5A5A"
             };
             console.log(item);
             rects.push(item);
@@ -186,7 +196,7 @@ class VehicleMenu extends LHSMenuWindow {
                 laminate: LaminateLookup["3m Gloss (Standard)"],
                 appTape: "None",
                 description: "Oneway",
-                colour: "green"
+                colour: "#5EEF7D"
             };
             rects.push(item);
             VehicleBuilder_Template.addRow(item);
@@ -204,7 +214,7 @@ class VehicleMenu extends LHSMenuWindow {
                 laminate: LaminateLookup["Gloss"],
                 appTape: "None",
                 description: "Panel",
-                colour: "purple"
+                colour: "#FF5CFF"
             };
             rects.push(item);
             VehicleBuilder_Template.addRow(item);
@@ -222,7 +232,7 @@ class VehicleMenu extends LHSMenuWindow {
                 laminate: LaminateLookup["Gloss"],
                 appTape: "None",
                 description: "Tray Back Panel",
-                colour: "purple"
+                colour: "#D85FED"
             };
             rects.push(item);
             VehicleBuilder_Template.addRow(item);
@@ -240,7 +250,7 @@ class VehicleMenu extends LHSMenuWindow {
                 laminate: LaminateLookup["Gloss"],
                 appTape: "None",
                 description: "Tray Sides Panel",
-                colour: "purple"
+                colour: "#D85FED"
             };
             rects.push(item);
             VehicleBuilder_Template.addRow(item);
@@ -390,18 +400,10 @@ class VehicleMenu extends LHSMenuWindow {
             Ordui.Alert("Done.");
         }
 
-        //createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo)
-        //*****************************************************************************//
-        //                              CREATE CHECKBOXES FOR OVERLAYS                 //
-        //*****************************************************************************//
-
         let measuresCkb = createCheckbox_Infield("Show Measurements", showMeasures, "width: 200px;", () => {showMeasures = measuresCkb[1].checked; update(null);}, footer);
         let qtyCkb = createCheckbox_Infield("Show Quantity", showQuantity, "width: 200px;", () => {showQuantity = qtyCkb[1].checked; update(null);}, footer);
         let descriptionCkb = createCheckbox_Infield("Show Description", showDescription, "width: 200px;", () => {showDescription = descriptionCkb[1].checked; update(null);}, footer);
 
-        //*****************************************************************************//
-        //                                  MAIN CONTAINER                             //
-        //*****************************************************************************//
         createCanvasContainer();
         VehicleBuilder_TotalQuantity = new TotalQuantity(this.getPage(1), canvasCtxLayers[1], update);
         VehicleBuilder_Template = new VehicleTemplate(this.getPage(1), canvasCtxLayers[1], function() {initRects(); update(); initBackground(); refreshBackground();}, function() {updateRectsFromFields();}, function(rowNumber) {deleteRow(rowNumber);});
@@ -442,12 +444,10 @@ class VehicleMenu extends LHSMenuWindow {
     }
 }
 
-function showVehicleBuilder() {
-};
-
-
 function initVehicleCanvas() {
     console.log("called init");
+    canvasContainer.style.cursor = "grab";
+
     canvas_Vehicle.addEventListener('mousedown', mouseDown, false);
     canvas_Vehicle.addEventListener('mouseup', mouseUp, false);
     canvas_Vehicle.addEventListener('mousemove', mouseMove, false);
@@ -509,31 +509,55 @@ function getHandle(mouse, shapeIndex) {
 }
 
 function mouseDown(e) {
-    drag = true;
-    lastX = e.clientX;
-    lastY = e.clientY;
-
     e.preventDefault();
+    console.log('mouseDown');
+    var leftPressed = e.button == 0,
+        scrossPressed = e.button == 1,
+        rightPressed = e.button == 2;
+
+    if(leftPressed) {
+        dragging = true;
+
+        mouseDownX = getMousePos(canvas_Vehicle, e).x;
+        mouseDownY = getMousePos(canvas_Vehicle, e).y;
+
+        lastX = e.clientX;
+        lastY = e.clientY;
+    }
+
+    canvasContainer.style.cursor = "grabbing";
 }
 
+
 function mouseMove(e) {
-    if(drag) {
+    e.preventDefault();
+
+    canvasContainer.style.cursor = "grab";
+
+    if(dragging) {
         var deltaX = e.clientX - lastX;
         var deltaY = e.clientY - lastY;
         lastX = e.clientX;
         lastY = e.clientY;
+
         if(!lockMovement) {
             xOffset_Vehicle += deltaX;
             yOffset_Vehicle += deltaY;
         }
+
+        canvasContainer.style.cursor = "grabbing";
     }
-    e.preventDefault();
+
     update(e);
 }
 
 function mouseUp(e) {
-    drag = false;
+    dragging = false;
+
+    canvasContainer.style.cursor = "grab";
     currentHandle = [false, null];
+    mouseOffsetFromShapeX = 0;
+    mouseOffsetFromShapeY = 0;
     var pos = getMousePos(canvasArray[1], e);
     var leftPressed = e.button == 0,
         scrossPressed = e.button == 1,
@@ -559,29 +583,38 @@ function mouseUp(e) {
 }
 
 function drawRects(e) {
+
     canvasCtxLayers[1].clearRect(0, 0, canvasWidth_Vehicle, canvasHeight_Vehicle);
     canvasCtxLayers[1].fillStyle = "white";
     lockMovement = false;
 
     isHoveringOnRect = false;
+
+    var x, y;
+
+    if(e) {
+        mousePos = getMousePos(canvas_Vehicle, e);
+        x = mousePos.x;
+        y = mousePos.y;
+
+    } else {
+        x = 0;
+        y = 0;
+    }
+
     for(var r = 0; r < rects.length; r++) {
+        //Draw Rectangle
         canvasCtxLayers[1].fillStyle = rects[r].colour;
-        canvasCtxLayers[1].globalAlpha = 0.3;
+        canvasCtxLayers[1].globalAlpha = 1;
+        canvasCtxLayers[1].shadowColor = "black";
+        canvasCtxLayers[1].shadowBlur = 20;
         canvasCtxLayers[1].fillRect(xOffset_Vehicle + rects[r].x * canvasScale_Vehicle, yOffset_Vehicle + rects[r].y * canvasScale_Vehicle, rects[r].w * canvasScale_Vehicle, rects[r].h * canvasScale_Vehicle);
+        canvasCtxLayers[1].shadowColor = "black";
+        canvasCtxLayers[1].shadowBlur = 0;
         canvasCtxLayers[1].globalAlpha = 1;
 
-        var x, y;
-        if(e) {
-            mousePos = getMousePos(canvas_Vehicle, e);
-            x = mousePos.x;
-            y = mousePos.y;
-        } else {
-            x = 0;
-            y = 0;
-        }
-
-        //if move
-        if(!drag) {
+        //if mouse move
+        if(!dragging) {
             //if hover on blue for this shape
             if(getHandle(point(x, y), r)) {
                 lockMovement = true;
@@ -593,10 +626,20 @@ function drawRects(e) {
             }
         }
 
-        //if drag, and current handle of shape only
-        if(drag && currentHandle[0] && currentHandle[1] == r) {
+        //if holding shape
+        if(dragging && currentHandle[0] && currentHandle[1] == r) {
+            //mouse offset from shape
+            if(mouseOffsetFromShapeX == 0 && mouseOffsetFromShapeY == 0) {
+                mouseOffsetFromShapeX = (rects[r].x + rects[r].w / 2 - mouseDownX);
+                mouseOffsetFromShapeY = (rects[r].y + rects[r].h / 2 - mouseDownY);
+            }
+
             lockMovement = true;
-            var mousePos = point(x / canvasScale_Vehicle, y / canvasScale_Vehicle);
+            //holding.isGrabbingShape = true;
+            mousePos = point((x) / canvasScale_Vehicle, (y) / canvasScale_Vehicle);
+
+
+            //rect offsets
             switch(currentHandle[0]) {
                 case 'topleft':
                     rects[r].w += rects[r].x - mousePos.x;
@@ -633,95 +676,103 @@ function drawRects(e) {
                     rects[r].w = mousePos.x - rects[r].x;
                     break;
                 case 'grabbable':
-                    rects[r].x = mousePos.x - rects[r].w / 2;
-                    rects[r].y = mousePos.y - rects[r].h / 2;
+                    mousePos.x += mouseOffsetFromShapeX;
+                    mousePos.y += mouseOffsetFromShapeY;
+                    rects[r].x = (mousePos.x - rects[r].w / 2);
+                    rects[r].y = (mousePos.y - rects[r].h / 2);
                     break;
             }
         }
 
-        //********************************************//
-        //             DRAW HANDLE                    //
-        //********************************************//
+        //Draw Handle
         var handle = getHandle(point(x, y), r);
         if(handle) {
             isHoveringOnRect = true;
             var posHandle = point(0, 0);
             switch(currentHandle[0]) {
                 case 'topleft':
+                    if(!dragging) canvasContainer.style.cursor = "nwse-resize";
                     posHandle.x = rects[r].x;
                     posHandle.y = rects[r].y;
                     break;
                 case 'topright':
+                    if(!dragging) canvasContainer.style.cursor = "nesw-resize";
                     posHandle.x = rects[r].x + rects[r].w;
                     posHandle.y = rects[r].y;
                     break;
                 case 'bottomleft':
+                    if(!dragging) canvasContainer.style.cursor = "nesw-resize";
                     posHandle.x = rects[r].x;
                     posHandle.y = rects[r].y + rects[r].h;
                     break;
                 case 'bottomright':
+                    if(!dragging) canvasContainer.style.cursor = "nwse-resize";
                     posHandle.x = rects[r].x + rects[r].w;
                     posHandle.y = rects[r].y + rects[r].h;
                     break;
                 case 'top':
+                    if(!dragging) canvasContainer.style.cursor = "ns-resize";
                     posHandle.x = rects[r].x + (rects[r].w) / 2;
                     posHandle.y = rects[r].y;
                     break;
                 case 'left':
+                    if(!dragging) canvasContainer.style.cursor = "ew-resize";
                     posHandle.x = rects[r].x;
                     posHandle.y = rects[r].y + (rects[r].h) / 2;
                     break;
                 case 'bottom':
+                    if(!dragging) canvasContainer.style.cursor = "ns-resize";
                     posHandle.x = rects[r].x + (rects[r].w) / 2;
                     posHandle.y = rects[r].y + rects[r].h;
                     break;
                 case 'right':
+                    if(!dragging) canvasContainer.style.cursor = "ew-resize";
                     posHandle.x = rects[r].x + rects[r].w;
                     posHandle.y = rects[r].y + (rects[r].h) / 2;
                     break;
                 case 'grabbable':
+                    if(!dragging) canvasContainer.style.cursor = "grab";
                     posHandle.x = rects[r].x + rects[r].w / 2;
                     posHandle.y = rects[r].y + rects[r].h / 2;
                     break;
             }
 
+            //Draw Handle
             canvasCtxLayers[1].beginPath();
             canvasCtxLayers[1].fillStyle = COLOUR.Blue;
             canvasCtxLayers[1].arc(posHandle.x * canvasScale_Vehicle + xOffset_Vehicle, posHandle.y * canvasScale_Vehicle + yOffset_Vehicle, handlesSize, 0, 2 * Math.PI);
             canvasCtxLayers[1].fill();
             canvasCtxLayers[1].globalCompositeOperation = 'source-over';
-            //********************************************//
-            //              END HANDLE                    //
-            //********************************************//
+
+            //Draw Rect
+            drawRect(canvasCtxLayers[1], xOffset_Vehicle + rects[r].x * canvasScale_Vehicle, yOffset_Vehicle + rects[r].y * canvasScale_Vehicle, rects[r].w * canvasScale_Vehicle, rects[r].h * canvasScale_Vehicle, "TL", "blue", 1);
+
         }
 
+        //Draw Description
         if(showDescription) {
             let xo = (rects[r].x + rects[r].w / 2) * canvasScale_Vehicle + xOffset_Vehicle;
             let yo = (rects[r].y + rects[r].h / 2) * canvasScale_Vehicle + yOffset_Vehicle;
 
-            drawText(canvasCtxLayers[1], xo, yo, 14, "M", rects[r].description == null ? "" : rects[r].description, COLOUR.Blue);
+            drawText(canvasCtxLayers[1], xo, yo, 14, "M", rects[r].description == null ? "" : rects[r].description, COLOUR.Black);
         }
 
+        //Draw Qty
         if(showQuantity) {
             let xo = (rects[r].x + rects[r].w / 2) * canvasScale_Vehicle + xOffset_Vehicle;
             let yo = (rects[r].y) * canvasScale_Vehicle + yOffset_Vehicle;
 
-            drawText(canvasCtxLayers[1], xo, yo, 14, "T", "x" + rects[r].qty, COLOUR.Blue);
+            drawText(canvasCtxLayers[1], xo, yo, 14, "T", "x" + rects[r].qty, COLOUR.Black);
         }
 
+        //Draw Measures
         if(showMeasures) {
-            //for width
             let xo1 = (rects[r].x) * canvasScale_Vehicle + xOffset_Vehicle;
             let yo1 = (rects[r].y) * canvasScale_Vehicle + yOffset_Vehicle;
-            //for height
-            //let xo2 = (rects[r].x) * canvasScale_Vehicle + xOffset_Vehicle;
-            //let yo2 = (rects[r].y + rects[r].h) * canvasScale_Vehicle + yOffset_Vehicle;
 
             let w = (rects[r].w) * canvasScale_Vehicle;
             let h = (rects[r].h) * canvasScale_Vehicle;
 
-            //drawText(canvasCtxLayers[1], xo, yo, 10, "T", "x" + rects[r].qty, "black");
-            //(ctx, xOffset, yOffset, width, height, text, textSize, colour, lineWidth, crossScale, offsetFromShape, isTopBottom, textOriginPoint);
             drawMeasurement_Verbose(canvasCtxLayers[1], xo1, yo1, w, 0, "T", roundNumber(rects[r].w, 1), 14, COLOUR.Blue, 0.5, 0.2, 15, true, "B");
             drawMeasurement_Verbose(canvasCtxLayers[1], xo1, yo1, 0, h, "L", roundNumber(rects[r].h, 1), 14, COLOUR.Blue, 0.5, 0.2, 15, false, "R");
         }
@@ -816,7 +867,6 @@ async function createSkewableCanvas() {
         mouseDownPosition = mousePos;
         canvasContainer.style.cursor = "grabbing";
         console.log("in mouseDown ");
-        console.log("isHoveringOnRect " + isHoveringOnRect);
         closeCustomContextMenu();
 
         if(isHoveringOnRect) return;
@@ -826,10 +876,10 @@ async function createSkewableCanvas() {
         }
 
         if(leftPressed) {
-            holding.isHoldingShape = false;
+            holding.isGrabbingShape = false;
             shapeVertsWhenMouseDown = [];
-            if(withinCorner || holding.canGrab) {
-                holding.isHoldingShape = true;
+            if(withinCorner || holding.hoveringOverShape) {
+                holding.isGrabbingShape = true;
                 dirtyTriangles = true;
                 needsToUpdate = true;
                 lockMovement = true;
@@ -839,10 +889,10 @@ async function createSkewableCanvas() {
         }
     });
     $(canvasContainer).mousemove(function(e) {
-        if(isHoveringOnRect && !holding.isHoldingShape) return;
+        if(isHoveringOnRect && !holding.isGrabbingShape) return;
         mousePos = getMousePos(canvas_Vehicle, e);
 
-        if(!holding.isHoldingShape) {
+        if(!holding.isGrabbingShape) {
             topLoop:
             for(var s = skewableRects.length - 1; s >= 0; s--) {
                 var numCorners = skewableRects[s].length - 1;
@@ -853,11 +903,13 @@ async function createSkewableCanvas() {
 
                     shapeVertsX.push(skewableRects[s][c].x);
                     shapeVertsY.push(skewableRects[s][c].y);
-                    holding.canGrab = false;
+                    holding.hoveringOverShape = false;
+                    holding.hoveringOverCorner = false;
                     if(withinCorner) {
-                        canvasContainer.style.cursor = "grab";
+                        //canvasContainer.style.cursor = "grab";
                         holding.shapeIndex = s;
                         holding.cornerIndex = c;
+                        holding.hoveringOverCorner = true;
                         drawFillCircle(canvasCtxLayers[1], skewableRects[s][c].x * canvasScale_Vehicle + xOffset_Vehicle, skewableRects[s][c].y * canvasScale_Vehicle + yOffset_Vehicle, selectRadius, "M", "red", 0.5);
                         c = numCorners;
                         break topLoop;
@@ -865,8 +917,8 @@ async function createSkewableCanvas() {
                         if(pointInPolygon(numCorners, shapeVertsX, shapeVertsY, mousePos.x, mousePos.y)) {
                             holding.shapeIndex = s;
                             holding.cornerIndex = null;
-                            holding.canGrab = true;
-                            canvasContainer.style.cursor = "grab";
+                            holding.hoveringOverShape = true;
+                            //canvasContainer.style.cursor = "grab";
                             break topLoop;
                         }
                     }
@@ -874,26 +926,44 @@ async function createSkewableCanvas() {
             }
         }
 
-        if(holding.isHoldingShape) {
-            canvasContainer.style.cursor = "grabbing";
-            let holdingCorner = !holding.canGrab;
-            if(holdingCorner) {
-                dirtyTriangles = true;
-                needsToUpdate = true;
-                skewableRects[holding.shapeIndex][holding.cornerIndex] = {x: mousePos.x, y: mousePos.y};
-                lockMovement = true;
-                drawFillCircle(canvasCtxLayers[1], mousePos.x * canvasScale_Vehicle + xOffset_Vehicle, mousePos.y * canvasScale_Vehicle + yOffset_Vehicle, selectRadius, "M", "red", 0.5);
-            } else {
-                dirtyTriangles = true;
-                needsToUpdate = true;
-                lockMovement = true;
-                canvasContainer.style.cursor = "grab";
-                for(let i = 0; i < shapeVertsWhenMouseDown.length - 1; i++) {
-                    let xo = mouseDownPosition.x - shapeVertsWhenMouseDown[i].x;
-                    let yo = mouseDownPosition.y - shapeVertsWhenMouseDown[i].y;
+        if(holding.isGrabbingShape) {
+            for(var s = skewableRects.length - 1; s >= 0; s--) {
+                canvasContainer.style.cursor = "grabbing";
+                let hoveringOverCorner = !holding.hoveringOverShape;
 
-                    skewableRects[holding.shapeIndex][i].x = mousePos.x - xo;
-                    skewableRects[holding.shapeIndex][i].y = mousePos.y - yo;
+                if(hoveringOverCorner) {
+                    dirtyTriangles = true;
+                    needsToUpdate = true;
+
+                    skewableRects[holding.shapeIndex][holding.cornerIndex] = {x: mousePos.x, y: mousePos.y};
+                    lockMovement = true;
+                    drawFillCircle(canvasCtxLayers[1], mousePos.x * canvasScale_Vehicle + xOffset_Vehicle, mousePos.y * canvasScale_Vehicle + yOffset_Vehicle, selectRadius, "M", "red", 0.5);
+                } else {
+                    dirtyTriangles = true;
+                    needsToUpdate = true;
+                    lockMovement = true;
+                    // canvasContainer.style.cursor = "grab";
+                    for(let i = 0; i < shapeVertsWhenMouseDown.length - 1; i++) {
+                        let xo = mouseDownPosition.x - shapeVertsWhenMouseDown[i].x;
+                        let yo = mouseDownPosition.y - shapeVertsWhenMouseDown[i].y;
+
+                        skewableRects[holding.shapeIndex][i].x = mousePos.x - xo;
+                        skewableRects[holding.shapeIndex][i].y = mousePos.y - yo;
+                    }
+                }
+            }
+        }
+
+        //if hovering on shape
+        if(holding.hoveringOverShape || holding.hoveringOverCorner) {
+            for(var s = skewableRects.length - 1; s >= 0; s--) {
+                var numCorners = skewableRects[s].length - 1;
+                for(var c = 0; c < numCorners; c++) {
+                    var lastcorner = c == numCorners - 1;
+                    let bv = c + 1;
+                    if(lastcorner) bv = 0;
+                    drawLine_To(canvasCtxLayers[1], skewableRects[s][c].x * canvasScale_Vehicle + xOffset_Vehicle, skewableRects[s][c].y * canvasScale_Vehicle + yOffset_Vehicle,
+                        skewableRects[s][bv].x * canvasScale_Vehicle + xOffset_Vehicle, skewableRects[s][bv].y * canvasScale_Vehicle + yOffset_Vehicle, "blue", 0.5, 1);
                 }
             }
         }
@@ -901,11 +971,11 @@ async function createSkewableCanvas() {
 
     $(canvasContainer).mouseup(function(e) {
         console.log("mouseup called");
-        canvasContainer.style.cursor = "default";
-        holding.isHoldingShape = false;
+        //canvasContainer.style.cursor = "grab";
+        holding.isGrabbingShape = false;
         holding.shapeIndex = null;
         holding.cornerIndex = null;
-        holding.canGrab = false;
+        holding.hoveringOverShape = false;
         lockMovement = false;
 
         var leftPressed = e.button == 0,
@@ -950,7 +1020,7 @@ async function createSkewableCanvas() {
 
 var needsToUpdate = false;
 function updateSkewCanvas() {
-    var updateCondition = drag || needsToUpdate;
+    var updateCondition = dragging || needsToUpdate;
     if(updateCondition) {
         needsToUpdate = false;
         canvasCtxLayers[0].clearRect(0, 0, canvasWidth_Vehicle, canvasHeight_Vehicle);
@@ -1046,15 +1116,12 @@ function deleteSkewableRect(xPos, yPos) {
 function scaleSkewableRect(xPos, yPos) {
     if(isHoveringOnRect) return;
 
-    console.log("in scale");
     let shapeIndex = getSkewRectAtPosition(xPos, yPos);
     if(shapeIndex != null && shapeIndex !== false) {
         let modal = new ModalWidthHeight("Apply Scale", 1, function() {
             let scaleW = (modal.width || modal.width != 0) ? modal.width - 1 : 0;
             let scaleH = (modal.height || modal.height != 0) ? modal.height - 1 : 0;
 
-            console.log("in shapeIndex");
-            console.log(skewableRects[shapeIndex]);
             let centerCoord = {
                 x: (skewableRects[shapeIndex][1].x + skewableRects[shapeIndex][0].x) / 2,
                 y: (skewableRects[shapeIndex][2].y + skewableRects[shapeIndex][0].y) / 2
@@ -1090,13 +1157,11 @@ async function pasteSkewableRect(xPos, yPos) {
 
     console.log("in paste");
     if(copiedRect != null) {
-        console.log(copiedRect);
         var centrePos = getCenterPosReal(canvasArray[0]);
         await addSkewableImages(centrePos.x, centrePos.y, [copiedRect[4]]);
         for(var c = 0; c < 4; c++) {
             var offset;
             if(c == 0) {
-                //offset = {x: copiedRect[c].x - centrePos.x, y: copiedRect[c].y - centrePos.y};
                 offset = {x: copiedRect[c].x - xPos, y: copiedRect[c].y - yPos};
             }
             skewableRects[skewableRects.length - 1][c] = {
@@ -1106,7 +1171,6 @@ async function pasteSkewableRect(xPos, yPos) {
             dirtyTriangles = true;
             needsToUpdate = true;
         }
-        //console.log(skewableRects);
     }
 }
 
@@ -1167,29 +1231,6 @@ async function saveSkewableImageToFile(xPos, yPos) {
         console.log(skewableRects[shapeIndex]);
 
         await downloadFileContent_Text_SingleFile(JSON.stringify(skewableRects[shapeIndex]));
-        /*
-                for(var c = 0; c < 4; c++) {
-                    var offset;
-                    switch(c) {
-                        case 0:
-                            offset = {x: skewableRects[shapeIndex][c].x, y: skewableRects[shapeIndex][c].y};
-                            skewableRects[shapeIndex][c] = {x: offset.x, y: offset.y};
-                            break;
-                        case 1:
-                            skewableRects[shapeIndex][c] = {x: offset.x + width, y: offset.y};
-                            break;
-                        case 2:
-                            skewableRects[shapeIndex][c] = {x: offset.x + width, y: offset.y + height};
-                            break;
-                        case 3:
-                            skewableRects[shapeIndex][c] = {x: offset.x, y: offset.y + height};
-                            break;
-                        default:
-                            break;
-                    }
-                    dirtyTriangles = true;
-                    needsToUpdate = true;
-                }*/
     }
 }
 
@@ -1208,27 +1249,6 @@ async function openSkewableImageFromFile(event, xPos, yPos) {
         {x: parsedContent[2].x + offset.x, y: parsedContent[2].y + offset.y},
         {x: parsedContent[3].x + offset.x, y: parsedContent[3].y + offset.y});
     refreshBackground();
-    /*
-    
-        if(copiedRect != null) {
-            console.log(copiedRect);
-            var centrePos = getCenterPosReal(canvasArray[0]);
-            await addSkewableImages(centrePos.x, centrePos.y, [copiedRect[4]]);
-            for(var c = 0; c < 4; c++) {
-                var offset;
-                if(c == 0) {
-                    //offset = {x: copiedRect[c].x - centrePos.x, y: copiedRect[c].y - centrePos.y};
-                    offset = {x: copiedRect[c].x - xPos, y: copiedRect[c].y - yPos};
-                }
-                skewableRects[skewableRects.length - 1][c] = {
-                    x: copiedRect[c].x - offset.x,
-                    y: copiedRect[c].y - offset.y
-                };
-                dirtyTriangles = true;
-                needsToUpdate = true;
-            }
-            //console.log(skewableRects);
-        }*/
 }
 
 function deleteRect(xPos, yPos) {
@@ -1320,6 +1340,8 @@ function closeSkewableCanvas() {
 
 function renderSkew_Wireframe_Image(wireframe, image, tri) {
     canvasCtxLayers[0].setTransform(1, 0, 0, 1, 0, 0);
+
+    let _x, _y, _w, _h;
 
     if(wireframe) {
         canvasCtxLayers[0].beginPath();
@@ -1548,7 +1570,7 @@ function getSkewRectAtPosition(xPos, yPos) {
             searchArrayY.push(skewableRects[s][c].y);
         }
         var inThisShape = pointInPolygon(4, searchArrayX, searchArrayY, xPos, yPos);
-        console.log(xPos, yPos);
+
         if(inThisShape) {
             return s;
         }

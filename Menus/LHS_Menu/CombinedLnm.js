@@ -83,18 +83,15 @@ class LnmMenu extends LHSMenuWindow {
         });
 
         this.onDrop = async function(e) {
-            console.log(e);
             let dropOverElement = e.dropOverElement;
             if(!e) return;
             populateProductN.value = e.detail.productNo;
             populatePartN.value = e.detail.partNo;
             await populate();
         };
-        console.log("in");
 
         document.removeEventListener("dropEvent", this.onDrop);
         document.addEventListener("dropEvent", this.onDrop);
-
 
         page.appendChild(combinedLnmContainer_display);
         page.appendChild(combinedLnmContainer_addBtn);
