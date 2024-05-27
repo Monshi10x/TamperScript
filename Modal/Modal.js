@@ -62,7 +62,6 @@ class Modal {
             window.addEventListener("keyup", (event) => {
                   if(event.key === "Enter") {
                         this.hide();
-                        $("#btnGoToOrderStep2").show();
                   }
             }, {bubbles: false});
       }
@@ -75,8 +74,8 @@ class Modal {
       hide() {
             this.#modalOpaqueBackground.style.display = 'none';
             removeAllChildrenFromParent(this.#modalOpaqueBackground);
+            $("#btnGoToOrderStep2").show();
             deleteElement(this.#modalOpaqueBackground);
-
       }
 
       addFooterElement(element) {
