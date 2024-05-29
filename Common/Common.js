@@ -353,6 +353,7 @@ function getTopBottomMargins(element) {
 _todo = [];
 function TODO(element) {
     _todo.push(element);
+    console.log("%cTODO: " + element, 'background: green; color: white');
 }
 
 function HTMLToText(htmlString) {

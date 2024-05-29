@@ -599,7 +599,6 @@ var newDiv_ReadyToPrint;
 var newDiv_Production;
 async function init() {
       console.log(jobs);
-      console.log(awaitingApprovalJobs);
 
       let parentContainer = document.body;
 
@@ -1022,7 +1021,6 @@ async function init() {
                   if(jobs[i].AssignedUsers == null) val2 += "null";
                   else val2 += jobs[i].AssignedUsers.toString().replaceAll(" ", "");
 
-                  console.log(val1, val2);
                   if(val1 == val2) {
                         designer[1].selectedIndex = x;
                         break;
@@ -1084,33 +1082,82 @@ async function init() {
             createLabel("Item Price: $" + jobs[i].TotalPrice, null, inhouseDiv);
 
             //Notes
-            let ns, nd, np, nc, nv;
-            let btnContainer = document.createElement("div");
-            btnContainer.style = "padding-left:6px;width:100%;box-sizing:border-box;display:block;min-height: 10px;float:left;margin-top:12px;";
-            jobContainers[i].contentContainer.appendChild(btnContainer);
-            salesNotesBtns.push(createButton("Sales", "width:100px;margin:0px;position:relative;", () => {toggleNotes(ns);}, btnContainer));
-            designNotesBtns.push(createButton("Design", "width:100px;margin:0px;position:relative;", () => {toggleNotes(nd);}, btnContainer));
-            productionNotesBtns.push(createButton("Production", "width:100px;margin:0px;position:relative;", () => {toggleNotes(np);}, btnContainer));
-            customerNotesBtns.push(createButton("Customer", "width:100px;margin:0px;position:relative;", () => {toggleNotes(nc);}, btnContainer));
-            vendorNotesBtns.push(createButton("Vendor", "width:100px;margin:0px;position:relative;", () => {toggleNotes(nv);}, btnContainer));
-            ns = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:block;", "Sales Notes", jobContainers[i].contentContainer);
-            nd = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:none;", "Design Notes", jobContainers[i].contentContainer);
-            np = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:none;", "Production Notes", jobContainers[i].contentContainer);
-            nc = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:none;", "Customer Notes", jobContainers[i].contentContainer);
-            nv = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:none;", "Vendor Notes", jobContainers[i].contentContainer);
-            notesSales.push(ns);
-            notesDesign.push(nd);
-            notesProduction.push(np);
-            notesCustomer.push(nc);
-            notesVendor.push(nv);
+            notesContainer = createDiv("width:calc(100% - 12px);margin:6px;margin-top:0px;min-height:40px;background-color:white;display:block;", "Notes", jobContainers[i].contentContainer);
 
+            let btnContainer = document.createElement("div");
+            btnContainer.style = "padding-left:10px;width:calc(100%);box-sizing:border-box;display:block;min-height: 10px;float:left;margin-top:12px;";
+            notesContainer.appendChild(btnContainer);
+
+            let noteInput = createInput("Note", "", "width:80%;margin:0px;box-sizing:border-box;height:35px;margin:10px;margin-right:0px;", () => { }, notesContainer);
+            let noteBtn = createButton("+ Add Note", "width:calc(20% - 20px);margin:10px;margin-left:0px;", () => { }, notesContainer);
+
+            let salesBtn = createButton("Sales", "width:100px;margin:0px;position:relative;", () => {
+                  toggleNotes(salesNotesContainer);
+                  salesBtn.style.borderBottomColor = "red";
+            }, btnContainer);
+            let designBtn = createButton("Design", "width:100px;margin:0px;position:relative;", () => {
+                  toggleNotes(designNotesContainer);
+                  designBtn.style.borderBottomColor = "red";
+            }, btnContainer);
+            let productionBtn = createButton("Production", "width:100px;margin:0px;position:relative;", () => {
+                  toggleNotes(productionNotesContainer);
+                  productionBtn.style.borderBottomColor = "red";
+            }, btnContainer);
+            let customerBtn = createButton("Customer", "width:100px;margin:0px;position:relative;", () => {
+                  toggleNotes(customerNotesContainer);
+                  customerBtn.style.borderBottomColor = "red";
+            }, btnContainer);
+            let vendorBtn = createButton("Vendor", "width:100px;margin:0px;position:relative;", () => {
+                  toggleNotes(vendorNotesContainer);
+                  vendorBtn.style.borderBottomColor = "red";
+            }, btnContainer);
+
+            salesNotesBtns.push(salesBtn);
+            designNotesBtns.push(designBtn);
+            productionNotesBtns.push(productionBtn);
+            customerNotesBtns.push(customerBtn);
+            vendorNotesBtns.push(vendorBtn);
+
+            let salesNotesContainer = document.createElement("div");
+            salesNotesContainer.style = "width:calc(100% - 20px);margin:10px;height:200px;overflow-y:scroll;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            notesContainer.appendChild(salesNotesContainer);
+            notesSales.push(salesNotesContainer);
+
+            let designNotesContainer = document.createElement("div");
+            designNotesContainer.style = "width:calc(100% - 20px);margin:10px;height:200px;overflow-y:scroll;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            notesContainer.appendChild(designNotesContainer);
+            notesDesign.push(designNotesContainer);
+
+            let productionNotesContainer = document.createElement("div");
+            productionNotesContainer.style = "width:calc(100% - 20px);margin:10px;height:200px;overflow-y:scroll;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            notesContainer.appendChild(productionNotesContainer);
+            notesProduction.push(productionNotesContainer);
+
+            let customerNotesContainer = document.createElement("div");
+            customerNotesContainer.style = "width:calc(100% - 20px);margin:10px;height:200px;overflow-y:scroll;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            notesContainer.appendChild(customerNotesContainer);
+            notesCustomer.push(customerNotesContainer);
+
+            let vendorNotesContainer = document.createElement("div");
+            vendorNotesContainer.style = "width:calc(100% - 20px);margin:10px;height:200px;overflow-y:scroll;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            notesContainer.appendChild(vendorNotesContainer);
+            notesVendor.push(vendorNotesContainer);
+
+            toggleNotes(designNotesContainer);
+            designBtn.style.borderBottomColor = "red";
             function toggleNotes(elementToShow) {
-                  $(notesSales).hide();
-                  $(notesDesign).hide();
-                  $(notesProduction).hide();
-                  $(notesCustomer).hide();
-                  $(notesVendor).hide();
+                  $(salesNotesContainer).hide();
+                  $(designNotesContainer).hide();
+                  $(productionNotesContainer).hide();
+                  $(customerNotesContainer).hide();
+                  $(vendorNotesContainer).hide();
                   $(elementToShow).show();
+
+                  salesBtn.style.borderBottomColor = COLOUR.Blue;
+                  designBtn.style.borderBottomColor = COLOUR.Blue;
+                  productionBtn.style.borderBottomColor = COLOUR.Blue;
+                  customerBtn.style.borderBottomColor = COLOUR.Blue;
+                  vendorBtn.style.borderBottomColor = COLOUR.Blue;
             }
 
             //Job Buttons
@@ -1255,14 +1302,12 @@ async function init() {
                         if(currentQueueID != newQueueID) requiresUpdatePriority = true;
 
                         if(requiresUpdatePriority) {
-                              console.log("" + jobArrayElement.Id, "" + jobArrayElement.OrderId, (j + 1), "" + newColourAsHex, newQueueID == null ? currentQueueID : newQueueID);
                               jobArrayElement.QueuePrioritySettingId = newQueueID == null ? currentQueueID : newQueueID;
 
                               await updateItemPriority("" + jobArrayElement.Id, "" + jobArrayElement.OrderId, (j + 1), "" + newColourAsHex, newQueueID == null ? currentQueueID : newQueueID);
 
                         }
                         if(requiresUpdateStatus) {
-                              console.log("requires status: " + jobArrayElement.Id, currentStateId, newStateId);
                               jobArrayElement.OrderProductStatusId = newStateId == null ? currentStateId : newStateId;
                               await updateItemStatus(jobArrayElement.Id, currentQueueID, newStateId == null ? currentStateId : newStateId);
                               $("#imgExpander_" + jobArrayElement.Id).click();
@@ -1276,20 +1321,61 @@ async function init() {
 
       //Notes
       for(let i = 0; i < jobs.length; i++) {
-            let productNotesDesign = await getProductNotes(jobs[i].Id, 2);
-            let numOfNotes = productNotesDesign.ProductionNotes.length;
+            let productNotes = await getProductNotes(jobs[i].Id, 2);
+            let numOfNotes = productNotes.ProductionNotes.length;
+
+
+            let numOfNotes_Type = {
+                  Design: 0,
+                  Sales: 0,
+                  Production: 0,
+                  Vendor: 0,
+                  Customer: 0
+            };
+
+            //Add Notes
             for(let x = 0; x < numOfNotes; x++) {
-                  let newNote = createDiv("width:calc(100% - 20px);margin:10px;min-height:40px;background-color:#eee;padding:10px;" + STYLE.DropShadow, null, notesDesign[i]);
-                  newNote.innerText = productNotesDesign.ProductionNotes[x].Note;
+                  let containerToAppendTo;
+                  switch(productNotes.ProductionNotes[x].NoteTypeDisplay) {
+                        case "Design":
+                              containerToAppendTo = notesDesign[i];
+                              numOfNotes_Type.Design++;
+                              break;
+                        case "Sales":
+                              containerToAppendTo = notesSales[i];
+                              numOfNotes_Type.Sales++;
+                              break;
+                        case "Production":
+                              containerToAppendTo = notesProduction[i];
+                              numOfNotes_Type.Production++;
+                              break;
+                        case "Vendor":
+                              containerToAppendTo = notesVendor[i];
+                              numOfNotes_Type.Vendor++;
+                              break;
+                        case "Customer":
+                              containerToAppendTo = notesCustomer[i];
+                              numOfNotes_Type.Customer++;
+                              break;
+                        default: break;
+                  }
+                  let newNote = createDiv("width:calc(100% - 20px);margin:10px;min-height:40px;background-color:#eee;padding:10px;" + STYLE.DropShadow, null, containerToAppendTo);
+                  newNote.innerText = productNotes.ProductionNotes[x].Note;
             }
 
-            if(numOfNotes > 0) {
+            //Add Qty Count Circle 
+            function createQtyCircle(qty, attachedTo) {
                   let numberDisplayDiv = document.createElement("div");
-                  numberDisplayDiv.innerText = numOfNotes;
+                  numberDisplayDiv.innerText = qty;
                   numberDisplayDiv.style = "width:20px;height:15px;background-color:red;border-radius:10px;font-size:10px;font-weight:bold;position:absolute;top:-15px;left:35px;color:white;padding-top:4px;";
-
-                  designNotesBtns[i].appendChild(numberDisplayDiv);
+                  attachedTo.appendChild(numberDisplayDiv);
             }
+
+            if(numOfNotes_Type.Design > 0) createQtyCircle(numOfNotes_Type.Design, designNotesBtns[i]);
+            if(numOfNotes_Type.Sales > 0) createQtyCircle(numOfNotes_Type.Sales, salesNotesBtns[i]);
+            if(numOfNotes_Type.Production > 0) createQtyCircle(numOfNotes_Type.Production, productionNotesBtns[i]);
+            if(numOfNotes_Type.Vendor > 0) createQtyCircle(numOfNotes_Type.Vendor, vendorNotesBtns[i]);
+            if(numOfNotes_Type.Customer > 0) createQtyCircle(numOfNotes_Type.Customer, customerNotesBtns[i]);
       }
 
       let data = await Promise.all(dataPromise);
@@ -1361,11 +1447,9 @@ async function init() {
                         '</g>' +
                         '</svg>';
                   saveToClipboard(x);
-                  console.log(x);
 
                   var parser = new DOMParser();
                   var doc = parser.parseFromString(x, "image/svg+xml");
-                  console.log(doc);
 
             }, jobContainers[i].contentContainer, true);
 
