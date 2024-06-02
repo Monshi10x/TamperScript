@@ -16,6 +16,8 @@ class Modal {
       get callbackFunction() {return this.#callbackFunction;}
       set callbackFunction(value) {this.#callbackFunction = value;}
 
+      shouldHideOnEnterKeyPress = true;
+
       setContainerSize(width = 300, height = 300) {
             this.#modalContainer.style.width = width + 'px';
             this.#modalContainer.style.height = height + 'px';
@@ -61,7 +63,7 @@ class Modal {
             window.addEventListener("mousemove", (event) => this.onMouseMove(event));
             window.addEventListener("keyup", (event) => {
                   if(event.key === "Enter") {
-                        this.hide();
+                        if(this.shouldHideOnEnterKeyPress) this.hide();
                   }
             }, {bubbles: false});
       }

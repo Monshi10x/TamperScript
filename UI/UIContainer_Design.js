@@ -32,11 +32,15 @@ class UIContainer_Design {
       #minimizeBtn_Width = 30;
       #minimizeBtn_Height = 30;
       #isMinimized = false;
+      growOnHover = true;
 
       #contentContainer;
       get contentContainer() {return this.#contentContainer;}
 
-
+      /**@Overrideable */
+      onPopOutCallback = function() { };
+      /**@Overrideable */
+      onPopOutLeaveCallback = function() { };
 
       #Id;
       set Id(value) {this.#Id = value;}
@@ -54,7 +58,6 @@ class UIContainer_Design {
       set QueuePrioritySettingId(value) {this.#QueuePrioritySettingId = value;}
       get QueuePrioritySettingId() {return this.#QueuePrioritySettingId;}
 
-
       #jobData;
       set jobData(value) {this.#jobData = value;}
       get jobData() {return this.#jobData;}
@@ -71,11 +74,15 @@ class UIContainer_Design {
             this.#container.style.boxShadow = "rgb(0, 0, 0, 0.5) 0px 0px 20px 0px";
             this.#container.style.cssText += overrideCssStyles;
 
-
+            let self = this;
             $(this.#container).hover(function() {
-                  this.style.boxShadow = "rgb(0, 0, 0, 0.9) 0px 0px 20px 0.5px";
+                  if(self.growOnHover) {
+                        this.style.boxShadow = "rgb(0, 0, 0, 0.9) 0px 0px 20px 0.5px";
+                        this.style.cssText += "transform: scale(1.01, 1.01);";
+                  }
             }, function() {
                   this.style.boxShadow = "rgb(0, 0, 0, 0.5) 0px 0px 20px 0px";
+                  this.style.cssText += "transform: scale(1.0, 1.0);";
             });
 
             if(parentObjectToAppendTo != null) {
@@ -94,6 +101,7 @@ class UIContainer_Design {
                               this.onPopOutLeave();
                               this.callbackOverridable();
                         }, this.#container);
+                        this.#popOutModal.shouldHideOnEnterKeyPress = false;
                         this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
                   }
             });
@@ -119,6 +127,7 @@ class UIContainer_Design {
                               this.callbackOverridable();
                         }, this.#container);
                         this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
+                        this.#popOutModal.shouldHideOnEnterKeyPress = false;
                   });
             }
 
@@ -142,26 +151,9 @@ class UIContainer_Design {
                               this.callbackOverridable();
                         }, this.#container);
                         this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
+                        this.#popOutModal.shouldHideOnEnterKeyPress = false;
                   });
             }
-
-            /**@MinimizeBtn */
-            /*this.#minimizeBtn = createButton("-", "display: block; float: right; width: " + this.#minimizeBtn_Width + "px;height:" + this.#minimizeBtn_Height + "px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.LightBlue + ";", () => {this.toggleMinimize();});
-            this.#minimizeBtn.id = "minimizeBtn";
-            this.#minimizeBtn.dataset.minimizedState = "maximized";
-            this.#headingContainer.appendChild(this.#minimizeBtn);*/
-
-            /**@PopOutBtn */
-            /*this.#popOutBtn = createButton("\u274F", "display: block; float: right; width: " + this.#popOutBtn_Width + "px;height:" + this.#popOutBtn_Height + "px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkBlue + ";", () => {
-                  setFieldDisabled(true, this.#popOutBtn);
-                  this.onPopOut();
-                  this.#popOutModal = new ModalPopOut("Expanded View", () => {
-                        setFieldDisabled(false, this.#popOutBtn);
-                        this.onPopOutLeave();
-                        this.callbackOverridable();
-                  }, this.#container);
-                  this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
-            }, this.#headingContainer);*/
 
             /**@ContentContainer */
             this.#contentContainer = document.createElement("div");
@@ -180,15 +172,11 @@ class UIContainer_Design {
       Minimize() {
             this.#isMinimized = true;
             this.#contentContainer.style.display = "none";
-            //this.#minimizeBtn.innerText = "▭";
-            //this.#minimizeBtn.dataset.minimizedState = "minimized";
       }
 
       Maximize() {
             this.#isMinimized = false;
             this.#contentContainer.style.display = "block";
-            //this.#minimizeBtn.innerText = "-";
-            //this.#minimizeBtn.dataset.minimizedState = "maximized";
       }
 
       onPopOut() {
@@ -196,6 +184,7 @@ class UIContainer_Design {
             this.Maximize();
             this.#contentContainer.style.maxHeight = "100%";
             this.#container.style.maxHeight = "10000px";
+            this.onPopOutCallback();
       }
 
       onPopOutLeave() {
@@ -204,6 +193,7 @@ class UIContainer_Design {
             else this.Maximize();
             this.#contentContainer.style.maxHeight = "400px";
             this.#container.style = STYLE.Div3;
+            this.onPopOutLeaveCallback();
       }
 
       /**@Overridable */
@@ -217,6 +207,5 @@ class UIContainer_Design {
                   this.#headingContainer.appendChild(itemContainers[i]);
                   this.#addedHeadingItems_combinedWidth += itemContainers[i].offsetWidth;
             }
-            //this.#customerNameText.style.width = "calc(100% - " + (this.#addedHeadingItems_combinedWidth + this.#minimizeBtn_Width + this.#popOutBtn_Width) + "px";
       }
 }

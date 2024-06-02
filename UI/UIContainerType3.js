@@ -74,7 +74,7 @@ class UIContainerType3 {
 
             /**@ContentContainer */
             this.#contentContainer = document.createElement("div");
-            this.#contentContainer.style = "width:100%;max-height:calc(100% - 30px);overflow-y:scroll;display:block;";
+            this.#contentContainer.style = "width:100%;max-height:calc(100% - 30px);overflow-y:scroll;display:block;position: relative;";
             this.#container.appendChild(this.#contentContainer);
       }
 

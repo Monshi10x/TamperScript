@@ -378,6 +378,21 @@ function createInputCalculated_Infield(text, defaultValue, overrideCssStyles, op
 
     return [containerDiv, input, calculated];
 }
+function createTextarea(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo) {
+    var input = document.createElement('textarea');
+    input.placeholder = text;
+    input.autocomplete = 'off';
+    input.style = STYLE.InputField;
+    if(defaultValue != null) input.value = defaultValue;
+    if(overrideCssStyles) input.style.cssText += overrideCssStyles;
+    if(optionalCallback) {
+        input.onkeyup = optionalCallback;
+    }
+    if(parentObjectToAppendTo != null) {
+        parentObjectToAppendTo.appendChild(input);
+    }
+    return input;
+}
 function createDropdown(text, selectedIndex, overrideCssStyles, options, optionalCallback) {
     var dropdown = document.createElement('select');
     dropdown.placeholder = text;
@@ -728,6 +743,16 @@ function createFloatingTag(text, overrideCssStyles, parentObjectToAppendTo) {
     }
     return floatingTag;
 }
+function createIFrame(url, overrideCssStyles, parentObjectToAppendTo) {
+    let element = document.createElement("iframe");
+    element.src = url;
+    if(overrideCssStyles) element.style.cssText += overrideCssStyles;
+    if(parentObjectToAppendTo != null) {
+        parentObjectToAppendTo.appendChild(element);
+    }
+    return element;
+}
+
 function resetDropdownOption_Icon(options, dropdownText, dropdownBody, optionalCallback) {
     for(var o = 0; o < options.length; o++) {
         var nullFunc = function() {
