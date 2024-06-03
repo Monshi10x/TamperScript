@@ -1687,7 +1687,6 @@ async function OnJobPopOut(jobId, jobIndex, OrderId, AccountId, jobContainer) {
       if(numOfNotes_Type.Customer > 0) $(noteQtyCircles[3]).show(); else $(noteQtyCircles[3]).hide();
       if(numOfNotes_Type.Vendor > 0) $(noteQtyCircles[4]).show(); else $(noteQtyCircles[4]).hide();
 
-
       //Customer Email
       let email = await getCustomerEmail(OrderId, AccountId);
       console.log(email);
