@@ -1089,8 +1089,8 @@ async function init() {
             newJobContainer.Priority = jobs[i].QueuePriority;
             newJobContainer.JobColour = jobs[i].QueuePrioritySettingColor;
             newJobContainer.QueuePrioritySettingId = jobs[i].QueuePrioritySettingId;
-            newJobContainer.onPopOutCallback = function() {OnJobPopOut(jobs[i].Id, i, jobs[i].OrderId, jobs[i].AccountId, newJobContainer);};
-            newJobContainer.onPopOutLeaveCallback = function() {OnJobPopOutLeave(jobs[i].Id, i, newJobContainer);};
+            newJobContainer.onPopOut = function() {OnJobPopOut(jobs[i].Id, i, jobs[i].OrderId, jobs[i].AccountId, newJobContainer);};
+            newJobContainer.onPopOutLeave = function() {OnJobPopOutLeave(jobs[i].Id, i, newJobContainer);};
             jobContainers.push(newJobContainer);
             jobs[i].jobContainer = newJobContainer;
             newJobContainer.container.id = "sortablelist";
@@ -1107,7 +1107,7 @@ async function init() {
 
             //Description Container
             let descriptionField = new UIContainerType3("width:calc(100% - 40px);", "DESCRIPTION", jobContainers[i].contentContainer);
-            descriptionField.contentContainer.style.cssText += "min-height:100px;";
+            descriptionField.contentContainer.style.cssText += "min-height:100px;max-height:300px;overflow-y:scroll;";
             lineItemDescriptionFields.push(descriptionField.contentContainer);
             let loader = new Loader("", descriptionField.contentContainer);
             lineItemDescriptionSpinners.push(loader);
@@ -1296,27 +1296,27 @@ async function init() {
             vendorNotesBtns.push(vendorBtn);
 
             let salesNotesContainer = document.createElement("div");
-            salesNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:50px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            salesNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
             notesContainer.contentContainer.appendChild(salesNotesContainer);
             notesSales.push(salesNotesContainer);
 
             let designNotesContainer = document.createElement("div");
-            designNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:50px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            designNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
             notesContainer.contentContainer.appendChild(designNotesContainer);
             notesDesign.push(designNotesContainer);
 
             let productionNotesContainer = document.createElement("div");
-            productionNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:50px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            productionNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
             notesContainer.contentContainer.appendChild(productionNotesContainer);
             notesProduction.push(productionNotesContainer);
 
             let customerNotesContainer = document.createElement("div");
-            customerNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:50px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            customerNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
             notesContainer.contentContainer.appendChild(customerNotesContainer);
             notesCustomer.push(customerNotesContainer);
 
             let vendorNotesContainer = document.createElement("div");
-            vendorNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:50px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            vendorNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
             notesContainer.contentContainer.appendChild(vendorNotesContainer);
             notesVendor.push(vendorNotesContainer);
 
@@ -1584,7 +1584,7 @@ async function init() {
             }
 
             //Line Item Description
-            let lineItemDescriptionText = createText("", "width:100%; height:300px;", lineItemDescriptionFields[i]);
+            let lineItemDescriptionText = createText("", "width:100%;height: 100%;", lineItemDescriptionFields[i]);
             lineItemDescriptionText.innerHTML = lineItemDescription;
             lineItemDescriptionSpinners[i].Delete();
       }
@@ -1625,7 +1625,12 @@ async function OnJobPopOut(jobId, jobIndex, OrderId, AccountId, jobContainer) {
             Customer: 0
       };
 
-      console.log(productNotes);
+      removeAllChildrenFromParent(notesSales[jobIndex]);
+      removeAllChildrenFromParent(notesDesign[jobIndex]);
+      removeAllChildrenFromParent(notesProduction[jobIndex]);
+      removeAllChildrenFromParent(notesCustomer[jobIndex]);
+      removeAllChildrenFromParent(notesVendor[jobIndex]);
+
       for(let j = 0; j < 5; j++) {
             let numOfNotes = productNotes[j].ProductionNotes.length;
 
@@ -1659,8 +1664,6 @@ async function OnJobPopOut(jobId, jobIndex, OrderId, AccountId, jobContainer) {
                         default: break;
                   }
 
-                  if(x == 0) removeAllChildrenFromParent(containerToAppendTo);
-
                   addNote(productNotes[j].ProductionNotes[x].Note, productNotes[j].ProductionNotes[x].CreatedByName, productNotes[j].ProductionNotes[x].Id, j, containerToAppendTo);
             }
       }
@@ -1687,7 +1690,6 @@ async function OnJobPopOut(jobId, jobIndex, OrderId, AccountId, jobContainer) {
       if(numOfNotes_Type.Customer > 0) $(noteQtyCircles[3]).show(); else $(noteQtyCircles[3]).hide();
       if(numOfNotes_Type.Vendor > 0) $(noteQtyCircles[4]).show(); else $(noteQtyCircles[4]).hide();
 
-
       //Customer Email
       let email = await getCustomerEmail(OrderId, AccountId);
       console.log(email);
@@ -1702,7 +1704,7 @@ async function OnJobPopOutLeave(jobId, jobIndex, jobContainer) {
 function addNote(text, createdBy = "", noteId, typeIndex = 1/*Design*/, containerToAppendTo) {
       let newNote, noteText, deleteButton, createdByText;
 
-      newNote = createDiv("width:calc(100% - 20px);margin:10px;min-height:40px;background-color:#eee;padding:10px;" + STYLE.DropShadow, null, containerToAppendTo);
+      newNote = createDiv("width:calc(100% - 20px);margin:10px;min-height:40px;background-color:#eee;padding:10px;" + STYLE.DropShadow, null);
       newNote.id = noteId;
 
       noteText = createText(text, "width:calc(100% - 120px);height:100%;", newNote);
@@ -1716,6 +1718,12 @@ function addNote(text, createdBy = "", noteId, typeIndex = 1/*Design*/, containe
       }, newNote);
 
       createdByText = createText(createdBy, "width:calc(80px);height:100%;text-align:right;float:right;color:" + COLOUR.MidGrey, newNote);
+
+      if(containerToAppendTo.firstChild) {
+            insertBefore(newNote, containerToAppendTo.firstChild);
+      } else {
+            containerToAppendTo.appendChild(newNote);
+      }
 }
 
 async function deleteNote(noteId, typeIndex) {
