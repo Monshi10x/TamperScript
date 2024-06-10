@@ -790,6 +790,7 @@ class Frame {
       }
 
       Description() {
+            TODO("Fix frameHeight_SideB -> wording comes up as width measure");
             if(!this.frameRequired) return "";
             return "Frame: <br>" + "<ul>" + "<li>" + "Size (Side A): " + this.frameWidth_SideA + "mmW x " + this.frameHeight_SideA + "mmH" + "</li>" + (this.qty == 2 ? "<li>" + "Size (Side B): " + this.frameWidth_SideB + "mmW x " + this.frameHeight_SideB + "mmH" + "</li>" : "") + "<li>" + "Material: " + this.frameMaterial + " " + this.frameDimensions + "</li>" + "<li>" + "Partitions: " + this.frameVerticalPartitions + " (V), " + this.frameHorizontalPartitions + " (H)" + "</li>" + (this.powdercoatingRequired ? "<li>" + "Powdercoated standard colour" + "</li>" : "") + (this.twoPacRequired ? "<li>" + "2Pac painted" + "</li>" : "") + "</ul>";
       }
