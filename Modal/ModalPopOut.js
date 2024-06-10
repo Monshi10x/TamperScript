@@ -41,6 +41,8 @@ class ModalPopOut extends Modal {
             for(let i = 0; i < this.#borrowedFields.length; i++) {
                   if(this.#borrowedFields[i].returnAfterElement) insertAfter(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnAfterElement);
                   else insertBefore(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnBeforeElement);
+
+                  this.#borrowedFields[i].fieldContainer.style = this.#borrowedFields[i].currentCssStyle;
             }
       }
 

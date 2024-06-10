@@ -38,9 +38,11 @@ class UIContainer_Design {
       get contentContainer() {return this.#contentContainer;}
 
       /**@Overrideable */
-      onPopOutCallback = function() { };
+      onPopOut = function() { };
       /**@Overrideable */
-      onPopOutLeaveCallback = function() { };
+      onPopOutLeave = function() { };
+      /**@Overrideable */
+      onCallback() { }
 
       #Id;
       set Id(value) {this.#Id = value;}
@@ -95,11 +97,11 @@ class UIContainer_Design {
             this.#headingContainer.addEventListener("click", (e) => {
                   if(e.target == this.#headingContainer) {
                         setFieldDisabled(true, this.#popOutBtn);
-                        this.onPopOut();
+                        this.popOut();
                         this.#popOutModal = new ModalPopOut("Expanded View", () => {
                               setFieldDisabled(false, this.#popOutBtn);
-                              this.onPopOutLeave();
-                              this.callbackOverridable();
+                              this.popOutLeave();
+                              this.onCallback();
                         }, this.#container);
                         this.#popOutModal.shouldHideOnEnterKeyPress = false;
                         this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
@@ -120,11 +122,11 @@ class UIContainer_Design {
 
                   this.#customerNameHeadingContainer.addEventListener("click", () => {
                         setFieldDisabled(true, this.#popOutBtn);
-                        this.onPopOut();
+                        this.popOut();
                         this.#popOutModal = new ModalPopOut("Expanded View", () => {
                               setFieldDisabled(false, this.#popOutBtn);
-                              this.onPopOutLeave();
-                              this.callbackOverridable();
+                              this.popOutLeave();
+                              this.onCallback();
                         }, this.#container);
                         this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
                         this.#popOutModal.shouldHideOnEnterKeyPress = false;
@@ -144,11 +146,11 @@ class UIContainer_Design {
 
                   this.#jobNameHeadingContainer.addEventListener("click", () => {
                         setFieldDisabled(true, this.#popOutBtn);
-                        this.onPopOut();
+                        this.popOut();
                         this.#popOutModal = new ModalPopOut("Expanded View", () => {
                               setFieldDisabled(false, this.#popOutBtn);
-                              this.onPopOutLeave();
-                              this.callbackOverridable();
+                              this.popOutLeave();
+                              this.onCallback();
                         }, this.#container);
                         this.#popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
                         this.#popOutModal.shouldHideOnEnterKeyPress = false;
@@ -179,26 +181,21 @@ class UIContainer_Design {
             this.#contentContainer.style.display = "block";
       }
 
-      onPopOut() {
+      popOut() {
             this.prePopOutState = this.#isMinimized;
             this.Maximize();
             this.#contentContainer.style.maxHeight = "100%";
             this.#container.style.maxHeight = "10000px";
-            this.onPopOutCallback();
+            this.onPopOut();
       }
 
-      onPopOutLeave() {
+      popOutLeave() {
             //if was minimized before, restore to minimized
             if(this.prePopOutState == true) this.Minimize();
             else this.Maximize();
             this.#contentContainer.style.maxHeight = "400px";
             this.#container.style = STYLE.Div3;
-            this.onPopOutLeaveCallback();
-      }
-
-      /**@Overridable */
-      callbackOverridable() {
-            console.log("callbackOverridable");
+            this.onPopOutLeave();
       }
 
       #addedHeadingItems_combinedWidth = 0;
