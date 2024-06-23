@@ -1,128 +1,118 @@
 class Material extends SubscriptionManager {
-      #container;
-      get container() {return this.#container;}
 
-      #Type = "";
-      get Type() {return this.#Type;}
-      set Type(type) {this.#Type = type;};
-
-      #UNIQUEID = generateUniqueID();
-      get ID() {return this.#Type + "-" + this.#UNIQUEID;}
-
-      #typeLabel;
-      get typeLabel() {return this.#typeLabel;}
-
-      #productNumberLabel;
-      #productNumber = -1;
-      get productNumber() {return this.#productNumber;}
-      set productNumber(value) {this.#productNumber = value; this.#productNumberLabel.innerText = value;}
-
-      #subscribedToLabel;
-      #subscriptionsContainer;
-      get inheritedRowSizeLabel() {return this.#subscribedToLabel;}
-
-      #heading;
-      #minimizeBtn;
+      /*
+      VARIABLES*/
       #isMinimized = true;
-      #deleteBtn;
       #showIDInContainer = true;
-      #subscriptionsModal;
-      #lhsMenuWindow;
-
-      /**
-       * @InheritedSize
-       */
-      #inheritedSizeHeader;
-      #qty;
-      get qty() {return zeroIfNaNNullBlank(this.#qty[1].value);}
-      #width;
-      get width() {return zeroIfNaNNullBlank(this.#width[1].value);}
-      #height;
-      get height() {return zeroIfNaNNullBlank(this.#height[1].value);}
-      #lockBtn;
+      #productNumber = -1;
+      #Type = "";
+      #UNIQUEID = generateUniqueID();
+      #backgroundColor = COLOUR.Black;
+      #textColor = COLOUR.White;
       #isLocked;
 
-      #backgroundColor = COLOUR.Black;
+      /*
+      UI FIELDS*/
+      #inheritedSizeHeader;
+      #f_qty;
+      #f_width;
+      #f_height;
+      #f_lockBtn;
+      #f_deleteBtn;
+      #f_container;
+      #f_typeLabel;
+      #f_productNumberLabel;
+      #f_subscribedToLabel;
+      #f_subscriptionsContainer;
+      #f_minimizeBtn;
+      #f_subscriptionsModal;
+      #f_lhsMenuWindow;
+      #f_popOutModal;
+      #f_popOutBtn;
+
+      /*
+      GETTER*/
+      get qty() {return zeroIfNaNNullBlank(this.#f_qty[1].value);}
+      get width() {return zeroIfNaNNullBlank(this.#f_width[1].value);}
+      get height() {return zeroIfNaNNullBlank(this.#f_height[1].value);}
+      get container() {return this.#f_container;}
+      get Type() {return this.#Type;}
+      get ID() {return this.#Type + "-" + this.#UNIQUEID;}
+      get typeLabel() {return this.#f_typeLabel;}
+      get productNumber() {return this.#productNumber;}
+      get inheritedRowSizeLabel() {return this.#f_subscribedToLabel;}
       get backgroundColor() {return this.#backgroundColor;}
-      set backgroundColor(color) {this.#backgroundColor = color;}
-      #textColor = COLOUR.White;
       get textColor() {return this.#textColor;}
+
+      /*
+      SETTER*/
+      set Type(type) {this.#Type = type;};
+      set productNumber(value) {this.#productNumber = value; this.#f_productNumberLabel.innerText = value;}
+      set backgroundColor(color) {this.#backgroundColor = color;}
       set textColor(color) {this.#textColor = color;}
 
       constructor(parentContainer, lhsMenuWindow, Type) {
             super();
             if(!lhsMenuWindow instanceof LHSMenuWindow) throw new Error('Parameter 2 must be an instance of LHSMenuWindow');
-            this.#lhsMenuWindow = lhsMenuWindow;
-            this.Type = Type;
+            this.#f_lhsMenuWindow = lhsMenuWindow;
+            this.#Type = Type;
 
-            this.#container = document.createElement("div");
-            this.#container.style =
+            this.#f_container = document.createElement("div");
+            this.#f_container.style =
                   "display: block; float: left; width: calc(100% - 16px);min-height:20px; background-color:" +
                   COLOUR.White +
                   ";border:2px solid;border-color: black;margin:8px;box-shadow: rgb(0 0 0 / 80%) 3px 4px 10px 0px;padding:0px;overflow:hidden;box-sizing: border-box";
-            parentContainer.appendChild(this.#container);
+            parentContainer.appendChild(this.#f_container);
 
-            this.#productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
+            this.#f_productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
                         this.productNumber = modal.value;
-                        console.log(modal.value);
-                        this.onproductNumberChange();
+                        this.onProductNumberChange();
                   });
                   modal.value = this.productNumber;
-            }, this.#container);
+            }, this.#f_container);
 
-            this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:150px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", this.#container);
+            this.#f_typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:150px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", this.#f_container);
 
-            /** @Subscriptions */
-            this.#subscriptionsModal = createIconButton("https://cdn.gorilladash.com/images/media/6144522/signarama-australia-noun-multiple-assign-2848055-635d23b3b3f2b.png", "Subscriptions",
-                  "width: 150px; height: 40px; margin: 0px;margin-left:30px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, () => {this.OpenSubscriptionsModal();}, this.#container);
+            /*
+            Subscriptions */
+            this.#f_subscriptionsModal = createIconButton("https://cdn.gorilladash.com/images/media/6144522/signarama-australia-noun-multiple-assign-2848055-635d23b3b3f2b.png", "Subscriptions",
+                  "width: 150px; height: 40px; margin: 0px;margin-left:30px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, () => {this.OpenSubscriptionsModal();}, this.#f_container);
 
-            //this.#subscribedToLabel = createText("Subscribed: None", "height:40px;margin:0px;background-color:" + COLOUR.White + ";width:129px;font-size:10px;color:" + COLOUR.Blue + ";text-align:center;line-height:30px;border:1px solid " + COLOUR.Blue + ";", this.#container);
-            this.#subscriptionsContainer = document.createElement("div");
-            this.#subscriptionsContainer.style = "height:40px;width:310px;background-color:white;box-sizing:border-box;float:left;margin:0px;";
-            this.#container.appendChild(this.#subscriptionsContainer);
-            //this.#heading = createInput("Description", "", "width:calc(100% - 364px);height:30px;margin:0px;text-align:center;font-weight:bold", () => { }, this.#container);
-            //this.#heading.id = "rowHeading";
+            this.#f_subscriptionsContainer = document.createElement("div");
+            this.#f_subscriptionsContainer.style = "height:40px;width:310px;background-color:white;box-sizing:border-box;float:left;margin:0px;";
+            this.#f_container.appendChild(this.#f_subscriptionsContainer);
 
+            this.#f_deleteBtn = createButton("X", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
+            this.#f_container.appendChild(this.#f_deleteBtn);
 
-            this.#deleteBtn = createButton("X", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
-            this.#container.appendChild(this.#deleteBtn);
+            this.#f_minimizeBtn = createButton("-", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.LightBlue + ";", () => {this.toggleMinimize();});
+            this.#f_container.appendChild(this.#f_minimizeBtn);
 
-            this.#minimizeBtn = createButton("-", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.LightBlue + ";", () => {this.toggleMinimize();});
-            this.#container.appendChild(this.#minimizeBtn);
-
-            let popOutBtn = createButton("\u274F", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkBlue + ";", () => {
-                  setFieldDisabled(true, popOutBtn);
+            this.#f_popOutBtn = createButton("\u274F", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkBlue + ";", () => {
                   this.onPopOut();
-                  new ModalPopOut("Expanded View", () => {
-                        this.onPopOutLeave();
-                        setFieldDisabled(false, popOutBtn);
-                  }, this.#container);
-            }, this.#container);
+            }, this.#f_container);
 
-            if(this.#showIDInContainer) createLabel(this.ID, "width:100%", this.#container);
+            if(this.#showIDInContainer) createLabel(this.ID, "width:100%", this.#f_container);
 
-            this.#inheritedSizeHeader = createHeadingStyle1("Inherited Total Size", null, this.#container);
+            this.#inheritedSizeHeader = createHeadingStyle1("Inherited Total Size", null, this.#f_container);
 
-            this.#qty = createInput_Infield("Qty", 0, "width:20%", () => {this.UpdateFromChange();}, this.#container, true, 1);
-            setFieldDisabled(true, this.#qty[1], this.#qty[0]);
+            this.#f_qty = createInput_Infield("Qty", 0, "width:20%", () => {this.UpdateFromChange();}, this.#f_container, true, 1);
+            setFieldDisabled(true, this.#f_qty[1], this.#f_qty[0]);
 
-            this.#width = createInput_Infield("Width", 0, "width:20%", () => {this.UpdateFromChange();}, this.#container, true, 100);
-            setFieldDisabled(true, this.#width[1], this.#width[0]);
+            this.#f_width = createInput_Infield("Width", 0, "width:20%", () => {this.UpdateFromChange();}, this.#f_container, true, 100);
+            setFieldDisabled(true, this.#f_width[1], this.#f_width[0]);
 
-            this.#height = createInput_Infield("Height", 0, "width:20%", () => {this.UpdateFromChange();}, this.#container, true, 100);
-            setFieldDisabled(true, this.#height[1], this.#height[0]);
+            this.#f_height = createInput_Infield("Height", 0, "width:20%", () => {this.UpdateFromChange();}, this.#f_container, true, 100);
+            setFieldDisabled(true, this.#f_height[1], this.#f_height[0]);
 
-            this.#lockBtn = createButton("", "font-size: 18px;display: block; float: left; width:10%; min-width:20px;max-width:30px;border:none;padding:2px; color:white;min-height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
-                  this.#isLocked = toggleLock(this.#lockBtn);
+            this.#f_lockBtn = createButton("", "font-size: 18px;display: block; float: left; width:10%; min-width:20px;max-width:30px;border:none;padding:2px; color:white;min-height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
+                  this.#isLocked = toggleLock(this.#f_lockBtn);
                   this.UpdateFromChange();
-            }, this.#container);
-            this.#lockBtn.innerHTML = "🔒";
+            }, this.#f_container);
+            this.#f_lockBtn.innerHTML = "🔒";
             this.#isLocked = true;
 
-            /**
-             * @Updates
-             */
             this.UpdateQWH();
             this.Minimize();
       }
@@ -137,12 +127,12 @@ class Material extends SubscriptionManager {
       OpenSubscriptionsModal() {
             new ModalManageSubscriptions2("Manage Subscriptions", () => {
                   this.UpdateFromChange();
-            }, this, this.#lhsMenuWindow);
+            }, this, this.#f_lhsMenuWindow);
             this.UpdateQWH();
       }
 
       UpdateSubscribedLabel() {
-            removeAllChildrenFromParent(this.#subscriptionsContainer);
+            removeAllChildrenFromParent(this.#f_subscriptionsContainer);
             for(let i = 0; i < this.subscriptions.length; i++) {
                   let subscription_colour = this.subscriptions[i].backgroundColor;
 
@@ -152,7 +142,7 @@ class Material extends SubscriptionManager {
 
                   let subSlotText = createText(this.subscriptions[i].productNumber, "width:100%;height:100%;padding:2px;padding-top:10px;box-sizing: border-box;color: " + this.subscriptions[i].textColor, subSlot);
 
-                  this.#subscriptionsContainer.appendChild(subSlot);
+                  this.#f_subscriptionsContainer.appendChild(subSlot);
             }
 
       }
@@ -160,18 +150,17 @@ class Material extends SubscriptionManager {
       UpdateQWH() {
             let setDisabled = true;
             if(this.#isLocked) {
-                  $(this.#qty[1]).val(roundNumber(this.getQWH().qty, 0));
-                  $(this.#width[1]).val(roundNumber(this.getQWH().width, 2));
-                  $(this.#height[1]).val(roundNumber(this.getQWH().height, 2));
+                  $(this.#f_qty[1]).val(roundNumber(this.getQWH().qty, 0));
+                  $(this.#f_width[1]).val(roundNumber(this.getQWH().width, 2));
+                  $(this.#f_height[1]).val(roundNumber(this.getQWH().height, 2));
             } else {
                   setDisabled = false;
             }
-            setFieldDisabled(setDisabled, this.#width[1], this.#width[0]);
-            setFieldDisabled(setDisabled, this.#height[1], this.#height[0]);
-            setFieldDisabled(setDisabled, this.#qty[1], this.#qty[0]);
+            setFieldDisabled(setDisabled, this.#f_width[1], this.#f_width[0]);
+            setFieldDisabled(setDisabled, this.#f_height[1], this.#f_height[0]);
+            setFieldDisabled(setDisabled, this.#f_qty[1], this.#f_qty[0]);
       }
 
-      //TODO: Handle Multiple Size Subscriptions, not just the first one
       getQWH() {
             if(!this.#isLocked) return new QWH(this.qty, this.width, this.height);
 
@@ -183,19 +172,13 @@ class Material extends SubscriptionManager {
             return new QWH(0, 0, 0);
       };
 
-      /**
-       * @DeleteThis
-       */
       Delete() {
-            this.#lhsMenuWindow.DeleteMaterial(this);
+            this.#f_lhsMenuWindow.DeleteMaterial(this);
             super.Delete();
 
-            deleteElement(this.#container);
+            deleteElement(this.#f_container);
       }
 
-      /**
-       * @Container
-       */
       toggleMinimize() {
             if(this.#isMinimized) this.Maximize();
             else this.Minimize();
@@ -203,34 +186,41 @@ class Material extends SubscriptionManager {
 
       Maximize() {
             this.#isMinimized = false;
-            this.#container.style.maxHeight = "10000px";
-            this.#minimizeBtn.innerText = "-";
+            this.#f_container.style.maxHeight = "10000px";
+            this.#f_minimizeBtn.innerText = "-";
       }
 
       Minimize() {
             this.#isMinimized = true;
-            this.#container.style.maxHeight = "44px";
-            this.#minimizeBtn.innerText = "▭";
+            this.#f_container.style.maxHeight = "44px";
+            this.#f_minimizeBtn.innerText = "▭";
       }
 
       onPopOut() {
             this.prePopOutState = this.#isMinimized;
+
+            this.#f_popOutModal = new ModalPopOut("Expanded View", () => {
+                  this.onPopOutLeave();
+            }, this.#f_container);
+
+            setFieldDisabled(true, this.#f_popOutBtn);
+
+            this.#f_container.style.cssText += "margin:0px;width:100%;border:0px;";
             this.Maximize();
       }
 
       onPopOutLeave() {
-            //if was minimized before, restore to minimized
-            if(this.prePopOutState == true) this.Minimize();
-            else this.Maximize();
+            if(this.prePopOutState == true) this.Minimize(); else this.Maximize();
+
+            setFieldDisabled(false, this.#f_popOutBtn);
       }
 
-      onproductNumberChange() {
+      onProductNumberChange() {
             this.UpdateFromChange();
       }
 
-      /**
-       * @CorebridgeCreate
-       */
+      /*
+       CorebridgeCreate*/
       async Create(productNo, partIndex) {
             return partIndex;
       }

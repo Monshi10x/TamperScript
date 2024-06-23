@@ -748,12 +748,12 @@ async function init() {
 
       let masterContainer = document.createElement("div");
       parentContainer.appendChild(masterContainer);
-      masterContainer.style = "display:flex;float:left;width:100vw;height:calc(100vh - 157px);background-color:white;flex-wrap: nowrap;overflow: auto;overflow-x:scroll;margin-bottom:0px;";
+      masterContainer.style = "display:flex;float:left;width:100vw;height:calc(100vh - 157px);background-color:" + COLOUR.DarkGrey + ";flex-wrap: nowrap;overflow: auto;overflow-x:scroll;margin-bottom:0px;";
       masterContainer.classList.add("x-scrollable");
 
 
       let optionsHeader = document.createElement("div");
-      optionsHeader.style = "width:100%;height:75px;display:block;float: left;background-color:" + COLOUR.White;
+      optionsHeader.style = "width:100%;height:75px;display:block;float: left;background-color:" + COLOUR.DarkGrey;
 
       insertBefore(optionsHeader, existingJobBoard);
 
@@ -1105,6 +1105,12 @@ async function init() {
             placeHolderPaymentDueLoaders.push(placeholderLoader);
             placeholderLoader.setSize(10);
 
+            //Buttons
+            let buttonsContainer = new UIContainerType3("width:calc(100% - 40px);", "VISIT", jobContainers[i].contentContainer);
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out order", "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "new window", buttonsContainer.contentContainer);
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "new window", buttonsContainer.contentContainer);
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "open order in sales", "/SalesModule/Orders/Order.aspx?OrderId=" + jobs[i].OrderId, "new window", buttonsContainer.contentContainer);
+
             //Description Container
             let descriptionField = new UIContainerType3("width:calc(100% - 40px);", "DESCRIPTION", jobContainers[i].contentContainer);
             descriptionField.contentContainer.style.cssText += "min-height:100px;max-height:300px;overflow-y:scroll;";
@@ -1210,53 +1216,65 @@ async function init() {
 
             //Notes Container
             notesContainer = new UIContainerType3("width:calc(100% - 40px);", "NOTES", jobContainers[i].contentContainer);
+            AddCssStyle("overflow-y:auto;", notesContainer.contentContainer);
 
             let btnContainer = document.createElement("div");
-            btnContainer.style = "padding-left:10px;width:calc(100%);box-sizing:border-box;display:block;min-height: 10px;float:left;margin-top:12px;";
+            btnContainer.style = "padding-left:0px;width:calc(100%);box-sizing:border-box;display:block;min-height: 10px;float:left;";
             notesContainer.contentContainer.appendChild(btnContainer);
 
-            let noteInput = createTextarea("Note", "", "width:80%;margin:0px;box-sizing:border-box;height:35px;margin:10px;margin-right:0px;resize: vertical;", () => { }, notesContainer.contentContainer);
+
+            let recipients = [
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px;", () => { }, notesContainer.contentContainer, null),
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer.contentContainer, null),
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer.contentContainer, null),
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer.contentContainer, null),
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer.contentContainer, null)
+            ];
+
+            let recipientsLabel = createLabel("Recipients", "width:100%;margin:0px;margin-bottom:20px;height:10px;font-size:12px;background-color:white;color:black;text-align:center;", notesContainer.contentContainer);
+
+            let noteInput = createTextarea("Add Note", "", "width:80%;margin:0px;box-sizing:border-box;height:35px;margin:10px;margin-right:0px;resize: vertical;", () => { }, notesContainer.contentContainer);
             let c = notesContainer.contentContainer;
-            let noteBtn = createButton("+ Add Note", "width:calc(20% - 20px);margin:10px;margin-left:0px;", async () => {
+            let addNoteBtn = createButton("+ Add Note", "width:calc(20% - 20px);margin:10px;margin-left:0px;", async () => {
+                  if(!recipients[0][1].checked && !recipients[1][1].checked && !recipients[2][1].checked && !recipients[3][1].checked && !recipients[4][1].checked) return;
 
                   let loader = new Loader("", c);
-
                   await addProductNote(jobs[i].Id, noteInput.value,
-                        $(salesNotesContainer).is(':visible'),
-                        $(designNotesContainer).is(':visible'),
-                        $(productionNotesContainer).is(':visible'),
-                        $(customerNotesContainer).is(':visible'),
-                        $(vendorNotesContainer).is(':visible'));
+                        recipients[0][1].checked,
+                        recipients[1][1].checked,
+                        recipients[2][1].checked,
+                        recipients[3][1].checked,
+                        recipients[4][1].checked);
 
-                  if($(notesSales[i]).is(':visible')) {
+                  if(recipients[0][1].checked) {
                         let currentNotes = await getProductNotes(jobs[i].Id, 1);
                         newNoteId = currentNotes.ProductionNotes[0].Id;
                         addNote(noteInput.value, currentUser, newNoteId, 0, notesSales[i]);
                         noteQtyCircles[0].innerText = parseInt(noteQtyCircles[0].innerText) + 1;
                         $(noteQtyCircles[0]).show();
                   };
-                  if($(notesDesign[i]).is(':visible')) {
+                  if(recipients[1][1].checked) {
                         let currentNotes = await getProductNotes(jobs[i].Id, 2);
                         newNoteId = currentNotes.ProductionNotes[0].Id;
                         addNote(noteInput.value, currentUser, newNoteId, 1, notesDesign[i]);
                         noteQtyCircles[1].innerText = parseInt(noteQtyCircles[1].innerText) + 1;
                         $(noteQtyCircles[1]).show();
                   };
-                  if($(notesProduction[i]).is(':visible')) {
+                  if(recipients[2][1].checked) {
                         let currentNotes = await getProductNotes(jobs[i].Id, 3);
                         newNoteId = currentNotes.ProductionNotes[0].Id;
                         addNote(noteInput.value, currentUser, newNoteId, 2, notesProduction[i]);
                         noteQtyCircles[2].innerText = parseInt(noteQtyCircles[2].innerText) + 1;
                         $(noteQtyCircles[2]).show();
                   };
-                  if($(notesCustomer[i]).is(':visible')) {
+                  if(recipients[3][1].checked) {
                         let currentNotes = await getProductNotes(jobs[i].Id, 4);
                         newNoteId = currentNotes.ProductionNotes[0].Id;
                         addNote(noteInput.value, currentUser, newNoteId, 3, notesCustomer[i]);
                         noteQtyCircles[3].innerText = parseInt(noteQtyCircles[3].innerText) + 1;
                         $(noteQtyCircles[3]).show();
                   };
-                  if($(notesVendor[i]).is(':visible')) {
+                  if(recipients[4][1].checked) {
                         let currentNotes = await getProductNotes(jobs[i].Id, 5);
                         newNoteId = currentNotes.ProductionNotes[0].Id;
                         addNote(noteInput.value, currentUser, newNoteId, 4, notesVendor[i]);
@@ -1268,26 +1286,27 @@ async function init() {
 
             }, notesContainer.contentContainer);
 
-            let salesBtn = createButton("Sales", "width:100px;margin:0px;position:relative;", () => {
-                  toggleNotes(salesNotesContainer);
+            let salesBtn = createButton("SALES", "width:20%;height:50px;margin:0px;position:relative;padding-top:20px;", () => {
+                  toggleNotes(salesNotesContainer, 0);
                   salesBtn.style.borderBottomColor = "red";
             }, btnContainer);
-            let designBtn = createButton("Design", "width:100px;margin:0px;position:relative;", () => {
-                  toggleNotes(designNotesContainer);
+            let designBtn = createButton("DESIGN", "width:20%;height:50px;margin:0px;position:relative;padding-top:20px;", () => {
+                  toggleNotes(designNotesContainer, 1);
                   designBtn.style.borderBottomColor = "red";
             }, btnContainer);
-            let productionBtn = createButton("Production", "width:100px;margin:0px;position:relative;", () => {
-                  toggleNotes(productionNotesContainer);
+            let productionBtn = createButton("PRODUCTION", "width:20%;height:50px;margin:0px;position:relative;padding-top:20px;", () => {
+                  toggleNotes(productionNotesContainer, 3);
                   productionBtn.style.borderBottomColor = "red";
             }, btnContainer);
-            let customerBtn = createButton("Customer", "width:100px;margin:0px;position:relative;", () => {
-                  toggleNotes(customerNotesContainer);
+            let customerBtn = createButton("CUSTOMER", "width:20%;height:50px;margin:0px;position:relative;padding-top:20px;", () => {
+                  toggleNotes(customerNotesContainer, 4);
                   customerBtn.style.borderBottomColor = "red";
             }, btnContainer);
-            let vendorBtn = createButton("Vendor", "width:100px;margin:0px;position:relative;", () => {
-                  toggleNotes(vendorNotesContainer);
+            let vendorBtn = createButton("VENDOR", "width:20%;height:50px;margin:0px;position:relative;padding-top:20px;", () => {
+                  toggleNotes(vendorNotesContainer, 5);
                   vendorBtn.style.borderBottomColor = "red";
             }, btnContainer);
+
 
             salesNotesBtns.push(salesBtn);
             designNotesBtns.push(designBtn);
@@ -1296,33 +1315,33 @@ async function init() {
             vendorNotesBtns.push(vendorBtn);
 
             let salesNotesContainer = document.createElement("div");
-            salesNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            salesNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
             notesContainer.contentContainer.appendChild(salesNotesContainer);
             notesSales.push(salesNotesContainer);
 
             let designNotesContainer = document.createElement("div");
-            designNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            designNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
             notesContainer.contentContainer.appendChild(designNotesContainer);
             notesDesign.push(designNotesContainer);
 
             let productionNotesContainer = document.createElement("div");
-            productionNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            productionNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
             notesContainer.contentContainer.appendChild(productionNotesContainer);
             notesProduction.push(productionNotesContainer);
 
             let customerNotesContainer = document.createElement("div");
-            customerNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            customerNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
             notesContainer.contentContainer.appendChild(customerNotesContainer);
             notesCustomer.push(customerNotesContainer);
 
             let vendorNotesContainer = document.createElement("div");
-            vendorNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:200px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;";
+            vendorNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
             notesContainer.contentContainer.appendChild(vendorNotesContainer);
             notesVendor.push(vendorNotesContainer);
 
             toggleNotes(designNotesContainer);
             designBtn.style.borderBottomColor = "red";
-            function toggleNotes(elementToShow) {
+            function toggleNotes(elementToShow, index) {
                   $(salesNotesContainer).hide();
                   $(designNotesContainer).hide();
                   $(productionNotesContainer).hide();
@@ -1343,13 +1362,6 @@ async function init() {
 
             let itemNoBtn = createLink("display: block; float: left; width: " + 40 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, jobs[i].LineItemOrder + "/" + jobs[i].TotalProductsInOrder, "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "_blank", jobContainers[i].contentContainer);
             jobContainers[i].addHeadingButtons(itemNoBtn);
-
-            //Buttons
-            let buttonsContainer = new UIContainerType3("width:calc(100% - 40px);", "VISIT", jobContainers[i].contentContainer);
-            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out order", "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "new window", buttonsContainer.contentContainer);
-            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "new window", buttonsContainer.contentContainer);
-            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "open order in sales", "/SalesModule/Orders/Order.aspx?OrderId=" + jobs[i].OrderId, "new window", buttonsContainer.contentContainer);
-
 
             let jobColour = document.createElement("div");
             jobColour.style = "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:0px; position:relative;color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + (jobs[i].QueuePrioritySettingColor == null ? "white" : jobs[i].QueuePrioritySettingColor) + ";";
@@ -1635,7 +1647,7 @@ async function OnJobPopOut(jobId, jobIndex, OrderId, AccountId, jobContainer) {
             let numOfNotes = productNotes[j].ProductionNotes.length;
 
             //Add Notes
-            for(let x = 0; x < numOfNotes; x++) {
+            for(let x = numOfNotes - 1; x >= 0; x--) {
 
                   if(productNotes[j].ProductionNotes[x].IsHidden) continue;
 
@@ -1672,7 +1684,7 @@ async function OnJobPopOut(jobId, jobIndex, OrderId, AccountId, jobContainer) {
       function createQtyCircle(qty, attachedTo) {
             let numberDisplayDiv = document.createElement("div");
             numberDisplayDiv.innerText = qty;
-            numberDisplayDiv.style = "width:20px;height:15px;background-color:red;border-radius:10px;font-size:10px;font-weight:bold;position:absolute;top:-15px;left:35px;color:white;padding-top:4px;";
+            numberDisplayDiv.style = "width:20px;height:15px;background-color:red;border-radius:10px;font-size:10px;font-weight:bold;position:absolute;top:0px;left:calc(50% - 10px);color:white;padding-top:4px;";
             attachedTo.appendChild(numberDisplayDiv);
             return numberDisplayDiv;
       }
@@ -1704,12 +1716,12 @@ async function OnJobPopOutLeave(jobId, jobIndex, jobContainer) {
 function addNote(text, createdBy = "", noteId, typeIndex = 1/*Design*/, containerToAppendTo) {
       let newNote, noteText, deleteButton, createdByText;
 
-      newNote = createDiv("width:calc(100% - 20px);margin:10px;min-height:40px;background-color:#eee;padding:10px;" + STYLE.DropShadow, null);
+      newNote = createDiv("width:calc(100% - 20px);margin:10px;min-height:40px;background-color:#eee;padding:10px;display:none;padding-bottom:20px;position:relative;" + STYLE.DropShadow, null);
       newNote.id = noteId;
 
       noteText = createText(text, "width:calc(100% - 120px);height:100%;", newNote);
 
-      deleteButton = createButton("X", "width:30px;height:15px;margin:0px;float:right;backgrou-color:" + COLOUR.Red + ";transform: translate(10px, -10px);", async () => {
+      deleteButton = createButton("X", "width:30px;height:15px;margin:0px;float:right;background-color:" + COLOUR.Red + ";transform: translate(10px, -10px);", async () => {
             await deleteNote(noteId, typeIndex);
             deleteElement(newNote);
             deleteElement(deleteButton);
@@ -1717,13 +1729,14 @@ function addNote(text, createdBy = "", noteId, typeIndex = 1/*Design*/, containe
             deleteElement(createdByText);
       }, newNote);
 
-      createdByText = createText(createdBy, "width:calc(80px);height:100%;text-align:right;float:right;color:" + COLOUR.MidGrey, newNote);
+      createdByText = createText(createdBy, "width:100%;height:20px;position:absolute;bottom:0px;right:0px;text-align:right;position;color:" + COLOUR.MidGrey, newNote);
 
       if(containerToAppendTo.firstChild) {
             insertBefore(newNote, containerToAppendTo.firstChild);
       } else {
             containerToAppendTo.appendChild(newNote);
       }
+      $(newNote).fadeIn(500);
 }
 
 async function deleteNote(noteId, typeIndex) {

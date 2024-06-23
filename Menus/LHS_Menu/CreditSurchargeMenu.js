@@ -62,8 +62,8 @@ class CreditSurchargeMenu extends LHSMenuWindow {
       get balanceDueIncGst() {
             if(document.querySelector("#ord_prod_model_item_1") == null) return null;
             var product1 = ko.contextFor(document.querySelector("#ord_prod_model_item_1"));
-            console.log(product1.$parent.balanceDueIncGst());
-            return product1.$parent.balanceDueIncGst();
+            console.log(product1.$parent);
+            return product1.$parent.BalanceDue();
       }
 
       get priceIncGst() {

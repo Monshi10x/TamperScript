@@ -7,23 +7,27 @@ class ModalPopOut extends Modal {
 
       constructor(headerText, callback, ...containersToBorrow) {
             super(headerText, callback);
-            this.setContainerSize(900, 900);
             this.#containersToBorrow = containersToBorrow;
+
+            this.setContainerSize(900, 900);
             this.borrowFields(...containersToBorrow);
 
-            this.addFooterElement(createButton("Close", "width:100px;float:right;", () => {
+            this.btn = createButton("Close", "width:100px;float:right;", () => {
                   if(this.#whenClosedReturnBorrowed == true) this.returnAllBorrowedFields();
                   console.log("in callback modal popout");
                   this.callback();
-            }));
+            });
+
+            this.addFooterElement(this.btn);
       }
 
       borrowFields(...fieldContainers) {
             for(let i = 0; i < fieldContainers.length; i++) {
                   let borrowedElement = fieldContainers[i];
-
                   let placeholder = document.createElement("div");
                   insertAfter(placeholder, borrowedElement);
+
+                  console.log(borrowedElement.style.cssText);
 
                   this.#borrowedFields.push({
                         fieldContainer: borrowedElement,
@@ -55,4 +59,5 @@ class ModalPopOut extends Modal {
             if(this.#whenClosedReturnBorrowed == true) this.returnAllBorrowedFields();
             super.hide();
       }
+
 }

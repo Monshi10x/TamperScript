@@ -39,7 +39,7 @@ class LHSMenuWindow {
 
         this.#container = document.createElement('div');
         this.#container.id = ID;
-        this.#container.style = "z-index:100;background-color:#fff;color:white;width:" + this.#width + "px;min-height:" + this.#height + "px;position:fixed;top:" + this.#yOffset + "px;left:" + this.#xOffset + "px;display: none;flex-direction: column;flex: 1;overflow:none;box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
+        this.#container.style = "z-index:100;background-color:" + COLOUR.MediumGrey + ";color:" + COLOUR.White + ";width:" + this.#width + "px;min-height:" + this.#height + "px;position:fixed;top:" + this.#yOffset + "px;left:" + this.#xOffset + "px;display: none;flex-direction: column;flex: 1;overflow:none;box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
 
         this.createDragableHeaderAndClose();
 
@@ -100,7 +100,7 @@ class LHSMenuWindow {
             this.#numPages++;
             let newPage = document.createElement('div');
             newPage.id = this.#ID + "body";
-            newPage.style = "margin: 0px;height:100%; min-height:400px;max-height:900px;width: 100%; padding: 0px; float: left; display: none; color: white; cursor: pointer; border-style: none; overflow-y: auto; overflow-x:none;background-color: white;";
+            newPage.style = "margin: 0px;height:100%; min-height:400px;max-height:900px;width: 100%; padding: 0px; float: left; display: none; color: white; cursor: pointer; border-style: none; overflow-y: auto; overflow-x:none;background-color:" + COLOUR.MediumGrey + ";";
             if(this.#numPages == 1) setFieldHidden(false, newPage);
             this.#pages.push(newPage);
             this.body.appendChild(newPage);

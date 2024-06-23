@@ -299,6 +299,7 @@ class Size2 extends SubscriptionManager {
             modal.setContainerSize(500, 500);
             modal.addBodyElement(this.#setting_KeepQty1[0]);
             modal.addBodyElement(this.#setting_IncludeSizeInDescription[0]);
+            modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {modal.hide();}));
       }
 
       onproductNumberChange() {

@@ -362,3 +362,12 @@ function HTMLToText(htmlString) {
 
     return tempDivElement.textContent || tempDivElement.innerText || "";
 }
+
+function toggle(expression, trueCallback, falseCallback) {
+    if(expression) trueCallback();
+    else falseCallback();
+}
+
+function AddCssStyle(cssStyle, element) {
+    element.style.cssText += ";" + cssStyle + ";";
+}

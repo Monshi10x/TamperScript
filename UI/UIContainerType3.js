@@ -101,7 +101,7 @@ class UIContainerType3 {
       }
 
       onPopOut() {
-            this.prePopOutState = this.#isMinimized;
+            this.prePopOutState = this.#isMinimized;//true
             this.Maximize();
             this.#contentContainer.style.maxHeight = "100%";
             this.#container.style.maxHeight = "10000px";

@@ -100,11 +100,6 @@ class Sheet extends Material {
       #sheetSize;
       set sheetSize(value) {$(this.#sheetSize[1]).val(value).change();}
 
-      /*
-
-            $(this.#thickness[1]).val("3x0.21").change();
-            $(this.#finish[1]).val("Primer").change();
-      */
       #updateOrderBtn;
 
       /**
@@ -552,7 +547,7 @@ class Sheet extends Material {
             let returnArray = [];
             let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet";
             let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material);
-            let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material);
+            let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material); console.log(canRouterSheet);
             let canHandCutSheet = Sheet.canHandCutSheet(width, height, sheetWidth, sheetHeight, material);
             if(width === null && height === null && sheetWidth === null && sheetHeight === null) {
                   returnArray = [
@@ -703,7 +698,7 @@ class Sheet extends Material {
             if(sw > Sheet.guillotineMaxCutWidth && sh > Sheet.guillotineMaxCutWidth) return false;
             if(w > Sheet.guillotineMaxCutWidth && h > Sheet.guillotineMaxCutWidth) return false;
             if(w > Sheet.guillotineMaxCutWidth && h != sh) return false;
-            else return true;
+            return true;
       };
 
       static getNumberOfGuillotineCuts = (width, height, sheetWidth, sheetHeight) => {
@@ -714,6 +709,7 @@ class Sheet extends Material {
        * @Router
        */
       static canRouterSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
+            console.log(cutWidth, cutHeight, sheetWidth, sheetHeight, material);
             if(!Sheet.routerMaterialsCanCut.includes(material)) {
                   return false;
             }
@@ -722,6 +718,7 @@ class Sheet extends Material {
             let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
 
             if(sw > maxCutW || sh > maxCutH || w > maxCutW || h > maxCutH) return false;
+            return true;
       };
 
       /**
@@ -731,6 +728,7 @@ class Sheet extends Material {
             if(!Sheet.handMaterialsCanCut.includes(material)) {
                   return false;
             }
+            return true;
       };
 
       /**

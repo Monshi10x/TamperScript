@@ -121,6 +121,14 @@
 					}
 				},
 				{
+					"scope": "comment.block.js",
+					"settings": {
+						"foreground":"#ffff00",
+						"fontStyle": "italic bold underline"
+					}
+				},
+				
+				{
 					"scope": "variable.other",
 					"settings": {
 						"foreground": "#ffffff",
@@ -140,7 +148,22 @@
 						"foreground": "#ffffff",
 						"fontStyle":"italic"
 					}
-				}
+				},
+				{
+					"scope": "comment.line.double-slash.js",
+					"settings": {
+						"foreground": "#5c5c5c",
+						"fontStyle":"italic"
+					}
+				},
+				{
+					"scope": "punctuation.definition.comment.js",
+					"settings": {
+						"foreground": "#242424",
+						"fontStyle":"italic"
+					}
+				}	
+				
 			]
 		},
 		"editor.fontFamily": "Consolas, 'Courier New', monospace",
