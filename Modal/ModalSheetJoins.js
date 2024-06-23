@@ -121,19 +121,29 @@ class ModalSheetJoins extends ModalWidthHeight {
       borrowFields(...fieldContainers) {
             for(let i = 0; i < fieldContainers.length; i++) {
                   let elementToBorrow = fieldContainers[i];
+                  let placeholderBefore = document.createElement("div");
+                  let placeholderAfter = document.createElement("div");
+
+                  insertBefore(placeholderBefore, elementToBorrow);
+                  insertAfter(placeholderAfter, elementToBorrow);
+
                   this.#borrowedFields.push({
-                        fieldContainer: elementToBorrow,
-                        returnAfterElement: elementToBorrow.previousElementSibling,
-                        returnBeforeElement: elementToBorrow.nextElementSibling
+                        elementToBorrow: elementToBorrow,
+                        placeholderBefore: placeholderBefore,
+                        placeholderAfter: placeholderAfter
                   });
+            }
+            for(let i = 0; i < fieldContainers.length; i++) {
+                  let elementToBorrow = fieldContainers[i];
                   this.#containerBeforeCanvas.appendChild(elementToBorrow);
             }
       }
 
       returnAllBorrowedFields() {
             for(let i = this.#borrowedFields.length - 1; i >= 0; i--) {
-                  if(this.#borrowedFields[i].returnAfterElement) insertAfter(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnAfterElement);
-                  else insertBefore(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnBeforeElement);
+                  insertAfter(this.#borrowedFields[i].elementToBorrow, this.#borrowedFields[i].placeholderBefore);
+                  deleteElement(this.#borrowedFields[i].placeholderBefore);
+                  deleteElement(this.#borrowedFields[i].placeholderAfter);
             }
       }
 

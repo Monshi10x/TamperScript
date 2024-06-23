@@ -16,9 +16,9 @@ class ProductionSubscribable extends Material {
       * @Updated on table changes
       * @example 
       *          [{qty: 4, width: '2440', height: '1220'},
-      *           {qty: 4, width: '2440', height: '580'},
-      *           {qty: 1, width: '240', height: '1220'},
-      *           {qty: 1, width: '240', height: '580'}]
+      *           {qty: 4, width: '2440', height: '580' },
+      *           {qty: 1, width: '240',  height: '1220'},
+      *           {qty: 1, width: '240',  height: '580' }]
       */
       #dataForSubscribers = [];
 
@@ -28,31 +28,38 @@ class ProductionSubscribable extends Material {
       constructor(parentObject, sizeClass, type) {
             super(parentObject, sizeClass, type);
 
-            /** @InheritedParentSizeSplits */
-            createText("Inherited Parent Size Splits", "height:30px;margin:0px;margin-bottom:10px;background-color:" + COLOUR.DarkBlue + ";width:100%;z-index:99;position: relative;box-sizing: border-box;padding:0px;font-size:10px;color:white;text-align:center;line-height:30px;border:1px solid " + COLOUR.DarkBlue + ";", this.container);
-            this.#inheritedSizeTable = new Table(this.container, 780, 20, 250);
+            /*
+            InheritedParentSizeSplits*/
+            let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
+
+            this.#inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
+            this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
             this.#inheritedSizeTable.addRow("-", "-", "-");
 
-            this.#productionItem = new Production(this.container, null, () => { }, null);
+            let f_container_production = createDivStyle5(null, "Production", this.container)[1];
 
-            this.dataToPushToSubscribers = {
-                  parent: this,
-                  data: this.#dataForSubscribers
-            };
+            this.#productionItem = new Production(f_container_production, null, () => { }, null);
+
+            this.UpdateDataForSubscribers();
       }
 
-      /**@Inherited */
+      /*
+      Inherited*/
       UpdateFromChange() {
             super.UpdateFromChange();
 
             this.UpdateInheritedTable();
+            this.UpdateDataForSubscribers();
+            this.UpdateSubscribedLabel();
+            this.PushToSubscribers();
+      }
+
+      UpdateDataForSubscribers() {
             this.dataToPushToSubscribers = {
                   parent: this,
                   data: this.#dataForSubscribers
             };
-            this.UpdateSubscribedLabel();
-            this.PushToSubscribers();
       }
 
       UpdateInheritedTable = () => {
@@ -85,7 +92,8 @@ class ProductionSubscribable extends Material {
             super.ReceiveSubscriptionData(data);
       }
 
-      /**@Override */
+      /*
+      Override*/
       UnSubscribeFrom(parent) {
             for(let i = 0; i < this.#inheritedData.length; i++) {
                   if(this.#inheritedData[i].parent == parent) {

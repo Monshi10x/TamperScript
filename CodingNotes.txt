@@ -604,3 +604,9 @@ class Size extends SubMenu {
 
             this.#backgroundColor = Color.randomRGBAsHex();
             this.#textColor = Color.invertColor(this.#backgroundColor, true);
+
+		
+    /*new ResizeObserver((entries) => {
+        f_headingText.style.height = entries[0].target.getBoundingClientRect().height + "px";//must be after append, otherwise values are 0
+        f_headingText.style.lineHeight = entries[0].target.getBoundingClientRect().height + "px";//must be after append, otherwise values are 0
+    }).observe(f_div);*/

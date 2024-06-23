@@ -57,7 +57,8 @@
 				{
 					"scope": "comment.line.double-slash.js",
 					"settings": {
-						"fontStyle": "italic"
+						"fontStyle": "italic",
+						"foreground": "#00ffee"
 					}
 				},
 				{
@@ -152,14 +153,14 @@
 				{
 					"scope": "comment.line.double-slash.js",
 					"settings": {
-						"foreground": "#5c5c5c",
+						"foreground": "#ffff005a",
 						"fontStyle":"italic"
 					}
 				},
 				{
 					"scope": "punctuation.definition.comment.js",
 					"settings": {
-						"foreground": "#242424",
+						"foreground": "#181818",
 						"fontStyle":"italic"
 					}
 				}	

@@ -168,24 +168,24 @@ class Sheet extends Material {
 
             /*
             InheritedParentSizeSplits*/
-            let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
-            this.#inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
+            createHeadingStyle1("Inherited Parent Size Splits", null, this.container);
+            this.#inheritedSizeTable = new Table(this.container, "100%", 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
             this.#inheritedSizeTable.addRow("-", "-", "-");
             this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
-            /*
-            Sheet Size*/
-            let f_container_sheetSize = createDivStyle5(null, "Sheet Size", this.container)[1];
+            createDivStyle5(null, "Testing Material", this.container);
 
-            this.#material = createDropdown_Infield("Material", 0, "width:80px", this.#materialOptions, () => {this.UpdateFilters("Material");}, f_container_sheetSize);
+            this.#filtersHeader = createHeadingStyle1("Filters", null, this.container);
+
+            this.#material = createDropdown_Infield("Material", 0, "width:80px", this.#materialOptions, () => {this.UpdateFilters("Material");}, this.container);
             this.#searchTerms.push(this.#material[1].value + " - (sqm)");
 
-            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters("Thickness");}, f_container_sheetSize);
+            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters("Thickness");}, this.container);
 
-            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters("Finish");}, f_container_sheetSize);
+            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters("Finish");}, this.container);
 
-            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters('Sheet Size');}, f_container_sheetSize);
+            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters('Sheet Size');}, this.container);
             this.#sheetSize[1].id = "Sheet Size";
 
             this.#updateOrderBtn = createIconButton("https://cdn.gorilladash.com/images/media/6144512/signarama-australia-icons8-numeric-50-635d113e9382c.png", "Set Order", "width: 120px; height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
@@ -195,11 +195,11 @@ class Sheet extends Material {
                         this.#filterOrder = ['Material', ...modal.getOrder()];
                         this.UpdateFilters('Material');
                   }, ...items);
-            }, f_container_sheetSize);
+            }, this.container);
 
             /*
-            Joins*/
-            let f_container_joins = createDivStyle5(null, "Joins", this.container)[1];
+            Visualiser*/
+            this.#joinHelperHeader = createHeadingStyle1("Joins", null, this.container);
 
             this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:40%;margin-right:55%;height:40px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#visualiser = new ModalSheetJoins("Join Helper", 100, () => {
@@ -213,7 +213,7 @@ class Sheet extends Material {
                   this.#visualiser.width = this.getQWH().width;
                   this.#visualiser.height = this.getQWH().height;
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
-            }, f_container_joins, true);
+            }, this.container, true);
 
             let flipDiagram;
             this.#flip = createCheckbox_Infield("Flip", this.#flipSheet, "width:150px;margin-left:10px;", () => {
@@ -228,10 +228,11 @@ class Sheet extends Material {
                         flipDiagram.style.width = "30px";
                   }
                   this.UpdateFromChange();
-            }, f_container_joins, true);
+            }, this.container, true);
             flipDiagram = createDiv("background-color:yellow;width:30px;height:10px;margin-top:10px;", null, this.#flip[0]);
 
-            let methodContainer = createDivStyle4("width:40%;margin-right:50%;", f_container_joins);
+
+            let methodContainer = createDivStyle4("width:40%;margin-right:50%;", this.container);
             let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
             let methodText = createText("Join Method", null, methodContainer);
             this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
@@ -241,20 +242,21 @@ class Sheet extends Material {
 
             /*
             FinalOutputSizes*/
-            let f_container_finalOutputSizes = createDivStyle5(null, "Final Output Sizes", this.container)[1];
-            this.#outputSizeTable = new Table(f_container_finalOutputSizes, "100%", 20, 250);
+            this.#finalOutputSizesHeader = createHeadingStyle1("Final Output Sizes", null, this.container);
+            this.#outputSizeTable = new Table(this.container, "100%", 20, 250);
             this.#outputSizeTable.setHeading("Qty", "Width", "Height", "Cuts Each", "Machine Type", "Cuts Total", "Total Router Perimeter");
             this.#outputSizeTable.addRow("-", "-", "-", "-", "-", "-", "-", "-");
             this.#outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /*
             Cutting*/
-            let f_container_cutting = createDivStyle5(null, "Cutting", this.container)[1];
-            this.#cuttingJoinNote = createLabel("Note: Some sizes bigger than sheet size. Increase sheet size or use helper to establish joins", "width:95%;font-weight:bold;display:none;color:red;padding-bottom:5px;", f_container_cutting);
-            this.#cuttingNote = createLabel("Note: Materials other than ACM, and bigger than 2500w must be router cut", "width:95%;font-weight:bold", f_container_cutting);
+            this.#cuttingHeader = createHeadingStyle1("Cutting", null, this.container);
+            this.#cuttingJoinNote = createLabel("Note: Some sizes bigger than sheet size. Increase sheet size or use helper to establish joins", "width:95%;font-weight:bold;display:none;color:red;padding-bottom:5px;", this.container);
+            this.#cuttingNote = createLabel("Note: Materials other than ACM, and bigger than 2500w must be router cut", "width:95%;font-weight:bold", this.container);
 
-            //Guillotine
-            this.#guillotineProduction = new Production(f_container_cutting, null, function() { }, null);
+            /*
+            Guillotine*/
+            this.#guillotineProduction = new Production(this.container, null, function() { }, null);
             this.#guillotineProduction.showContainerDiv = true;
             this.#guillotineProduction.headerName = "Guillotine";
             this.#guillotineProduction.productionTime = Sheet.guillotinePerCutTime;
@@ -263,17 +265,20 @@ class Sheet extends Material {
             this.#guillotineProduction.requiredName = "Required";
             this.#guillotineProduction.SubscribeTo(this);
 
-            //Router
-            this.#router = new Router(f_container_cutting, null, null, null);
+            /*
+            Router*/
+            this.#router = new Router(this.container, null, null, null);
             this.#router.showContainer = false;
             this.#router.SubscribeTo(this);
 
-            //Supplier
-            this.#supplierCuts = new Supplier(f_container_cutting, null, () => { });
+            /*
+            Supplier*/
+            this.#supplierCuts = new Supplier(this.container, null, () => { });
             this.#supplierCuts.SubscribeTo(this);
 
-            //HandCutting
-            this.#cutByHandProduction = new Production(f_container_cutting, null, function() { }, null);
+            /*
+            HandCutting*/
+            this.#cutByHandProduction = new Production(this.container, null, function() { }, null);
             this.#cutByHandProduction.showContainerDiv = true;
             this.#cutByHandProduction.headerName = "Hand Cutting";
             this.#cutByHandProduction.productionTime = Sheet.handPerCutTime;
@@ -290,6 +295,7 @@ class Sheet extends Material {
             this.finish = "Primer";
 
             this.UpdateDataForSubscribers();
+
       }
 
       /*

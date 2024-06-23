@@ -1,7 +1,8 @@
 class Material extends SubscriptionManager {
 
       /*
-      VARIABLES*/
+                        
+      Variables         */
       #isMinimized = true;
       #showIDInContainer = true;
       #productNumber = -1;
@@ -10,9 +11,9 @@ class Material extends SubscriptionManager {
       #backgroundColor = COLOUR.Black;
       #textColor = COLOUR.White;
       #isLocked;
-
       /*
-      UI FIELDS*/
+                        
+      FIELDS            */
       #inheritedSizeHeader;
       #f_qty;
       #f_width;
@@ -29,9 +30,9 @@ class Material extends SubscriptionManager {
       #f_lhsMenuWindow;
       #f_popOutModal;
       #f_popOutBtn;
-
       /*
-      GETTER*/
+                        
+      GETTER            */
       get qty() {return zeroIfNaNNullBlank(this.#f_qty[1].value);}
       get width() {return zeroIfNaNNullBlank(this.#f_width[1].value);}
       get height() {return zeroIfNaNNullBlank(this.#f_height[1].value);}
@@ -43,14 +44,16 @@ class Material extends SubscriptionManager {
       get inheritedRowSizeLabel() {return this.#f_subscribedToLabel;}
       get backgroundColor() {return this.#backgroundColor;}
       get textColor() {return this.#textColor;}
-
       /*
-      SETTER*/
+                        
+      SETTER            */
       set Type(type) {this.#Type = type;};
       set productNumber(value) {this.#productNumber = value; this.#f_productNumberLabel.innerText = value;}
       set backgroundColor(color) {this.#backgroundColor = color;}
       set textColor(color) {this.#textColor = color;}
-
+      /*
+                        
+      START             */
       constructor(parentContainer, lhsMenuWindow, Type) {
             super();
             if(!lhsMenuWindow instanceof LHSMenuWindow) throw new Error('Parameter 2 must be an instance of LHSMenuWindow');
@@ -95,21 +98,21 @@ class Material extends SubscriptionManager {
 
             if(this.#showIDInContainer) createLabel(this.ID, "width:100%", this.#f_container);
 
-            this.#inheritedSizeHeader = createHeadingStyle1("Inherited Total Size", null, this.#f_container);
+            this.#inheritedSizeHeader = createDivStyle5(null, "Inherited Total Size", this.#f_container)[1];
 
-            this.#f_qty = createInput_Infield("Qty", 0, "width:20%", () => {this.UpdateFromChange();}, this.#f_container, true, 1);
+            this.#f_qty = createInput_Infield("Qty", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 1);
             setFieldDisabled(true, this.#f_qty[1], this.#f_qty[0]);
 
-            this.#f_width = createInput_Infield("Width", 0, "width:20%", () => {this.UpdateFromChange();}, this.#f_container, true, 100);
+            this.#f_width = createInput_Infield("Width", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100);
             setFieldDisabled(true, this.#f_width[1], this.#f_width[0]);
 
-            this.#f_height = createInput_Infield("Height", 0, "width:20%", () => {this.UpdateFromChange();}, this.#f_container, true, 100);
+            this.#f_height = createInput_Infield("Height", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100);
             setFieldDisabled(true, this.#f_height[1], this.#f_height[0]);
 
             this.#f_lockBtn = createButton("", "font-size: 18px;display: block; float: left; width:10%; min-width:20px;max-width:30px;border:none;padding:2px; color:white;min-height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
                   this.#isLocked = toggleLock(this.#f_lockBtn);
                   this.UpdateFromChange();
-            }, this.#f_container);
+            }, this.#inheritedSizeHeader);
             this.#f_lockBtn.innerHTML = "🔒";
             this.#isLocked = true;
 
@@ -117,7 +120,8 @@ class Material extends SubscriptionManager {
             this.Minimize();
       }
 
-      /**@Override */
+      /*
+      Override */
       UpdateFromChange() {
             super.UpdateFromChange();
             this.UpdateQWH();

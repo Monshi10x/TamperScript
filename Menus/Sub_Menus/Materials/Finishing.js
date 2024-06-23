@@ -10,7 +10,7 @@ class Finishing extends Material {
        * @Inherited
        * @example
        * [{parent: 'SHEET-1699952073332-95570559', data: []},
-       * {parent: 'SHEET-1699952073332-95574529', data: []}]
+       *  {parent: 'SHEET-1699952073332-95574529', data: []}]
        */
       #inheritedData = [];
       #inheritedSizes = [];
@@ -21,9 +21,9 @@ class Finishing extends Material {
       * @Updated on table changes
       * @example 
       *          [{qty: 4, width: '2440', height: '1220'},
-      *           {qty: 4, width: '2440', height: '580'},
-      *           {qty: 1, width: '240', height: '1220'},
-      *           {qty: 1, width: '240', height: '580'}]
+      *           {qty: 4, width: '2440', height: '580' },
+      *           {qty: 1, width: '240',  height: '1220'},
+      *           {qty: 1, width: '240',  height: '580' }]
       */
       #dataForSubscribers = [];
 
@@ -88,70 +88,21 @@ class Finishing extends Material {
       constructor(parentObject, sizeClass, type) {
             super(parentObject, sizeClass, type);
 
-            /**
-             * @InheritedParentSizeSplits
-             */
-            createHeadingStyle1("Inherited Parent Size Splits", null, this.container);
-            this.#inheritedSizeTable = new Table(this.container, 780, 20, 250);
+            /*
+            InheritedParentSizeSplits*/
+            let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
+
+            this.#inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
             this.#inheritedSizeTable.addRow("-", "-", "-");
             this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
+            /*
+            standOffType*/
+            let f_container_standOff = createDivStyle5(null, "Stand-Off", this.container)[1];
 
-            /**
-             * @Modifiers
-             */
-            createHeadingStyle1("Modifiers", null, this.container);
-
-            this.#eyeletsRequired = createCheckbox_Infield("Eyelets", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateFromChange();}, this.container, true);
-            this.#eyeletsQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:400px;", () => {this.UpdateFromChange();}, this.container, false, 1);
-            this.#eyeletsHelper;
-            this.#eyeletsHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;display:none;margin-left:40px;margin-right:400px;", () => {
-                  this.#eyeletsHelper = new ModalStandoffHelper2("Eyelets Helper", 100, () => {
-                        this.UpdateEyeletQty();
-                        this.UpdateFromChange();
-                        this.#modalIsOpen = false;
-                  }, this);
-                  this.#modalIsOpen = true;
-                  this.#eyeletsHelper.borrowFields(this.#eyeletsType[0], this.#eyelets_offsetFromEdgeField[0],
-                        this.#eyelets_horizontalSpacingField[0], this.#eyelets_verticalSpacingField[0],
-                        this.#eyelets_spacingAllowanceField[0]);
-                  this.#eyeletsHelper.setTypeField(this.#eyeletsType[1]);
-                  this.#eyeletsHelper.setOffsetFromEdgeField(this.#eyelets_offsetFromEdgeField[1]);
-                  this.#eyeletsHelper.setHorizontalSpacingField(this.#eyelets_horizontalSpacingField[1]);
-                  this.#eyeletsHelper.setVerticalSpacingField(this.#eyelets_verticalSpacingField[1]);
-                  this.#eyeletsHelper.setSpacingAllowanceField(this.#eyelets_spacingAllowanceField[1]);
-                  this.#eyeletsHelper.width = this.getQWH().width;
-                  this.#eyeletsHelper.height = this.getQWH().height;
-
-                  let matrixSizeArrays = [];
-                  for(let i = 0; i < this.#inheritedData.length; i++) {
-                        matrixSizeArrays.push(this.#inheritedData[i].matrixSizes);
-                  }
-                  this.#eyeletsHelper.setSizeArrays(...matrixSizeArrays);
-            }, this.container, true);
-            this.#eyeletsType = createDropdown_Infield("Eyelets Type", 0, "width:30%;display:none;margin-left:40px;",
-                  [createDropdownOption("Eyelet - 20x10 Silver", "20,10")], () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container);
-            this.#eyelets_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 100);
-            this.#eyelets_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 100);
-            this.#eyelets_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 10);
-            this.#eyelets_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none;margin-right:200px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, this.container, true, 1);
-            this.#eyelets_productionEach = createInput_Infield("Production per eyelet (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, this.container, true, 1);
-
-            makeFieldGroup("Checkbox", this.#eyeletsRequired[1], true, this.#eyeletsQty[0], this.#eyeletsHelperBtn,
-                  this.#eyeletsType[0],
-                  this.#eyelets_offsetFromEdgeField[0], this.#eyelets_horizontalSpacingField[0], this.#eyelets_verticalSpacingField[0],
-                  this.#eyelets_spacingAllowanceField[0], this.#eyelets_productionEach[0]
-            );
-
-            this.#pinsRequired = createCheckbox_Infield("Pins (Thread Rod)", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateFromChange();}, this.container, true);
-            this.#pinsQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:60%;", () => {this.UpdateFromChange();}, this.container, false, 1);
-            this.#pins_productionEach = createInput_Infield("Production per pin (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, this.container, true, 1);
-
-            makeFieldGroup("Checkbox", this.#pinsRequired[1], true, this.#pinsQty[0], this.#pins_productionEach[0]);
-
-            this.#standOffRequired = createCheckbox_Infield("Stand-off", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true);
-            this.#standOffQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:400px;", () => {this.UpdateFromChange();}, this.container, false, 1);
+            this.#standOffRequired = createCheckbox_Infield("Stand-off", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true);
+            this.#standOffQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:400px;", () => {this.UpdateFromChange();}, f_container_standOff, false, 1);
 
             this.#standOffHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;display:none;margin-left:40px;margin-right:400px;", () => {
                   this.#standOffHelper = new ModalStandoffHelper2("Standoff Helper", 100, () => {
@@ -177,40 +128,101 @@ class Finishing extends Material {
 
                   }
                   this.#standOffHelper.setSizeArrays(...matrixSizeArrays);
-            }, this.container, true);
+            }, f_container_standOff, true);
 
             this.#standOffType = createDropdown_Infield("Stand-off Type", 1, "width:30%;display:none;margin-left:40px;",
                   [createDropdownOption("Standoff - 19x19 Satin Silver", "19,19"),
                   createDropdownOption("Standoff - 19x25 Satin Silver", "19,25"),
-                  createDropdownOption("Standoff - 19x50 Satin Silver", "19,50")], () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container);
-            this.#standoff_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 100);
-            this.#standoff_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 100);
-            this.#standoff_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 10);
-            this.#standoff_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none;margin-right:200px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, this.container, true, 1);
-            this.#standoff_productionEach = createInput_Infield("Production per standoff (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, this.container, true, 1);
+                  createDropdownOption("Standoff - 19x50 Satin Silver", "19,50")], () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff);
+            this.#standoff_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 100);
+            this.#standoff_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 100);
+            this.#standoff_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 10);
+            this.#standoff_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none;margin-right:200px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 1);
+            this.#standoff_productionEach = createInput_Infield("Production per standoff (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_standOff, true, 1);
 
             makeFieldGroup("Checkbox", this.#standOffRequired[1], true, this.#standOffQty[0], this.#standOffType[0], this.#standOffHelperBtn,
                   this.#standoff_offsetFromEdgeField[0], this.#standoff_horizontalSpacingField[0], this.#standoff_verticalSpacingField[0],
                   this.#standoff_spacingAllowanceField[0], this.#standoff_productionEach[0]);
+
+
+            /*
+            Eyelets*/
+            let f_container_eyelets = createDivStyle5(null, "Eyelets", this.container)[1];
+
+            this.#eyeletsRequired = createCheckbox_Infield("Eyelets", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateFromChange();}, f_container_eyelets, true);
+            this.#eyeletsQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:400px;", () => {this.UpdateFromChange();}, f_container_eyelets, false, 1);
+            this.#eyeletsHelper;
+            this.#eyeletsHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;display:none;margin-left:40px;margin-right:400px;", () => {
+                  this.#eyeletsHelper = new ModalStandoffHelper2("Eyelets Helper", 100, () => {
+                        this.UpdateEyeletQty();
+                        this.UpdateFromChange();
+                        this.#modalIsOpen = false;
+                  }, this);
+                  this.#modalIsOpen = true;
+                  this.#eyeletsHelper.borrowFields(this.#eyeletsType[0], this.#eyelets_offsetFromEdgeField[0],
+                        this.#eyelets_horizontalSpacingField[0], this.#eyelets_verticalSpacingField[0],
+                        this.#eyelets_spacingAllowanceField[0]);
+                  this.#eyeletsHelper.setTypeField(this.#eyeletsType[1]);
+                  this.#eyeletsHelper.setOffsetFromEdgeField(this.#eyelets_offsetFromEdgeField[1]);
+                  this.#eyeletsHelper.setHorizontalSpacingField(this.#eyelets_horizontalSpacingField[1]);
+                  this.#eyeletsHelper.setVerticalSpacingField(this.#eyelets_verticalSpacingField[1]);
+                  this.#eyeletsHelper.setSpacingAllowanceField(this.#eyelets_spacingAllowanceField[1]);
+                  this.#eyeletsHelper.width = this.getQWH().width;
+                  this.#eyeletsHelper.height = this.getQWH().height;
+
+                  let matrixSizeArrays = [];
+                  for(let i = 0; i < this.#inheritedData.length; i++) {
+                        matrixSizeArrays.push(this.#inheritedData[i].matrixSizes);
+                  }
+                  this.#eyeletsHelper.setSizeArrays(...matrixSizeArrays);
+            }, f_container_eyelets, true);
+            this.#eyeletsType = createDropdown_Infield("Eyelets Type", 0, "width:30%;display:none;margin-left:40px;",
+                  [createDropdownOption("Eyelet - 20x10 Silver", "20,10")], () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets);
+            this.#eyelets_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 100);
+            this.#eyelets_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 100);
+            this.#eyelets_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 10);
+            this.#eyelets_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none;margin-right:200px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 1);
+            this.#eyelets_productionEach = createInput_Infield("Production per eyelet (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_eyelets, true, 1);
+
+            makeFieldGroup("Checkbox", this.#eyeletsRequired[1], true, this.#eyeletsQty[0], this.#eyeletsHelperBtn,
+                  this.#eyeletsType[0],
+                  this.#eyelets_offsetFromEdgeField[0], this.#eyelets_horizontalSpacingField[0], this.#eyelets_verticalSpacingField[0],
+                  this.#eyelets_spacingAllowanceField[0], this.#eyelets_productionEach[0]
+            );
+
+
+            /*
+            Pins*/
+            let f_container_pins = createDivStyle5(null, "Pins", this.container)[1];
+
+            this.#pinsRequired = createCheckbox_Infield("Pins (Thread Rod)", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateFromChange();}, f_container_pins, true);
+            this.#pinsQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:60%;", () => {this.UpdateFromChange();}, f_container_pins, false, 1);
+            this.#pins_productionEach = createInput_Infield("Production per pin (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_pins, true, 1);
+
+            makeFieldGroup("Checkbox", this.#pinsRequired[1], true, this.#pinsQty[0], this.#pins_productionEach[0]);
+
+            /*
+            Custom Required*/
+            let f_container_custom = createDivStyle5(null, "Custom", this.container)[1];
 
             this.#customRequired = createCheckbox_Infield("Custom", false, "width:30%;min-width:150px;margin-right:65%;", () => {
                   setFieldHidden(!this.#customRequired[1].checked, this.#customQty[0], this.#customQty[0]);
                   setFieldHidden(!this.#customRequired[1].checked, this.#customCost[0], this.#customCost[0]);
                   setFieldHidden(!this.#customRequired[1].checked, this.#customMarkup[0], this.#customMarkup[0]);
                   setFieldHidden(!this.#customRequired[1].checked, this.#customDescription[0], this.#customDescription[0]);
-            }, this.container, true);
-            this.#customQty = createInput_Infield("Qty per Product", null, "width:20%;min-width:110px;margin-left:40px;display:none", () => {this.UpdateFromChange();}, this.container, false, 1);
-            this.#customCost = createInput_Infield("Cost", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, this.container, false, 1);
-            this.#customMarkup = createInput_Infield("Markup", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, this.container, false, 0.1);
-            this.#customDescription = createInput_Infield("Description", null, "width:20%;min-width:110px;display:none;", () => {this.UpdateFromChange();}, this.container, false, null);
-            this.#custom_productionEach = createInput_Infield("Production per custom (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, this.container, true, 1);
+            }, f_container_custom, true);
+            this.#customQty = createInput_Infield("Qty per Product", null, "width:20%;min-width:110px;margin-left:40px;display:none", () => {this.UpdateFromChange();}, f_container_custom, false, 1);
+            this.#customCost = createInput_Infield("Cost", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, f_container_custom, false, 1);
+            this.#customMarkup = createInput_Infield("Markup", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, f_container_custom, false, 0.1);
+            this.#customDescription = createInput_Infield("Description", null, "width:20%;min-width:110px;display:none;", () => {this.UpdateFromChange();}, f_container_custom, false, null);
+            this.#custom_productionEach = createInput_Infield("Production per custom (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_custom, true, 1);
             makeFieldGroup("Checkbox", this.#customRequired[1], true, this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0], this.#custom_productionEach[0]);
 
-            /**
-             * @Production
-             */
-            this.#productionHeader = createHeadingStyle1("Production", null, this.container);
-            this.#production = new Production(this.container, null, function() { }, this.sizeClass);
+            /*
+            Production*/
+            let f_container_production = createDivStyle5(null, "Production", this.container)[1];
+
+            this.#production = new Production(f_container_production, null, function() { }, this.sizeClass);
             this.#production.showContainerDiv = true;
             this.#production.headerName = "Finishing Production";
             this.#production.productionTime = 0;
@@ -218,25 +230,19 @@ class Finishing extends Material {
             this.#production.showRequiredCkb = false;
             this.#production.requiredName = "Production Time";
 
-            /**
-             * @Subscribers
-             */
-            this.dataToPushToSubscribers = {
-                  parent: this,
-                  data: this.#dataForSubscribers
-            };
+            /*
+            Subscribers*/
+            this.UpdateDataForSubscribers();
       }
 
-      /**@Inherited */
+      /*
+      Inherited*/
       UpdateFromChange() {
             super.UpdateFromChange();
 
             this.UpdateInheritedSizes();
 
-            this.dataToPushToSubscribers = {
-                  parent: this,
-                  data: this.#dataForSubscribers
-            };
+            this.UpdateDataForSubscribers();
             this.UpdateSubscribedLabel();
             this.PushToSubscribers();
 
@@ -250,6 +256,13 @@ class Finishing extends Material {
 
             this.UpdateStandoffQty();
             this.UpdateProduction();
+      }
+
+      UpdateDataForSubscribers() {
+            this.dataToPushToSubscribers = {
+                  parent: this,
+                  data: this.#dataForSubscribers
+            };
       }
 
       getCalcQty(fieldType) {
@@ -323,7 +336,8 @@ class Finishing extends Material {
             }
       };
 
-      /**@Override */
+      /*
+      Override*/
       ReceiveSubscriptionData(data) {
             let dataIsNew = true;
             for(let i = 0; i < this.#inheritedData.length; i++) {
@@ -340,7 +354,8 @@ class Finishing extends Material {
             super.ReceiveSubscriptionData(data);
       }
 
-      /**@Override */
+      /*
+      Override*/
       UnSubscribeFrom(parent) {
             for(let i = 0; i < this.#inheritedData.length; i++) {
                   if(this.#inheritedData[i].parent == parent) {

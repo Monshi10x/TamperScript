@@ -60,6 +60,9 @@ class ModalVinylJoins extends ModalWidthHeight {
       #maintainGapBetweenBleed = true;
       #maintainGapBetweenBleedField;
 
+      #containerBeforeCanvas;
+      #containerAfterCanvas;
+
       constructor(headerText, incrementAmount, callback, sheetClass) {
             super(headerText, incrementAmount, callback);
 
@@ -75,7 +78,11 @@ class ModalVinylJoins extends ModalWidthHeight {
 
             this.#maintainGapBetweenBleedField = createCheckbox_Infield("maintainGapBetweenBleed", this.#maintainGapBetweenBleed, null, () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.updateFromFields();}, this.getBodyElement(), () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.updateFromFields();});
 
+            this.#containerBeforeCanvas = createDiv("width:100%;margin:10px 0px;", "Borrowed Fields", this.getBodyElement());
+
             this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
+
+            this.#containerAfterCanvas = createDiv("width:100%;margin:10px 0px;", "View Settings", this.getBodyElement());
       }
 
       Close() {
@@ -165,19 +172,29 @@ class ModalVinylJoins extends ModalWidthHeight {
       borrowFields(...fieldContainers) {
             for(let i = 0; i < fieldContainers.length; i++) {
                   let elementToBorrow = fieldContainers[i];
+                  let placeholderBefore = document.createElement("div");
+                  let placeholderAfter = document.createElement("div");
+
+                  insertBefore(placeholderBefore, elementToBorrow);
+                  insertAfter(placeholderAfter, elementToBorrow);
+
                   this.#borrowedFields.push({
-                        fieldContainer: elementToBorrow,
-                        returnAfterElement: elementToBorrow.previousElementSibling,
-                        returnBeforeElement: elementToBorrow.nextElementSibling
+                        elementToBorrow: elementToBorrow,
+                        placeholderBefore: placeholderBefore,
+                        placeholderAfter: placeholderAfter
                   });
-                  this.addBodyElement(elementToBorrow);
+            }
+            for(let i = 0; i < fieldContainers.length; i++) {
+                  let elementToBorrow = fieldContainers[i];
+                  this.#containerBeforeCanvas.appendChild(elementToBorrow);
             }
       }
 
       returnAllBorrowedFields() {
             for(let i = this.#borrowedFields.length - 1; i >= 0; i--) {
-                  if(this.#borrowedFields[i].returnAfterElement) insertAfter(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnAfterElement);
-                  else insertBefore(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnBeforeElement);
+                  insertAfter(this.#borrowedFields[i].elementToBorrow, this.#borrowedFields[i].placeholderBefore);
+                  deleteElement(this.#borrowedFields[i].placeholderBefore);
+                  deleteElement(this.#borrowedFields[i].placeholderAfter);
             }
       }
 

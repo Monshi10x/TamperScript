@@ -36,9 +36,10 @@ class ProductDetails extends Material {
       constructor(parentObject, sizeClass, type) {
             super(parentObject, sizeClass, type);
 
-            this.#productLocationField = createInput_Infield("Product Location", null, "width:30%", null, this.container, false, null);
+            let f_container_description = createDivStyle5(null, "Description", this.container)[1];
+            this.#productLocationField = createInput_Infield("Product Location", null, "width:30%", null, f_container_description, false, null);
             this.#productLocationField[1].placeholder = "i.e. Main Fascia";
-            this.#productNameField = createInput_Infield("Product Name", null, "width:30%", null, this.container, false, null);
+            this.#productNameField = createInput_Infield("Product Name", null, "width:30%", null, f_container_description, false, null);
             this.#productNameField[1].placeholder = "i.e. ACM Panel";
 
             this.dataToPushToSubscribers = {
@@ -47,7 +48,8 @@ class ProductDetails extends Material {
             };
       }
 
-      /**@Inherited */
+      /*
+      Inherited */
       UpdateFromChange() {
             super.UpdateFromChange();
 
@@ -75,7 +77,8 @@ class ProductDetails extends Material {
             super.ReceiveSubscriptionData(data);
       }
 
-      /**@Override */
+      /*
+      Override */
       UnSubscribeFrom(parent) {
             for(let i = 0; i < this.#inheritedData.length; i++) {
                   if(this.#inheritedData[i].parent == parent) {

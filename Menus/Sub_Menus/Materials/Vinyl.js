@@ -1,42 +1,91 @@
 class Vinyl extends Material {
+
+      /*
+                        
+      Variables         */
       static DISPLAY_NAME = "VINYL";
-
-      #materialHeader;
-      #production;
-      #addVinylBtn;
-      #productionHeader;
-      #sheetSplitSizes;
-      #materialUsageArea;
-      get materialUsageArea() {return zeroIfNaNNullBlank(this.#materialUsageArea[1].value);};
-      #materialContainer;
-      #material;
-      set material(value) {$(this.#material[1]).val(value).change();}
-
+      /**
+       * @Subscribers
+       * @Updated on table changes
+       * @example 
+       *          [{qty: 4, width: '2440', height: '1220'},
+       *           {qty: 4, width: '2440', height: '580' },
+       *           {qty: 1, width: '240',  height: '1220'},
+       *           {qty: 1, width: '240',  height: '580' }]
+      */
+      #dataForSubscribers = [];
+      /** 
+       * @Example [{qty: 1, width: 1370, height: 25000}] as in 1370 being roll width, 25000 being roll length 
+       */
+      #finalRollSize = [];
       /**
        * @Inherited
        * @example
        * [{parent: 'SHEET-1699952073332-95570559', data: []},
-       * {parent: 'SHEET-1699952073332-95574529', data: []}]
-       */
+       *  {parent: 'SHEET-1699952073332-95574529', data: []}]
+      */
       #inheritedData = [];
       #inheritedSizes = [];
+      #outputSizes = [];
+
+      /*
+                        
+      Fields            */
+      #materialHeader;
+      #production;
+      #addVinylBtn;
+      #productionHeader;
+      #materialUsageArea;
+      #material;
       #inheritedSizeTable;
+      #outputSizeTable;
+      #outputSizeTable2;
 
-      /**
-      * @Subscribers
-      * @Updated on table changes
-      * @example 
-      *          [{qty: 4, width: '2440', height: '1220'},
-      *           {qty: 4, width: '2440', height: '580'},
-       *           {qty: 1, width: '240', height: '1220'},
-      *           {qty: 1, width: '240', height: '580'}]
-      */
-      #dataForSubscribers = [];
-
-      /**
-       * @Bleed
-       */
+      /*
+       Machine*/
+      #machineSetupTime;
+      #machineRunSpeed;
+      #machineLengthToRun;
+      #machineRunTime;
+      #machineTotalTime;
+      /*
+      JoinsOverlap*/
+      #joinOverlap;
+      #joinHelperBtn;
+      #visualiser;
+      #joinOrientation;
+      /*
+      RollUsage*/
+      #rollWidth;
+      #rollWastage;
+      #rollLengthUsed;
+      /*
+      Bleed*/
       #bleedDropdown;
+      #bleedTop;
+      #bleedBottom;
+      #bleedLeft;
+      #bleedRight;
+
+      /*
+                        
+      Getter            */
+      get machineSetupTime() {return zeroIfNaNNullBlank(this.#machineSetupTime[1].value);}
+      get machineRunTime() {return zeroIfNaNNullBlank(this.#machineRunTime[1].value);}
+      get machineTotalTime() {return zeroIfNaNNullBlank(this.#machineTotalTime[1].value);}
+      get backgroundColor() {return COLOUR.Yellow;}
+      get textColor() {return COLOUR.Black;}
+      get materialUsageArea() {return zeroIfNaNNullBlank(this.#materialUsageArea[1].value);};
+      get isJoinHorizontal() {return this.#joinOrientation[1].checked;};
+      get joinOverlap() {return zeroIfNaNNullBlank(this.#joinOverlap[1].value);};
+      get rollLengthUsed() {return zeroIfNaNNullBlank(this.#rollLengthUsed[1].value);};
+      get rollWastage() {return zeroIfNaNNullBlank(this.#rollWastage[1].value);};
+      get rollWidth() {return zeroIfNaNNullBlank(this.#rollWidth[1].value);};
+
+      /*
+                        
+      Setter            */
+      set material(value) {$(this.#material[1]).val(value).change();}
       set bleedDropdown(stringValue = "") {
             for(let i = 0; i < this.#bleedDropdown[1].options.length; i++) {
                   if(this.#bleedDropdown[1].options[i].text == stringValue) {
@@ -47,65 +96,29 @@ class Vinyl extends Material {
                   if(i == this.#bleedDropdown[1].options.length - 1) alert("could not find bleed type");
             }
       }
-      #bleedTop;
       set bleedTop(value) {$(this.#bleedTop[1]).val(value).change();}
-      #bleedBottom;
       set bleedBottom(value) {$(this.#bleedBottom[1]).val(value).change();}
-      #bleedLeft;
+      set isJoinHorizontal(value) {this.#joinOrientation[1].checked = value; $(this.#joinOrientation[1]).change();}
       set bleedLeft(value) {$(this.#bleedLeft[1]).val(value).change();}
-      #bleedRight;
       set bleedRight(value) {$(this.#bleedRight[1]).val(value).change();}
 
-      /** @RollUsage */
-      #rollWidth;
-      get rollWidth() {return zeroIfNaNNullBlank(this.#rollWidth[1].value);};
-      #rollWastage;
-      get rollWastage() {return zeroIfNaNNullBlank(this.#rollWastage[1].value);};
-      #rollLengthUsed;
-      get rollLengthUsed() {return zeroIfNaNNullBlank(this.#rollLengthUsed[1].value);};
-
-
-      /** @JoinsOverlap */
-      #joinOverlap;
-      get joinOverlap() {return zeroIfNaNNullBlank(this.#joinOverlap[1].value);};
-      #joinHelperBtn;
-      #visualiser;
-      #joinOrientation;
-      get isJoinHorizontal() {return this.#joinOrientation[1].checked;};
-      set isJoinHorizontal(value) {this.#joinOrientation[1].checked = value; $(this.#joinOrientation[1]).change();}
-
-      /**
-       * @Output
-       */
-      #outputSizeTable;
-      #outputSizeTable2;
-      #outputSizes = [];
-      /** @Example [{qty: 1, width: 1370, height: 25000}] as in 1370 being roll width, 25000 being roll length */
-      #finalRollSize = [];
-
-      /** @Machine */
-      #machineSetupTime;
-      get machineSetupTime() {return zeroIfNaNNullBlank(this.#machineSetupTime[1].value);}
-      #machineRunSpeed;
-      #machineLengthToRun;
-      #machineRunTime;
-      get machineRunTime() {return zeroIfNaNNullBlank(this.#machineRunTime[1].value);}
-
-      get backgroundColor() {return COLOUR.Yellow;}
-      get textColor() {return COLOUR.Black;}
-
+      /*
+                        
+      Start             */
       constructor(parentObject, sizeClass, type) {
             super(parentObject, sizeClass, type);
 
-            /** @InheritedParentSizeSplits */
-            createHeadingStyle1("Inherited Parent Size Splits", null, this.container);
-            this.#inheritedSizeTable = new Table(this.container, "100%", 20, 250);
+            /*
+            InheritedParentSizeSplits*/
+            let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
+            this.#inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height", "Needs Joins");
             this.#inheritedSizeTable.addRow("-", "-", "-", "-");
             this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
-            /** @Bleeds */
-            createHeadingStyle1("Bleeds", null, this.container);
+            /*
+            Bleeds*/
+            let f_container_bleeds = createDivStyle5(null, "Bleeds", this.container)[1];
             this.#bleedDropdown = createDropdown_Infield("Standard Bleeds", 0, "width:40%",
                   [createDropdownOption("ACM", [20, 20, 20, 20]),
                   createDropdownOption("Windows", [0, 20, 0, 20]),
@@ -121,32 +134,38 @@ class Vinyl extends Material {
                         $(this.#bleedBottom[1]).val(selectedOption[1]).change();
                         $(this.#bleedLeft[1]).val(selectedOption[2]).change();
                         $(this.#bleedRight[1]).val(selectedOption[3]).change();
-                  }, this.container);
-            this.#bleedTop = createInput_Infield("Top", 20, "width:100px;", () => {this.UpdateFromChange();}, this.container, false, 10);
-            this.#bleedBottom = createInput_Infield("Bottom", 20, "width:100px;", () => {this.UpdateFromChange();}, this.container, false, 10);
-            this.#bleedLeft = createInput_Infield("Left", 20, "width:100px;", () => {this.UpdateFromChange();}, this.container, false, 10);
-            this.#bleedRight = createInput_Infield("Right", 20, "width:100px;", () => {this.UpdateFromChange();}, this.container, false, 10);
+                  }, f_container_bleeds);
+            this.#bleedTop = createInput_Infield("Top", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10);
+            this.#bleedBottom = createInput_Infield("Bottom", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10);
+            this.#bleedLeft = createInput_Infield("Left", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10);
+            this.#bleedRight = createInput_Infield("Right", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10);
 
-            /** @Material */
-            this.#materialHeader = createHeadingStyle1("Material", null, this.container);
-            this.#materialUsageArea = createInput_Infield("Total Area", 0, null, () => {this.UpdateFromChange();}, this.container, false, 1);
+            /*
+            Material*/
+            let f_container_material = createDivStyle5(null, "Material", this.container)[1];
+
+            this.#materialUsageArea = createInput_Infield("Total Area", 0, null, () => {this.UpdateFromChange();}, f_container_material, false, 1);
             setFieldDisabled(true, this.#materialUsageArea[1], this.#materialUsageArea[0]);
 
             let vinylParts = getPredefinedParts("Vinyl - ");
             let vinylDropdownElements = [];
             vinylParts.forEach(element => vinylDropdownElements.push([element.Name, "white"]));
-            this.#material = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:60%;", 10, true, vinylDropdownElements, () => {this.UpdateFromChange();}, this.container);
+            this.#material = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:60%;", 10, true, vinylDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
             $(this.#material).val(VinylLookup["Air Release"]).change();
 
-            /** @RollUsage */
-            createHeadingStyle1("Roll Usage", null, this.container);
-            this.#rollWidth = createInput_Infield("Roll Width", 1370, "width:100px;", () => {this.UpdateFromChange();}, this.container, false, 10);
-            this.#rollWastage = createInput_Infield("Roll Wastage % *Approx", 25, "width:200px;", () => {this.UpdateFromChange();}, this.container, false, 10);
-            this.#rollLengthUsed = createInput_Infield("Roll Length (m) Used *Approx", 0, "width:200px;", () => {this.UpdateFromChange();}, this.container, false, 10);
+            /*
+            RollUsage*/
+            let f_container_rollUsage = createDivStyle5(null, "Roll Usage", this.container)[1];
+
+            this.#rollWidth = createInput_Infield("Roll Width", 1370, "width:100px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10);
+            this.#rollWastage = createInput_Infield("Roll Wastage % *Approx", 25, "width:200px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10);
+            this.#rollLengthUsed = createInput_Infield("Roll Length (m) Used *Approx", 0, "width:200px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10);
             setFieldDisabled(true, this.#rollLengthUsed[1], this.#rollLengthUsed[0]);
 
-            /**@JoinOverlap */
-            createHeadingStyle1("Joins", null, this.container);
+            /*
+            JoinOverlap*/
+            let f_container_joins = createDivStyle5(null, "Joins", this.container)[1];
+
             this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;", () => {
                   this.#visualiser = new ModalVinylJoins("Join Helper", 100, () => {
                         this.#visualiser.Close();
@@ -154,6 +173,7 @@ class Vinyl extends Material {
                   }, this);
 
                   this.#visualiser.borrowFields(this.#joinOverlap[0], this.#joinOrientation[0], this.#rollWidth[0], this.#material[0], this.#bleedDropdown[0], this.#bleedTop[0], this.#bleedBottom[0], this.#bleedLeft[0], this.#bleedRight[0]);
+                  //this.#visualiser.borrowFields(...this.#filterContainersOrdered, this.#flip[0], methodContainer);
                   this.#visualiser.setBleedFields(this.#bleedTop[1], this.#bleedBottom[1], this.#bleedLeft[1], this.#bleedRight[1]);
                   this.#visualiser.setJoinOrientationField(this.#joinOrientation[1]);
                   this.#visualiser.setRollWidthField(this.#rollWidth[1]);
@@ -166,39 +186,49 @@ class Vinyl extends Material {
                         matrixSizeArrays.push(this.#inheritedData[i].matrixSizes);
                   }
                   this.#visualiser.setSizeArrays(...matrixSizeArrays);
-            }, this.container, true);
-            this.#joinOverlap = createInput_Infield("Join Overlap", 10, "width:100px;", () => {this.UpdateFromChange();}, this.container, false, 5);
-            this.#joinOrientation = createCheckbox_Infield("Join Horizontal", true, "width:150px", () => {this.UpdateFromChange();}, this.container, () => {this.UpdateFromChange();});
+            }, f_container_joins, true);
+            this.#joinOverlap = createInput_Infield("Join Overlap", 10, "width:100px;", () => {this.UpdateFromChange();}, f_container_joins, false, 5);
+            this.#joinOrientation = createCheckbox_Infield("Join Horizontal", true, "width:150px", () => {this.UpdateFromChange();}, f_container_joins, () => {this.UpdateFromChange();});
 
-            /** @OutputSizes */
-            createHeadingStyle1("Output Sizes", null, this.container);
-            createText("Individual Pieces", "width:100%;height:20px", this.container);
-            this.#outputSizeTable = new Table(this.container, "100%", 20, 250);
+            /*
+            OutputSizes*/
+            let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.container)[1];
+
+            createText("Individual Pieces", "width:100%;height:20px", f_container_outputSizes);
+            this.#outputSizeTable = new Table(f_container_outputSizes, "100%", 20, 250);
             this.#outputSizeTable.setHeading("Qty", "Width", "Height");
             this.#outputSizeTable.addRow("-", "-", "-");
             this.#outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
-            createText("Roll Usage", "width:100%;height:20px", this.container);
-            this.#outputSizeTable2 = new Table(this.container, "100%", 20, 250);
+            createText("Roll Usage", "width:100%;height:20px", f_container_outputSizes);
+            this.#outputSizeTable2 = new Table(f_container_outputSizes, "100%", 20, 250);
             this.#outputSizeTable2.setHeading("Qty", "Width", "Height");
             this.#outputSizeTable2.addRow("-", "-", "-");
             this.#outputSizeTable2.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
-            /** @Machine */
-            createHeadingStyle1("Machine", null, this.container);
-            createText("Setup", "width:100%;height:20px", this.container);
-            this.#machineSetupTime = createInput_Infield("Setup Time (min)", 2, null, () => {this.UpdateFromChange();}, this.container, false, 0.1);
+            /*
+            Machine*/
+            let f_container_machine = createDivStyle5(null, "HP Printer", this.container)[1];
 
-            createText("Run", "width:100%;height:20px", this.container);
-            this.#machineRunSpeed = createInput_Infield("Run Speed (m/min)", 0.3, null, () => {this.UpdateFromChange();}, this.container, false, 0.1);
-            this.#machineLengthToRun = createInput_Infield("Length to Run (m)", -1, null, () => {this.UpdateFromChange();}, this.container, false, 1);
+            createText("Setup", "width:100%;height:20px", f_container_machine);
+            this.#machineSetupTime = createInput_Infield("Setup Time (min)", 2, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1);
+
+            createText("Run", "width:100%;height:20px", f_container_machine);
+            this.#machineLengthToRun = createInput_Infield("Length to Run (m)", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1);
             setFieldDisabled(true, this.#machineLengthToRun[1], this.#machineLengthToRun[0]);
-            this.#machineRunTime = createInput_Infield("Total Run Time (mins)", -1, null, () => {this.UpdateFromChange();}, this.container, false, 1);
+            this.#machineRunSpeed = createInput_Infield("Run Speed (m/min)", 0.3, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1);
+            this.#machineRunTime = createInput_Infield("Total Run Time (mins)", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1);
             setFieldDisabled(true, this.#machineRunTime[1], this.#machineRunTime[0]);
 
-            /** @Production */
-            createHeadingStyle1("Printer Production", null, this.container);
-            this.#production = new Production(this.container, null, function() { }, this.sizeClass);
+            createText("Total", "width:100%;height:20px", f_container_machine);
+            this.#machineTotalTime = createInput_Infield("Total Time (mins)", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1);
+            setFieldDisabled(true, this.#machineTotalTime[1], this.#machineTotalTime[0]);
+
+            /*
+            Production*/
+            let f_container_production = createDivStyle5(null, "HP Printer Production", this.container)[1];
+
+            this.#production = new Production(f_container_production, null, function() { }, this.sizeClass);
             this.#production.showContainerDiv = true;
             this.#production.productionTime = 20;
             this.#production.headerName = "Printer Production";
@@ -206,10 +236,13 @@ class Vinyl extends Material {
             this.#production.showRequiredCkb = false;
             this.#production.requiredName = "Required";
 
+            /*
+            Update*/
             this.UpdateDataForSubscribers();
       }
 
-      /**@Inherited */
+      /*
+      Inherited*/
       UpdateFromChange() {
             super.UpdateFromChange();
 
@@ -269,10 +302,11 @@ class Vinyl extends Material {
 
             this.#machineLengthToRun[1].value = roundNumber(mmToM(totalLength_mm), 2);
             this.#machineRunTime[1].value = roundNumber(mmToM(totalLength_mm) / runSpeed_mMin, 2);
+            this.#machineTotalTime[1].value = this.machineSetupTime + this.machineRunTime;
       }
 
       UpdateProductionTimes() {
-            this.#production.productionTime = this.machineSetupTime + this.machineRunTime;
+            this.#production.productionTime = this.machineTotalTime;
       }
 
       UpdateRollOptions() {

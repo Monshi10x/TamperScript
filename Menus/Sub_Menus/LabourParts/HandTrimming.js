@@ -46,38 +46,38 @@ class HandTrimming extends Material {
       constructor(parentObject, sizeClass, type) {
             super(parentObject, sizeClass, type);
 
-            /**
-             * @InheritedParentSizeSplits
-             */
-            createHeadingStyle1("Inherited Parent Size Splits", null, this.container);
-            this.#inheritedSizeTable = new Table(this.container, 780, 20, 250);
+            /*
+            InheritedParentSizeSplits*/
+            let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
+
+            this.#inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
             this.#inheritedSizeTable.addRow("-", "-", "-");
             this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
 
-            /**
-             * @TimeStats
-             */
-            createHeadingStyle1("Stats", null, this.container);
-            this.#totalLinearMetresField = createInput_Infield("Total Linear Metres", 30, null, () => {this.UpdateTrimmingTimes();}, this.container, true, 1);
+            /*
+            TimeStats*/
+            let f_container_stats = createDivStyle5(null, "Stats", this.container)[1];
+
+            this.#totalLinearMetresField = createInput_Infield("Total Linear Metres", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1);
             setFieldDisabled(true, this.#totalLinearMetresField[1], this.#totalLinearMetresField[0]);
-            this.#trimmingSecondsPerMetreField = createInput_Infield("Trimming Seconds Per Metre", 30, null, () => {this.UpdateTrimmingTimes();}, this.container, true, 1);
-            this.#totalTrimmingText = createText("Total Trimming: ", "width:250px;height:60px;padding:16px;", this.container);
+            this.#trimmingSecondsPerMetreField = createInput_Infield("Trimming Seconds Per Metre", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1);
+            this.#totalTrimmingText = createText("Total Trimming: ", "width:250px;height:60px;padding:16px;", f_container_stats);
 
-            createHr(null, this.container);
+            createHr(null, f_container_stats);
 
-            this.#numberOfShapesField = createInputCalculated_Infield("Number Of Shapes", 0, null, () => {this.UpdateTrimmingTimes();}, true, this.container);
-            this.#handlingTimePerShapeField = createInput_Infield("Handling Time Per Shape (sec)", 30, null, () => {this.UpdateTrimmingTimes();}, this.container, true, 1);
-            this.#totalHandlingText = createText("Total Handling: ", "width:250px;height:60px;padding:16px;", this.container);
-            createHr(null, this.container);
-            this.#totalTimeField = createInputCalculated_Infield("Total Time (mins)", 0, "margin: 5px calc(50% - 125px);", () => {this.UpdateTrimmingTimes();}, true, this.container);
+            this.#numberOfShapesField = createInputCalculated_Infield("Number Of Shapes", 0, null, () => {this.UpdateTrimmingTimes();}, true, f_container_stats);
+            this.#handlingTimePerShapeField = createInput_Infield("Handling Time Per Shape (sec)", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1);
+            this.#totalHandlingText = createText("Total Handling: ", "width:250px;height:60px;padding:16px;", f_container_stats);
+            createHr(null, f_container_stats);
+            this.#totalTimeField = createInputCalculated_Infield("Total Time (mins)", 0, "margin: 5px calc(50% - 125px);", () => {this.UpdateTrimmingTimes();}, true, f_container_stats);
 
-            /**
-             * @Production
-             */
-            this.#productionHeader = createHeadingStyle1("Production", null, this.container);
-            this.#production = new Production(this.container, null, function() { }, this.sizeClass);
+            /*
+            Production*/
+            let f_container_production = createDivStyle5(null, "Production", this.container)[1];
+
+            this.#production = new Production(f_container_production, null, function() { }, this.sizeClass);
             this.#production.showContainerDiv = true;
             this.#production.productionTime = 20;
             this.#production.headerName = "Hand Trimming Production";
@@ -85,27 +85,28 @@ class HandTrimming extends Material {
             this.#production.showRequiredCkb = false;
             this.#production.requiredName = "Production Time";
 
-            /**
-             * @Subscribers
-             */
-            this.dataToPushToSubscribers = {
-                  parent: this,
-                  data: this.#dataForSubscribers
-            };
+            /*
+            Subscribers*/
+            this.UpdateDataForSubscribers();
       }
 
-      /**@Inherited */
+      /*
+      Inherited */
       UpdateFromChange() {
             super.UpdateFromChange();
 
             this.UpdateInheritedSizes();
             this.UpdateTrimmingTimes();
+            this.UpdateDataForSubscribers();
+            this.UpdateSubscribedLabel();
+            this.PushToSubscribers();
+      }
+
+      UpdateDataForSubscribers() {
             this.dataToPushToSubscribers = {
                   parent: this,
                   data: this.#dataForSubscribers
             };
-            this.UpdateSubscribedLabel();
-            this.PushToSubscribers();
       }
 
       UpdateInheritedSizes = () => {
@@ -147,7 +148,8 @@ class HandTrimming extends Material {
             this.#production.productionTime = totalTime;
       };
 
-      /**@Override */
+      /*
+      Override */
       ReceiveSubscriptionData(data) {
             let dataIsNew = true;
             for(let i = 0; i < this.#inheritedData.length; i++) {
@@ -164,7 +166,8 @@ class HandTrimming extends Material {
             super.ReceiveSubscriptionData(data);
       }
 
-      /**@Override */
+      /*
+      Override */
       UnSubscribeFrom(parent) {
             for(let i = 0; i < this.#inheritedData.length; i++) {
                   if(this.#inheritedData[i].parent == parent) {

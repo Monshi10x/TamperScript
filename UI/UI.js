@@ -130,6 +130,32 @@ function createDivStyle4(overrideCssStyles, parentObjectToAppendTo) {
     }
     return div;
 }
+function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo) {
+    let f_div = document.createElement("div");
+    let f_headingTextWrapper = document.createElement("div");
+    let f_headingText = document.createElement("span");
+    let f_contentContainer = document.createElement("div");
+
+    f_div.style = STYLE.Div5;
+    f_div.style.cssText += overrideCssStyles;
+
+    f_headingTextWrapper.style = "display:table;width:100px;text-align: center;float: left; position: relative; background-color: " + COLOUR.DarkBlue +
+        ";box-sizing: border-box; padding: 0px; font-size: 10px; color: white; text-align: center; margin: 0px; border: 0px;";
+
+    f_headingText.style = "display:table-cell;vertical-align: middle;word-break: break-all ";
+    f_headingText.innerText = headingText;
+
+    f_contentContainer.style = "width:calc(100% - " + f_headingTextWrapper.style.width + ");height:100%;float:left;";
+
+    if(parentObjectToAppendTo != null) {
+        parentObjectToAppendTo.appendChild(f_div);
+    }
+    f_headingTextWrapper.appendChild(f_headingText);
+    f_div.appendChild(f_headingTextWrapper);
+    f_div.appendChild(f_contentContainer);
+
+    return [f_div, f_contentContainer, f_headingText];
+}
 function createButton(text, overrideCssStyles, optionalCallback, parentObjectToAppendTo) {
     var btn = document.createElement('button');
     btn.appendChild(document.createTextNode(text));
@@ -578,7 +604,7 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
     dropdownArrow.onclick = toggleMenu;
     containerDiv.appendChild(dropdownArrow);
 
-    var searchBar = createInput("", null, "width:" + 600 + "px;height:30px;position:fixed;top:40px;left:0px;display:none;margin:0;padding:5;box-sizing:border-box;z-index:1000", narrowSearches, containerDiv);
+    var searchBar = createInput("", null, "width:" + 600 + "px;height:30px;position:fixed;top:40px;left:0px;display:none;margin:0;padding:5px;box-sizing:border-box;z-index:1000;border:0px;outline:none;", narrowSearches, containerDiv);
     searchBar.placeholder = "Search...";
 
     function narrowSearches() {
@@ -642,12 +668,12 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
         searchBar.style.left = containerDiv.getBoundingClientRect().x + "px";
         resetSearches();
         hideCustom();
-        dropdownBody.style.top = containerDiv.getBoundingClientRect().y + containerDiv.getBoundingClientRect().height + 30 + "px";
+        dropdownBody.style.top = containerDiv.getBoundingClientRect().y + containerDiv.getBoundingClientRect().height + 40 + "px";
         dropdownBody.style.left = containerDiv.getBoundingClientRect().x + "px";
     }
 
     var dropdownBody = document.createElement('div');
-    dropdownBody.style = "width:" + 600 + "px;height:300px;position:fixed;top:200px;left:0px;display:block;background-color:white;z-index:100;display:none; border:1px solid black;box-shadow: 1px 1px 6px 1px #aaa;overflow-y:scroll;z-index:1000;";
+    dropdownBody.style = "width:" + 600 + "px;height:400px;position:fixed;top:200px;left:0px;display:block;background-color:white;z-index:100;display:none; border:1px solid black;" + STYLE.DropShadow + ";overflow-y:scroll;z-index:1000;";
     containerDiv.appendChild(dropdownBody);
     containerDiv.appendChild(dummyInput);
     dropdownBody.style.top = containerDiv.getBoundingClientRect().bottom;
