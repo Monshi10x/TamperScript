@@ -96,16 +96,19 @@ class MenuPanelSigns extends LHSMenuWindow {
 		this.page1 = this.getPage(0);
 
 		document.addEventListener("loadedPredefinedParts", () => {
-			/**@ToggleOpen */
-			let toggleOpenBtn = createButton("Open All", "width:100px;height:30px;", () => {this.#toggleAllOpen();}, this.page1);
+			/*
+			ToggleOpen */
+			let toggleOpenBtn = createButton("Open All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllOpen();}, this.page1);
 
-			/**@ToggleClosed */
-			let toggleClosedBtn = createButton("Close All", "width:100px;height:30px;", () => {this.#toggleAllClosed();}, this.page1);
+			/*
+				ToggleClosed */
+			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
-			/**@AddFullSuite */
-			let addFullSuiteBtn = createButton("Add Blank Product", "width:200px;height:30px;", () => {this.#addFullSuite();}, this.page1);
+			/*
+			AddFullSuite */
+			let addFullSuiteBtn = createButton("Add Blank Product", "width:20%;height:40px;margin:0px;", () => {this.#addFullSuite();}, this.page1);
 
-			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:250px;", 100, false,
+			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:20%;height:35px;margin:0px;box-sizing:border-box;", 100, false,
 				[["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
 				["Lightbox Face - Opal Acrylic", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv2ViepnkaCu6NWbWfFrDPb0nNn7SBQ9r7oQ&usqp=CAU"],
 				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
@@ -117,7 +120,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				this.page1, false
 			);
 			//"https://cdn.gorilladash.com/images/media/12526805/Corflute-Resized.jpg"
-			this.#viewMode = createDropdown_Infield('View Mode', 0, "width:150px;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product")], () => {this.#updateViewMode();}, this.page1);
+			this.#viewMode = createDropdown_Infield('View Mode', 0, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product")], () => {this.#updateViewMode();}, this.page1);
 
 			this.#numProducts = getNumProducts() - 1;
 		});
@@ -357,7 +360,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 		return newItem;
 	}
 
-	/** @overload */
+	/*
+	overload*/
 	#addBlank(classType, headingText = "", container) {
 		let newItem = new classType(container, this, headingText);
 
