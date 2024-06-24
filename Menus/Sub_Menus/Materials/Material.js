@@ -80,10 +80,10 @@ class Material extends SubscriptionManager {
             /*
             Subscriptions */
             this.#f_subscriptionsModal = createIconButton("https://cdn.gorilladash.com/images/media/6144522/signarama-australia-noun-multiple-assign-2848055-635d23b3b3f2b.png", "Subscriptions",
-                  "width: 150px; height: 40px; margin: 0px;margin-left:30px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, () => {this.OpenSubscriptionsModal();}, this.#f_container);
+                  "width: 150px; height: 40px; margin: 0px;margin-left:0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, () => {this.OpenSubscriptionsModal();}, this.#f_container);
 
             this.#f_subscriptionsContainer = document.createElement("div");
-            this.#f_subscriptionsContainer.style = "height:40px;width:310px;background-color:white;box-sizing:border-box;float:left;margin:0px;";
+            this.#f_subscriptionsContainer.style = "height:40px;width:20%;background-color:white;box-sizing:border-box;float:left;margin:0px;";
             this.#f_container.appendChild(this.#f_subscriptionsContainer);
 
             this.#f_deleteBtn = createButton("X", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});

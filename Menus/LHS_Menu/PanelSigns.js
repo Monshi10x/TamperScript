@@ -104,11 +104,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				ToggleClosed */
 			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
-			/*
-			AddFullSuite */
-			let addFullSuiteBtn = createButton("Add Blank Product", "width:20%;height:40px;margin:0px;", () => {this.#addFullSuite();}, this.page1);
-
-			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:20%;height:35px;margin:0px;box-sizing:border-box;", 100, false,
+			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 100, false,
 				[["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
 				["Lightbox Face - Opal Acrylic", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv2ViepnkaCu6NWbWfFrDPb0nNn7SBQ9r7oQ&usqp=CAU"],
 				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
@@ -119,8 +115,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 				() => {this.#addQuickTemplate();},
 				this.page1, false
 			);
-			//"https://cdn.gorilladash.com/images/media/12526805/Corflute-Resized.jpg"
-			this.#viewMode = createDropdown_Infield('View Mode', 0, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product")], () => {this.#updateViewMode();}, this.page1);
+
+			this.#viewMode = createDropdown_Infield('View Mode', 0, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.#updateViewMode();}, this.page1);
 
 			this.#numProducts = getNumProducts() - 1;
 		});
@@ -324,22 +320,6 @@ class MenuPanelSigns extends LHSMenuWindow {
 		this.#updateViewMode();
 	}
 
-	#addFullSuite() {
-		this.#numProducts++;
-		this.#add(Size2, "SIZE2", this.page1, []);
-		this.#add(ProductDetails, "PRODUCT DETAILS", this.page1, [Size2]);
-		this.#add(Sheet, "SHEET", this.page1, [Size2]);
-		this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
-		this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
-		this.#add(AppTaping, "APP TAPE", this.page1, [Vinyl]);
-		this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
-		this.#add(PrintMounting, "PRINT MOUNTING", this.page1, [Sheet]);
-		this.#add(ProductionSubscribable, "PRODUCTION", this.page1, [Sheet]);
-		this.#add(ArtworkSubscribable, "ARTWORK", this.page1, [Size2]);
-		this.#add(InstallSubscribable, "INSTALL", this.page1, [Sheet]);
-		this.#updateViewMode();
-	}
-
 	#add(classType, headingText = "", container, subscribeToClasses = []) {
 		let newItem = new classType(container, this, headingText);
 		newItem.productNumber = this.#getproductNumber(classType);
@@ -453,10 +433,12 @@ class MenuPanelSigns extends LHSMenuWindow {
 			this.#containers = [/*Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < creationOrder.length; i++) {
-				this.#containers.push(new UIContainerType3("max-height:450px;", creationOrder[i].DISPLAY_NAME, this.page1));
-				createButton("Add +", "width:20%", () => {
+				let UIContainer = new UIContainerType3("", creationOrder[i].DISPLAY_NAME, this.page1);
+				this.#containers.push(UIContainer);
+				let addBtn = createButton("Add +", "width:100px;min-height:30px;margin:0px;border:0px;", () => {
 					this.#addBlank(creationOrder[i], creationOrder[i].DISPLAY_NAME, this.#containers[i].contentContainer);
-				}, this.#containers[i].contentContainer);
+				}, null);
+				UIContainer.addHeadingButtons(addBtn);
 			}
 			for(let x = 0; x < this.#containers.length; x++) {
 				let sameItemCount = 0;
@@ -497,6 +479,35 @@ class MenuPanelSigns extends LHSMenuWindow {
 					if(item.productNumber != currentProductNumber) continue;
 
 					newProductContainer.contentContainer.appendChild(itemContainer);
+				}
+			}
+		} else if(this.#viewMode[1].value == "Per Type2") {
+
+			let creationOrder = [Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+			this.#containers = [/*Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+
+			for(let i = 0; i < creationOrder.length; i++) {
+				let UIContainer = new Object();
+				let d = createDivStyle5("", creationOrder[i].DISPLAY_NAME, this.page1);
+				UIContainer.container = d[0];
+				UIContainer.contentContainer = d[1];
+				this.#containers.push(UIContainer);
+				let addBtn = createButton("+", "width:50px;min-height:100%;margin:0px;border:0px;", () => {
+					this.#addBlank(creationOrder[i], creationOrder[i].DISPLAY_NAME, this.#containers[i].contentContainer);
+				}, UIContainer.contentContainer);
+				//UIContainer.addHeadingButtons(addBtn);
+			}
+			for(let x = 0; x < this.#containers.length; x++) {
+				let sameItemCount = 0;
+				for(let y = 0; y < this.#allMaterials.length; y++) {
+					let item = this.#allMaterials[y];
+					if(item instanceof creationOrder[x]) {
+						if(sameItemCount == 0) {
+
+						}
+						sameItemCount++;
+						this.#containers[x].contentContainer.appendChild(item.container);
+					}
 				}
 			}
 		} else {

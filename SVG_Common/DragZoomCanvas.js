@@ -35,7 +35,7 @@ class DragZoomCanvas {
 
       constructor(canvasWidth, canvasHeight, drawFunction, parentToAppendTo) {
             this.#canvas = document.createElement('canvas');
-            this.#canvas.style = "z-index:2000; outline: 2px solid #000;outline-offset:-2px;display:block;box-sizing: border-box;max-width: 100%";
+            this.#canvas.style = "z-index:2000; outline: 2px solid #000;outline-offset:-2px;display:block;box-sizing: border-box;max-width: 100%;background-color:white;";
 
             this.canvasWidth = canvasWidth;
             this.canvasHeight = canvasHeight;
