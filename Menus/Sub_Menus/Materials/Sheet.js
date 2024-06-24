@@ -203,7 +203,6 @@ class Sheet extends Material {
 
             this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:40%;margin-right:55%;height:40px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#visualiser = new ModalSheetJoins("Join Helper", 100, () => {
-                        this.#visualiser.Close();
                         this.UpdateFromChange();
                   }, this);
 

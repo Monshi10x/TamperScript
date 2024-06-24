@@ -168,7 +168,6 @@ class Vinyl extends Material {
 
             this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;", () => {
                   this.#visualiser = new ModalVinylJoins("Join Helper", 100, () => {
-                        this.#visualiser.Close();
                         this.UpdateFromChange();
                   }, this);
 
