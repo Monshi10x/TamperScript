@@ -20,7 +20,7 @@ class LEDMenu extends LHSMenuWindow {
         //this.LedContainer = new LED(page, null, function() {}, "LEDs");
 
         var fieldHR = document.createElement('hr');
-        var productionMinsPerLED = 120 / (144);//2 hours for 2440 lightbox
+        var productionMinsPerLED = 60 / (50);//1 hours for 50 LEDs (1 bag)
         var distanceToOutsideBox = 0;
         var ledWidth = 66;
         var ledAllowanceW = 0;
