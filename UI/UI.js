@@ -145,7 +145,7 @@ function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo)
     f_headingText.style = "display:table-cell;vertical-align: middle;word-break: break-all ";
     f_headingText.innerText = headingText;
 
-    f_contentContainer.style = "width:calc(100% - " + f_headingTextWrapper.style.width + ");height:100%;float:left;";
+    f_contentContainer.style = "width:calc(100% - " + f_headingTextWrapper.style.width + ");height:100%;float:left;position: relative;";
 
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(f_div);

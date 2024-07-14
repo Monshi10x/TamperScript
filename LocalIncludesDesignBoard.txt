@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Design Board
+// @name         Design Board v2
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      2.0
 // @description  try to take over the world!
 // @author       You
 // @match        https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx
@@ -27,9 +27,12 @@
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      https://raw.githack.com/SortableJS/Sortable/master/Sortable.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Charts\Chart.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Async_Functions\Async_Functions_Design.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Async_Functions\WebWorker_load.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UI.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UIContainerType3.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\UI\UIContainer_Design.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\UI\UIContainer_Design2.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Loaders\Loader.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\Common.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\ObjectArray.js
@@ -53,5 +56,6 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalWidthHeight.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\SVG_Common\SVG_Common.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\SVG_Common\DragZoomCanvas.js
-// @require      file://C:\Users\monsh\Documents\TamperScript\DesignBoard\DesignBoard.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\DesignBoard\JobBoard.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\DesignBoard\DesignBoard2.js
 // ==/UserScript==

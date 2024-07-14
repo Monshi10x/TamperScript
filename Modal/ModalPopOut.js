@@ -25,16 +25,14 @@ class ModalPopOut extends Modal {
             for(let i = 0; i < fieldContainers.length; i++) {
                   let borrowedElement = fieldContainers[i];
                   let placeholder = document.createElement("div");
+                  placeholder.style = borrowedElement.style.cssText + ";opacity:0.2;height:" + borrowedElement.clientHeight + "px;";
                   insertAfter(placeholder, borrowedElement);
-
-                  console.log(borrowedElement.style.cssText);
 
                   this.#borrowedFields.push({
                         fieldContainer: borrowedElement,
-                        returnAfterElement: placeholder,
+                        placeholder: placeholder,
                         returnBeforeElement: borrowedElement.nextElementSibling,
-                        currentCssStyle: borrowedElement.style.cssText,
-                        placeholder: placeholder
+                        currentCssStyle: borrowedElement.style.cssText
                   });
 
                   this.addBodyElement(borrowedElement);
@@ -43,10 +41,10 @@ class ModalPopOut extends Modal {
 
       returnAllBorrowedFields() {
             for(let i = 0; i < this.#borrowedFields.length; i++) {
-                  if(this.#borrowedFields[i].returnAfterElement) insertAfter(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnAfterElement);
-                  else insertBefore(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnBeforeElement);
-
+                  this.#borrowedFields[i].placeholder.replaceWith(this.#borrowedFields[i].fieldContainer);
                   this.#borrowedFields[i].fieldContainer.style = this.#borrowedFields[i].currentCssStyle;
+
+                  deleteElement(this.#borrowedFields[i].placeholder);
             }
       }
 

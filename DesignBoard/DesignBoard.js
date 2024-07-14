@@ -22,7 +22,7 @@ var colour_InProduction = "#000000";
 let currentUser = "";
 let noteQtyCircles = [];
 
-let allOrderProductStatuses = [
+var allOrderProductStatuses = [
       {
             "Id": 12,
             "Name": "ESTIMATE",
@@ -743,8 +743,7 @@ async function init() {
       currentUser = document.querySelector("#CurrentUserLabel").innerText;
       let parentContainer = document.body;
 
-      let existingJobBoard = document.querySelector("#MainContent");
-      let existingJobBoardFooter = document.querySelector("#divFooterLogoWrapper");
+
 
       let masterContainer = document.createElement("div");
       parentContainer.appendChild(masterContainer);
@@ -754,6 +753,9 @@ async function init() {
 
       let optionsHeader = document.createElement("div");
       optionsHeader.style = "width:100%;height:75px;display:block;float: left;background-color:" + COLOUR.DarkGrey;
+
+      let existingJobBoard = document.querySelector("#MainContent");
+      let existingJobBoardFooter = document.querySelector("#divFooterLogoWrapper");
 
       insertBefore(optionsHeader, existingJobBoard);
 
@@ -1101,52 +1103,53 @@ async function init() {
             tempSpinnerDiv.innerHTML = "  $";
             placeHolderPaymentDueBtns.push(tempSpinnerDiv);
             newJobContainer.addHeadingButtons(tempSpinnerDiv);
-            let placeholderLoader = new Loader("", tempSpinnerDiv);
+            let placeholderLoader = new Loader(tempSpinnerDiv);
             placeHolderPaymentDueLoaders.push(placeholderLoader);
             placeholderLoader.setSize(10);
 
             //Buttons
-            let buttonsContainer = new UIContainerType3("width:calc(100% - 40px);", "VISIT", jobContainers[i].contentContainer);
-            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out order", "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "new window", buttonsContainer.contentContainer);
-            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "new window", buttonsContainer.contentContainer);
-            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "open order in sales", "/SalesModule/Orders/Order.aspx?OrderId=" + jobs[i].OrderId, "new window", buttonsContainer.contentContainer);
+            let buttonsContainer = createDivStyle5("width:calc(100%);", "VISIT", jobContainers[i].contentContainer)[1];
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out order", "/DesignModule/DesignOrderView.aspx?OrderId=" + jobs[i].OrderId, "new window", buttonsContainer);
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "pop-out item", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + jobs[i].Id + "&OrderId=" + jobs[i].OrderId, "new window", buttonsContainer);
+            createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "open order in sales", "/SalesModule/Orders/Order.aspx?OrderId=" + jobs[i].OrderId, "new window", buttonsContainer);
 
             //Description Container
-            let descriptionField = new UIContainerType3("width:calc(100% - 40px);", "DESCRIPTION", jobContainers[i].contentContainer);
-            descriptionField.contentContainer.style.cssText += "min-height:100px;max-height:300px;overflow-y:scroll;";
-            lineItemDescriptionFields.push(descriptionField.contentContainer);
-            let loader = new Loader("", descriptionField.contentContainer);
+            let descriptionField = createDivStyle5("width:calc(100%);", "DESCRIPTION", jobContainers[i].contentContainer)[1];
+
+            descriptionField.style.cssText += "min-height:100px;max-height:300px;overflow-y:scroll;";
+            lineItemDescriptionFields.push(descriptionField);
+            let loader = new Loader(descriptionField);
             lineItemDescriptionSpinners.push(loader);
 
             jobContainers[i].Minimize();
 
             //Customer Contact Container
-            let customerContactDiv = new UIContainerType3("width:calc(100% - 40px);", "CUSTOMER CONTACT", jobContainers[i].contentContainer);
+            let customerContactDiv = createDivStyle5("width:calc(100%);", "CUSTOMER", jobContainers[i].contentContainer)[1];
 
-            createInput_Infield("Contact Name", jobs[i].OrderContactName, null, () => { }, customerContactDiv.contentContainer, false, null);
-            createInput_Infield("Contact Phone", jobs[i].OrderContactWorkPhone, null, () => { }, customerContactDiv.contentContainer, false, null);
-            createInput_Infield("Contact Phone 2", jobs[i].OrderContactCellPhone, null, () => { }, customerContactDiv.contentContainer, false, null);
-            customerEmails.push(createInput_Infield("Contact Email", "", null, () => { }, customerContactDiv.contentContainer, false, null));
+            createInput_Infield("Contact Name", jobs[i].OrderContactName, null, () => { }, customerContactDiv, false, null);
+            createInput_Infield("Contact Phone", jobs[i].OrderContactWorkPhone, null, () => { }, customerContactDiv, false, null);
+            createInput_Infield("Contact Phone 2", jobs[i].OrderContactCellPhone, null, () => { }, customerContactDiv, false, null);
+            customerEmails.push(createInput_Infield("Contact Email", "", null, () => { }, customerContactDiv, false, null));
 
             //Inhouse Items Container
 
-            let inhouseDiv = new UIContainerType3("width:calc(100% - 40px);", "INHOUSE ITEMS", jobContainers[i].contentContainer);
+            let inhouseDiv = createDivStyle5("width:calc(100%);", "INFO", jobContainers[i].contentContainer)[1];
 
-            let productQty = createInput_Infield("product Qty", null, null, null, inhouseDiv.contentContainer, false, null);
+            let productQty = createInput_Infield("product Qty", null, null, null, inhouseDiv, false, null);
             setFieldDisabled(true, productQty[1], productQty[0]);
             productQtyFields.push(productQty);
-            let productQtyLoader = new Loader("", productQty[0]);
+            let productQtyLoader = new Loader(productQty[0]);
             productQtySpinners.push(productQtyLoader);
 
             let designer = createDropdown_Infield("Designer", 2, "",
                   [createDropdownOption("Darren Frankish", "20"),
                   createDropdownOption("Leandri Hayward", "31"),
                   createDropdownOption("null", "")], async () => {
-                        let loader = new Loader("", designer[0]);
+                        let loader = new Loader(designer[0]);
 
                         await AssignUsersToOrderProduct(jobs[i].OrderId, jobs[i].Id, designer[1].value);
                         loader.Delete();
-                  }, inhouseDiv.contentContainer);
+                  }, inhouseDiv);
 
             for(let x = 0; x < designer[1].options.length; x++) {
 
@@ -1185,7 +1188,7 @@ async function init() {
             }
             let WIPStatus = createDropdown_Infield("WIP Status", 0, "",
                   dropdownOptions, async () => {
-                        let loader = new Loader("", WIPStatus[0]);
+                        let loader = new Loader(WIPStatus[0]);
                         await updateItemStatus(jobs[i].Id, WIPStatus[1].options[WIPStatus[1].dataset.currentValue].value, WIPStatus[1].options[WIPStatus[1].selectedIndex].value);
 
                         jobContainers[i].whenClosedReturnBorrowed = false;
@@ -1199,7 +1202,7 @@ async function init() {
                         WIPStatus[1].dataset.currentValue = WIPStatus[1].selectedIndex;
                         loader.Delete();
 
-                  }, inhouseDiv.contentContainer);
+                  }, inhouseDiv);
             WIPStatus[1].dataset.currentValue = 0;
             WIPStatus[1].id = "WIPStatus";
 
@@ -1211,34 +1214,34 @@ async function init() {
                   }
             }
 
-            createInput_Infield("Sales Person", jobs[i].SalesPersonName, null, () => { }, inhouseDiv.contentContainer, false, null);
-            createInput_Infield("Item Price", jobs[i].TotalPrice, null, () => { }, inhouseDiv.contentContainer, false, null);
+            createInput_Infield("Sales Person", jobs[i].SalesPersonName, null, () => { }, inhouseDiv, false, null);
+            createInput_Infield("Item Price", jobs[i].TotalPrice, null, () => { }, inhouseDiv, false, null);
 
             //Notes Container
-            notesContainer = new UIContainerType3("width:calc(100% - 40px);", "NOTES", jobContainers[i].contentContainer);
-            AddCssStyle("overflow-y:auto;", notesContainer.contentContainer);
+            notesContainer = createDivStyle5("width:calc(100%);", "NOTES", jobContainers[i].contentContainer)[1];
+            AddCssStyle("overflow-y:auto;", notesContainer);
 
             let btnContainer = document.createElement("div");
             btnContainer.style = "padding-left:0px;width:calc(100%);box-sizing:border-box;display:block;min-height: 10px;float:left;";
-            notesContainer.contentContainer.appendChild(btnContainer);
+            notesContainer.appendChild(btnContainer);
 
 
             let recipients = [
-                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px;", () => { }, notesContainer.contentContainer, null),
-                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer.contentContainer, null),
-                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer.contentContainer, null),
-                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer.contentContainer, null),
-                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer.contentContainer, null)
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px;", () => { }, notesContainer, null),
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer, null),
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer, null),
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer, null),
+                  createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px", () => { }, notesContainer, null)
             ];
 
-            let recipientsLabel = createLabel("Recipients", "width:100%;margin:0px;margin-bottom:20px;height:10px;font-size:12px;background-color:white;color:black;text-align:center;", notesContainer.contentContainer);
+            let recipientsLabel = createLabel("Recipients", "width:100%;margin:0px;margin-bottom:20px;height:10px;font-size:12px;background-color:white;color:black;text-align:center;", notesContainer);
 
-            let noteInput = createTextarea("Add Note", "", "width:80%;margin:0px;box-sizing:border-box;height:35px;margin:10px;margin-right:0px;resize: vertical;", () => { }, notesContainer.contentContainer);
-            let c = notesContainer.contentContainer;
+            let noteInput = createTextarea("Add Note", "", "width:80%;margin:0px;box-sizing:border-box;height:35px;margin:10px;margin-right:0px;resize: vertical;", () => { }, notesContainer);
+            let c = notesContainer;
             let addNoteBtn = createButton("+ Add Note", "width:calc(20% - 20px);margin:10px;margin-left:0px;", async () => {
                   if(!recipients[0][1].checked && !recipients[1][1].checked && !recipients[2][1].checked && !recipients[3][1].checked && !recipients[4][1].checked) return;
 
-                  let loader = new Loader("", c);
+                  let loader = new Loader(c);
                   await addProductNote(jobs[i].Id, noteInput.value,
                         recipients[0][1].checked,
                         recipients[1][1].checked,
@@ -1284,7 +1287,7 @@ async function init() {
                   noteInput.value = "";
                   loader.Delete();
 
-            }, notesContainer.contentContainer);
+            }, notesContainer);
 
             let salesBtn = createButton("SALES", "width:20%;height:50px;margin:0px;position:relative;padding-top:20px;", () => {
                   toggleNotes(salesNotesContainer, 0);
@@ -1316,27 +1319,27 @@ async function init() {
 
             let salesNotesContainer = document.createElement("div");
             salesNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
-            notesContainer.contentContainer.appendChild(salesNotesContainer);
+            notesContainer.appendChild(salesNotesContainer);
             notesSales.push(salesNotesContainer);
 
             let designNotesContainer = document.createElement("div");
             designNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
-            notesContainer.contentContainer.appendChild(designNotesContainer);
+            notesContainer.appendChild(designNotesContainer);
             notesDesign.push(designNotesContainer);
 
             let productionNotesContainer = document.createElement("div");
             productionNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
-            notesContainer.contentContainer.appendChild(productionNotesContainer);
+            notesContainer.appendChild(productionNotesContainer);
             notesProduction.push(productionNotesContainer);
 
             let customerNotesContainer = document.createElement("div");
             customerNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
-            notesContainer.contentContainer.appendChild(customerNotesContainer);
+            notesContainer.appendChild(customerNotesContainer);
             notesCustomer.push(customerNotesContainer);
 
             let vendorNotesContainer = document.createElement("div");
             vendorNotesContainer.style = "width:calc(100% - 20px);margin:10px;min-height:100px;max-height:300px;overflow-y:auto;box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;background-color:" + COLOUR.MidGrey;
-            notesContainer.contentContainer.appendChild(vendorNotesContainer);
+            notesContainer.appendChild(vendorNotesContainer);
             notesVendor.push(vendorNotesContainer);
 
             toggleNotes(designNotesContainer);
@@ -1419,7 +1422,7 @@ async function init() {
                         let newColour = jobColour.style.backgroundColor = jobContainer_Colour;
                         let newColourAsHex = RGBToHex(jobColour.style.backgroundColor);
                         if(prevColour != newColour) requiresUpdatePriority = true;
-                        let loader = new Loader("", jobColour);
+                        let loader = new Loader(jobColour);
 
                         //state
                         let currentState = jobArrayElement.OrderProductStatusTextWithOrderStatus;
@@ -1543,13 +1546,13 @@ async function init() {
             productQtySpinners[i].Delete();
 
             //Parts
-            partContainer = new UIContainerType3("width:calc(100% - 40px);", "PARTS", jobContainers[i].contentContainer);
+            partContainer = createDivStyle5("width:calc(100%);", "PARTS", jobContainers[i].contentContainer)[1];
             let partsString = "";
             for(let a = 0; a < partPreviewsArray.length; a++) {
                   let partName = partPreviewsArray[a].O2;
                   partsString += (a + 1) + ': ' + partName + '\n';
             }
-            createText(partsString, "width:100%;height:fit-content;float:left;display:block;", partContainer.contentContainer);
+            createText(partsString, "width:100%;height:fit-content;float:left;display:block;", partContainer);
 
             //Illustrator Clipboard
             createIconButton(GM_getResourceURL("Icon_AdobeIllustrator"), "Copy For Illustrator", "width:200px;height:35px;", async () => {
