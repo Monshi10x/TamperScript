@@ -169,8 +169,6 @@ class DesignBoard2 extends JobBoard {
                               else {
                                     await this.ChangeJobColourToSuitWIPAndAddToBoard(jobObject);
                               }
-                        } else {
-                              alert("job colour doesn't match board colour");
                         }
                   }
 
