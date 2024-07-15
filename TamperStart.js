@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.48
+// @version      10.49
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -17,6 +17,7 @@
 // @grant        GM_info
 // @grant        GM_xmlhttpRequest
 // @grant        GM_getResourceText
+// @grant        GM_getResourceURL
 // @grant        GM_addElement
 // @grant        unsafeWindow
 // @grant        window.close
@@ -24,14 +25,17 @@
 // @grant        window.onurlchange
 // @updateURL    https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
 // @downloadURL  https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
+// @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_Sales.css
+// @resource     Image_Corflute https://github.com/Monshi10x/TamperScript/raw/main/Images/Corflute-Resized.jpg
+// @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Charts/Chart.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/DragAndDrop/DragAndDrop.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/QWH.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/PredefinedVehicleTemplates.json
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UI.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UIContainerType3.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/Loaders/Loader.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Async_Functions/Async_Functions.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Common.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Subscription/SubscriptionManager.js
@@ -56,13 +60,14 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/CreditSurchargeMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/Menu3D.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/PanelSigns.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/ChartMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/TogglePartsMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/Modal.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalManageSubscriptions.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalPopOut.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalMoveProduct.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSetOrder.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInput.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalPopOut.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSetOrder.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalMoveProduct.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInputText.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInputCheckbox.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInputWithCalcResult.js
