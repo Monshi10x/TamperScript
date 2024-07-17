@@ -371,3 +371,8 @@ function toggle(expression, trueCallback, falseCallback) {
 function AddCssStyle(cssStyle, element) {
     element.style.cssText += ";" + cssStyle + ";";
 }
+
+function catchNull(value, valueIfNull) {
+    if(value == null) return valueIfNull;
+    else return value;
+}

@@ -619,7 +619,7 @@ class UIContainer_Design2 {
             this.#f_container.appendChild(this.#f_jobNameHeadingContainer);
 
             this.#f_jobNameTextField = document.createElement("h3");
-            this.#f_jobNameTextField.innerText = this.#jobObject.OrderDescription;
+            this.#f_jobNameTextField.innerText = this.#jobObject.Description;
             this.#f_jobNameTextField.style = "float: left; height: 30px; margin: 0px 0px 0px 0px; background-color: " + COLOUR.White +
                   "; width: calc(100%); box-sizing: border-box; padding: 0px; font-size: 10px; color: " + COLOUR.DarkGrey +
                   "; text-align: center; line-height: 30px; border: 1px solid " + COLOUR.White + ";overflow: hidden;text-overflow: ellipsis;white-space: nowrap;padding-left: 4px;padding-right: 4px;";

@@ -159,19 +159,23 @@ class DesignBoard2 extends JobBoard {
 
                         let jobColourMatchesBoardColour = jobObject.QueuePrioritySettingColor === board.colour;
                         let jobWIPMatchesBoardWIP = jobObject.OrderProductStatusTextWithOrderStatus === board.WIPStatus;
+                        let jobHasNoColour = jobObject.QueuePrioritySettingColor == null || jobObject.QueuePrioritySettingColor == "#ffffff";
 
                         if(jobColourMatchesBoardColour) {
                               //if job WIP is same as board, or board WIP is any (null)
                               if(jobWIPMatchesBoardWIP || board.WIPStatus == null) {
-                                    this.columnContainers[b].containerObject.contentContainer.appendChild(this.#jobObjects[j].containerObject.container);
+                                    this.columnContainers[b].containerObject.contentContainer.appendChild(jobObject.containerObject.container);
                               }
                               //if job WIP doesn't match board colour, change job colour
                               else {
                                     await this.ChangeJobColourToSuitWIPAndAddToBoard(jobObject);
                               }
                         }
-                  }
 
+                        if(jobHasNoColour) {
+                              await this.ChangeJobColourToSuitWIPAndAddToBoard(jobObject);
+                        }
+                  }
                   this.UpdateJobsInContainer(this.columnContainers[b].containerObject.contentContainer);
             }
       }
@@ -193,9 +197,10 @@ class DesignBoard2 extends JobBoard {
             //update job to match WIP Colour
             let newColour = lowestWIPStatusBoard.colour;
 
-            await updateItemPriority(jobObject.Id, jobObject.OrderId, jobObject.QueuePrioritySettingOrder, newColour, lowestWIPStatusBoard.CBQueueID);
+            await updateItemPriority(jobObject.Id, jobObject.OrderId, lowestWIPStatusBoard.CBQueueID, newColour, lowestWIPStatusBoard.CBQueueID);
 
             jobObject.QueuePrioritySettingId = lowestWIPStatusBoard.CBQueueID;
+            jobObject.QueuePrioritySettingColor = newColour;
             jobObject.containerObject.jobColour = newColour;
 
             //add to correct board
