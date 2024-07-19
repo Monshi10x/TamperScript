@@ -328,7 +328,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         parentObjectToAppendTo.appendChild(containerDiv);
     }
 
-    return [containerDiv, input];
+    return [containerDiv, input, textDescription];
 }
 function createInputCalculated_Infield(text, defaultValue, overrideCssStyles, optionalCallback, locked, parentObjectToAppendTo) {
     var input = document.createElement('input');
@@ -956,7 +956,7 @@ function createCheckbox(text, defaultValue, overrideCssStyles, optionalCallback,
     }
     return checkbox;
 }
-function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo, callbackIfUnticked) {
+function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo) {
     var input = document.createElement('input');
     input.type = "checkbox";
     input.name = "checkbox";
@@ -1109,7 +1109,17 @@ function createToken(text, selectedTF, overrideCssStyles, parentObjectToAppendTo
     }
     return [token, fakeValueContainer];
 }
-function createLink(overrideCssStyles, text, href, target = "_blank", parentObjectToAppendTo) {
+
+/**
+ * 
+ * @param {*} overrideCssStyles 
+ * @param {*} text 
+ * @param {*} href 
+ * @param {*} target "_blank" (default), "new window"
+ * @param {*} parentObjectToAppendTo 
+ * @returns 
+ */
+function createLink(overrideCssStyles = "", text = "", href = "", target = "_blank", parentObjectToAppendTo) {
     let link = document.createElement('a');
     link.style = STYLE.Link;
     link.style.cssText += overrideCssStyles;
@@ -1117,7 +1127,7 @@ function createLink(overrideCssStyles, text, href, target = "_blank", parentObje
 
     let windowWidth = 1500, windowHeight = 1000, offsetX, offsetY;
 
-    if(target == "_blank") {
+    if(target == "_blank" || target == null) {
         link.target = target;
         link.href = href;
     } else if(target == "new window") {

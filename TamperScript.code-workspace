@@ -36,6 +36,20 @@
 				"overviewRulerColor": "grey",
 				"padding": "5px",
 				"isWholeLine": true
+		},{
+				"text": "//VARIABLES",
+				"color": "#ffffff",
+				"fontWeight": "bold",
+				"backgroundColor": "blue",
+				"overviewRulerColor": "grey",
+				"padding": "5px"
+		},{
+				"text": "//FIELDS",
+				"color": "#ffffff",
+				"fontWeight": "bold",
+				"backgroundColor": "blue",
+				"overviewRulerColor": "grey",
+				"padding": "5px"
 		}],
 		"json.format.enable": true,
 		"editor.tokenColorCustomizations": {
@@ -44,6 +58,19 @@
 			"keywords": "#0051ff",
 			"strings": "#555",
 			"textMateRules": [
+				{
+					"scope": "storage.type.js",
+					"settings": {
+						"foreground": "#0051ff",
+						"fontStyle": "bold"
+					}
+				},{
+					"scope": "storage.type.class.js",
+					"settings": {
+						"foreground": "#0051ff",
+						"fontStyle": "bold"
+					}
+				},
 				{
 					"scope": "storage.modifier",
 					"settings": {

@@ -20,7 +20,8 @@ const ICON = {
       convert: "https://cdn.gorilladash.com/images/media/6110740/signarama-australia-refresh-cw-630ab2c04e207.svg",
       add: "https://cdn.gorilladash.com/images/media/6110741/signarama-australia-plus-630ab3780a19f.svg",
       creditCard: "https://cdn.gorilladash.com/images/media/6125146/signarama-australia-card-outline-632acedb3a569.svg",
-      _3D: "https://cdn.gorilladash.com/images/media/6128178/signarama-australia-3d-icon-3-63319ac131f13.svg"
+      _3D: "https://cdn.gorilladash.com/images/media/6128178/signarama-australia-3d-icon-3-63319ac131f13.svg",
+      POS: "https://cdn.gorilladash.com/images/media/13204087/1064479.png"
 };
 
 const IMAGE = {
