@@ -105,7 +105,6 @@ function partInfoTick() {
 				});
 			}
 			if(!p1.classList.contains("itemDragLeave")) {
-				console.log("in shouldnt");
 				p1.classList.add("itemDragLeave");
 				p1.addEventListener("dragleave", (e) => {
 					e.preventDefault();

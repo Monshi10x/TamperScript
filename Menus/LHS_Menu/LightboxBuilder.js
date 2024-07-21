@@ -54,10 +54,10 @@ class LightboxMenu extends LHSMenuWindow {
         var c2 = document.createElement('div');
         c2.style = STYLE.BillboardMenus;
 
-        var fieldBoxWidth = createInput_Infield("Box Width", null, "width:47%", lightboxUpdate, c2, true, 100);
+        var fieldBoxWidth = createInput_Infield("Box Width", null, "width:47%", lightboxUpdate, c2, true, 100, {postfix: "mm"});
         fieldBoxWidth.id = "LightboxBuilder_BoxWidth";
 
-        var fieldBoxHeight = createInput_Infield("Box Height", null, "width:47%", lightboxUpdate, c2, true, 100);
+        var fieldBoxHeight = createInput_Infield("Box Height", null, "width:47%", lightboxUpdate, c2, true, 100, {postfix: "mm"});
         fieldBoxHeight.id = "LightboxBuilder_BoxHeight";
 
         var fieldBoxDepth = createDropdown_Infield('Box Depth', 0, "margin-right:500px;width:47%;",
@@ -176,9 +176,9 @@ class LightboxMenu extends LHSMenuWindow {
             lightboxUpdate,
             c4);
 
-        var fieldLoading = createInput_Infield('Transformer Loading(%)', 80, "width:47%", lightboxUpdate, c4, true);
+        var fieldLoading = createInput_Infield('Transformer Loading', 80, "width:47%", lightboxUpdate, c4, true, 1, {postfix: "%"});
 
-        var fieldAmpAllowance = createInput_Infield('Amperage Allowance', 0, "width:47%", lightboxUpdate, c4, true);
+        var fieldAmpAllowance = createInput_Infield('Amperage Allowance', 0, "width:47%", lightboxUpdate, c4, true, 1, {postfix: "A"});
 
         var fieldVoltage = createDropdown_Infield("Voltage", 0, "width:47%",
             [createDropdownOption("12", "12"),

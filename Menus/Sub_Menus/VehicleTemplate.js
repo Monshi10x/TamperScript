@@ -125,21 +125,21 @@ class VehicleTemplate extends SubMenu {
       addRow = (item) => {
             this.rowID++;
             var rowContainer = document.createElement('div');
-            rowContainer.style = "width:100%;height:105px;display:block;float:left;background-color:#aaa;margin-top:10px;";
+            rowContainer.style = "width:100%;height:55px;display:block;float:left;background-color:#aaa;margin-top:10px;";
             rowContainer.id = "rowContainer";
             rowContainer.className = this.rowID;
 
-            var description = createInput_Infield("Description", null, "width:180px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false);
+            var description = createInput_Infield("Description", null, "width:100px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false);
             description[1].id = "description";
-            var quantity = createInput_Infield("Qty", 1, "width:80px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 1);
+            var quantity = createInput_Infield("Qty", 1, "width:50px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 1);
             quantity[1].id = "quantity";
-            var width = createInput_Infield("Width", 0, "width:150px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 50);
+            var width = createInput_Infield("Width", 0, "width:80px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 50, {postfix: "mm"});
             width[1].id = "width";
-            var height = createInput_Infield("Height", 0, "width:150px;height:40px;margin:5px;margin-right:20%;", this.fieldChangeFunction, rowContainer, false, 50);
+            var height = createInput_Infield("Height", 0, "width:80px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 50, {postfix: "mm"});
             height[1].id = "height";
 
             var tempThis = this;
-            var deleteBtn = createButton("X", "width:40px;height:45px;margin:0px;margin-left:5px;margin-right:0px;background-color:red;border-color:red;float:right", () => {
+            var deleteBtn = createButton("X", "width:40px;height:100%;margin:0px;margin-left:5px;margin-right:0px;background-color:red;border-color:red;float:right", () => {
                   var rows = tempThis.parentObject.querySelectorAll("#rowContainer");
                   var rowN = parseFloat(deleteBtn.id);
                   var actualIndex = 0;
@@ -155,7 +155,7 @@ class VehicleTemplate extends SubMenu {
             var vinylDropdownElements = [];
             vinylDropdownElements.push(["None", "white"]);
             vinylParts.forEach(element => vinylDropdownElements.push([element.Name, "white"]));
-            var vinyl = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:300px;margin:5px;margin-left:50px", 0, true, vinylDropdownElements, function() { }, rowContainer);
+            var vinyl = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:200px;margin:5px;", 0, true, vinylDropdownElements, function() { }, rowContainer);
 
             vinyl[1].id = "vinyl";
             $(vinyl[1]).val(item ? item.vinyl : VinylLookup["Air Release"]).change();
@@ -164,7 +164,7 @@ class VehicleTemplate extends SubMenu {
             var laminateDropdownElements = [];
             laminateDropdownElements.push(["None", "white"]);
             laminateParts.forEach(element => laminateDropdownElements.push([element.Name, "white"]));
-            var laminate = createDropdown_Infield_Icons_Search("Laminate", 0, "width:300px;margin:5px;", 0, true, laminateDropdownElements, function() { }, rowContainer);
+            var laminate = createDropdown_Infield_Icons_Search("Laminate", 0, "width:200px;margin:5px;", 0, true, laminateDropdownElements, function() { }, rowContainer);
             laminate[1].id = "laminate";
             $(laminate[1]).val(item ? item.laminate : LaminateLookup["Gloss"]).change();
 
@@ -186,12 +186,12 @@ class VehicleTemplate extends SubMenu {
                         rowContainer.appendChild(combo_Poly);
                   }
             } else {
-                  var combo_3M_2 = createButton("3M", "width:40px;height:45px;margin:5px;", function() {
+                  var combo_3M_2 = createButton("3M", "width:30px;height:45px;margin:5px;", function() {
                         $(vinyl[1]).val(VinylLookup["3M Vehicle"]).change();
                         $(laminate[1]).val(LaminateLookup["3m Gloss (Standard)"]).change();
                   });
                   rowContainer.appendChild(combo_3M_2);
-                  var combo_Poly_2 = createButton("Py", "width:40px;height:45px;margin:5px;", function() {
+                  var combo_Poly_2 = createButton("Py", "width:30px;height:45px;margin:5px;", function() {
                         $(vinyl[1]).val(VinylLookup["Air Release"]).change();
                         $(laminate[1]).val(LaminateLookup["Gloss"]).change();
                   });
@@ -202,7 +202,7 @@ class VehicleTemplate extends SubMenu {
             var tapeDropdownElements = [];
             tapeDropdownElements.push(["None", "white"]);
             tapeParts.forEach(element => tapeDropdownElements.push([element.Name, "white"]));
-            var tape = createDropdown_Infield_Icons_Search("App Tape", 0, "width:300px;margin:5px;", 0, true, tapeDropdownElements, function() { }, rowContainer);
+            var tape = createDropdown_Infield_Icons_Search("App Tape", 0, "width:200px;margin:5px;", 0, true, tapeDropdownElements, function() { }, rowContainer);
             tape[1].id = "tape";
             $(tape[1]).val(item ? item.appTape : AppTapeLookup["Medium Tack"]).change();
 

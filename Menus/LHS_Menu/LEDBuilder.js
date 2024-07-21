@@ -36,17 +36,17 @@ class LEDMenu extends LHSMenuWindow {
         //********************************************//
         //                  WIDTH
         //********************************************//
-        var fieldBoxWidth = createInput_Infield("Box Width", null, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, true, 100);
+        var fieldBoxWidth = createInput_Infield("Box Width", null, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, true, 100, {postfix: "mm"});
 
         //********************************************//
         //                  HEIGHT
         //********************************************//
-        var fieldBoxHeight = createInput_Infield("Box Height", null, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, true, 100);
+        var fieldBoxHeight = createInput_Infield("Box Height", null, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, true, 100, {postfix: "mm"});
 
         //********************************************//
         //                  DEPTH
         //********************************************//
-        var fieldBoxDepth = createInput_Infield("Depth to Face (Overall)", null, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, true, 10);
+        var fieldBoxDepth = createInput_Infield("Depth to Face (Overall)", null, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, true, 10, {postfix: "mm"});
 
         //********************************************//
         //                  DOUBLE-SIDED
@@ -83,12 +83,12 @@ class LEDMenu extends LHSMenuWindow {
         //********************************************//
         //                  LED LOADING
         //********************************************//
-        var fieldLoading = createInput_Infield('Transformer Loading(%)', 80, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, false, 1);
+        var fieldLoading = createInput_Infield('Transformer Loading(%)', 80, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, false, 1, {postfix: "%"});
 
         //********************************************//
         //                  LED AMP ALLOWANCE
         //********************************************//
-        var fieldAmpAllowance = createInput_Infield('Amperage Allowance', 0, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, false, 1);
+        var fieldAmpAllowance = createInput_Infield('Amperage Allowance', 0, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, false, 1, {postfix: "A"});
 
         //********************************************//
         //                  LED VOLTAGE

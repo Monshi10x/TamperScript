@@ -243,14 +243,17 @@ function createInput(text, defaultValue, overrideCssStyles, optionalCallback, pa
     }
     return input;
 }
-function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo, fieldRequired, increments) {
+function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo, fieldRequired, increments, options = {
+    prefix: "",
+    postfix: ""
+}) {
     var input = document.createElement('input');
     var containerDiv = document.createElement('div');
     var textDescription = document.createElement('p');
-    textDescription.style = "width:97%;height:10px;margin: 0px;padding:4px;color:#666;font-size:12px;";
+    textDescription.style = "width:calc(100% - 15px);box-sizing:border-box;height:18px;margin: 0px;padding:2px;color:#666;font-size:11px;";
     textDescription.innerText = text;
     input.autocomplete = 'off';
-    input.style = "float:left;width:calc(97% - 20px);height:20px;margin: 0px;padding:4px;padding-top:20px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:absolute;top:0;left:0;";
+    input.style = "float:left;field-sizing:content;min-width:10px;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-size:14px;";
     containerDiv.style = STYLE.InputInfield;
     containerDiv.appendChild(textDescription);
     containerDiv.appendChild(input);
@@ -268,7 +271,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         }*/
         var upArrow = document.createElement('button');
         upArrow.innerHTML = "&#9650";
-        upArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.Blue + ";position:absolute;top:0px;right:0;color:white; border:0px solid " + COLOUR.Blue + ";cursor: pointer;padding:0px;";
+        upArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.Blue + ";position:absolute;top:0;right:0;color:white; border:0px solid " + COLOUR.Blue + ";cursor: pointer;padding:0px;";
         upArrow.tabIndex = "-1";
         $(upArrow).hover(function() {
             $(this).css("background-color", "white");
@@ -308,7 +311,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
             optionalCallback();
         }
         if(input.value != "" || !fieldRequired) {
-            containerDiv.style.borderColor = "#666";
+            containerDiv.style.borderColor = "rgb(177, 177, 177)";
         } else {
             containerDiv.style.borderColor = "red";
         }
@@ -318,14 +321,45 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
             optionalCallback();
         }
         if(input.value != "" || !fieldRequired) {
-            containerDiv.style.borderColor = "#666";
+            containerDiv.style.borderColor = "rgb(177, 177, 177)";
         } else {
             containerDiv.style.borderColor = "red";
         }
     };
 
+    containerDiv.addEventListener("click", (event) => {
+        if(event.target == containerDiv) {
+            input.focus();
+        }
+    });
+
+    textDescription.onclick = function() {
+        input.focus();
+    };
+
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(containerDiv);
+    }
+
+    if(options.prefix) {
+        let prefixField = document.createElement("p");
+        prefixField.style = "float:left; field-sizing: content;color:#555;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-family:Arial;font-size: 14px;line-height: 18px;";
+        prefixField.innerText = options.prefix;
+        prefixField.onclick = function() {
+            input.focus();
+        };
+        input.style.cssText += "";
+        insertBefore(prefixField, input);
+    }
+    if(options.postfix) {
+        let postfixField = document.createElement("p");
+        postfixField.style = "float:left; field-sizing: content;color:#555;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-family:Arial;font-size: 14px;line-height: 18px;";
+        postfixField.innerText = options.postfix;
+        postfixField.onclick = function() {
+            input.focus();
+        };
+        input.style.cssText += "";
+        insertAfter(postfixField, input);
     }
 
     return [containerDiv, input, textDescription];
