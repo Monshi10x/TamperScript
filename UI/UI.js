@@ -253,7 +253,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
     textDescription.style = "width:calc(100% - 15px);box-sizing:border-box;height:18px;margin: 0px;padding:2px;color:#666;font-size:11px;";
     textDescription.innerText = text;
     input.autocomplete = 'off';
-    input.style = "float:left;field-sizing:content;min-width:10px;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-size:14px;";
+    input.style = "float:left;field-sizing:content;min-width:10px;max-width:calc(100% - 4px);height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-size:14px;";
     containerDiv.style = STYLE.InputInfield;
     containerDiv.appendChild(textDescription);
     containerDiv.appendChild(input);

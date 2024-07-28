@@ -169,7 +169,7 @@ class VehicleTemplate extends SubMenu {
             $(laminate[1]).val(item ? item.laminate : LaminateLookup["Gloss"]).change();
 
             if(item) {
-                  if(item.description == "Panel") {
+                  if(item.isPanel == true) {
                         var panel = createCheckbox_Infield("Panel", true, "width:100px", function() { }, rowContainer);
                         panel[1].id = "panel";
                   }

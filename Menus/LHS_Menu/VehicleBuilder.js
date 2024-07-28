@@ -210,6 +210,7 @@ class VehicleMenu extends LHSMenuWindow {
                 w: 600,
                 h: 600,
                 qty: 1,
+                isPanel: true,
                 vinyl: VinylLookup["Air Release"],
                 laminate: LaminateLookup["Gloss"],
                 appTape: "None",
@@ -228,11 +229,12 @@ class VehicleMenu extends LHSMenuWindow {
                 w: 1800,
                 h: 300,
                 qty: 1,
+                isPanel: true,
                 vinyl: VinylLookup["Air Release"],
                 laminate: LaminateLookup["Gloss"],
                 appTape: "None",
                 description: "Tray Back Panel",
-                colour: "#D85FED"
+                colour: "#FF5CFF"
             };
             rects.push(item);
             VehicleBuilder_Template.addRow(item);
@@ -246,11 +248,12 @@ class VehicleMenu extends LHSMenuWindow {
                 w: 2500,
                 h: 300,
                 qty: 2,
+                isPanel: true,
                 vinyl: VinylLookup["Air Release"],
                 laminate: LaminateLookup["Gloss"],
                 appTape: "None",
                 description: "Tray Sides Panel",
-                colour: "#D85FED"
+                colour: "#FF5CFF"
             };
             rects.push(item);
             VehicleBuilder_Template.addRow(item);
@@ -269,6 +272,13 @@ class VehicleMenu extends LHSMenuWindow {
 
         addItem(ICON.convert, "SVG Convert", null, null, function() {
             window.open("https://cloudconvert.com/eps-to-svg", "_blank");
+        });
+
+
+        addItem(ICON.add, "Copy Template", null, null, function() {
+            console.log(rects);
+
+            saveToClipboard(JSON.stringify(rects));
         });
 
         function addItem(imageSrc, text, overrideCss, overrideImageCss, callback) {
@@ -465,14 +475,21 @@ function initRects() {
         rects = VehicleBuilder_Template.selectedTemplateData.template_rects;
         VehicleBuilder_Template.clearRows();
         for(var n = 0; n < rects.length; n++) {
-            VehicleBuilder_Template.addRow();
-            VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#description").value = rects[n].description;
-            VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#width").value = parseFloat(rects[n].w);
-            VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#height").value = parseFloat(rects[n].h);
-            VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#quantity").value = parseFloat(rects[n].qty);
-            VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#vinyl").value = rects[n].vinyl;
-            VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#laminate").value = rects[n].laminate;
-            VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#tape").value = rects[n].appTape;
+
+            let newItem = {
+                "x": 6152.058116005365,
+                "y": 3630.7737281592413,
+                "w": roundNumber(parseFloat(rects[n].w), 2),
+                "h": roundNumber(parseFloat(rects[n].h), 2),
+                "qty": parseFloat(rects[n].qty),
+                "isPanel": rects[n].isPanel,
+                "vinyl": rects[n].vinyl,
+                "laminate": rects[n].laminate,
+                "appTape": rects[n].appTape,
+                "description": rects[n].description,
+                "colour": rects[n].colour
+            };
+            VehicleBuilder_Template.addRow(newItem);
         }
 
         VehicleBuilder_Production.required = true;
@@ -605,7 +622,7 @@ function drawRects(e) {
     for(var r = 0; r < rects.length; r++) {
         //Draw Rectangle
         canvasCtxLayers[1].fillStyle = rects[r].colour;
-        canvasCtxLayers[1].globalAlpha = 1;
+        canvasCtxLayers[1].globalAlpha = 0.65;
         canvasCtxLayers[1].shadowColor = "black";
         canvasCtxLayers[1].shadowBlur = 20;
         canvasCtxLayers[1].fillRect(xOffset_Vehicle + rects[r].x * canvasScale_Vehicle, yOffset_Vehicle + rects[r].y * canvasScale_Vehicle, rects[r].w * canvasScale_Vehicle, rects[r].h * canvasScale_Vehicle);
@@ -811,9 +828,15 @@ function update(e) {
     for(var n = 0; n < rects.length; n++) {
         VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#description").value = rects[n].description;
         VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#quantity").value = parseFloat(rects[n].qty);
-        VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#width").value = parseFloat(rects[n].w);
-        VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#height").value = parseFloat(rects[n].h);
+        VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#width").value = roundNumber(parseFloat(rects[n].w), 2);
+        VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#height").value = roundNumber(parseFloat(rects[n].h), 2);
         VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#tape").value = rects[n].appTape;
+        VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#vinyl").value = rects[n].vinyl;
+        VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#laminate").value = rects[n].laminate;
+
+        $(VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#vinyl")).change();
+        $(VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#laminate")).change();
+        $(VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#tape")).change();
     }
 
     updateBackground();
@@ -837,16 +860,17 @@ function refreshBackground() {
 function updateRectsFromFields() {
     for(var n = 0; n < rects.length; n++) {
         rects[n].description = VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#description").value;
-        rects[n].w = parseFloat(VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#width").value);
-        rects[n].h = parseFloat(VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#height").value);
+        rects[n].w = roundNumber(parseFloat(VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#width").value), 2);
+        rects[n].h = roundNumber(parseFloat(VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#height").value), 2);
         rects[n].qty = parseFloat(VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#quantity").value);
         rects[n].appTape = VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#tape").value;
+        rects[n].vinyl = VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#vinyl").value;
+        rects[n].laminate = VehicleBuilder_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#laminate").value;
     }
     update(null);
 }
 
 function deleteRow(rowNumber) {
-    console.log("hello " + rowNumber);
     rects.splice(rowNumber, 1);
     update(null);
 }

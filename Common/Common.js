@@ -91,6 +91,7 @@ function convertClipboardToMeasure() {
 async function saveToClipboard(string) {
     await navigator.clipboard.writeText(string);
     console.log("string copied to clipboard");
+    Ordui.Alert("copied to clipboard");
 }
 
 function StringCombine(...args) {

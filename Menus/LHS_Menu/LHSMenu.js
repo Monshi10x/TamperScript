@@ -340,7 +340,7 @@ async function initLHSMenu() {
     menu_ProductCompare = new ProductCompareMenu(800, 600, "Compare", "Compare");
     menu_Router = new RouterMenu(800, 600, "Router", "Router");
     menu_Window = new WindowMenu(800, 600, "Window", "Window");
-    menu_Vehicle = new VehicleMenu(1200, 600, "Vehicle", "Vehicle");
+    menu_Vehicle = new VehicleMenu(1500, 600, "Vehicle", "Vehicle");
     menu_creditCardSurcharge = new CreditSurchargeMenu(400, 600, "CreditSurchargeMenu", "Credit Card Surcharge");
     menu_3D = new Menu3D(900, 600, "3DLetterMenu", "3D Letters");
     menu_PanelSigns = new MenuPanelSigns(900, 700, "PanelSignsMenu", "Panel Signs");
