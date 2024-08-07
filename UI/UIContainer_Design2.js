@@ -525,6 +525,7 @@ class UIContainer_Design2 {
       get jobOrder() {return this.#f_jobOrder.innerText;}
       get jobObject() {return this.#jobObject;}
       get userCanSeeCosting() {return this.#usersWithSalesPermissions.includes(this.currentUser);}
+      get designer() {return this.#f_designer[1].options[this.#f_designer[1].selectedIndex].text;}
 
       /*Setter*/
       set whenClosedReturnBorrowed(val) {
@@ -938,6 +939,10 @@ class UIContainer_Design2 {
 
       toggleMinimize() {
             toggle(this.#f_contentContainer.style.display == "none", this.Maximize, this.Minimize);
+      }
+
+      Hide() {
+            this.#f_contentContainer.style.display == "none";
       }
 
       Minimize() {

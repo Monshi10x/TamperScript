@@ -5,6 +5,7 @@ class JobBoard {
       #scrollableContainer;
       columnContainers = [/**{title: "", containerObject: UIContainerType3},...*/];
       #defaultView = "Card View";
+      optionsHeader;
 
       constructor(parentToAppendTo) {
             this.#parentToAppendTo = parentToAppendTo;
@@ -56,13 +57,13 @@ class JobBoard {
       }
 
       CreateOptionsHeader() {
-            let optionsHeader = document.createElement("div");
-            optionsHeader.style = "width:100%;height:75px;display:block;float: left;background-color:" + COLOUR.DarkGrey;
+            this.optionsHeader = document.createElement("div");
+            this.optionsHeader.style = "width:100%;height:75px;display:block;float: left;background-color:" + COLOUR.DarkGrey;
 
             let existingJobBoard = document.querySelector("#MainContent");
             let existingJobBoardFooter = document.querySelector("#divFooterLogoWrapper");
 
-            insertBefore(optionsHeader, existingJobBoard);
+            insertBefore(this.optionsHeader, existingJobBoard);
 
             let option_viewType = createDropdown_Infield("View", 1, "width:200px;box-shadow:none;",
                   [createDropdownOption("List View", "List View"),
@@ -81,7 +82,7 @@ class JobBoard {
                               $(existingJobBoardFooter).show();
                               $(this.#scrollableContainer).show();
                         }
-                  }, optionsHeader);
+                  }, this.optionsHeader);
 
             switch(this.#defaultView) {
                   case "List View":
@@ -104,6 +105,10 @@ class JobBoard {
 
                   default: break;
             }
+      }
+
+      AddToHeader(element) {
+            this.optionsHeader.appendChild(element);
       }
 
       CreateBoard(title = "", colour = "#ff0000", CBQueueID, CBStateId, WIPStatus) {

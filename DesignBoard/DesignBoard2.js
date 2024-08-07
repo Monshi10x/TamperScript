@@ -28,6 +28,7 @@ class DesignBoard2 extends JobBoard {
       ];
 
       #usersWithSalesPermissions = ["ben", "tristan", "pearl"];
+      #designers = ["All", "Leandri Hayward", "Darren Frankish", "Tristan Cargill"];
 
       #jobObjects = [/**{
                   "Id": 57855,
@@ -108,6 +109,7 @@ class DesignBoard2 extends JobBoard {
             await this.LoadJobsData();
             this.CreateJobColumns();
             await this.AddJobCardsToBoards();
+            this.AddFiltersToHeader();
             this.ListenForWIPChanges();
             await this.AddPaymentButtonToCards(); //TODO
       }
@@ -227,9 +229,13 @@ class DesignBoard2 extends JobBoard {
             if(!this.#usersWithSalesPermissions.includes(this.currentUser)) return;
       }
 
-      OnJobPopOut() { }
+      OnJobPopOut() {
+            ToggleTimerPause();//Corebridge Inherited Function
+      }
 
-      OnJobPopOutLeave() { }
+      OnJobPopOutLeave() {
+            ToggleTimerPause();//Corebridge Inherited Function
+      }
 
       OnMoveEnd(event) {
             super.OnMoveEnd(event);
@@ -284,6 +290,24 @@ class DesignBoard2 extends JobBoard {
 
                   if(loader) loader.Delete();
             }
+      }
+
+      AddFiltersToHeader() {
+            let designerFilter = createDropdown_Infield("Designer", 0, ";box-shadow:none;", this.#designers.map(function(element) {
+                  return createDropdownOption(element, element);
+            }), () => {
+                  let currentFilterValue = designerFilter[1].value;
+                  for(let j = 0; j < this.#jobObjects.length; j++) {
+                        let jobDesigner = this.#jobObjects[j].containerObject.designer;
+                        if(jobDesigner != currentFilterValue && currentFilterValue != "All") {
+                              $(this.#jobObjects[j].containerObject.container).hide();
+                        } else {
+                              $(this.#jobObjects[j].containerObject.container).show();
+                        }
+                  }
+            }, null);
+
+            this.AddToHeader(designerFilter[0]);
       }
 
       async ListenForWIPChanges() {
