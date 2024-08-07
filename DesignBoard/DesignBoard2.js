@@ -28,7 +28,7 @@ class DesignBoard2 extends JobBoard {
       ];
 
       #usersWithSalesPermissions = ["ben", "tristan", "pearl"];
-      #designers = ["All", "Leandri Hayward", "Darren Frankish", "Tristan Cargill"];
+      #designers = ["All", "Leandri Hayward", "Darren Frankish", "Tristan Cargill", "null"];
 
       #jobObjects = [/**{
                   "Id": 57855,
