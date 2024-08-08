@@ -526,6 +526,7 @@ class UIContainer_Design2 {
       get jobObject() {return this.#jobObject;}
       get userCanSeeCosting() {return this.#usersWithSalesPermissions.includes(this.currentUser);}
       get designer() {return this.#f_designer[1].options[this.#f_designer[1].selectedIndex].text;}
+      get CompanyName() {return this.#jobObject.CompanyName;}
 
       /*Setter*/
       set whenClosedReturnBorrowed(val) {
@@ -786,6 +787,10 @@ class UIContainer_Design2 {
             }
 
             this.toggleNoteContainers("design");
+
+            /*
+            Address*/
+            let addressContainer = createDivStyle5("width:calc(100%);", "ADDRESS", this.#f_contentContainer)[1];
             /*
             Parts Container*/
             let partsContainer = createDivStyle5("width:calc(100%);", "PARTS", this.#f_contentContainer)[1];

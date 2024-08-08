@@ -97,6 +97,8 @@ class DesignBoard2 extends JobBoard {
                          
       FIELDS             
 */
+      #f_designerFilter;
+      #f_companyFilter;
 
       constructor(parentToAppendTo) {
             super(parentToAppendTo);
@@ -293,21 +295,36 @@ class DesignBoard2 extends JobBoard {
       }
 
       AddFiltersToHeader() {
-            let designerFilter = createDropdown_Infield("Designer", 0, ";box-shadow:none;", this.#designers.map(function(element) {
+            //Designer
+            this.#f_designerFilter = createDropdown_Infield("Designer", 0, ";box-shadow:none;", this.#designers.map(function(element) {
                   return createDropdownOption(element, element);
-            }), () => {
-                  let currentFilterValue = designerFilter[1].value;
-                  for(let j = 0; j < this.#jobObjects.length; j++) {
-                        let jobDesigner = this.#jobObjects[j].containerObject.designer;
-                        if(jobDesigner != currentFilterValue && currentFilterValue != "All") {
-                              $(this.#jobObjects[j].containerObject.container).hide();
-                        } else {
-                              $(this.#jobObjects[j].containerObject.container).show();
-                        }
-                  }
-            }, null);
+            }), () => {this.FilterJobs();}, null);
+            this.AddToHeader(this.#f_designerFilter[0]);
 
-            this.AddToHeader(designerFilter[0]);
+            //Company
+            this.#f_companyFilter = createInput_Infield("Company", "", "box-shadow:none;", () => {this.FilterJobs();}, null, false, null);
+
+            this.AddToHeader(this.#f_companyFilter[0]);
+      }
+
+      FilterJobs() {
+            for(let j = 0; j < this.#jobObjects.length; j++) {
+                  $(this.#jobObjects[j].containerObject.container).show();
+
+                  //Designer
+                  let filterValue = this.#f_designerFilter[1].value;
+                  let jobDesigner = this.#jobObjects[j].containerObject.designer;
+                  if(jobDesigner != filterValue && filterValue != "All") {
+                        $(this.#jobObjects[j].containerObject.container).hide();
+                  }
+
+                  //Company
+                  filterValue = this.#f_companyFilter[1].value;
+                  let companyName = this.#jobObjects[j].CompanyName;
+                  if(!companyName.toLowerCase().includes(filterValue.toLowerCase())) {
+                        $(this.#jobObjects[j].containerObject.container).hide();
+                  }
+            }
       }
 
       async ListenForWIPChanges() {

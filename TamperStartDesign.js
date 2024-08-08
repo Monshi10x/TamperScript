@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Design Board v2
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  try to take over the world!
 // @author       You
 // @match        https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx
