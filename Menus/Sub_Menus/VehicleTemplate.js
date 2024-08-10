@@ -133,9 +133,9 @@ class VehicleTemplate extends SubMenu {
             description[1].id = "description";
             var quantity = createInput_Infield("Qty", 1, "width:50px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 1);
             quantity[1].id = "quantity";
-            var width = createInput_Infield("Width", 0, "width:80px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 50, {postfix: "mm"});
+            var width = createInput_Infield("Width", 0, "width:120px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 50, {postfix: "mm"});
             width[1].id = "width";
-            var height = createInput_Infield("Height", 0, "width:80px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 50, {postfix: "mm"});
+            var height = createInput_Infield("Height", 0, "width:120px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 50, {postfix: "mm"});
             height[1].id = "height";
 
             var tempThis = this;
