@@ -739,7 +739,7 @@ class UIContainer_Design2 {
             createInput_Infield("Sales Person", this.#jobObject.SalesPersonName, null, () => { }, inhouseDiv, false, null);
 
             //Item Price
-            if(this.userCanSeeCosting) createInput_Infield("Item Price", this.#jobObject.TotalPrice, null, () => { }, inhouseDiv, false, null);
+            if(this.userCanSeeCosting) createInput_Infield("Item Price", this.#jobObject.TotalPrice, null, () => { }, inhouseDiv, false, null, {prefix: "$"});
 
             /*
             Customer*/
