@@ -121,4 +121,7 @@
 "prettier.tabWidth": 6,
 "editor.fontFamily": "Fira Code",//Fira Code
 "editor.fontLigatures": true,
+"[json]": {
+	"editor.defaultFormatter": "esbenp.prettier-vscode"
+},
 }
