@@ -425,6 +425,46 @@
                   }
             ],
             [
+                  "Ute - Toyota Hilux Single Cab 2020",
+                  "https://github.com/Monshi10x/TamperScript/raw/main/Images/ToyotaHiluxSingleCab2020.svg",
+                  14728.26,
+                  10480.67,
+                  {
+                        "name": "Single Door",
+                        "production_time": 120,
+                        "production_TE": "Each",
+                        "install_TE": "Each",
+                        "install_time": 160,
+                        "install_rate": "Install 1 Person (Min) $135/h",
+                        "template_rects": [
+                              {
+                                    "x": 10570,
+                                    "y": 3780.1136779785156,
+                                    "w": 1050,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Driver Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 9252.047768476488,
+                                    "y": 6519.14950433588,
+                                    "w": 1050,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Pass Door",
+                                    "colour": "#FF5A5A"
+                              }
+                        ]
+                  }
+            ],
+            [
                   "Sedan - Toyota Camry",
                   "https://github.com/Monshi10x/TamperScript/raw/main/Images/ToyotaCamry2024.svg",
                   9863.24,
