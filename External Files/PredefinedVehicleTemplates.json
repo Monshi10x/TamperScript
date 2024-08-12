@@ -398,10 +398,10 @@
                         "install_rate": "Install 1 Person (Min) $135/h",
                         "template_rects": [
                               {
-                                    "x": 4338.538567529978,
-                                    "y": 1497.1608374761054,
+                                    "x": 9677.570672605952,
+                                    "y": 4155.432270812819,
                                     "w": 1000,
-                                    "h": 500,
+                                    "h": 375,
                                     "qty": 1,
                                     "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
                                     "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
@@ -410,10 +410,10 @@
                                     "colour": "#FF5A5A"
                               },
                               {
-                                    "x": 3970.1974446149716,
-                                    "y": 3742.6334417093135,
+                                    "x": 9247.07799662209,
+                                    "y": 6140.170851817735,
                                     "w": 1000,
-                                    "h": 500,
+                                    "h": 375,
                                     "qty": 1,
                                     "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
                                     "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
