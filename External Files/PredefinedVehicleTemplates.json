@@ -425,6 +425,46 @@
                   }
             ],
             [
+                  "Sedan - Toyota Rav 4",
+                  "https://github.com/Monshi10x/TamperScript/raw/main/Images/ToyotaRav42017.svg",
+                  10155.1,
+                  6242.03,
+                  {
+                        "name": "Single Door",
+                        "production_time": 120,
+                        "production_TE": "Each",
+                        "install_TE": "Each",
+                        "install_time": 120,
+                        "install_rate": "Install 1 Person (Min) $135/h",
+                        "template_rects": [
+                              {
+                                    "x": 4983.318601415947,
+                                    "y": 1687.2036486293623,
+                                    "w": 1100,
+                                    "h": 500,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Driver Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 4222.525453241369,
+                                    "y": 3973.6033048625186,
+                                    "w": 1100,
+                                    "h": 500,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Pass Door",
+                                    "colour": "#FF5A5A"
+                              }
+                        ]
+                  }
+            ],
+            [
                   "Van - Toyota Hiace 2019",
                   "https://github.com/Monshi10x/TamperScript/raw/main/Images/toyotaHiace2019.svg",
                   14728.2,
@@ -558,10 +598,10 @@
                         "install_rate": "Install 1 Person (Min) $135/h",
                         "template_rects": [
                               {
-                                    "x": 9677.570672605952,
-                                    "y": 4155.432270812819,
+                                    "x": 9805.096302930308,
+                                    "y": 3970.520106842505,
                                     "w": 1000,
-                                    "h": 375,
+                                    "h": 500,
                                     "qty": 1,
                                     "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
                                     "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
@@ -570,10 +610,10 @@
                                     "colour": "#FF5A5A"
                               },
                               {
-                                    "x": 9247.07799662209,
-                                    "y": 6140.170851817735,
+                                    "x": 9259.125765098579,
+                                    "y": 6453.412832206426,
                                     "w": 1000,
-                                    "h": 375,
+                                    "h": 500,
                                     "qty": 1,
                                     "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
                                     "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
