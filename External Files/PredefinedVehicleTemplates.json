@@ -310,7 +310,7 @@
                   14728.2,
                   10480.6,
                   {
-                        "name": "Test33",
+                        "name": "Single Door",
                         "production_time": 120,
                         "production_TE": "Each",
                         "install_TE": "Each",
@@ -345,11 +345,44 @@
                   }
             ],
             [
-                  "Hatch",
+                  "Hatch - Toyota Carola 2022",
                   "https://cdn.gorilladash.com/images/media/5418205/Carola-01.svg",
                   9204.8,
                   6104.156,
-                  {}
+                  {
+                        "name": "Single Door",
+                        "production_time": 120,
+                        "production_TE": "Each",
+                        "install_TE": "Each",
+                        "install_time": 120,
+                        "install_rate": "Install 1 Person (Min) $135/h",
+                        "template_rects": [
+                              {
+                                    "x": 10782.582143355241,
+                                    "y": 3902.336470159139,
+                                    "w": 800,
+                                    "h": 500,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Driver Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 9208.142641992743,
+                                    "y": 6800.113677978516,
+                                    "w": 800,
+                                    "h": 500,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Pass Door",
+                                    "colour": "#FF5A5A"
+                              }
+                        ]
+                  }
             ]
       ]
 }
