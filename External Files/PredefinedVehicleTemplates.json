@@ -1,7 +1,7 @@
 {
       "predefinedVehicleTemplates": [
             [
-                  "Ute",
+                  "Ute - Ford Ranger 2022",
                   "https://cdn.gorilladash.com/images/media/5413744/ranger1-svg.svg",
                   10045.82,
                   6319.66,
@@ -265,12 +265,12 @@
                   }
             ],
             [
-                  "Sedan",
-                  "https://github.com/Monshi10x/TamperScript/raw/main/External%20Files/Toyota%20Camry%20Sedan.svg",
-                  9204.8,
-                  6104.156,
+                  "Sedan - Toyota Camry",
+                  "https://github.com/Monshi10x/TamperScript/raw/main/Images/ToyotaCamry2024.svg",
+                  9863.24,
+                  5918.25,
                   {
-                        "name": "Test33",
+                        "name": "Single Door",
                         "production_time": 120,
                         "production_TE": "Each",
                         "install_TE": "Each",
