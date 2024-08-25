@@ -10,7 +10,8 @@ function partInfoTick() {
 	var containsOtherInformation = false;
 	var containsAnyInstall = false;
 	totalOrderCost = 0;
-
+	let partCombinedPrice = 0;
+	let partCombinedPrice_anyIsTicked = false;
 
 	//******************************//
 	//           PRODUCT            //
@@ -185,8 +186,20 @@ function partInfoTick() {
 				createNameBtn(parts[part].querySelector(".ord-prod-part-header"), "partNameBtn", parts[part].querySelector(".txtPartDescription"), koPartName);
 			}
 
-
 			partPrice = koPartTotalPrice;
+
+			if(parts[part].querySelectorAll(".partCombinedPrice").length == 0) {
+				createPartCombinedPrice(parts[part].querySelector(".ord-prod-part-header"), "partCombinedPrice", parts[part]);
+			}
+			if(parts[part].querySelectorAll(".partCombinedPrice").length != 0) {
+				if(parts[part].querySelectorAll(".partCombinedPrice")[0].checked) {
+					partCombinedPrice += partPrice;
+					partCombinedPrice_anyIsTicked = true;
+				}
+			}
+
+
+
 
 			if(partHasInstall && partPrice == 0) {
 				setPartBorderColour(product + 1, part + 1, "red");
@@ -308,6 +321,17 @@ function partInfoTick() {
 	//******************************//
 	//            ORDER             //
 	//******************************//
+
+	//Combined Price
+	if(partCombinedPrice_anyIsTicked) {
+		document.getElementById("partCombinedPriceContainer").innerHTML = "Combined: <br>$" + roundNumber(partCombinedPrice, 2);
+		showPartCombinedPrice();
+	} else {
+		document.getElementById("partCombinedPriceContainer").innerHTML = "Combined: <br>$" + 0;
+		hidePartCombinedPrice();
+	}
+
+	partCombinedPrice = 0;
 	totalOrderPricePreGst = parseFloat(document.querySelector('#newSubtotalValue').innerText.replace(/\$|,/g, ''));
 	totalOrderPriceIncGst = totalOrderPricePreGst * 1.1;
 	orderMinimum_Price = totalOrderPricePreGst;
@@ -393,7 +417,7 @@ function partInfoTick() {
 	}
 
 	function createNameBtn(partInstance, classN, inputElement, newTextElement) {
-		let btn = createButton("Update Name", "height:27px;min-height:29px;width:80px;padding:0px;margin:0px 5px;font-size:11px;", function() {
+		let btn = createButton("Update", "height:27px;min-height:29px;width:60px;padding:0px;margin:0px 5px;font-size:11px;", function() {
 			var event = new Event('change');
 			$(inputElement).val(newTextElement).change();
 			inputElement.dispatchEvent(event);
@@ -408,6 +432,13 @@ function partInfoTick() {
 		}, partHead);
 		btn.className = classN;
 	}
+
+	function createPartCombinedPrice(partHead, classN, partInstance) {
+		let btn = createCheckbox("", false, "width:15px;padding:0px;", () => { }, partHead);
+
+		btn.className = classN;
+	}
+
 
 	function createAddArtworkBtn(partInstance, classN, productIndex, productInstance) {
 		let btn = createButton("Artwork", "width:80px;height:31px;padding:0px;margin:2px;margin-left:10px;font-size:11px;", async function() {
@@ -904,6 +935,22 @@ function tickAllParts(partN) {
 	}
 }
 
+function createPartCombinedPrice() {
+	let container = document.createElement('div');
+	container.style = "display:none;position:fixed;right:0px;top:82px;background-color:" + COLOUR.Blue + ";width:100px;height:30px;color:white;padding:10px;box-shadow:rgb(0, 0, 0) -6px 1px 20px -2px";
+	container.id = "partCombinedPriceContainer";
+	document.body.appendChild(container);
+}
+
+function showPartCombinedPrice() {
+	let container = document.getElementById("partCombinedPriceContainer");
+	container.style.display = "block";
+}
+
+function hidePartCombinedPrice() {
+	let container = document.getElementById("partCombinedPriceContainer");
+	container.style.display = "none";
+}
 
 function addQuickFindProducts() {
 	var footer = document.querySelector("#orderProductFooter");

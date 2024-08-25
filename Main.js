@@ -76,6 +76,7 @@ async function init() {
   orderStep2Btn = document.getElementById("orderStep2Btn");
   orderStep3Btn = document.getElementById("orderStep3Btn");
 
+  createPartCombinedPrice();
   addQuickFindProducts();
   await loadPredefinedQuickProducts();
   await loadPredefinedParts();
