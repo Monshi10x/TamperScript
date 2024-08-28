@@ -377,3 +377,16 @@ function catchNull(value, valueIfNull) {
     if(value == null) return valueIfNull;
     else return value;
 }
+
+function IFELSE(expression, valueIf, valueElse) {
+    if(expression) {
+        return valueIf;
+    } else {
+        return valueElse;
+    }
+}
+
+function isVisible(element) {
+    if(element.style.display != "none") return true;
+    return false;
+}

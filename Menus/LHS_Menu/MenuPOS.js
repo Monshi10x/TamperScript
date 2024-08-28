@@ -18,6 +18,7 @@ class MenuPOS extends LHSMenuWindow {
       #f_thickness;
       #f_markup;
       #f_createProductBtn;
+      #f_sides;
       #artwork;
 
       constructor(width, height, ID, windowTitle) {
@@ -40,7 +41,8 @@ class MenuPOS extends LHSMenuWindow {
             this.#f_typeDropdown = createDropdown_Infield_Icons_Search("Type", 0, null, 100, false, [
                   ["Business Cards", "https://orders.ibscards.com.au/assets/images/Products/5400.png"],
                   ["Flyers", "https://orders.ibscards.com.au/assets/images/Products/5407.png"],
-                  ["Corflute", "https://onespotprint.com.au/wp-content/uploads/2018/07/Corflute-Signs-1-One-Spot-Print.jpg"]], () => {
+                  ["Corflute - Direct Print", "https://onespotprint.com.au/wp-content/uploads/2018/07/Corflute-Signs-1-One-Spot-Print.jpg"],
+                  ["Flags", "https://onespotprint.com.au/wp-content/uploads/2018/07/Corflute-Signs-1-One-Spot-Print.jpg"]], () => {
                         setCheckboxChecked(this.#f_typeDropdown[1].value == "Corflute", this.#f_isPanelProduct[1]);
                   }, container, true);
 
@@ -68,6 +70,7 @@ class MenuPOS extends LHSMenuWindow {
                   ["A4 (297x210)", "#ffffff"],
                   ["A3 (297x420)", "#ffffff"],
                   ["A2 (594x420)", "#ffffff"],
+                  ["90x55", "#ffffff"],
                   ["600x900", "#ffffff"],
                   ["Custom Size", "#0000ff"]], () => {
                         if(this.#f_dimensions[1].value == "Custom Size") {
@@ -96,6 +99,10 @@ class MenuPOS extends LHSMenuWindow {
                   ["Silk/Matte", "#ffffff"],
                   ["Matte", "#ffffff"]], () => { }, container3, true);
 
+            this.#f_sides = createDropdown_Infield_Icons_Search("Sides", 0, "margin-right:60%;", 10, true, [
+                  ["Single Sided", "Single Sided"],
+                  ["Double Sided", "Double Sided"]], () => { }, container3, true);
+
             this.#f_extras = createTextarea("Other Extras", null, "margin-right:60%;", () => { }, container3);
 
             let container4 = createDivStyle5(null, "Links", this.#page1)[1];
@@ -105,8 +112,8 @@ class MenuPOS extends LHSMenuWindow {
             let container5 = createDivStyle5(null, "Artwork", this.#page1)[1];
             this.#artwork = new Artwork(container5, null, null);
 
-            this.#f_createProductBtn = createButton('Create Product', "margin:0px;width:100%", function() {
-                  this.Create();
+            this.#f_createProductBtn = createButton('Create Product', "margin:0px;width:100%", async () => {
+                  await this.Create();
             });
             this.footer.appendChild(this.#f_createProductBtn);
       }
@@ -120,7 +127,30 @@ class MenuPOS extends LHSMenuWindow {
             super.hide();
       }
 
-      Create() {
+      async Create() {
+            this.minimize();
+            await AddBlankProduct();
+            let productNo = getNumProducts();
+            var newPartIndex = 1;
+            console.log(parseFloat(this.#f_costForQty[1].value) / parseFloat(this.#f_qty[1].value));
+            await q_AddPart_CostMarkup(productNo, 0, true, false, 1, parseFloat(this.#f_costForQty[1].value) / parseFloat(this.#f_qty[1].value), this.#f_markup[1].value, "");
+            await setProductQty(productNo, this.#f_qty[1].value);
+            await setProductSummary(productNo, this.Description());
+            await setProductName(productNo, this.#f_typeDropdown[1].value);
 
+            Ordui.Alert("Done");
+            return newPartIndex;
       }
-}
+      //catchNull(value, valueIfNull)
+      Description() {
+            return "<ul>" +
+                  "<li>" + "Size: " + this.#f_dimensions[1].value + "</li>" +
+                  IFELSE(isVisible(this.#f_thickness[0]), "<li>" + "Thickness: " + this.#f_thickness[1].value + "mm</li>", "") +
+                  "<li>" + "GSM: " + this.#f_gsmDropdown[1].value + "</li>" +
+                  "<li>" + "Finish: " + this.#f_finishDropdown[1].value + "</li>" +
+                  "<li>" + this.#f_sides[1].value + "</li>" +
+                  IFELSE(this.#f_extras.value, "<li>" + "Extras: " + this.#f_extras.value + "</li>", "") +
+                  "</ul>" +
+                  this.#artwork.Description();
+      }
+} 

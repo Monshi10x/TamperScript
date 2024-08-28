@@ -639,7 +639,7 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
     containerDiv.appendChild(dropdownArrow);
 
     var searchBar = createInput("", null, "width:" + 600 + "px;height:30px;position:fixed;top:40px;left:0px;display:none;margin:0;padding:5px;box-sizing:border-box;z-index:1000;border:0px;outline:none;", narrowSearches, containerDiv);
-    searchBar.placeholder = "Search...";
+    searchBar.placeholder = "Search or Type Custom...";
 
     function narrowSearches() {
         let currentSearchTerm = searchBar.value.toLowerCase();
