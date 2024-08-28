@@ -29,7 +29,7 @@ class LightboxMenu extends LHSMenuWindow {
         var productionMinsPerLED = 120 / (144);//2 hours for 2440 lightbox
 
         var faceToBoxReductionAmount = 10;
-        var supportSpacing = 500;
+        var supportSpacing = 600;
         var supportSpacing_ReinforcedFrame = 1000;
         var supportReductionAmount = 4;
         var supportOrientation = 'vertical';
