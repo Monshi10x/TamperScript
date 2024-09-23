@@ -222,9 +222,9 @@ class Size2 extends SubscriptionManager {
 
             this.#qty = createInput_Infield("Qty", 1, "width:100px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 1);
 
-            this.#width = createInput_Infield("Width", null, "width:15%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100);
+            this.#width = createInput_Infield("Width", null, "width:15%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
 
-            this.#height = createInput_Infield("Height", null, "width:15%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100);
+            this.#height = createInput_Infield("Height", null, "width:15%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
 
             let commonSizeButton = createButton("A4,...", "width:60px;height:40px;margin:0px;margin-left:5px;margin-right:10px", () => {
                   this.#openCommonSizeModal();

@@ -97,16 +97,16 @@ class Laminate extends Material {
             let f_container_machine = createDivStyle5(null, "Machine", this.container)[1];
 
             createText("Setup", "width:100%;height:20px", f_container_machine);
-            this.#machineSetupTime = createInput_Infield("Setup Time Average (min)", 3, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1);
+            this.#machineSetupTime = createInput_Infield("Setup Time Average", 3, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "min"});
 
             createText("Run", "width:100%;height:20px", f_container_machine);
-            this.#machineLengthToRun = createInput_Infield("Length to Run (m)", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1);
+            this.#machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "m"});
             setFieldDisabled(true, this.#machineLengthToRun[1], this.#machineLengthToRun[0]);
-            this.#machineRunSpeed = createInput_Infield("Run Speed (m/min)", 2, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1);
-            this.#machineRunTime = createInput_Infield("Run Time (mins)", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1);
+            this.#machineRunSpeed = createInput_Infield("Run Speed", 2, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "m/min"});
+            this.#machineRunTime = createInput_Infield("Run Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#machineRunTime[1], this.#machineRunTime[0]);
             createText("Total", "width:100%;height:20px", f_container_machine);
-            this.#machineTotalTime = createInput_Infield("Total Time (mins)", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1);
+            this.#machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#machineTotalTime[1], this.#machineTotalTime[0]);
 
             /*

@@ -103,10 +103,10 @@ class Material extends SubscriptionManager {
             this.#f_qty = createInput_Infield("Qty", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 1);
             setFieldDisabled(true, this.#f_qty[1], this.#f_qty[0]);
 
-            this.#f_width = createInput_Infield("Width", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100);
+            this.#f_width = createInput_Infield("Width", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100, {postfix: "mm"});
             setFieldDisabled(true, this.#f_width[1], this.#f_width[0]);
 
-            this.#f_height = createInput_Infield("Height", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100);
+            this.#f_height = createInput_Infield("Height", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100, {postfix: "mm"});
             setFieldDisabled(true, this.#f_height[1], this.#f_height[0]);
 
             this.#f_lockBtn = createButton("", "font-size: 18px;display: block; float: left; width:10%; min-width:20px;max-width:30px;border:none;padding:2px; color:white;min-height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {

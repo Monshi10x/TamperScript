@@ -157,9 +157,9 @@ class Vinyl extends Material {
             RollUsage*/
             let f_container_rollUsage = createDivStyle5(null, "Roll Usage", this.container)[1];
 
-            this.#rollWidth = createInput_Infield("Roll Width", 1370, "width:100px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10);
-            this.#rollWastage = createInput_Infield("Roll Wastage % *Approx", 25, "width:200px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10);
-            this.#rollLengthUsed = createInput_Infield("Roll Length (m) Used *Approx", 0, "width:200px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10);
+            this.#rollWidth = createInput_Infield("Roll Width", 1370, "width:100px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "mm"});
+            this.#rollWastage = createInput_Infield("Roll Wastage *Approx", 25, "width:200px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "%"});
+            this.#rollLengthUsed = createInput_Infield("Roll Length Used *Approx", 0, "width:200px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "m"});
             setFieldDisabled(true, this.#rollLengthUsed[1], this.#rollLengthUsed[0]);
 
             /*
@@ -186,7 +186,7 @@ class Vinyl extends Material {
                   }
                   this.#visualiser.setSizeArrays(...matrixSizeArrays);
             }, f_container_joins, true);
-            this.#joinOverlap = createInput_Infield("Join Overlap", 10, "width:100px;", () => {this.UpdateFromChange();}, f_container_joins, false, 5);
+            this.#joinOverlap = createInput_Infield("Join Overlap", 10, "width:100px;", () => {this.UpdateFromChange();}, f_container_joins, false, 5, {postfix: "mm"});
             this.#joinOrientation = createCheckbox_Infield("Join Horizontal", true, "width:150px", () => {this.UpdateFromChange();}, f_container_joins, () => {this.UpdateFromChange();});
 
             /*
@@ -210,17 +210,17 @@ class Vinyl extends Material {
             let f_container_machine = createDivStyle5(null, "HP Printer", this.container)[1];
 
             createText("Setup", "width:100%;height:20px", f_container_machine);
-            this.#machineSetupTime = createInput_Infield("Setup Time (min)", 2, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1);
+            this.#machineSetupTime = createInput_Infield("Setup Time", 2, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "min"});
 
             createText("Run", "width:100%;height:20px", f_container_machine);
-            this.#machineLengthToRun = createInput_Infield("Length to Run (m)", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1);
+            this.#machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mm"});
             setFieldDisabled(true, this.#machineLengthToRun[1], this.#machineLengthToRun[0]);
-            this.#machineRunSpeed = createInput_Infield("Run Speed (m/min)", 0.3, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1);
-            this.#machineRunTime = createInput_Infield("Total Run Time (mins)", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1);
+            this.#machineRunSpeed = createInput_Infield("Run Speed", 0.3, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "m/min"});
+            this.#machineRunTime = createInput_Infield("Total Run Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#machineRunTime[1], this.#machineRunTime[0]);
 
             createText("Total", "width:100%;height:20px", f_container_machine);
-            this.#machineTotalTime = createInput_Infield("Total Time (mins)", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1);
+            this.#machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#machineTotalTime[1], this.#machineTotalTime[0]);
 
             /*
