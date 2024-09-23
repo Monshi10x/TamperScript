@@ -175,7 +175,7 @@ class Laminate extends Material {
             let runSpeed_mMin = zeroIfNaNNullBlank(this.#machineRunSpeed[1].value);
             let setupTime = zeroIfNaNNullBlank(this.#machineSetupTime[1].value);
             for(let i = 0; i < this.#inheritedSizes.length; i++) {
-                  totalLength_mm += Math.max(this.#inheritedSizes[i].height, this.#inheritedSizes[i].width);
+                  totalLength_mm += Math.max(this.#inheritedSizes[i].height, this.#inheritedSizes[i].width) * this.#inheritedSizes[i].qty;
             }
             this.#machineLengthToRun[1].value = roundNumber(mmToM(totalLength_mm), 2);
             this.#machineRunTime[1].value = roundNumber(mmToM(totalLength_mm) / runSpeed_mMin, 2);

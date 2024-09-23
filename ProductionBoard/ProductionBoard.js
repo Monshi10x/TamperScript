@@ -5,11 +5,11 @@
 })();
 
 window.addEventListener("load", async (event) => {
-      new DesignBoard2(document.body);
+      new ProductionBoard(document.body);
 });
 
 
-class DesignBoard2 extends JobBoard {
+class ProductionBoard extends JobBoard {
       /*
                         
       VARIABLES         
@@ -17,14 +17,13 @@ class DesignBoard2 extends JobBoard {
       //StateID = production, design etc (WIP ID)
       //QueueID = QueuePrioritizationSettingId = colour number (Colour ID)
       #boards = [
-            {title: "Hold", colour: "#a5a5a5", WIPStatus: "WIP : In Design", CBQueueID: "9", CBStateId: "7", fallbackPriority: 2},
+            {title: "Hold", colour: "#a5a5a5", WIPStatus: "WIP : In Production", CBQueueID: "9", CBStateId: "8", fallbackPriority: 3},
             {title: "Urgent", colour: "#ff0000", WIPStatus: null, CBQueueID: "3", CBStateId: null, fallbackPriority: null},
-            {title: "Design", colour: "#4472c4", WIPStatus: "WIP : In Design", CBQueueID: "5", CBStateId: "7", fallbackPriority: 1},
-            {title: "Design Revision", colour: "#a9d08e", WIPStatus: "WIP : In Design Revision", CBQueueID: "14", CBStateId: "10", fallbackPriority: 1},
-            {title: "Print Files To Be Done", colour: "#d9e1f2", WIPStatus: "WIP : Proof Approved", CBQueueID: "13", CBStateId: "14", fallbackPriority: 1},
-            {title: "T To Approve Print Files", colour: "#47ad8b", WIPStatus: "WIP : Proof Approved", CBQueueID: "6", CBStateId: "14", fallbackPriority: 2},
-            {title: "Print Files Approved", colour: "#ffc000", WIPStatus: "WIP : Proof Approved", CBQueueID: "8", CBStateId: "14", fallbackPriority: 3},
-            {title: "In Production", colour: "#000000", WIPStatus: "WIP : In Production", CBQueueID: "5", CBStateId: "8"}
+            {title: "Printed Ready to Laminate", colour: "#ff9999", WIPStatus: "WIP : In Production", CBQueueID: "10", CBStateId: "8", fallbackPriority: 1},
+            {title: "Prep", colour: "#4472c4", WIPStatus: "WIP : In Production", CBQueueID: "5", CBStateId: "8", fallbackPriority: 1},
+            {title: "Ready To Install", colour: "#be32ed", WIPStatus: "WIP : In Production", CBQueueID: "12", CBStateId: "8", fallbackPriority: 1},
+            {title: "Customer To Collect", colour: "#84f5cf", WIPStatus: "WIP : In Production", CBQueueID: "11", CBStateId: "8", fallbackPriority: 1},
+            {title: "Job Finished", colour: "#d984f5", WIPStatus: "WIP : In Production", CBQueueID: "15", CBStateId: "6", fallbackPriority: 1}
       ];
 
       #usersWithSalesPermissions = ["ben", "tristan", "pearl"];
@@ -124,7 +123,7 @@ class DesignBoard2 extends JobBoard {
 
       async LoadJobsData() {
             console.time("LoadJobsData");
-            let data = await getDesignJobs();
+            let data = await getProductionJobs();
             console.timeEnd("LoadJobsData");
 
             this.#numJobs = data.length;
@@ -178,11 +177,6 @@ class DesignBoard2 extends JobBoard {
 
                         if(jobHasNoColour) {
                               await this.ChangeJobColourToSuitWIPAndAddToBoard(jobObject);
-                        }
-
-                        jobObject = this.#jobObjects[j];//refresh after changes made
-                        if(jobObject.containerObject.jobColour == "#ff0000") {
-                              jobObject.containerObject.container.classList.add("urgentPulse");
                         }
                   }
                   this.UpdateJobsInContainer(this.columnContainers[b].containerObject.contentContainer);

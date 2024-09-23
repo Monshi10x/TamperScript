@@ -536,7 +536,9 @@ class UIContainer_Design2 {
       set Id(value) {this.#Id = value;}
       set OrderId(value) {this.#OrderId = value;}
       set Priority(value) {this.#Priority = value;}
-      set jobColour(value) {this.#f_jobColour.style.backgroundColor = value;}
+      set jobColour(value) {
+            this.#f_jobColour.style.backgroundColor = value;
+      }
       set QueuePrioritySettingId(value) {this.#QueuePrioritySettingId = value;}
 
       setOrder(value) {this.#f_jobOrder.innerText = value;}
