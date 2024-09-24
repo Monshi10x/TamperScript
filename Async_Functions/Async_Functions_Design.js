@@ -46,7 +46,7 @@ async function getProductionJobs() {
             },
             "referrer": "https://sar10686.corebridge.net/ProductionModule/WipQueue.aspx",
             "referrerPolicy": "strict-origin-when-cross-origin",
-            "body": "{\"sEcho\":2,\"iColumns\":21,\"sColumns\":\"\",\"iDisplayStart\":0,\"iDisplayLength\":30,\"iSortCol_0\":6,\"sSortDir_0\":\"asc\",\"viewType\":\"production\",\"queueType\":\"production_wip\",\"txSearch\":\"\",\"pageIndex\":1,\"arrQueueFilters\":[null,\"\",null,\"\",\"\",\"\",\"\",\"\",null,null,\"\",\"\",null,null]}",
+            "body": "{\"sEcho\":2,\"iColumns\":21,\"sColumns\":\"\",\"iDisplayStart\":0,\"iDisplayLength\":500,\"iSortCol_0\":6,\"sSortDir_0\":\"asc\",\"viewType\":\"production\",\"queueType\":\"production_wip\",\"txSearch\":\"\",\"pageIndex\":1,\"arrQueueFilters\":[null,\"\",null,\"\",\"\",\"\",\"\",\"\",null,null,\"\",\"\",null,null]}",
             "method": "POST",
             "mode": "cors",
             "credentials": "include"
