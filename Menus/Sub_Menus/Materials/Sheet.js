@@ -17,6 +17,7 @@ class Sheet extends Material {
             "Guillotine": createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine"),
             "None": createDropdownOption("None - (standard sheet)", "None"),
             "Router": createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router"),
+            "Laser": createDropdownOption("Laser - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Laser"),
             "Hand": createDropdownOption("Cut By Hand - (PVC, Corflute)", "Cut By Hand"),
             "Supplier": createDropdownOption("Cut By Supplier", "Cut By Supplier")
       };
@@ -41,7 +42,22 @@ class Sheet extends Material {
             "Mondoclad",
             "Foamed PVC",
             "Polycarb",
-            "HDPE"
+            "HDPE",
+            "MDF"
+      ];
+      static laserMaterialsCanCut = [
+            "Acrylic",
+            "Aluminium",
+            "Mondoclad",
+            "Foamed PVC",
+            "Polycarb",
+            "HDPE",
+            "Corflute",
+            "Stainless Steel",
+            "Copper",
+            "Brass",
+            "MDF",
+            "Steel"
       ];
       static handMaterialsCanCut = [
             "ACM",
@@ -250,7 +266,6 @@ class Sheet extends Material {
             Cutting*/
             let f_container_cutting = createDivStyle5(null, "Cutting", this.container)[1];
             this.#cuttingJoinNote = createLabel("Note: Some sizes bigger than sheet size. Increase sheet size or use helper to establish joins", "width:95%;font-weight:bold;display:none;color:red;padding-bottom:5px;", f_container_cutting);
-            this.#cuttingNote = createLabel("Note: Materials other than ACM, and bigger than 2500w must be router cut", "width:95%;font-weight:bold", f_container_cutting);
 
             //Guillotine
             this.#guillotineProduction = new Production(f_container_cutting, null, function() { }, null);
@@ -424,7 +439,7 @@ class Sheet extends Material {
                         let totalPerimeter = roundNumber((w * 2 + h * 2) * qty, 2);
                         let options = this.createCuttingOptions(w, h, sheetSizeWidth, sheetSizeHeight, currentMaterial);
 
-                        let cuttingTypeDropDown = createDropdown_Infield("Panel Cutting Type", 0, "width:200px;", options, () => {
+                        let cuttingTypeDropDown = createDropdown_Infield("Panel Cutting Type", 0, ";width:-webkit-fill-available;", options, () => {
                               this.UpdateTableTotals();
                         }, null);
 
@@ -535,13 +550,15 @@ class Sheet extends Material {
             let returnArray = [];
             let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet";
             let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material);
-            let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material); console.log(canRouterSheet);
+            let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material);
+            let canLaserSheet = Sheet.canLaserSheet(width, height, sheetWidth, sheetHeight, material);
             let canHandCutSheet = Sheet.canHandCutSheet(width, height, sheetWidth, sheetHeight, material);
             if(width === null && height === null && sheetWidth === null && sheetHeight === null) {
                   returnArray = [
                         createDropdownOption("None - (standard sheet)", "None"),
                         createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine"),
                         createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router"),
+                        createDropdownOption("Laser - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Laser"),
                         createDropdownOption("Cut By Hand - (PVC, Corflute)", "Cut By Hand"),
                         createDropdownOption("Cut By Supplier", "Cut By Supplier")
                   ];
@@ -550,6 +567,7 @@ class Sheet extends Material {
                         setFieldDisabled(!isStandardSheet, createDropdownOption("None - (standard sheet)", "None")),
                         setFieldDisabled(!canGuillotineSheet, createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine")),
                         setFieldDisabled(!canRouterSheet, createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router")),
+                        setFieldDisabled(!canLaserSheet, createDropdownOption("Laser - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Laser")),
                         setFieldDisabled(!canHandCutSheet, createDropdownOption("Cut By Hand - (PVC, Corflute)", "Cut By Hand")),
                         createDropdownOption("Cut By Supplier", "Cut By Supplier")
                   ];
@@ -702,6 +720,22 @@ class Sheet extends Material {
                   return false;
             }
             let [maxCutW, maxCutH] = convertDimensionsToLandscape(Router.maxCutSize.width, Router.maxCutSize.height);
+            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
+            let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
+
+            if(sw > maxCutW || sh > maxCutH || w > maxCutW || h > maxCutH) return false;
+            return true;
+      };
+
+      /**
+       * @Laser
+       */
+      static canLaserSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
+            console.log(cutWidth, cutHeight, sheetWidth, sheetHeight, material);
+            if(!Sheet.laserMaterialsCanCut.includes(material)) {
+                  return false;
+            }
+            let [maxCutW, maxCutH] = convertDimensionsToLandscape(Laser.maxCutSize.width, Laser.maxCutSize.height);
             let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
             let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
 

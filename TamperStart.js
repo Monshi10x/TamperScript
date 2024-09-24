@@ -96,6 +96,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Leg.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Production.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Router.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Laser.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/Material.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Size.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Size2.js

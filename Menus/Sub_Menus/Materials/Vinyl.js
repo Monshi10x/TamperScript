@@ -201,7 +201,7 @@ class Vinyl extends Material {
 
             createText("Roll Usage", "width:100%;height:20px", f_container_outputSizes);
             this.#outputSizeTable2 = new Table(f_container_outputSizes, "100%", 20, 250);
-            this.#outputSizeTable2.setHeading("Qty", "Width", "Height");
+            this.#outputSizeTable2.setHeading("Qty", "Width", "Length");
             this.#outputSizeTable2.addRow("-", "-", "-");
             this.#outputSizeTable2.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
@@ -213,7 +213,7 @@ class Vinyl extends Material {
             this.#machineSetupTime = createInput_Infield("Setup Time", 2, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "min"});
 
             createText("Run", "width:100%;height:20px", f_container_machine);
-            this.#machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mm"});
+            this.#machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "m"});
             setFieldDisabled(true, this.#machineLengthToRun[1], this.#machineLengthToRun[0]);
             this.#machineRunSpeed = createInput_Infield("Run Speed", 0.3, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "m/min"});
             this.#machineRunTime = createInput_Infield("Total Run Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
