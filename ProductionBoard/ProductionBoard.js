@@ -20,7 +20,7 @@ class ProductionBoard extends JobBoard {
             {title: "Hold", colour: "#a5a5a5", WIPStatus: "WIP : In Production", CBQueueID: "9", CBStateId: "8", fallbackPriority: 3},
             {title: "Urgent", colour: "#ff0000", WIPStatus: null, CBQueueID: "3", CBStateId: null, fallbackPriority: null},
             {title: "Printed Ready to Laminate", colour: "#ff9999", WIPStatus: "WIP : In Production", CBQueueID: "10", CBStateId: "8", fallbackPriority: 1},
-            {title: "Prep", colour: "#4472c4", WIPStatus: "WIP : In Production", CBQueueID: "5", CBStateId: "8", fallbackPriority: 1},
+            {title: "Prep", colour: "#4472c4", WIPStatus: "WIP : In Production", CBQueueID: "5", CBStateId: "8", fallbackPriority: 2},
             {title: "Ready To Install", colour: "#be32ed", WIPStatus: "WIP : In Production", CBQueueID: "12", CBStateId: "8", fallbackPriority: 1},
             {title: "Customer To Collect", colour: "#84f5cf", WIPStatus: "WIP : In Production", CBQueueID: "11", CBStateId: "8", fallbackPriority: 1},
             {title: "Job Finished", colour: "#d984f5", WIPStatus: "WIP : In Production", CBQueueID: "15", CBStateId: "6", fallbackPriority: 1}

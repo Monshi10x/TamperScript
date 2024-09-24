@@ -24,7 +24,7 @@ class DesignBoard2 extends JobBoard {
             {title: "Print Files To Be Done", colour: "#d9e1f2", WIPStatus: "WIP : Proof Approved", CBQueueID: "13", CBStateId: "14", fallbackPriority: 1},
             {title: "T To Approve Print Files", colour: "#47ad8b", WIPStatus: "WIP : Proof Approved", CBQueueID: "6", CBStateId: "14", fallbackPriority: 2},
             {title: "Print Files Approved", colour: "#ffc000", WIPStatus: "WIP : Proof Approved", CBQueueID: "8", CBStateId: "14", fallbackPriority: 3},
-            {title: "In Production", colour: "#000000", WIPStatus: "WIP : In Production", CBQueueID: "5", CBStateId: "8"}
+            {title: "In Production", colour: "#000000", WIPStatus: "WIP : In Production", CBQueueID: "10", CBStateId: "8"}
       ];
 
       #usersWithSalesPermissions = ["ben", "tristan", "pearl"];
