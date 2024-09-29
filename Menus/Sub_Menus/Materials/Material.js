@@ -4,7 +4,7 @@ class Material extends SubscriptionManager {
                         
       Variables         */
       #isMinimized = true;
-      #showIDInContainer = true;
+      #showIDInContainer = false;
       #productNumber = -1;
       #Type = "";
       #UNIQUEID = generateUniqueID();

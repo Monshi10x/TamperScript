@@ -9,48 +9,56 @@ class Router extends SubMenu {
 	constructor(parentContainer, canvasCtx, updateFunction, sizeClass) {
 		super(parentContainer, canvasCtx, updateFunction, "CNC Router");
 
-		this.l_qty = createInput_Infield("Qty", 1, "width:30%;min-width:50px;", null, this.contentContainer, true, 1);
+		/*Qty*/
+		let f_container_qty = createDivStyle5(null, "Qty", this.contentContainer);
+		f_container_qty[3].style.cssText += "width:50px;";
+		f_container_qty[1].style.cssText = "width:calc(100% - 50px)";
+		this.l_qty = createInput_Infield("Qty", 1, "width:30%;min-width:50px;", null, f_container_qty[1], true, 1);
+
 
 		this.l_timeTE = createDropdown_Infield("Each or Total", 1, "width:30%;margin-right:30%;", [
 			createDropdownOption("Total", "Total"),
 			createDropdownOption("Each", "Each")
-		], () => {this.Update();}, this.contentContainer);
+		], () => {this.Update();}, f_container_qty[1]);
 
-		let hr1 = createHr(null, this.contentContainer);
-
-		this.l_setupOnceOff = createCheckbox_Infield("Setup One Sheet", true, "width:30%;", () => {this.Update();}, this.contentContainer, true);
-		this.l_setupMultiple = createCheckbox_Infield("Setup Multiple Sheets", false, "width:30%;margin-right:30%;", () => {this.Update();}, this.contentContainer, true);
+		/*Setup*/
+		let f_container_setup = createDivStyle5(null, "Setup", this.contentContainer);
+		f_container_setup[3].style.cssText += "width:50px;";
+		f_container_setup[1].style.cssText = "width:calc(100% - 50px)";
+		this.l_setupOnceOff = createCheckbox_Infield("Setup One Sheet", true, "width:30%;", () => {this.Update();}, f_container_setup[1], true);
+		this.l_setupMultiple = createCheckbox_Infield("Setup Multiple Sheets", false, "width:60%;", () => {this.Update();}, f_container_setup[1], true);
 		checkboxesAddToSelectionGroup(true, this.l_setupOnceOff, this.l_setupMultiple);
-		this.l_setupNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, this.contentContainer, false, 1);
-		this.l_setupPerSheet = createInput_Infield("Setup per Sheet", 10, "width:30%;display:none", () => {this.Update();}, this.contentContainer, false, 1);
-		this.l_setupTime = createInput_Infield("Total Setup Minutes", 20, "width:30%;", null, this.contentContainer, false, 10);
+		this.l_setupNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, f_container_setup[1], false, 1);
+		this.l_setupPerSheet = createInput_Infield("Setup per Sheet", 10, "width:30%;display:none", () => {this.Update();}, f_container_setup[1], false, 1, {postfix: "mins"});
+		this.l_setupTime = createInput_Infield("Total Setup Minutes", 20, "width:30%;", null, f_container_setup[1], false, 10, {postfix: "mins"});
 
-		let hr2 = createHr(null, this.contentContainer);
-
-		this.l_usePaths = createCheckbox_Infield("Use Path Specs for Times", true, "width:30%;margin-right:50%;", () => {this.updateRun();}, this.contentContainer);
-
-		this.l_cuttingTable = new Table(this.contentContainer, 650, 20, 250);
+		/*Run Time*/
+		let f_container_run = createDivStyle5(null, "Run", this.contentContainer);
+		f_container_run[3].style.cssText += "width:50px;";
+		f_container_run[1].style.cssText = "width:calc(100% - 50px)";
+		this.l_usePaths = createCheckbox_Infield("Use Path Specs for Times", true, "width:60%;margin-right:30%;", () => {this.updateRun();}, f_container_run[1]);
+		this.l_cuttingTable = new Table(f_container_run[1], "100%", 20, 250);
 		this.l_cuttingTable.setHeading("Total Path Length", "Number Shapes", "Material", "Profile", "Quality", "Speed", "Delete");
+		this.l_addRowBtn = createButton("+ Row", "width:15%;margin-right:70%;min-width:80px;", () => {this.addRunRow();}, f_container_run[1]);
+		this.l_runTime = createInput_Infield("Total Run Minutes", 20, "width:30%", null, f_container_run[1], false, 10, {postfix: "mins"});
 
-		this.l_addRowBtn = createButton("+ Row", "width:15%;margin-right:70%;min-width:80px;", () => {this.addRunRow();}, this.contentContainer);
-
-		this.l_runTime = createInput_Infield("Run Minutes", 20, "width:30%", null, this.contentContainer, false, 10);
-
-		let hr3 = createHr(null, this.contentContainer);
-
-		this.l_cleanOnceOff = createCheckbox_Infield("Clean One Sheet", true, "width:30%;", () => {this.Update();}, this.contentContainer, true);
-		this.l_cleanMultiple = createCheckbox_Infield("Clean Multiple Sheets", false, "width:30%;margin-right:30%;", () => {this.Update();}, this.contentContainer, true);
+		/*Clean Time*/
+		let f_container_clean = createDivStyle5(null, "Clean", this.contentContainer);
+		f_container_clean[3].style.cssText += "width:50px;";
+		f_container_clean[1].style.cssText = "width:calc(100% - 50px)";
+		this.l_cleanOnceOff = createCheckbox_Infield("Clean One Sheet", true, "width:30%;", () => {this.Update();}, f_container_clean[1], true);
+		this.l_cleanMultiple = createCheckbox_Infield("Clean Multiple Sheets", false, "width:60%;", () => {this.Update();}, f_container_clean[1], true);
 		checkboxesAddToSelectionGroup(true, this.l_cleanOnceOff, this.l_cleanMultiple);
-		this.l_cleanNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, this.contentContainer, false, 1);
-		this.l_cleanPerSheet = createInput_Infield("Clean per Sheet", 10, "width:30%;display:none", () => {this.Update();}, this.contentContainer, false, 1);
-		this.l_cleanTime = createInput_Infield("Total Clean Minutes", 10, "width:30%", null, this.contentContainer, false, 10);
+		this.l_cleanNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, f_container_clean[1], false, 1);
+		this.l_cleanPerSheet = createInput_Infield("Clean per Sheet", 10, "width:30%;display:none", () => {this.Update();}, f_container_clean[1], false, 1, {postfix: "mins"});
+		this.l_cleanTime = createInput_Infield("Total Clean Minutes", 10, "width:30%", null, f_container_clean[1], false, 10, {postfix: "mins"});
 
 		makeFieldGroup("Checkbox", this.l_setupMultiple[1], true, this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0]);
 		makeFieldGroup("Checkbox", this.l_cleanMultiple[1], true, this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0]);
 		makeFieldGroup("Checkbox", this.l_usePaths[1], true, this.l_cuttingTable.container, this.l_addRowBtn);
 		makeFieldGroup("Checkbox",
 			this.requiredField[1], false, this.l_qty[0], this.l_timeTE[0], this.l_setupOnceOff[0], this.l_setupTime[0], this.l_runTime[0], this.l_addRowBtn,
-			this.l_cleanTime[0], this.l_usePaths[0], hr1, hr2, hr3, this.l_cuttingTable.container, this.l_setupMultiple[0], this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0],
+			this.l_cleanTime[0], this.l_usePaths[0], this.l_cuttingTable.container, this.l_setupMultiple[0], this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0],
 			this.l_cleanMultiple[0], this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0], this.l_cleanOnceOff[0]
 		);
 

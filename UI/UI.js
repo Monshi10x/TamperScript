@@ -136,7 +136,7 @@ function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo)
     let f_headingText = document.createElement("span");
     let f_contentContainer = document.createElement("div");
 
-    f_div.style = STYLE.Div5;
+    f_div.style = STYLE.Div5 + ";min-height:30px;";
     f_div.style.cssText += overrideCssStyles;
 
     f_headingTextWrapper.style = "display:table;width:100px;text-align: center;float: left; position: relative; background-color: " + COLOUR.DarkBlue +
@@ -154,7 +154,7 @@ function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo)
     f_div.appendChild(f_headingTextWrapper);
     f_div.appendChild(f_contentContainer);
 
-    return [f_div, f_contentContainer, f_headingText];
+    return [f_div, f_contentContainer, f_headingText, f_headingTextWrapper];
 }
 function createButton(text, overrideCssStyles, optionalCallback, parentObjectToAppendTo) {
     var btn = document.createElement('button');

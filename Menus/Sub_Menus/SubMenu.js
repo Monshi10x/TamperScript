@@ -7,7 +7,7 @@ class SubMenu extends SubscriptionManager {
       #required;
       #updateFunction;
       #UNIQUEID;
-      #showIDInContainer = true;
+      #showIDInContainer = false;
       get UNIQUEID() {return this.#UNIQUEID;}
       get ID() {return this.UNIQUEID;};
 
