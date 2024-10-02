@@ -308,6 +308,7 @@ class ProductionBoard extends JobBoard {
 
             //Company
             this.#f_companyFilter = createInput_Infield("Company", "", "box-shadow:none;", () => {this.FilterJobs();}, null, false, null);
+            this.#f_companyFilter[1].autocomplete = "off";
 
             this.AddToHeader(this.#f_companyFilter[0]);
       }
