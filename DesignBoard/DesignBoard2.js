@@ -313,8 +313,7 @@ class DesignBoard2 extends JobBoard {
             this.AddToHeader(this.#f_designerFilter[0]);
 
             //Company
-            this.#f_companyFilter = createInput_Infield("Company", "", "box-shadow:none;", () => {this.FilterJobs();}, null, false, null);
-            this.#f_companyFilter[1].autocomplete = "off";
+            this.#f_companyFilter = createInput_Infield("Company Name", "", "box-shadow:none;", () => {this.FilterJobs();}, null, false, null);
 
             this.AddToHeader(this.#f_companyFilter[0]);
       }
