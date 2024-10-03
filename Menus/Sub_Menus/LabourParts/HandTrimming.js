@@ -60,15 +60,15 @@ class HandTrimming extends Material {
             TimeStats*/
             let f_container_stats = createDivStyle5(null, "Stats", this.container)[1];
 
-            this.#totalLinearMetresField = createInput_Infield("Total Linear Metres", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1);
+            this.#totalLinearMetresField = createInput_Infield("Total Linear Metres", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "m"});
             setFieldDisabled(true, this.#totalLinearMetresField[1], this.#totalLinearMetresField[0]);
-            this.#trimmingSecondsPerMetreField = createInput_Infield("Trimming Seconds Per Metre", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1);
+            this.#trimmingSecondsPerMetreField = createInput_Infield("Trimming Speed", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "sec/m"});
             this.#totalTrimmingText = createText("Total Trimming: ", "width:250px;height:60px;padding:16px;", f_container_stats);
 
             createHr(null, f_container_stats);
 
             this.#numberOfShapesField = createInputCalculated_Infield("Number Of Shapes", 0, null, () => {this.UpdateTrimmingTimes();}, true, f_container_stats);
-            this.#handlingTimePerShapeField = createInput_Infield("Handling Time Per Shape (sec)", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1);
+            this.#handlingTimePerShapeField = createInput_Infield("Handling Time Per Shape", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "sec"});
             this.#totalHandlingText = createText("Total Handling: ", "width:250px;height:60px;padding:16px;", f_container_stats);
             createHr(null, f_container_stats);
             this.#totalTimeField = createInputCalculated_Infield("Total Time (mins)", 0, "margin: 5px calc(50% - 125px);", () => {this.UpdateTrimmingTimes();}, true, f_container_stats);

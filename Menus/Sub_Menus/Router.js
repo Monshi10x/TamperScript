@@ -39,7 +39,7 @@ class Router extends SubMenu {
 		this.l_usePaths = createCheckbox_Infield("Use Path Specs for Times", true, "width:60%;margin-right:30%;", () => {this.updateRun();}, f_container_run[1]);
 		this.l_cuttingTable = new Table(f_container_run[1], "100%", 20, 250);
 		this.l_cuttingTable.setHeading("Total Path Length", "Number Shapes", "Material", "Profile", "Quality", "Speed", "Delete");
-		this.l_addRowBtn = createButton("+ Row", "width:15%;margin-right:70%;min-width:80px;", () => {this.addRunRow();}, f_container_run[1]);
+		this.l_addRowBtn = createButton("+ Row", "width:15%;margin:0px;margin-right:70%;min-width:80px;", () => {this.addRunRow();}, f_container_run[1]);
 		this.l_runTime = createInput_Infield("Total Run Minutes", 20, "width:30%", null, f_container_run[1], false, 10, {postfix: "mins"});
 
 		/*Clean Time*/
@@ -179,13 +179,13 @@ class Router extends SubMenu {
 	addRunRow(pathLength = 0, numberShapes = 0) {
 		this.runRowIndex++;
 		let internalIndex = this.runRowIndex;
-		let l_pathLength = createInput_Infield("Length (mm)", pathLength, "width:90%;min-width:90px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 10);
+		let l_pathLength = createInput_Infield("Length", pathLength, "width:90%;min-width:90px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 10, {postfix: " mm"});
 		let l_numberShapes = createInput_Infield("# Shapes", numberShapes, "width:90%;min-width:70px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 1);
 		let l_material, l_profile, l_quality, l_speed;
 		l_material = createDropdown_Infield("Material", 0, "width:80px;margin:0px;", this.getProfileOptions("Material"), () => {this.updateCutProfile("Material", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer);
 		l_profile = createDropdown_Infield("Profile", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Profile", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer);
 		l_quality = createDropdown_Infield("Quality", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Quality", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer);
-		l_speed = createInput_Infield("Speed mm/min", 1000, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer, false, 10);
+		l_speed = createInput_Infield("Speed", 1000, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer, false, 10, {postfix: " mm/min"});
 		this.updateCutProfile("Material", l_material[1], l_profile[1], l_quality[1], l_speed[1]);
 		let l_deleteRowBtn = createButton("X", "Background-color:red;width:30px;margin:0px;", () => {
 			for(let i = 0; i < this.runRows.length; i++) {

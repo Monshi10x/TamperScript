@@ -79,28 +79,28 @@ class PrintMounting extends Material {
             let f_container_stats = createDivStyle5(null, "Stats", this.container)[1];
 
             this.#numberOfPanelsField = createInputCalculated_Infield("Number Of Panels", 0, null, () => {this.UpdateFromChange();}, f_container_stats);
-            this.#setupTimePerPanelField = createInput_Infield("Setup Time Per Panel (mins)", 5, "", () => {this.UpdateFromChange();}, f_container_stats, true, 1);
+            this.#setupTimePerPanelField = createInput_Infield("Setup Time Per Panel", 5, "", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
             this.#totalSetupText = createText("Total Setup: ", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
 
             createHr(null, f_container_stats);
 
             this.#numberOfJoinsToMatchField = createInputCalculated_Infield("Number Of Joins To Match", 0, "", () => {this.UpdateFromChange();}, true, f_container_stats);
-            this.#setupTimePerJoinField = createInput_Infield("Setup Time Per Join (mins)", 10, "", () => {this.UpdateFromChange();}, f_container_stats, true, 1);
+            this.#setupTimePerJoinField = createInput_Infield("Setup Time Per Join", 10, "", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
             this.#totalJoinSetupText = createText("Total Join Setup: ", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
 
             createHr(null, f_container_stats);
             this.#textRolloverSheets = createText("Rollover Sheets: x0", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
-            this.#layTimePerPanel_Rollover = createInput_Infield("Rollover Layup Time Per Panel (mins)", 5, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1);
-            this.#totalLayTimePerPanel_Rollover = createInput_Infield("Total Rollover Layup Time (mins)", 5, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1);
+            this.#layTimePerPanel_Rollover = createInput_Infield("Rollover Layup Time Per Panel", 5, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
+            this.#totalLayTimePerPanel_Rollover = createInput_Infield("Total Rollover Layup Time", 5, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#totalLayTimePerPanel_Rollover[1], this.#totalLayTimePerPanel_Rollover[0]);
             this.#textHandSheets = createText("Hand Sheets: x0", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
-            this.#layTimePerPanel_Hand = createInput_Infield("Hand Layup Time Per Panel (mins)", 20, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1);
-            this.#totalLayTimePerPanel_Hand = createInput_Infield("Total Hand Layup Time (mins)", 20, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1);
+            this.#layTimePerPanel_Hand = createInput_Infield("Hand Layup Time Per Panel", 20, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
+            this.#totalLayTimePerPanel_Hand = createInput_Infield("Total Hand Layup Time", 20, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#totalLayTimePerPanel_Hand[1], this.#totalLayTimePerPanel_Hand[0]);
 
             createHr(null, f_container_stats);
 
-            this.#totalLinearMetresField = createInput_Infield("Total Perimeter (m)", 0, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1);
+            this.#totalLinearMetresField = createInput_Infield("Total Perimeter", 0, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "m"});
             setFieldDisabled(true, this.#totalLinearMetresField[1], this.#totalLinearMetresField[0]);
 
             this.#edgeWrapSecondsPerMetreField = createInput_Infield("Edge Wrapping Seconds Per Metre", 30, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1);
@@ -108,7 +108,7 @@ class PrintMounting extends Material {
 
             createHr(null, f_container_stats);
 
-            this.#handlingTimePerPanelField = createInput_Infield("Handling Time Per Panel (sec)", 60, "margin-left:270px;", () => {this.UpdateFromChange();}, f_container_stats, true, 1);
+            this.#handlingTimePerPanelField = createInput_Infield("Handling Time Per Panel", 60, "margin-left:270px;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "sec"});
             this.#totalHandlingText = createText("Total Handling: ", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
 
             createHr(null, f_container_stats);

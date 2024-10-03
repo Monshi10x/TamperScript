@@ -61,7 +61,7 @@ class Laminate extends Material {
             let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
 
             this.#useRollLengthField = createCheckbox_Infield("Use Approx. Roll Length", this.#useRollLength, "width:300px;", () => {this.#useRollLength = this.#useRollLengthField[1].checked; this.UpdateFromChange();}, f_container_inheritedParentSizeSplits);
-            this.#inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "!00%", 20, 250);
+            this.#inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
             this.#inheritedSizeTable.addRow("-", "-", "-");
             this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
@@ -71,7 +71,7 @@ class Laminate extends Material {
             Material*/
             let f_container_material = createDivStyle5(null, "Laminate", this.container)[1];
 
-            this.#materialTotalArea = createInput_Infield("Total Area", 0, null, () => { }, f_container_material, false, 1);
+            this.#materialTotalArea = createInput_Infield("Total Area", 0, null, () => { }, f_container_material, false, 1, {postfix: "m2"});
             setFieldDisabled(true, this.#materialTotalArea[1], this.#materialTotalArea[0]);
 
             var laminateParts = getPredefinedParts("Laminate - ");

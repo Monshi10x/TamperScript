@@ -134,11 +134,11 @@ class Finishing extends Material {
                   [createDropdownOption("Standoff - 19x19 Satin Silver", "19,19"),
                   createDropdownOption("Standoff - 19x25 Satin Silver", "19,25"),
                   createDropdownOption("Standoff - 19x50 Satin Silver", "19,50")], () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff);
-            this.#standoff_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 100);
-            this.#standoff_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 100);
-            this.#standoff_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 10);
-            this.#standoff_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none;margin-right:200px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 1);
-            this.#standoff_productionEach = createInput_Infield("Production per standoff (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_standOff, true, 1);
+            this.#standoff_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 100, {postfix: "mm"});
+            this.#standoff_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 100, {postfix: "mm"});
+            this.#standoff_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 10, {postfix: "mm"});
+            this.#standoff_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none;margin-right:200px;", () => {this.UpdateStandoffQty(); this.UpdateFromChange();}, f_container_standOff, true, 1, {postfix: "mm"});
+            this.#standoff_productionEach = createInput_Infield("Production per standoff", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_standOff, true, 1, {postfix: "mins"});
 
             makeFieldGroup("Checkbox", this.#standOffRequired[1], true, this.#standOffQty[0], this.#standOffType[0], this.#standOffHelperBtn,
                   this.#standoff_offsetFromEdgeField[0], this.#standoff_horizontalSpacingField[0], this.#standoff_verticalSpacingField[0],
@@ -178,11 +178,11 @@ class Finishing extends Material {
             }, f_container_eyelets, true);
             this.#eyeletsType = createDropdown_Infield("Eyelets Type", 0, "width:30%;display:none;margin-left:40px;",
                   [createDropdownOption("Eyelet - 20x10 Silver", "20,10")], () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets);
-            this.#eyelets_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 100);
-            this.#eyelets_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 100);
-            this.#eyelets_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 10);
-            this.#eyelets_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none;margin-right:200px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 1);
-            this.#eyelets_productionEach = createInput_Infield("Production per eyelet (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_eyelets, true, 1);
+            this.#eyelets_horizontalSpacingField = createInput_Infield("Max Spacing Horizontal", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 100, {postfix: "mm"});
+            this.#eyelets_verticalSpacingField = createInput_Infield("Max Spacing Vertical", 600, "width:200px;display:none", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 100, {postfix: "mm"});
+            this.#eyelets_spacingAllowanceField = createInput_Infield("Max Spacing Allowance", 20, "width:200px;display:none;margin-left:40px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 10, {postfix: "mm"});
+            this.#eyelets_offsetFromEdgeField = createInput_Infield("Centers' Offset From Edge", 20, "width:200px;display:none;margin-right:200px;", () => {this.UpdateEyeletQty(); this.UpdateFromChange();}, f_container_eyelets, true, 1, {postfix: "mm"});
+            this.#eyelets_productionEach = createInput_Infield("Production per eyelet", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_eyelets, true, 1, {postfix: "mins"});
 
             makeFieldGroup("Checkbox", this.#eyeletsRequired[1], true, this.#eyeletsQty[0], this.#eyeletsHelperBtn,
                   this.#eyeletsType[0],
@@ -197,7 +197,7 @@ class Finishing extends Material {
 
             this.#pinsRequired = createCheckbox_Infield("Pins (Thread Rod)", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateFromChange();}, f_container_pins, true);
             this.#pinsQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:60%;", () => {this.UpdateFromChange();}, f_container_pins, false, 1);
-            this.#pins_productionEach = createInput_Infield("Production per pin (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_pins, true, 1);
+            this.#pins_productionEach = createInput_Infield("Production per pin", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_pins, true, 1, {postfix: "mins"});
 
             makeFieldGroup("Checkbox", this.#pinsRequired[1], true, this.#pinsQty[0], this.#pins_productionEach[0]);
 
@@ -212,10 +212,10 @@ class Finishing extends Material {
                   setFieldHidden(!this.#customRequired[1].checked, this.#customDescription[0], this.#customDescription[0]);
             }, f_container_custom, true);
             this.#customQty = createInput_Infield("Qty per Product", null, "width:20%;min-width:110px;margin-left:40px;display:none", () => {this.UpdateFromChange();}, f_container_custom, false, 1);
-            this.#customCost = createInput_Infield("Cost", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, f_container_custom, false, 1);
-            this.#customMarkup = createInput_Infield("Markup", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, f_container_custom, false, 0.1);
+            this.#customCost = createInput_Infield("Cost", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, f_container_custom, false, 1, {prefix: "$"});
+            this.#customMarkup = createInput_Infield("Markup", null, "width:20%;min-width:110px;display:none", () => {this.UpdateFromChange();}, f_container_custom, false, 0.1, {postfix: "x"});
             this.#customDescription = createInput_Infield("Description", null, "width:20%;min-width:110px;display:none;", () => {this.UpdateFromChange();}, f_container_custom, false, null);
-            this.#custom_productionEach = createInput_Infield("Production per custom (mins)", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_custom, true, 1);
+            this.#custom_productionEach = createInput_Infield("Production per custom", 2, "width:200px;display:none;margin-left:40px;", () => {this.UpdateFromChange();}, f_container_custom, true, 1, {postfix: "mins"});
             makeFieldGroup("Checkbox", this.#customRequired[1], true, this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0], this.#custom_productionEach[0]);
 
             /*

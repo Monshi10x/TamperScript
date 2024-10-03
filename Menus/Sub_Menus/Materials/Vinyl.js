@@ -135,16 +135,16 @@ class Vinyl extends Material {
                         $(this.#bleedLeft[1]).val(selectedOption[2]).change();
                         $(this.#bleedRight[1]).val(selectedOption[3]).change();
                   }, f_container_bleeds);
-            this.#bleedTop = createInput_Infield("Top", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10);
-            this.#bleedBottom = createInput_Infield("Bottom", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10);
-            this.#bleedLeft = createInput_Infield("Left", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10);
-            this.#bleedRight = createInput_Infield("Right", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10);
+            this.#bleedTop = createInput_Infield("Top", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10, {postfix: "mm"});
+            this.#bleedBottom = createInput_Infield("Bottom", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10, {postfix: "mm"});
+            this.#bleedLeft = createInput_Infield("Left", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10, {postfix: "mm"});
+            this.#bleedRight = createInput_Infield("Right", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10, {postfix: "mm"});
 
             /*
             Material*/
             let f_container_material = createDivStyle5(null, "Material", this.container)[1];
 
-            this.#materialUsageArea = createInput_Infield("Total Area", 0, null, () => {this.UpdateFromChange();}, f_container_material, false, 1);
+            this.#materialUsageArea = createInput_Infield("Total Area", 0, null, () => {this.UpdateFromChange();}, f_container_material, false, 1, {postfix: "m2"});
             setFieldDisabled(true, this.#materialUsageArea[1], this.#materialUsageArea[0]);
 
             let vinylParts = getPredefinedParts("Vinyl - ");
@@ -166,7 +166,7 @@ class Vinyl extends Material {
             JoinOverlap*/
             let f_container_joins = createDivStyle5(null, "Joins", this.container)[1];
 
-            this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;", () => {
+            this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#visualiser = new ModalVinylJoins("Join Helper", 100, () => {
                         this.UpdateFromChange();
                   }, this);

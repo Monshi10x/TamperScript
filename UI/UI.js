@@ -136,7 +136,7 @@ function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo)
     let f_headingText = document.createElement("span");
     let f_contentContainer = document.createElement("div");
 
-    f_div.style = STYLE.Div5 + ";min-height:30px;";
+    f_div.style = STYLE.Div5 + ";min-height:30px;background-color:" + COLOUR.MediumGrey + ";";
     f_div.style.cssText += overrideCssStyles;
 
     f_headingTextWrapper.style = "display:table;width:100px;text-align: center;float: left; position: relative; background-color: " + COLOUR.DarkBlue +
@@ -171,9 +171,11 @@ function createButton(text, overrideCssStyles, optionalCallback, parentObjectToA
     $(btn).hover(function() {
         $(this).css("background-color", initialTextColor);
         $(this).css("color", initialBackgroundColor);
+        btn.style.boxShadow = "3px 4px 10px 0px rgba(0, 0, 0, 0.8)";
     }, function() {
         $(this).css("background-color", initialBackgroundColor);
         $(this).css("color", initialTextColor);
+        btn.style.boxShadow = "3px 4px 10px 0px rgba(0, 0, 0, 0.3)";
     });
     if(optionalCallback) {
         btn.onclick = optionalCallback;
@@ -272,13 +274,13 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         }*/
         var upArrow = document.createElement('button');
         upArrow.innerHTML = "&#9650";
-        upArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.Blue + ";position:absolute;top:0;right:0;color:white; border:0px solid " + COLOUR.Blue + ";cursor: pointer;padding:0px;";
+        upArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.DarkGrey + ";position:absolute;top:0;right:0;color:white; border:0px solid " + COLOUR.DarkGrey + ";cursor: pointer;padding:0px;";
         upArrow.tabIndex = "-1";
         $(upArrow).hover(function() {
             $(this).css("background-color", "white");
-            $(this).css("color", COLOUR.Blue);
+            $(this).css("color", COLOUR.DarkGrey);
         }, function() {
-            $(this).css("background-color", COLOUR.Blue);
+            $(this).css("background-color", COLOUR.DarkGrey);
             $(this).css("color", "white");
         });
         upArrow.onclick = function() {
@@ -289,13 +291,13 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
 
         var downArrow = document.createElement('button');
         downArrow.innerHTML = "&#9660";
-        downArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.Blue + ";position:absolute;bottom:0px;right:0;color:white; border:0px solid " + COLOUR.Blue + ";cursor: pointer;padding:0px;tabindex:-1;";
+        downArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.DarkGrey + ";position:absolute;bottom:0px;right:0;color:white; border:0px solid " + COLOUR.DarkGrey + ";cursor: pointer;padding:0px;tabindex:-1;";
         downArrow.tabIndex = "-1";
         $(downArrow).hover(function() {
             $(this).css("background-color", "white");
-            $(this).css("color", COLOUR.Blue);
+            $(this).css("color", COLOUR.DarkGrey);
         }, function() {
-            $(this).css("background-color", COLOUR.Blue);
+            $(this).css("background-color", COLOUR.DarkGrey);
             $(this).css("color", "white");
         });
         downArrow.onclick = function() {
