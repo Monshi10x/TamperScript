@@ -630,12 +630,12 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
 
     var dropdownArrow = document.createElement('button');
     dropdownArrow.innerHTML = "&#9660";
-    dropdownArrow.style = "width:15px;height:100%;float:right;background-color:" + COLOUR.Blue + ";position:absolute;bottom:0px;right:0;color:white; border:0px solid " + COLOUR.Blue + ";cursor: pointer;padding:0px";
+    dropdownArrow.style = "width:15px;height:100%;float:right;background-color:" + COLOUR.DarkGrey + ";position:absolute;bottom:0px;right:0;color:white; border:0px solid " + COLOUR.DarkGrey + ";cursor: pointer;padding:0px";
     $(dropdownArrow).hover(function() {
         $(this).css("background-color", "white");
-        $(this).css("color", COLOUR.Blue);
+        $(this).css("color", COLOUR.DarkGrey);
     }, function() {
-        $(this).css("background-color", COLOUR.Blue);
+        $(this).css("background-color", COLOUR.DarkGrey);
         $(this).css("color", "white");
     });
     dropdownArrow.onclick = toggleMenu;

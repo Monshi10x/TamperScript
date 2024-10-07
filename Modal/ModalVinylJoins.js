@@ -60,6 +60,7 @@ class ModalVinylJoins extends ModalWidthHeight {
       #maintainGapBetweenBleed = true;
       #maintainGapBetweenBleedField;
 
+      #gapSettingsContainer;
       #containerBeforeCanvas;
       #containerAfterCanvas;
 
@@ -73,16 +74,18 @@ class ModalVinylJoins extends ModalWidthHeight {
             setFieldDisabled(true, this.widthField[1], this.widthField[0]);
             setFieldDisabled(true, this.heightField[1], this.heightField[0]);
 
-            this.#gapBetweenXField = createInput_Infield("gapBetweenX", this.#gapBetweenX, null, () => {this.#gapBetweenX = zeroIfNaNNullBlank(this.#gapBetweenXField[1].value); this.updateFromFields();}, this.getBodyElement(), true, 10);
-            this.#gapBetweenYField = createInput_Infield("gapBetweenY", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.updateFromFields();}, this.getBodyElement(), true, 10);
+            this.#gapSettingsContainer = createDivStyle5(null, "Gap Settings", this.getBodyElement())[1];
 
-            this.#maintainGapBetweenBleedField = createCheckbox_Infield("maintainGapBetweenBleed", this.#maintainGapBetweenBleed, null, () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.updateFromFields();}, this.getBodyElement(), () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.updateFromFields();});
+            this.#gapBetweenXField = createInput_Infield("gapBetweenX", this.#gapBetweenX, null, () => {this.#gapBetweenX = zeroIfNaNNullBlank(this.#gapBetweenXField[1].value); this.updateFromFields();}, this.#gapSettingsContainer, true, 10);
+            this.#gapBetweenYField = createInput_Infield("gapBetweenY", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.updateFromFields();}, this.#gapSettingsContainer, true, 10);
 
-            this.#containerBeforeCanvas = createDiv("width:100%;margin:10px 0px;", "Borrowed Fields", this.getBodyElement());
+            this.#maintainGapBetweenBleedField = createCheckbox_Infield("maintainGapBetweenBleed", this.#maintainGapBetweenBleed, null, () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.updateFromFields();}, this.#gapSettingsContainer, () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.updateFromFields();});
+
+            this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
 
             this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
 
-            this.#containerAfterCanvas = createDiv("width:100%;margin:10px 0px;", "View Settings", this.getBodyElement());
+            this.#containerAfterCanvas = createDivStyle5(null, "View Settings", this.getBodyElement())[1];
       }
 
       Close() {

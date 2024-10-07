@@ -768,9 +768,9 @@ class UIContainer_Design2 {
             for(let n = 0; n < this.#notes.length; n++) {
                   this.#notes[n].recipient = createCheckbox_Infield("", false, "width:20%;padding-left: calc(10% - 20px);margin:0px;", () => { }, notesContainer, null);
             }
-            let recipientsLabel = createLabel("Recipients", "width:100%;margin:0px;margin-bottom:20px;height:10px;font-size:12px;background-color:white;color:black;text-align:center;", notesContainer);
+            let recipientsLabel = createLabel("Recipients", "width:100%;margin:0px;margin-bottom:20px;height:10px;font-size:12px;background-color:" + COLOUR.MediumGrey + ";color:black;text-align:center;", notesContainer);
 
-            this.#f_addNoteInput = createTextarea("Add Note", "", "width:80%;margin:0px;box-sizing:border-box;height:35px;margin:10px;margin-right:0px;resize: vertical;", () => { }, notesContainer);
+            this.#f_addNoteInput = createTextarea("Add Note", "", "width:80%;margin:0px;box-sizing:border-box;height:35px;margin:10px;margin-right:0px;resize: vertical;box-shadow:none;", () => { }, notesContainer);
             let addNoteBtn = createButton("+ Add Note", "width:calc(20% - 20px);margin:10px;margin-left:0px;", async () => {
                   let loader = new Loader(addNoteBtn);
 

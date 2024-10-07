@@ -63,15 +63,15 @@ class HandTrimming extends Material {
             this.#totalLinearMetresField = createInput_Infield("Total Linear Metres", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "m"});
             setFieldDisabled(true, this.#totalLinearMetresField[1], this.#totalLinearMetresField[0]);
             this.#trimmingSecondsPerMetreField = createInput_Infield("Trimming Speed", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "sec/m"});
-            this.#totalTrimmingText = createText("Total Trimming: ", "width:250px;height:60px;padding:16px;", f_container_stats);
+            this.#totalTrimmingText = createInput_Infield("Total Trimming", 0, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "sec"});
 
             createHr(null, f_container_stats);
 
-            this.#numberOfShapesField = createInputCalculated_Infield("Number Of Shapes", 0, null, () => {this.UpdateTrimmingTimes();}, true, f_container_stats);
+            this.#numberOfShapesField = createInput_Infield("Number Of Shapes", 0, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1);
             this.#handlingTimePerShapeField = createInput_Infield("Handling Time Per Shape", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "sec"});
-            this.#totalHandlingText = createText("Total Handling: ", "width:250px;height:60px;padding:16px;", f_container_stats);
+            this.#totalHandlingText = createInput_Infield("Total Handling", 0, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "mins"});
             createHr(null, f_container_stats);
-            this.#totalTimeField = createInputCalculated_Infield("Total Time (mins)", 0, "margin: 5px calc(50% - 125px);", () => {this.UpdateTrimmingTimes();}, true, f_container_stats);
+            this.#totalTimeField = createInput_Infield("Total Time", 0, "margin: 5px calc(50% - 125px);", () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "mins"});
 
             /*
             Production*/
@@ -133,14 +133,14 @@ class HandTrimming extends Material {
             this.#totalLinearMetresField[1].value = roundNumber(totalLinearMetres, 2);
 
             let calculatedTrimmingTime = totalLinearMetres * secondsToMinutes(zeroIfNaNNullBlank(this.#trimmingSecondsPerMetreField[1].value));
-            this.#totalTrimmingText.innerText = "Total Trimming: " + roundNumber(calculatedTrimmingTime, 2) + " (mins)";
+            this.#totalTrimmingText[1].value = roundNumber(calculatedTrimmingTime, 2);
 
             this.#numberOfShapesField[1].value = numberOfShapes;
             this.#numberOfShapesField[2].value = numberOfShapes;
 
             let shapeHandlingTimeMinutes = secondsToMinutes(zeroIfNaNNullBlank(this.#handlingTimePerShapeField[1].value));
             let totalShapeHandlingTime = shapeHandlingTimeMinutes * numberOfShapes;
-            this.#totalHandlingText.innerText = "Total Handling: " + roundNumber(totalShapeHandlingTime, 2) + " (mins)";
+            this.#totalHandlingText[1].value = roundNumber(totalShapeHandlingTime, 2);
 
             let totalTime = roundNumber(calculatedTrimmingTime + totalShapeHandlingTime, 2);
             this.#totalTimeField[1].value = totalTime;

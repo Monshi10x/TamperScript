@@ -9,7 +9,7 @@ class Laminate extends Material {
       #materialTotalArea;
       #materialContainer;
       #material;
-      #useRollLength = false;
+      #useRollLength = true;
       #useRollLengthField;
       set material(value) {$(this.#material[1]).val(value).change();}
 
@@ -62,10 +62,9 @@ class Laminate extends Material {
 
             this.#useRollLengthField = createCheckbox_Infield("Use Approx. Roll Length", this.#useRollLength, "width:300px;", () => {this.#useRollLength = this.#useRollLengthField[1].checked; this.UpdateFromChange();}, f_container_inheritedParentSizeSplits);
             this.#inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
-            this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
+            this.#inheritedSizeTable.setHeading("Qty", "Width", "Height/Length");
             this.#inheritedSizeTable.addRow("-", "-", "-");
             this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
-
 
             /*
             Material*/
@@ -82,15 +81,6 @@ class Laminate extends Material {
 
             this.#material = createDropdown_Infield_Icons_Search("Laminate", 0, "width:60%;", 10, true, laminateDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
             $(this.#material).val(LaminateLookup["Gloss"]).change();
-
-            /*
-            OutputSizes*/
-            let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.container)[1];
-
-            this.#outputSizeTable = new Table(f_container_outputSizes, "100%", 20, 250);
-            this.#outputSizeTable.setHeading("Qty", "Width", "Height");
-            this.#outputSizeTable.addRow("-", "-", "-");
-            this.#outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /*
             Machine*/
@@ -120,6 +110,15 @@ class Laminate extends Material {
             this.#production.required = true;
             this.#production.showRequiredCkb = false;
             this.#production.requiredName = "Required";
+
+            /*
+            OutputSizes*/
+            let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.container)[1];
+
+            this.#outputSizeTable = new Table(f_container_outputSizes, "100%", 20, 250);
+            this.#outputSizeTable.setHeading("Qty", "Width", "Height");
+            this.#outputSizeTable.addRow("-", "-", "-");
+            this.#outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /*
             Update*/

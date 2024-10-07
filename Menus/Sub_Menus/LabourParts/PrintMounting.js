@@ -78,41 +78,41 @@ class PrintMounting extends Material {
             TimeStats*/
             let f_container_stats = createDivStyle5(null, "Stats", this.container)[1];
 
-            this.#numberOfPanelsField = createInputCalculated_Infield("Number Of Panels", 0, null, () => {this.UpdateFromChange();}, f_container_stats);
-            this.#setupTimePerPanelField = createInput_Infield("Setup Time Per Panel", 5, "", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
-            this.#totalSetupText = createText("Total Setup: ", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
+            this.#numberOfPanelsField = createInput_Infield("Number Of Panels", 0, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1);
+            this.#setupTimePerPanelField = createInput_Infield("Setup Time Per Panel", 5, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
+            this.#totalSetupText = createInput_Infield("Total Setup", 0, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
 
             createHr(null, f_container_stats);
 
-            this.#numberOfJoinsToMatchField = createInputCalculated_Infield("Number Of Joins To Match", 0, "", () => {this.UpdateFromChange();}, true, f_container_stats);
-            this.#setupTimePerJoinField = createInput_Infield("Setup Time Per Join", 10, "", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
-            this.#totalJoinSetupText = createText("Total Join Setup: ", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
+            this.#numberOfJoinsToMatchField = createInput_Infield("Number Of Joins To Match", 0, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1);
+            this.#setupTimePerJoinField = createInput_Infield("Setup Time Per Join", 10, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
+            this.#totalJoinSetupText = createInput_Infield("Total Join Setup", 0, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
 
             createHr(null, f_container_stats);
             this.#textRolloverSheets = createText("Rollover Sheets: x0", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
-            this.#layTimePerPanel_Rollover = createInput_Infield("Rollover Layup Time Per Panel", 5, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
-            this.#totalLayTimePerPanel_Rollover = createInput_Infield("Total Rollover Layup Time", 5, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
+            this.#layTimePerPanel_Rollover = createInput_Infield("Rollover Layup Time Per Panel", 5, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
+            this.#totalLayTimePerPanel_Rollover = createInput_Infield("Total Rollover Layup Time", 5, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#totalLayTimePerPanel_Rollover[1], this.#totalLayTimePerPanel_Rollover[0]);
             this.#textHandSheets = createText("Hand Sheets: x0", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
-            this.#layTimePerPanel_Hand = createInput_Infield("Hand Layup Time Per Panel", 20, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
-            this.#totalLayTimePerPanel_Hand = createInput_Infield("Total Hand Layup Time", 20, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
+            this.#layTimePerPanel_Hand = createInput_Infield("Hand Layup Time Per Panel", 20, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
+            this.#totalLayTimePerPanel_Hand = createInput_Infield("Total Hand Layup Time", 20, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#totalLayTimePerPanel_Hand[1], this.#totalLayTimePerPanel_Hand[0]);
 
             createHr(null, f_container_stats);
 
-            this.#totalLinearMetresField = createInput_Infield("Total Perimeter", 0, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "m"});
+            this.#totalLinearMetresField = createInput_Infield("Total Perimeter", 0, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "m"});
             setFieldDisabled(true, this.#totalLinearMetresField[1], this.#totalLinearMetresField[0]);
 
-            this.#edgeWrapSecondsPerMetreField = createInput_Infield("Edge Wrapping Seconds Per Metre", 30, null, () => {this.UpdateFromChange();}, f_container_stats, true, 1);
-            this.#totalWrappingText = createText("Total Wrapping: ", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
+            this.#edgeWrapSecondsPerMetreField = createInput_Infield("Edge Wrapping", 30, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "sec/m"});
+            this.#totalWrappingText = createInput_Infield("Total Wrapping", 0, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
 
             createHr(null, f_container_stats);
 
-            this.#handlingTimePerPanelField = createInput_Infield("Handling Time Per Panel", 60, "margin-left:270px;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "sec"});
-            this.#totalHandlingText = createText("Total Handling: ", "width:30%;height:41px;margin:5px;padding:10px;", f_container_stats);
+            this.#handlingTimePerPanelField = createInput_Infield("Handling Time Per Panel", 60, "margin-left:calc(30% + 16px);width: 30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "sec"});
+            this.#totalHandlingText = createInput_Infield("Total Handling", 0, "width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
 
             createHr(null, f_container_stats);
-            this.#totalTimeField = createInputCalculated_Infield("Total Time (mins)", 0, "margin: 5px calc(50% - 125px);", () => {this.UpdateFromChange();}, true, f_container_stats);
+            this.#totalTimeField = createInput_Infield("Total Time", 0, "margin-left:calc(30% + 16px);width:30%;", () => {this.UpdateFromChange();}, f_container_stats, true, 1, {postfix: "mins"});
 
             /*
             Production*/
@@ -185,7 +185,7 @@ class PrintMounting extends Material {
             this.#numberOfPanelsField[2].value = this.#numberOfPanels;
             let panelSetupTimeMinutes = zeroIfNaNNullBlank(this.#setupTimePerPanelField[1].value);
             this.totalSetupTime = panelSetupTimeMinutes * this.#numberOfPanels;
-            this.#totalSetupText.innerText = "Total Setup: " + roundNumber(this.totalSetupTime, 2) + " (mins)";
+            this.#totalSetupText[1].value = roundNumber(this.totalSetupTime, 2);
       }
 
       UpdateJoinMatchTimes() {
@@ -194,7 +194,7 @@ class PrintMounting extends Material {
 
             this.setupTimePerJoin = zeroIfNaNNullBlank(this.#setupTimePerJoinField[1].value);
             this.totalJoinSetup = this.setupTimePerJoin * (this.#numberOfPanels - 1);
-            this.#totalJoinSetupText.innerText = "Total Join Setup: " + roundNumber(this.totalJoinSetup, 2) + " (mins)";
+            this.#totalJoinSetupText[1].value = roundNumber(this.totalJoinSetup, 2);
       }
 
       UpdateLayupTimes() {
@@ -211,13 +211,13 @@ class PrintMounting extends Material {
             this.#totalLinearMetresField[1].value = roundNumber(this.#totalLinearMetres, 2);
 
             this.totalWrappingTime = this.#totalLinearMetres * secondsToMinutes(zeroIfNaNNullBlank(this.#edgeWrapSecondsPerMetreField[1].value));
-            this.#totalWrappingText.innerText = "Total Wrapping: " + roundNumber(this.totalWrappingTime, 2) + " (mins)";
+            this.#totalWrappingText[1].value = roundNumber(this.totalWrappingTime, 2);
       };
 
       UpdateHandlingTimes() {
             let shapeHandlingTimeMinutes = secondsToMinutes(zeroIfNaNNullBlank(this.#handlingTimePerPanelField[1].value));
             this.totalPanelHandlingTime = shapeHandlingTimeMinutes * this.#numberOfPanels;
-            this.#totalHandlingText.innerText = "Total Handling: " + roundNumber(this.totalPanelHandlingTime, 2) + " (mins)";
+            this.#totalHandlingText[1].value = roundNumber(this.totalPanelHandlingTime, 2);
       }
 
       UpdateTotalTimes() {

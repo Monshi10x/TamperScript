@@ -117,6 +117,19 @@ class Vinyl extends Material {
             this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /*
+            Material*/
+            let f_container_material = createDivStyle5(null, "Material", this.container)[1];
+
+            this.#materialUsageArea = createInput_Infield("Total Area", 0, "30%;", () => {this.UpdateFromChange();}, f_container_material, false, 1, {postfix: "m2"});
+            setFieldDisabled(true, this.#materialUsageArea[1], this.#materialUsageArea[0]);
+
+            let vinylParts = getPredefinedParts("Vinyl - ");
+            let vinylDropdownElements = [];
+            vinylParts.forEach(element => vinylDropdownElements.push([element.Name, "white"]));
+            this.#material = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:60%;", 10, true, vinylDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
+            $(this.#material).val(VinylLookup["Air Release"]).change();
+
+            /*
             Bleeds*/
             let f_container_bleeds = createDivStyle5(null, "Bleeds", this.container)[1];
             this.#bleedDropdown = createDropdown_Infield("Standard Bleeds", 0, "width:40%",
@@ -141,32 +154,10 @@ class Vinyl extends Material {
             this.#bleedRight = createInput_Infield("Right", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10, {postfix: "mm"});
 
             /*
-            Material*/
-            let f_container_material = createDivStyle5(null, "Material", this.container)[1];
-
-            this.#materialUsageArea = createInput_Infield("Total Area", 0, null, () => {this.UpdateFromChange();}, f_container_material, false, 1, {postfix: "m2"});
-            setFieldDisabled(true, this.#materialUsageArea[1], this.#materialUsageArea[0]);
-
-            let vinylParts = getPredefinedParts("Vinyl - ");
-            let vinylDropdownElements = [];
-            vinylParts.forEach(element => vinylDropdownElements.push([element.Name, "white"]));
-            this.#material = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:60%;", 10, true, vinylDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
-            $(this.#material).val(VinylLookup["Air Release"]).change();
-
-            /*
-            RollUsage*/
-            let f_container_rollUsage = createDivStyle5(null, "Roll Usage", this.container)[1];
-
-            this.#rollWidth = createInput_Infield("Roll Width", 1370, "width:100px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "mm"});
-            this.#rollWastage = createInput_Infield("Roll Wastage *Approx", 25, "width:200px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "%"});
-            this.#rollLengthUsed = createInput_Infield("Roll Length Used *Approx", 0, "width:200px;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "m"});
-            setFieldDisabled(true, this.#rollLengthUsed[1], this.#rollLengthUsed[0]);
-
-            /*
             JoinOverlap*/
             let f_container_joins = createDivStyle5(null, "Joins", this.container)[1];
 
-            this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;background-color:" + COLOUR.Orange + ";", () => {
+            this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 20px);height:40px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#visualiser = new ModalVinylJoins("Join Helper", 100, () => {
                         this.UpdateFromChange();
                   }, this);
@@ -186,24 +177,19 @@ class Vinyl extends Material {
                   }
                   this.#visualiser.setSizeArrays(...matrixSizeArrays);
             }, f_container_joins, true);
-            this.#joinOverlap = createInput_Infield("Join Overlap", 10, "width:100px;", () => {this.UpdateFromChange();}, f_container_joins, false, 5, {postfix: "mm"});
-            this.#joinOrientation = createCheckbox_Infield("Join Horizontal", true, "width:150px", () => {this.UpdateFromChange();}, f_container_joins, () => {this.UpdateFromChange();});
+            this.#joinOverlap = createInput_Infield("Join Overlap", 10, "width:30%;", () => {this.UpdateFromChange();}, f_container_joins, false, 5, {postfix: "mm"});
+            this.#joinOrientation = createCheckbox_Infield("Join Horizontal", true, "width:30%", () => {this.UpdateFromChange();}, f_container_joins, () => {this.UpdateFromChange();});
 
             /*
-            OutputSizes*/
-            let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.container)[1];
+            RollUsage*/
+            let f_container_rollUsage = createDivStyle5(null, "Roll Usage", this.container)[1];
 
-            createText("Individual Pieces", "width:100%;height:20px", f_container_outputSizes);
-            this.#outputSizeTable = new Table(f_container_outputSizes, "100%", 20, 250);
-            this.#outputSizeTable.setHeading("Qty", "Width", "Height");
-            this.#outputSizeTable.addRow("-", "-", "-");
-            this.#outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
+            this.#rollWidth = createInput_Infield("Roll Width", 1370, "width:30%;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "mm"});
+            this.#rollWastage = createInput_Infield("Roll Wastage *Approx", 20, "width:30%;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "%"});
+            this.#rollLengthUsed = createInput_Infield("Roll Length Used *Approx", 0, "width:30%;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "m"});
+            setFieldDisabled(true, this.#rollLengthUsed[1], this.#rollLengthUsed[0]);
 
-            createText("Roll Usage", "width:100%;height:20px", f_container_outputSizes);
-            this.#outputSizeTable2 = new Table(f_container_outputSizes, "100%", 20, 250);
-            this.#outputSizeTable2.setHeading("Qty", "Width", "Length");
-            this.#outputSizeTable2.addRow("-", "-", "-");
-            this.#outputSizeTable2.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
+
 
             /*
             Machine*/
@@ -234,6 +220,21 @@ class Vinyl extends Material {
             this.#production.required = true;
             this.#production.showRequiredCkb = false;
             this.#production.requiredName = "Required";
+            /*
+            OutputSizes*/
+            let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.container)[1];
+
+            createText("Individual Pieces", "width:100%;height:20px", f_container_outputSizes);
+            this.#outputSizeTable = new Table(f_container_outputSizes, "100%", 20, 250);
+            this.#outputSizeTable.setHeading("Qty", "Width", "Height");
+            this.#outputSizeTable.addRow("-", "-", "-");
+            this.#outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
+
+            createText("Roll Usage", "width:100%;height:20px", f_container_outputSizes);
+            this.#outputSizeTable2 = new Table(f_container_outputSizes, "100%", 20, 250);
+            this.#outputSizeTable2.setHeading("Qty", "Width", "Length");
+            this.#outputSizeTable2.addRow("-", "-", "-");
+            this.#outputSizeTable2.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /*
             Update*/

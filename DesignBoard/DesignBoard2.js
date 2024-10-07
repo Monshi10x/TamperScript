@@ -99,6 +99,7 @@ class DesignBoard2 extends JobBoard {
 */
       #f_designerFilter;
       #f_companyFilter;
+      #f_showPaymentsFilter;
 
       constructor(parentToAppendTo) {
             super(parentToAppendTo);
@@ -314,16 +315,31 @@ class DesignBoard2 extends JobBoard {
 
             //Company
             this.#f_companyFilter = createInput_Infield("Company Name", "", "box-shadow:none;", () => {this.FilterJobs();}, null, false, null);
-
             this.AddToHeader(this.#f_companyFilter[0]);
+
+            //Payments
+            this.#f_showPaymentsFilter = createCheckbox_Infield("Load Payments", false, "width:200px;box-shadow:none;", () => {this.FilterJobs();}, null);
+            this.AddToHeader(this.#f_showPaymentsFilter[0]);
       }
 
-      FilterJobs() {
-            for(let j = 0; j < this.#jobObjects.length; j++) {
+      async FilterJobs() {
+
+            let paymentLoader = null;
+            let paymentPromises = [];
+
+            let numJobs = this.#jobObjects.length;
+            for(let j = 0; j < numJobs; j++) {
                   $(this.#jobObjects[j].containerObject.container).show();
 
+                  //Payments
+                  let filterValue = this.#f_showPaymentsFilter[1].checked;
+                  if(filterValue === true) {
+                        if(paymentLoader == null) paymentLoader = new Loader(this.#f_showPaymentsFilter[0]);
+                        paymentPromises.push(this.#jobObjects[j].containerObject.loadSecondaryFields());
+                  }
+
                   //Designer
-                  let filterValue = this.#f_designerFilter[1].value;
+                  filterValue = this.#f_designerFilter[1].value;
                   let jobDesigner = this.#jobObjects[j].containerObject.designer;
                   if(jobDesigner != filterValue && filterValue != "All") {
                         $(this.#jobObjects[j].containerObject.container).hide();
@@ -336,6 +352,10 @@ class DesignBoard2 extends JobBoard {
                         $(this.#jobObjects[j].containerObject.container).hide();
                   }
             }
+
+            await Promise.all(paymentPromises);
+
+            if(paymentLoader) paymentLoader.Delete();
       }
 
       async ListenForWIPChanges() {
