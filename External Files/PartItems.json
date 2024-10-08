@@ -41,6 +41,7 @@
       },
       "ACMLookup":{
             "Standard White Gloss":"ACM - (sqm) - 2440x1220x3x0.21 White Satin/Gloss (Mulfords)",
-            "Standard Primer":"ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)"
+            "Standard Primer":"ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)",
+            "2mm White Gloss":"ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)"
       }
 }

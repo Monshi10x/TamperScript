@@ -26,7 +26,7 @@ class LightboxMenu extends LHSMenuWindow {
         var numberColumns = 0;
         var totalLEDs = 0;
         var totalAmp = 0;
-        var productionMinsPerLED = 120 / (144);//2 hours for 2440 lightbox
+        var productionMinsPerLED = 50 / (60);//50 leds per hour
 
         var faceToBoxReductionAmount = 10;
         var supportSpacing = 600;
@@ -62,9 +62,9 @@ class LightboxMenu extends LHSMenuWindow {
 
         var fieldBoxDepth = createDropdown_Infield('Box Depth', 0, "margin-right:500px;width:47%;",
             [createOptGroup("Single-sided", [createDropdownOption("150 (SS Acrylic)", "150"),
-            createDropdownOption("175 (SS Flexface)      *Outsourced", "175")]),
+            createDropdownOption("150 (SS Flexface)", "150")]),
             createOptGroup("Double-sided", [createDropdownOption("300 (DS Acrylic)", "300"),
-            createDropdownOption("350 (DS Flexface)      *Outsourced", "350")])], lightboxUpdate, c2);
+            createDropdownOption("300 (DS Flexface)", "300")])], lightboxUpdate, c2);
 
         var fieldIsDoubleSided = createCheckbox_Infield("Double-sided", null, "margin-right:500px;border:2px solid #ccc;background-color:#ededed;width:47%", lightboxUpdate, c2);
         fieldIsDoubleSided.disabled = true;
@@ -157,7 +157,7 @@ class LightboxMenu extends LHSMenuWindow {
         c4.style = STYLE.BillboardMenus;
         var fieldIsIlluminated = createCheckbox_Infield('Is Illuminated', true, "width:96%", lightboxUpdate, c4);
 
-        var fieldLEDWatt = createDropdown_Infield("LED Brightness", 1, "width:47%",
+        var fieldLEDWatt = createDropdown_Infield("LED Brightness", 0, "width:47%",
             [createDropdownOption("1.08w (Standard Brightness)", "1.08"),
             createDropdownOption("1.50w (Premium Brightness)", "1.50")], lightboxUpdate, c4);
 
@@ -209,17 +209,10 @@ class LightboxMenu extends LHSMenuWindow {
         function lightboxUpdate() {
             var tempDTF = 0;
 
-            if(fieldBoxDepth[1].value == 300 || fieldBoxDepth[1].value == 350) {
+            if(fieldBoxDepth[1].value == 300) {
                 fieldIsDoubleSided[1].checked = true;
             } else {
                 fieldIsDoubleSided[1].checked = false;
-            }
-            if(fieldBoxDepth[1].value == 175 || fieldBoxDepth[1].value == 350) {
-                fieldMakeInhouse[1].checked = false;
-                setFieldDisabled(true, fieldMakeInhouse[1], fieldMakeInhouse[0]);
-            }
-            else {
-                setFieldDisabled(false, fieldMakeInhouse[1], fieldMakeInhouse[0]);
             }
 
             if(fieldIsDoubleSided[1].checked) {
@@ -257,7 +250,6 @@ class LightboxMenu extends LHSMenuWindow {
                 fieldIsDoubleSidedReinforcementMaterial[0].style.display = "none";
                 fieldIsDoubleSidedReinforcementMaterial[0].style.visibility = "hidden";
             }
-
 
             distanceToOutsideBox = parseFloat(tempDTF) / 2;
             numberRows = Math.ceil(((parseFloat(fieldBoxHeight[1].value) - 2 * distanceToOutsideBox) / (tempDTF + ledAllowanceH)) + 1);
@@ -365,8 +357,9 @@ class LightboxMenu extends LHSMenuWindow {
 
             //-----------FACE TYPE------------//
             var FACETYPE;
+            console.log(faceType);
             if(faceType == '4.5mm Opal Acrylic with Printed Translucent Vinyl and Laminate' || faceType == 'Acrylic (Blank)' || faceType == 'none (Acrylic type)') FACETYPE = "(Acrylic face Type)";
-            else if(faceType == 'Premium Translucent Flexface Banner with Vibrant Double-sided Print and Gloss Laminate' || faceType == 'none (Flexface type)') FACETYPE = "(Flex-face Banner Type)";
+            else if(faceType == 'Flexface Banner' || faceType == 'none (Flexface type)') FACETYPE = "(Flex-face Banner Type)";
             else if(faceType == 'ACM Push-through Type') FACETYPE = "(ACM Push-through Type)";
             else if(faceType == 'ACM Intracut Type') FACETYPE = "(ACM Intracut Type)";
             else {
@@ -403,12 +396,8 @@ class LightboxMenu extends LHSMenuWindow {
             } else if(faceType == 'none (Flexface type)') {
                 //nothing to do.
             } else if(faceType == 'Flexface Banner') {
-                await q_AddPart_DimensionWH(productIndex, partIndex, true, "Banner - MMT - Lightbox, Illuminated only at night, Life 4+ years", boxIsDoubleSided ? 2 : 1, boxWidth - faceToBoxReductionAmount, boxHeight - faceToBoxReductionAmount, "[FACE] Banner - MMT - Lightbox, Illuminated only at night, Life 4+ years", null, true);
+                await q_AddPart_DimensionWH(productIndex, partIndex, true, "Banner - MMT - Lightbox, Illuminated only at night, Life 4+ years", boxIsDoubleSided ? 2 : 1, boxWidth - faceToBoxReductionAmount, boxHeight - faceToBoxReductionAmount, "[FACE] Banner - MMT - Lightbox, Illuminated only at night, Life 4+ years", null, false);
                 partIndex++;
-                if(IH_OS == "IH") {
-                    await q_AddPart_DimensionWH(productIndex, partIndex, true, "Sailtrack - (perimeter) - Aluminium Mill", boxIsDoubleSided ? 2 : 1, boxWidth - faceToBoxReductionAmount, boxHeight - faceToBoxReductionAmount, "[FACE] Sailtrack - (perimeter) - Aluminium Mill", null, true);
-                    partIndex++;
-                }
             } else if(faceType == 'ACM Push-through Type') {
                 alert("Not Ready Yet");
             } else if(faceType == 'ACM Intracut Type') {
@@ -420,22 +409,41 @@ class LightboxMenu extends LHSMenuWindow {
             if(IH_OS == "IH") {
                 //----------------EXTRUSION--------------//
                 //TODO: IH Flexface Extrusion
-                await q_AddPart_DimensionWH(productIndex, partIndex, true, "Extrusion - Lightbox SS 150D Aluminium Mill (DIR 263)", boxIsDoubleSided ? 2 : 1, boxWidth * 2 + boxHeight * 2, null, "[BOX] Extrusion",
-                    "Cut To: \n" +
-                    "Width: " + 2 * (boxIsDoubleSided ? 2 : 1) + " @ " + boxWidth + "mm mitred (per box)\n" +
-                    "Height: " + 2 * (boxIsDoubleSided ? 2 : 1) + " @ " + boxHeight + "mm mitred (per box)\n",
-                    true);
-                partIndex++;
-
-                //----------------CAPPING--------------//
-                //TODO: IH Flexface Extrusion
-                await q_AddPart_DimensionWH(productIndex, partIndex, true, "Angle - Aluminium 25x25x1.6", boxIsDoubleSided ? 2 : 1, boxWidth * 2 + boxHeight * 2, null, "[BOX] Capping",
-                    "Cut To: \n" +
-                    "Width: " + 2 * (boxIsDoubleSided ? 2 : 1) + " @ " + boxWidth + "mm mitred (per box)\n" +
-                    "Height: " + 2 * (boxIsDoubleSided ? 2 : 1) + " @ " + boxHeight + "mm mitred (per box)\n",
-                    true);
-                partIndex++;
-                await GroupParts(productIndex);
+                if(FACETYPE != "(Flex-face Banner Type)") {
+                    await q_AddPart_DimensionWH(productIndex, partIndex, true, "Extrusion - Lightbox SS 150D Aluminium Mill (DIR 263)", boxIsDoubleSided ? 2 : 1, boxWidth * 2 + boxHeight * 2, null, "[BOX] Extrusion",
+                        "Cut To: \n" +
+                        "Width: " + 2 * (boxIsDoubleSided ? 2 : 1) + " @ " + boxWidth + "mm mitred (per box)\n" +
+                        "Height: " + 2 * (boxIsDoubleSided ? 2 : 1) + " @ " + boxHeight + "mm mitred (per box)\n",
+                        true);
+                    partIndex++;
+                    //----------------CAPPING--------------//
+                    await q_AddPart_DimensionWH(productIndex, partIndex, true, "Angle - Aluminium 25x25x1.6", boxIsDoubleSided ? 2 : 1, boxWidth * 2 + boxHeight * 2, null, "[BOX] Capping",
+                        "Cut To: \n" +
+                        "Width: " + 2 * (boxIsDoubleSided ? 2 : 1) + " @ " + boxWidth + "mm mitred (per box)\n" +
+                        "Height: " + 2 * (boxIsDoubleSided ? 2 : 1) + " @ " + boxHeight + "mm mitred (per box)\n",
+                        true);
+                    partIndex++;
+                    await GroupParts(productIndex);
+                } else if(FACETYPE == "(Flex-face Banner Type)") {
+                    await q_AddPart_DimensionWH(productIndex, partIndex, true, "Extrusion - Aluminium Lightbox Flexface 150 (Box)", boxIsDoubleSided ? 2 : 1, boxWidth * 2 + boxHeight * 2 - 4, null, "[BOX] Extrusion",
+                        "Cut To: \n" +
+                        "Width: " + (2 * (boxIsDoubleSided ? 2 : 1) - 4) + " @ " + boxWidth + "mm mitred (per box)\n" +
+                        "Height: " + (2 * (boxIsDoubleSided ? 2 : 1) - 4) + " @ " + boxHeight + "mm mitred (per box)\n",
+                        false);
+                    partIndex++;
+                    await q_AddPart_DimensionWH(productIndex, partIndex, true, "Extrusion - Aluminium Lightbox Flexface 150 (Capping)", boxIsDoubleSided ? 2 : 1, boxWidth * 2 + boxHeight * 2, null, "[BOX] Capping",
+                        "Cut To: \n" +
+                        "Width: " + (2 * (boxIsDoubleSided ? 2 : 1)) + " @ " + boxWidth + "mm mitred (per box)\n" +
+                        "Height: " + (2 * (boxIsDoubleSided ? 2 : 1)) + " @ " + boxHeight + "mm mitred (per box)\n",
+                        false);
+                    partIndex++;
+                    await q_AddPart_DimensionWH(productIndex, partIndex, true, "Extrusion - Aluminium Lightbox Flexface 150 (Sailtrack)", boxIsDoubleSided ? 2 : 1, (boxWidth - 20) * 2 + (boxHeight - 20) * 2, null, "[BOX] Sailtrack",
+                        "Cut To: \n" +
+                        "Width: " + (2 * (boxIsDoubleSided ? 2 : 1) - 20) + " @ " + boxWidth + "mm mitred (per box)\n" +
+                        "Height: " + (2 * (boxIsDoubleSided ? 2 : 1) - 20) + " @ " + boxHeight + "mm mitred (per box)\n",
+                        false);
+                    partIndex++;
+                }
 
                 //--------------SUPPORTS--------------//
                 if(!boxDoubleSided_RequiresReinforcement) {
@@ -451,7 +459,7 @@ class LightboxMenu extends LHSMenuWindow {
                         supportExactSpacing = boxHeight / (numSupports + 1);
                         supportLength = boxWidth - supportReductionAmount;
                     }
-                    await q_AddPart_DimensionWH(productIndex, partIndex, true, "Angle - Aluminium 25x25x3", numSupports, supportLength, null, "[Supports every " + supportExactSpacing + "mm centers]", null, false);
+                    await q_AddPart_DimensionWH(productIndex, partIndex, true, "RHS - Aluminium 25x25x3", numSupports, supportLength, null, "[Supports every " + supportExactSpacing + "mm centers]", null, false);
                     partIndex++;
                 }
 
@@ -503,7 +511,7 @@ class LightboxMenu extends LHSMenuWindow {
                 //-------------LED----------------------//
                 if(isIlluminated) {
                     //ACM
-                    await q_AddPart_DimensionWH(productIndex, partIndex, true, ACMLookup["Standard White Gloss"], boxIsDoubleSided ? 2 : 1, boxWidth, boxHeight, "[LED] ACM Panel",
+                    await q_AddPart_DimensionWH(productIndex, partIndex, true, ACMLookup["2mm White Gloss"], boxIsDoubleSided ? 2 : 1, boxWidth, boxHeight, "[LED] ACM Panel",
                         false);
                     partIndex++;
 
@@ -543,58 +551,8 @@ class LightboxMenu extends LHSMenuWindow {
                 await savePart(productIndex, partIndex);
             }
 
-            //PRODUCTION
-            /*if(includeProduction){
-                //--------------PRODUCTION---------------//
-                await AddPart("Production (ea)", productIndex);
-                partIndex++;
-                await openPart(productIndex, partIndex);
-                await setProductionTime(productIndex, partIndex, productionMinutes);
-                await setPartDescription(productIndex, partIndex, "[PRODUCTION] Cutting, Welding, Sanding, Screwing");
-                await savePart(productIndex, partIndex);
-                //await setPartBorderColour(productIndex, partIndex, "red");
-            }*/
             partIndex = await production.Create(productIndex, partIndex);
-
-            //ARTWORK
-            /*if(includeArtwork){
-                await AddPart("Artwork and Print Files", productIndex);
-                partIndex++;
-                if(artworkMinutes!=0){
-                    await setArtworkTime(productIndex, partIndex, artworkMinutes);
-                    await setPartDescription(productIndex,partIndex,"[Artwork] "+artworkMinutes+"mins");
-                }
-                await savePart(productIndex,partIndex);
-            }*/
             partIndex = await artwork.Create(productIndex, partIndex);
-
-            //INCLUDES !INSTALL
-            /*if(includeInstall){
-                await AddPart("Install - IH"+(installTotalorEach=="Total"?"":" (ea)"), productIndex);
-                partIndex++;
-                //INSTALL
-                if(installMinutes!=0 || installMinutes!=null){
-                    if(installTotalorEach=="Total"){
-                        await setInstallTime(productIndex, partIndex, installMinutes);
-                        await setInstallPartType(productIndex, partIndex, installType);
-                    }else{
-                        await setInstallTimeEa(productIndex, partIndex, installMinutes);
-                        await setInstallPartTypeEa(productIndex, partIndex, installType);
-                    }
-                }
-                //TRAVEL
-                if(travelMinutes!=0 || travelMinutes!=null){
-                    if(installTotalorEach=="Total"){
-                        await setTravelTime(productIndex, partIndex, travelMinutes);
-                        await setTravelType(productIndex, partIndex, travelType);
-                    }else{
-                        await setTravelTimeEa(productIndex, partIndex, travelMinutes);
-                        await setTravelTypeEa(productIndex, partIndex, travelType);
-                    }
-                }
-                await setPartDescription(productIndex,partIndex,"[Install]");
-                await savePart(productIndex,partIndex);
-            }*/
             partIndex = await install.Create(productIndex, partIndex);
 
             //PRODUCT DESCRIPTION
@@ -605,7 +563,7 @@ class LightboxMenu extends LHSMenuWindow {
                 + "<li>" + (isIlluminated ? ledColour + " Bright Direct LED Lighting " : "No LED Lighting") + "</li></ul>"
                 + "<br>FACE: <br>"
                 + "<ul><li>" + faceType + "</li></ul>"
-                + (install.installRequired ? "<br>Includes Install<br>" : "<br>Supply Only or Install Separately</br>")
+                + (install.required ? "<br>Includes Install<br>" : "<br>Supply Only or Install Separately</br>")
                 + (artwork.required ? "<br>Includes Artwork<br>" : "<br>Artwork Separately");
             //+
             await setProductSummary(productIndex, productSummary);
@@ -637,23 +595,9 @@ class LightboxMenu extends LHSMenuWindow {
 
 function getLightboxPowdercoatCost(sqm, isDoubleSided) {
     if(!isDoubleSided) {
-        return ((33.418 * sqm) + 25).toFixed(2);
+        return ((35 * sqm) + 25).toFixed(2);
     } else {
         //TODO: find exact from ACE
-        return (2 * ((33.418 * sqm) + 25)).toFixed(2);
+        return (2 * ((35 * sqm) + 25)).toFixed(2);
     }
 }
-/*var lightboxBuilderContainer;
-async function createLightboxBuilder() {
-    lightboxBuilderContainer = document.createElement('div');
-
-
-    document.getElementsByTagName('body')[0].appendChild(lightboxBuilderContainer);
-    lightboxBuilderContainer.id = "lightboxBuilderContainer";
-    lightboxBuilderContainer.style = "z-index:100;background-color:#fff;color:white;width:600px;position: fixed;top:82px;left:" + menuXOffset + "px;display:none;";
-
-}
-function showLightboxBuilder() {
-
-}
-*/
