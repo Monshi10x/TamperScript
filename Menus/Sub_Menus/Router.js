@@ -56,15 +56,18 @@ class Router extends SubMenu {
 		makeFieldGroup("Checkbox", this.l_setupMultiple[1], true, this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0]);
 		makeFieldGroup("Checkbox", this.l_cleanMultiple[1], true, this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0]);
 		makeFieldGroup("Checkbox", this.l_usePaths[1], true, this.l_cuttingTable.container, this.l_addRowBtn);
-		makeFieldGroup("Checkbox",
-			this.requiredField[1], false, this.l_qty[0], this.l_timeTE[0], this.l_setupOnceOff[0], this.l_setupTime[0], this.l_runTime[0], this.l_addRowBtn,
-			this.l_cleanTime[0], this.l_usePaths[0], this.l_cuttingTable.container, this.l_setupMultiple[0], this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0],
-			this.l_cleanMultiple[0], this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0], this.l_cleanOnceOff[0]
-		);
+
 
 		this.addRunRow();
 
 		this.Update();
+
+		makeFieldGroup("Checkbox",
+			this.requiredField[1], false, this.l_qty[0], this.l_timeTE[0], this.l_setupOnceOff[0], this.l_setupTime[0], this.l_runTime[0], this.l_addRowBtn,
+			this.l_cleanTime[0], this.l_usePaths[0], this.l_cuttingTable.container, this.l_setupMultiple[0], this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0],
+			this.l_cleanMultiple[0], this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0], this.l_cleanOnceOff[0], f_container_qty[0], f_container_setup[0],
+			f_container_run[0], f_container_clean[0]
+		);
 	}
 
 	getQWH() {

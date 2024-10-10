@@ -63,9 +63,6 @@ class ModalSheetJoins extends ModalWidthHeight {
 
             this.#gapBetweenXField = createInput_Infield("gapBetweenX", this.#gapBetweenX, null, () => {this.#gapBetweenX = zeroIfNaNNullBlank(this.#gapBetweenXField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
             this.#gapBetweenYField = createInput_Infield("gapBetweenY", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
-
-            this.resultText = createText("Result:", "width:100%;min-height:100px;box-sizing:border-box;");
-            this.addBodyElement(this.resultText);
       }
 
       updateFromFields() {

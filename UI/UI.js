@@ -1338,17 +1338,17 @@ function setFieldDisabled(disabledTF, field, optionalParentContainer) {
 function setFieldHidden(disabledTF, field, optionalParentContainer) {
     if(disabledTF) {
         if(field) {
-            field.style.display = "none";
+            $(field).hide();
         }
         if(optionalParentContainer) {
-            optionalParentContainer.style.display = "none";
+            $(optionalParentContainer).hide();
         }
     } else {
         if(field) {
-            field.style.display = "block";
+            $(field).show();
         }
         if(optionalParentContainer) {
-            optionalParentContainer.style.display = "block";
+            $(optionalParentContainer).show();
         }
     }
     return field || optionalParentContainer;
