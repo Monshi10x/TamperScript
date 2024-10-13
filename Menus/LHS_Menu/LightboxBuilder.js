@@ -396,7 +396,7 @@ class LightboxMenu extends LHSMenuWindow {
             } else if(faceType == 'none (Flexface type)') {
                 //nothing to do.
             } else if(faceType == 'Flexface Banner') {
-                await q_AddPart_DimensionWH(productIndex, partIndex, true, "Banner - MMT - Lightbox, Illuminated only at night, Life 4+ years", boxIsDoubleSided ? 2 : 1, boxWidth - faceToBoxReductionAmount, boxHeight - faceToBoxReductionAmount, "[FACE] Banner - MMT - Lightbox, Illuminated only at night, Life 4+ years", null, false);
+                await q_AddPart_DimensionWH(productIndex, partIndex, true, "Banner - MMT - Lightbox, Illuminated only at night, Life 4+ years", boxIsDoubleSided ? 2 : 1, boxWidth + 65, boxHeight + 65, "[FACE] Banner - MMT - Lightbox, Illuminated only at night, Life 4+ years", null, false);
                 partIndex++;
             } else if(faceType == 'ACM Push-through Type') {
                 alert("Not Ready Yet");
