@@ -39,6 +39,24 @@ class ModalSheetJoins extends ModalWidthHeight {
             return this.#flippedField.checked;
       }
 
+      #hasGrainField;
+      setHasGrainField(field) {
+            this.#hasGrainField = field;
+      }
+
+      get hasGrain() {
+            return this.#hasGrainField.checked;
+      }
+
+      #grainDirectionField;
+      setGrainDirectionField(field) {
+            this.grainDirectionField = field;
+      }
+
+      get grainDirection() {
+            return this.grainDirectionField.value;
+      }
+
       #gapBetweenX = 0;
       #gapBetweenXField;
       #gapBetweenY = 0;
@@ -57,12 +75,12 @@ class ModalSheetJoins extends ModalWidthHeight {
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
 
-            this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
+            this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 500, () => this.draw(), this.getBodyElement());
 
             this.#containerAfterCanvas = createDivStyle5(null, "View Settings", this.getBodyElement())[1];
 
-            this.#gapBetweenXField = createInput_Infield("gapBetweenX", this.#gapBetweenX, null, () => {this.#gapBetweenX = zeroIfNaNNullBlank(this.#gapBetweenXField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
-            this.#gapBetweenYField = createInput_Infield("gapBetweenY", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
+            this.#gapBetweenXField = createInput_Infield("Gap Between Panels (x)", this.#gapBetweenX, null, () => {this.#gapBetweenX = zeroIfNaNNullBlank(this.#gapBetweenXField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
+            this.#gapBetweenYField = createInput_Infield("Gap Between Panels (y)", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
       }
 
       updateFromFields() {
@@ -96,7 +114,7 @@ class ModalSheetJoins extends ModalWidthHeight {
 
                                     let [rectWidth, rectHeight] = matrixSize[r][c];
 
-                                    let [rectWidth_Initial, rectHeight_Initial] = [rectWidth, rectHeight];
+                                    let rectWidth_Initial = rectWidth;
 
                                     //draw matrixSize
                                     drawRect(canvasCtx, xo, yo, rectWidth, rectHeight, "TL", COLOUR.Black, 1);
@@ -104,7 +122,34 @@ class ModalSheetJoins extends ModalWidthHeight {
                                     if(isFirstRow) drawMeasurement_Verbose(canvasCtx, xo, yo, rectWidth, 0, "T", roundNumber(rectWidth, 2), this.#textSize, COLOUR.Blue, this.#lineWidth, this.#crossScale, this.#offsetFromShape, true, "B", false, canvasScale);
                                     if(isFirstColumn) drawMeasurement_Verbose(canvasCtx, xo, yo, 0, rectHeight, "L", roundNumber(rectHeight, 2), this.#textSize, COLOUR.Blue, this.#lineWidth, this.#crossScale, this.#offsetFromShape, false, "R", false, canvasScale);
 
-                                    drawFillRect(canvasCtx, xo, yo, rectWidth, rectHeight, "TL", COLOUR.Red, 0.4);
+                                    drawFillRect(canvasCtx, xo, yo, rectWidth, rectHeight, "TL", COLOUR.Red, 0.3);
+
+                                    //draw grain
+                                    if(this.hasGrain) {
+                                          console.log(this.flipped, this.grainDirection);
+                                          if(!this.flipped && this.grainDirection == "With Long Side") {
+                                                let numberOfGrains = (rectHeight / 20) - 1;
+                                                for(let g = 0; g < numberOfGrains; g++) {
+                                                      drawLine_WH(canvasCtx, xo, yo + ((g + 1) * 20), rectWidth, 0, COLOUR.Blue, 1, 1);
+                                                }
+                                          } if(!this.flipped && this.grainDirection == "With Short Side") {
+                                                let numberOfGrains = (rectWidth / 20) - 1;
+                                                for(let g = 0; g < numberOfGrains; g++) {
+                                                      drawLine_WH(canvasCtx, xo + ((g + 1) * 20), yo, 0, rectHeight, COLOUR.Blue, 1, 1);
+                                                }
+                                          } if(this.flipped && this.grainDirection == "With Long Side") {
+                                                let numberOfGrains = (rectWidth / 20) - 1;
+                                                for(let g = 0; g < numberOfGrains; g++) {
+                                                      drawLine_WH(canvasCtx, xo + ((g + 1) * 20), yo, 0, rectHeight, COLOUR.Blue, 1, 1);
+                                                }
+                                          } if(this.flipped && this.grainDirection == "With Short Side") {
+                                                let numberOfGrains = (rectHeight / 20) - 1;
+                                                for(let g = 0; g < numberOfGrains; g++) {
+                                                      drawLine_WH(canvasCtx, xo, yo + ((g + 1) * 20), rectWidth, 0, COLOUR.Blue, 1, 1);
+                                                }
+
+                                          }
+                                    }
 
                                     xo += rectWidth_Initial + this.#gapBetweenX;
                               }

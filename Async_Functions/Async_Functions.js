@@ -200,45 +200,6 @@ async function loadBaseplateList() {
     document.dispatchEvent(event_loadedBaseplateList);
 }
 
-let Transformer;
-window.addEventListener("load", (event) => {
-    fetch(tamperPort + "/External%20Files/Transformers.json")
-        .then(res => res.json())
-        .then((data) => {
-            console.log(data);
-            Transformer = data.transformers;
-        })
-        .catch((error) => {
-            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
-        });
-});
-
-var predefinedVehicleTemplates;
-window.addEventListener("load", (event) => {
-    fetch(tamperPort + "/External%20Files/PredefinedVehicleTemplates.json")
-        .then(res => res.json())
-        .then((data) => {
-            console.log(data);
-            predefinedVehicleTemplates = data.predefinedVehicleTemplates;
-        })
-        .catch((error) => {
-            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
-        });
-});
-var blankVehicleTemplates;
-window.addEventListener("load", (event) => {
-    fetch(tamperPort + "/External%20Files/BlankVehicleTemplates.json")
-        .then(res => res.json())
-        .then((data) => {
-            console.log(data);
-            blankVehicleTemplates = data.blankVehicleTemplates;
-        })
-        .catch((error) => {
-            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
-        });
-});
-
-
 var VinylLookup;
 var LaminateLookup;
 var AppTapeLookup;
@@ -247,41 +208,37 @@ var TravelLookup;
 var ACMLookup;
 var RouterToolpathTimeLookup;
 var LaserToolpathTimeLookup;
+var PartItemsLookup;
+var Transformer;
+var predefinedVehicleTemplates;
+var blankVehicleTemplates;
 window.addEventListener("load", (event) => {
-    fetch(tamperPort + "/External%20Files/PartItems.json")
-        .then(res => res.json())
-        .then((data) => {
-            console.log(data);
-            VinylLookup = data.VinylLookup;
-            LaminateLookup = data.LaminateLookup;
-            AppTapeLookup = data.AppTapeLookup;
-            InstallLookup = data.InstallLookup;
-            TravelLookup = data.TravelLookup;
-            ACMLookup = data.ACMLookup;
-        })
-        .catch((error) => {
-            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
-        });
-    fetch(tamperPort + "/External%20Files/RouterToolpathTimes.json")
-        .then(res => res.json())
-        .then((data) => {
-            console.log(data);
-            RouterToolpathTimeLookup = data.RouterToolpathTimes;
-        })
-        .catch((error) => {
-            console.log(error);
-            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
-        });
-    fetch(tamperPort + "/External%20Files/LaserToolpathTimes.json")
-        .then(res => res.json())
-        .then((data) => {
-            console.log(data);
-            LaserToolpathTimeLookup = data.LaserToolpathTimes;
-        })
-        .catch((error) => {
-            console.log(error);
-            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
-        });
+    Transformer = JSON.parse(GM_getResourceText("JSONTransformers"));
+    console.log(Transformer);
+    Transformer = Transformer.transformers;
+
+    predefinedVehicleTemplates = JSON.parse(GM_getResourceText("JSONPredefinedVehicleTemplates"));
+    console.log(predefinedVehicleTemplates);
+    predefinedVehicleTemplates = predefinedVehicleTemplates.predefinedVehicleTemplates;
+
+    blankVehicleTemplates = JSON.parse(GM_getResourceText("JSONBlankVehicleTemplates"));
+    console.log(blankVehicleTemplates);
+    blankVehicleTemplates = blankVehicleTemplates.blankVehicleTemplates;
+
+    RouterToolpathTimeLookup = JSON.parse(GM_getResourceText("JSONLaser"));
+    console.log(RouterToolpathTimeLookup);
+
+    LaserToolpathTimeLookup = JSON.parse(GM_getResourceText("JSONRouter"));
+    console.log(LaserToolpathTimeLookup);
+
+    PartItemsLookup = JSON.parse(GM_getResourceText("JSONPartItems"));
+    console.log(PartItemsLookup);
+    VinylLookup = PartItemsLookup.VinylLookup;
+    LaminateLookup = PartItemsLookup.LaminateLookup;
+    AppTapeLookup = PartItemsLookup.AppTapeLookup;
+    InstallLookup = PartItemsLookup.InstallLookup;
+    TravelLookup = PartItemsLookup.TravelLookup;
+    ACMLookup = PartItemsLookup.ACMLookup;
 });
 
 document.addEventListener("loadedPredefinedParts", (event) => {

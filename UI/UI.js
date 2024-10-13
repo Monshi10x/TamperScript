@@ -134,6 +134,8 @@ function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo)
     let f_div = document.createElement("div");
     let f_headingTextWrapper = document.createElement("div");
     let f_headingText = document.createElement("span");
+    let f_headingTextWrapper2 = document.createElement("div");
+    let f_arrow = document.createElement("span");
     let f_contentContainer = document.createElement("div");
 
     f_div.style = STYLE.Div5 + ";min-height:30px;background-color:" + COLOUR.MediumGrey + ";";
@@ -142,16 +144,36 @@ function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo)
     f_headingTextWrapper.style = "display:table;width:100px;text-align: center;float: left; position: relative; background-color: " + COLOUR.DarkBlue +
         ";box-sizing: border-box; padding: 0px; font-size: 10px; color: white; text-align: center; margin: 0px; border: 0px;";
 
-    f_headingText.style = "display:table-cell;vertical-align: middle;word-break: break-all ";
+    f_headingText.style = "display:table-cell;vertical-align: middle;word-break: break-all;";
     f_headingText.innerText = headingText;
 
-    f_contentContainer.style = "width:calc(100% - " + f_headingTextWrapper.style.width + ");height:100%;float:left;position: relative;";
+    f_headingTextWrapper2.style = "display:table;width:20px;text-align: center;float: left; position: relative; background-color: " + COLOUR.DarkBlue +
+        ";box-sizing: border-box; padding: 0px; font-size: 20px; color: white; text-align: center; margin: 0px; border: 0px;";
+
+    f_arrow.style = "display:table-cell;vertical-align: middle;word-break: break-all;";
+    f_arrow.innerHTML = "&#11208";
+
+    f_contentContainer.style = "width:calc(100% - 120px);height:100%;float:left;position: relative;";
+
+    f_headingTextWrapper.addEventListener("click", function() {
+        $(f_contentContainer).toggle();
+        console.log(f_arrow.innerHTML);
+        toggle(f_arrow.innerHTML == "⯈", () => {
+            console.log("in first");
+            f_arrow.innerHTML = "&#11207";
+        }, () => {
+            console.log("in second");
+            f_arrow.innerHTML = "&#11208";
+        });
+    });
 
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(f_div);
     }
     f_headingTextWrapper.appendChild(f_headingText);
     f_div.appendChild(f_headingTextWrapper);
+    f_headingTextWrapper2.appendChild(f_arrow);
+    f_div.appendChild(f_headingTextWrapper2);
     f_div.appendChild(f_contentContainer);
 
     return [f_div, f_contentContainer, f_headingText, f_headingTextWrapper];
@@ -1192,6 +1214,19 @@ function dropdownSetSelectedIndexToNextAvailable(field, leaveIfCurrentSelectedIs
             return;
         }
     }
+}
+function dropdownSetSelectedValue(field, value) {
+    let allOptions = field.options;
+    console.log(allOptions);
+    for(let i = 0; i < allOptions.length; i++) {
+        console.log(allOptions[i].value);
+        if(allOptions[i].value === value) {
+            field.selectedIndex = i;
+            $(field).change();
+            return;
+        }
+    }
+    alert("no value selected for dropdown (no match)");
 }
 //helper functions
 function checkboxesAddToSelectionGroup(oneMustBeChecked, ...checkboxElements) {

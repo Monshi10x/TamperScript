@@ -114,6 +114,7 @@ class DragZoomCanvas {
       }
 
       onMouseDown(e) {
+            e.preventDefault();
             this.#canvas.style.cursor = "grabbing";
             this.#holding = true;
             this.updateMouseXY(e);

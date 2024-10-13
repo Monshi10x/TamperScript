@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.51
+// @version      10.52
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -26,6 +26,12 @@
 // @updateURL    https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
 // @downloadURL  https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
 // @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_Sales.css
+// @resource     JSONTransformers https://github.com/Monshi10x/TamperScript/raw/main/External Files/Transformers.json
+// @resource     JSONPredefinedVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/PredefinedVehicleTemplates.json
+// @resource     JSONBlankVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/BlankVehicleTemplates.json
+// @resource     JSONRouter https://github.com/Monshi10x/TamperScript/raw/main/External Files/RouterToolpathTimes.json
+// @resource     JSONLaser https://github.com/Monshi10x/TamperScript/raw/main/External Files/LaserToolpathTimes.json
+// @resource     JSONPartItems https://github.com/Monshi10x/TamperScript/raw/main/External Files/PartItems.json
 // @resource     Image_Corflute https://github.com/Monshi10x/TamperScript/raw/main/Images/Corflute-Resized.jpg
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js

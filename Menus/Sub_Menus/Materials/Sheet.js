@@ -177,6 +177,9 @@ class Sheet extends Material {
       #flipSheet = false;
       #flip;
 
+      #hasGrain;
+      #grainDirection;
+
       get backgroundColor() {return COLOUR.Orange;}
       get textColor() {return COLOUR.White;}
 
@@ -208,7 +211,7 @@ class Sheet extends Material {
             this.#updateOrderBtn = createIconButton("https://cdn.gorilladash.com/images/media/6144512/signarama-australia-icons8-numeric-50-635d113e9382c.png", "Set Order", "width: 120px; height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
                   let items = this.#filterOrder;
                   items.shift();
-                  let modal = new ModalSetOrder("Set Order", () => {
+                  let modal = new ModalSetOrder("Filter Order", () => {
                         this.#filterOrder = ['Material', ...modal.getOrder()];
                         this.UpdateFilters('Material');
                   }, ...items);
@@ -223,9 +226,11 @@ class Sheet extends Material {
                         this.UpdateFromChange();
                   }, this);
 
-                  this.#visualiser.borrowFields(...this.#filterContainersOrdered, this.#flip[0], methodContainer);
+                  this.#visualiser.borrowFields(...this.#filterContainersOrdered, this.#flip[0], this.#hasGrain[0], methodContainer);
                   this.#visualiser.setFlippedField(this.#flip[1]);
                   this.#visualiser.setSheetSizeField(this.#sheetSize[1]);
+                  this.#visualiser.setHasGrainField(this.#hasGrain[1]);
+                  this.#visualiser.setGrainDirectionField(this.#grainDirection[1]);
                   this.#visualiser.width = this.getQWH().width;
                   this.#visualiser.height = this.getQWH().height;
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
@@ -254,6 +259,16 @@ class Sheet extends Material {
                   this.UpdateFromChange();
             }, f_container_joins, true);
             flipDiagram = createDiv("background-color:yellow;width:30px;height:10px;margin-top:10px;", null, this.#flip[0]);
+
+            this.#hasGrain = createCheckbox_Infield("Has Grain", false, "width:calc(50% - 20px);margin:10px;", () => {
+                  setFieldHidden(!this.#hasGrain[1].checked, this.#grainDirection[1], this.#grainDirection[0]);
+
+                  this.UpdateFromChange();
+            }, f_container_joins, true);
+
+            this.#grainDirection = createDropdown_Infield("Grain Direction", 0, "width:calc(50% - 20px);", [createDropdownOption("With Long Side", "With Long Side"), createDropdownOption("With Short Side", "With Short Side")], () => { }, f_container_joins);
+            setFieldDisabled(true, this.#grainDirection[1], this.#grainDirection[0]);
+            setFieldHidden(true, this.#grainDirection[1], this.#grainDirection[0]);
 
             /*
             FinalOutputSizes*/
@@ -312,6 +327,7 @@ class Sheet extends Material {
       UpdateFromChange() {
             super.UpdateFromChange();
 
+            this.UpdateGrainDirection();
             this.UpdateInheritedTable();
             this.UpdateOutputTable();
             this.UpdateVisualizer();
@@ -331,6 +347,37 @@ class Sheet extends Material {
       UpdateJoinMethod() {
             if(this.#method1[1].checked) this.#currentJoinMethod = Sheet.joinMethod["Even Joins"];
             else this.#currentJoinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
+      }
+
+      UpdateGrainDirection() {
+            let hasGrain = false;
+            let grainDirection = "";
+            var name = this.#material[1].value + " - (sqm) - " + this.#finish[1].value + " " + this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", "") + "x" + this.#thickness[1].value;
+            var partFullName = getPredefinedParts_Name_FromLimitedName(name);
+            var part = getPredefinedParts(partFullName)[0];
+
+            if(part) {
+                  console.log(part);
+                  if(part.Color) {
+                        console.log(part.Color);
+                        if(part.Color.includes("{")) {
+                              let colourString = JSON.parse(part.Color.substring(1, part.Color.length - 1));
+                              console.log(colourString.grainDirection);
+                              if(colourString.grainDirection) {
+                                    hasGrain = true;
+                                    grainDirection = colourString.grainDirection;
+                              }
+                        }
+                  }
+
+            }
+
+            if(hasGrain) {
+                  setCheckboxChecked(true, this.#hasGrain[1]);
+                  dropdownSetSelectedValue(this.#grainDirection[1], grainDirection);
+            } else {
+                  setCheckboxChecked(false, this.#hasGrain[1]);
+            }
       }
 
       ReceiveSubscriptionData(data) {
