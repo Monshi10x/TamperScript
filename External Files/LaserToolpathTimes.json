@@ -1,0 +1,10 @@
+{
+      "LaserToolpathTimes": {
+            "Acrylic": {
+                  "Cut Through": {
+                        "Glossy Edge": 600,
+                        "Painted Edge (faster)": 1000
+                  }
+            }
+      }
+}

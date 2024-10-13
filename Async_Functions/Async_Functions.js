@@ -245,6 +245,8 @@ var AppTapeLookup;
 var InstallLookup;
 var TravelLookup;
 var ACMLookup;
+var RouterToolpathTimeLookup;
+var LaserToolpathTimeLookup;
 window.addEventListener("load", (event) => {
     fetch(tamperPort + "/External%20Files/PartItems.json")
         .then(res => res.json())
@@ -260,15 +262,21 @@ window.addEventListener("load", (event) => {
         .catch((error) => {
             Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
         });
-});
-
-var RouterToolpathTimeLookup;
-window.addEventListener("load", (event) => {
     fetch(tamperPort + "/External%20Files/RouterToolpathTimes.json")
         .then(res => res.json())
         .then((data) => {
             console.log(data);
             RouterToolpathTimeLookup = data.RouterToolpathTimes;
+        })
+        .catch((error) => {
+            console.log(error);
+            Ordui.Alert(error + ", Please open SimpleWebServer and refresh tab");
+        });
+    fetch(tamperPort + "/External%20Files/LaserToolpathTimes.json")
+        .then(res => res.json())
+        .then((data) => {
+            console.log(data);
+            LaserToolpathTimeLookup = data.LaserToolpathTimes;
         })
         .catch((error) => {
             console.log(error);

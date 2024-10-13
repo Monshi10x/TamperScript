@@ -13,6 +13,8 @@ class Sheet extends Material {
             createDropdownOption("HDPE", "HDPE"),
             createDropdownOption("Signwhite", "Signwhite")];
 
+      #materialsWithUsableFactoryEdge = ["ACM", "Aluminium", "Foamed PVC", "Corflute", "HDPE", "Signwhite"];
+
       #cuttingOptions = {
             "Guillotine": createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine"),
             "None": createDropdownOption("None - (standard sheet)", "None"),
@@ -48,7 +50,6 @@ class Sheet extends Material {
       static laserMaterialsCanCut = [
             "Acrylic",
             "Aluminium",
-            "Mondoclad",
             "Foamed PVC",
             "Polycarb",
             "HDPE",
@@ -230,8 +231,16 @@ class Sheet extends Material {
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
             }, f_container_joins, true);
 
+            let methodContainer = createDivStyle4("width:calc(50% - 20px);", f_container_joins);
+            let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
+            let methodText = createText("Join Method", null, methodContainer);
+            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
+            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
+
+            checkboxesAddToSelectionGroup(true, this.#method1, this.#method2);
+
             let flipDiagram;
-            this.#flip = createCheckbox_Infield("Flip", this.#flipSheet, "width:150px;margin-left:10px;", () => {
+            this.#flip = createCheckbox_Infield("Flip", this.#flipSheet, "width:calc(50% - 20px);margin:10px;", () => {
                   this.#flipSheet = this.#flip[1].checked;
                   if(this.#flipSheet) {
                         flipDiagram.style.marginTop = "0px";
@@ -245,14 +254,6 @@ class Sheet extends Material {
                   this.UpdateFromChange();
             }, f_container_joins, true);
             flipDiagram = createDiv("background-color:yellow;width:30px;height:10px;margin-top:10px;", null, this.#flip[0]);
-
-            let methodContainer = createDivStyle4("width:40%;margin-right:50%;", f_container_joins);
-            let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
-            let methodText = createText("Join Method", null, methodContainer);
-            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
-            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
-
-            checkboxesAddToSelectionGroup(true, this.#method1, this.#method2);
 
             /*
             FinalOutputSizes*/
@@ -549,6 +550,7 @@ class Sheet extends Material {
       createCuttingOptions = (width, height, sheetWidth, sheetHeight, material) => {
             let returnArray = [];
             let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet";
+            let canUseFactoryEdge = this.#materialsWithUsableFactoryEdge.includes(material);
             let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material);
             let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material);
             let canLaserSheet = Sheet.canLaserSheet(width, height, sheetWidth, sheetHeight, material);
@@ -564,7 +566,7 @@ class Sheet extends Material {
                   ];
             } else {
                   returnArray = [
-                        setFieldDisabled(!isStandardSheet, createDropdownOption("None - (standard sheet)", "None")),
+                        setFieldDisabled(!isStandardSheet || !canUseFactoryEdge, createDropdownOption("None - (standard sheet)", "None")),
                         setFieldDisabled(!canGuillotineSheet, createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine")),
                         setFieldDisabled(!canRouterSheet, createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router")),
                         setFieldDisabled(!canLaserSheet, createDropdownOption("Laser - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Laser")),
