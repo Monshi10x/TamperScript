@@ -159,10 +159,8 @@ function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo)
         $(f_contentContainer).toggle();
         console.log(f_arrow.innerHTML);
         toggle(f_arrow.innerHTML == "⯈", () => {
-            console.log("in first");
             f_arrow.innerHTML = "&#11207";
         }, () => {
-            console.log("in second");
             f_arrow.innerHTML = "&#11208";
         });
     });
