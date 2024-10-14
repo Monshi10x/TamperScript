@@ -318,8 +318,10 @@ class DesignBoard2 extends JobBoard {
             this.AddToHeader(this.#f_companyFilter[0]);
 
             //Payments
-            this.#f_showPaymentsFilter = createCheckbox_Infield("Load Payments", false, "width:200px;box-shadow:none;", () => {this.FilterJobs();}, null);
-            this.AddToHeader(this.#f_showPaymentsFilter[0]);
+            if(this.#usersWithSalesPermissions.includes(this.currentUser)) {
+                  this.#f_showPaymentsFilter = createCheckbox_Infield("Load Payments", false, "width:200px;box-shadow:none;", () => {this.FilterJobs();}, null);
+                  this.AddToHeader(this.#f_showPaymentsFilter[0]);
+            }
       }
 
       async FilterJobs() {
