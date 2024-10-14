@@ -22,7 +22,7 @@
 // @grant        window.onurlchange
 // @updateURL    https://github.com/Monshi10x/TamperScript/raw/main/TamperStartQuote.js
 // @downloadURL  https://github.com/Monshi10x/TamperScript/raw/main/TamperStartQuote.js
-// @resource     EmailTemplate_OrderAcknowledgement https://github.com/Monshi10x/TamperScript/raw/main/OrderHome/OrderAcknowledgement.txt
+// @resource     EmailTemplate_OrderAcknowledgement https://github.com/Monshi10x/TamperScript/raw/main/OrderHome/EmailTemplates/OrderAcknowledgement.txt
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js

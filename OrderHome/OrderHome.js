@@ -9,6 +9,7 @@ window.addEventListener("load", async (event) => {
 
 class OrderHome {
 
+      #emailTemplateContainer;
       #emailTemplate_OrderAcknowledgement;
 
       constructor() {
@@ -22,42 +23,48 @@ class OrderHome {
 
       InitEmailTemplates() {
             this.#emailTemplate_OrderAcknowledgement = GM_getResourceText("EmailTemplate_OrderAcknowledgement");
-            console.log(this.#emailTemplate_OrderAcknowledgement);
       }
 
       InitEvents() {
             console.log("in init events");
-            let emailEstimateBtn = document.getElementById("hlEmailInvoiceOrEstimate");
-            emailEstimateBtn.addEventListener("click", () => {
-                  this.OnEstimateBtnClicked();
+            let emailBtn = document.getElementById("hlEmailInvoiceOrEstimate");
+            emailBtn.addEventListener("click", () => {
+                  this.OnEmailBtnClicked();
+            });
+
+            let sendBtn = document.getElementById("btnClientEmailFormOne");
+            sendBtn.addEventListener("click", () => {
+                  this.OnSendBtnClicked();
             });
       }
 
-      OnEstimateBtnClicked() {
-            console.log("onEstimateBtnClicked");
+      OnEmailBtnClicked() {
+            console.log("OnEmailBtnClicked");
 
 
-
+            let self = this;
             let overlayF = setInterval(function() {
                   console.log("in timeout");
                   if(document.getElementById("simplemodal-overlay")) {
                         let overlay = document.getElementById("simplemodal-overlay");
                         let contentArea = document.getElementsByClassName("trumbowyg-editor notranslate")[0];
 
-                        let overlayContainer = document.createElement("div");
-                        overlayContainer.style = "position:absolute;top:200px;left:0;width:200px;height:500px;background-color:white;display:block;z-index: 2010 !important;";
+                        self.#emailTemplateContainer = document.createElement("div");
+                        self.#emailTemplateContainer.style = "position:absolute;top:200px;left:0;width:200px;height:500px;background-color:white;display:block;z-index: 2010 !important;";
 
-                        let button1 = createButton("Order Acknowledgement", "width:calc(100% - 16px);", (e) => {
+                        let orderAcknowledgementBtn = createButton("Order Acknowledgement", "width:calc(100% - 20px);", (e) => {
                               e.preventDefault();
-                              contentArea.innerHTML = "Hi";
-                        }, overlayContainer);
+                              contentArea.innerHTML = self.#emailTemplate_OrderAcknowledgement;
+                        }, self.#emailTemplateContainer);
 
-                        insertAfter(overlayContainer, overlay);
+                        insertAfter(self.#emailTemplateContainer, overlay);
 
                         clearInterval(overlayF);
                   }
             }, 100);
+      }
 
-
+      OnSendBtnClicked() {
+            deleteElement(this.#emailTemplateContainer);
       }
 }
