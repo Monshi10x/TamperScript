@@ -318,7 +318,7 @@ var menu_Charts;
 var menu_POS;
 async function initLHSMenu() {
     var container = document.createElement('div');
-    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + COLOUR.Blue + ";box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
+    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + COLOUR.DarkGrey + ";box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
     container.id = "LHSMenu";
 
     let header = document.createElement('div');
@@ -347,7 +347,7 @@ async function initLHSMenu() {
     menu_Charts = new ChartMenu(900, 700, "ChartsMenu", "Charts");
     menu_POS = new MenuPOS(900, 700, "MenuPOS", "POS");
 
-    addItem(GM_getResourceURL("Icon_Upload"), "Find", "finder");
+    addItem(GM_getResourceURL("Icon_Download"), "Find", "finder");
     addItem(ICON.area, "Area", "m2");
     addItem(ICON.length, "Length", "lnm");
     addItem(ICON.LED, "LED", "LED");
@@ -366,13 +366,13 @@ async function initLHSMenu() {
 
     function addItem(imageSrc, text, openMenuName, overrideCss, unlockListenEvent) {
         var itemContainer = document.createElement('div');
-        itemContainer.style = "display:block;float:left;width:100%;height:50px;margin:0px;cursor:pointer;background-color:" + COLOUR.Blue + ";padding:0px;border-bottom:0px solid #00b;";
+        itemContainer.style = "display:block;float:left;width:100%;height:50px;margin:0px;cursor:pointer;background-color:" + COLOUR.DarkGrey + ";padding:0px;border-bottom:0px solid #00b;";
         itemContainer.style.cssText += overrideCss;
         itemContainer.onmouseover = function() {
             itemContainer.style.backgroundColor = "#333";
         };
         itemContainer.onmouseout = function() {
-            itemContainer.style.backgroundColor = COLOUR.Blue;
+            itemContainer.style.backgroundColor = COLOUR.DarkGrey;
         };
         itemContainer.onclick = function() {
             openMenu(openMenuName);
@@ -401,7 +401,7 @@ async function initLHSMenu() {
             itemContainer.style.backgroundColor = "#2828ff";
             document.addEventListener(unlockListenEvent, () => {
                 itemContainer.style.pointerEvents = "inherit";
-                itemContainer.style.backgroundColor = COLOUR.Blue;
+                itemContainer.style.backgroundColor = COLOUR.DarkGrey;
             });
         }
 
