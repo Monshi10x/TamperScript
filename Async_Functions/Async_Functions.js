@@ -213,6 +213,7 @@ var Transformer;
 var predefinedVehicleTemplates;
 var blankVehicleTemplates;
 window.addEventListener("load", (event) => {
+    console.log(GM_getResourceText("JSONTransformers"));
     Transformer = JSON.parse(GM_getResourceText("JSONTransformers"));
     console.log(Transformer);
     Transformer = Transformer.transformers;
