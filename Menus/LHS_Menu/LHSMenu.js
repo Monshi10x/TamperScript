@@ -349,7 +349,7 @@ async function initLHSMenu() {
 
     addItem(GM_getResourceURL("Icon_Download"), "Find", "finder");
     addItem(GM_getResourceURL("Icon_M2"), "Area", "m2");
-    addItem(ICON.length, "Length", "lnm");
+    addItem(GM_getResourceURL("Icon_Lnm"), "Length", "lnm");
     addItem(ICON.LED, "LED", "LED");
     addItem(ICON.lightbox, "Lightbox", "lightbox", null, "loadedPredefinedParts");
     addItem(ICON.billboard, "Billboard", "billboard", null, "loadedPredefinedParts");
