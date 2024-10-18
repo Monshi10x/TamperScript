@@ -348,7 +348,7 @@ async function initLHSMenu() {
     menu_POS = new MenuPOS(900, 700, "MenuPOS", "POS");
 
     addItem(GM_getResourceURL("Icon_Download"), "Find", "finder");
-    addItem(ICON.area, "Area", "m2");
+    addItem(GM_getResourceURL("Icon_M2"), "Area", "m2");
     addItem(ICON.length, "Length", "lnm");
     addItem(ICON.LED, "LED", "LED");
     addItem(ICON.lightbox, "Lightbox", "lightbox", null, "loadedPredefinedParts");
@@ -387,7 +387,7 @@ async function initLHSMenu() {
 
         var image = document.createElement('img');
         image.src = imageSrc;
-        image.style = "display:block;float:left;width:25px;height:25px;padding:12.5px 10px;filter:invert(100%);background-size:cover;";
+        image.style = "display:block;float:left;width:45px;height:50px;;background-size:cover;";
         image.onclick = function() {openMenu(openMenuName);};
         itemContainer.appendChild(image);
 
