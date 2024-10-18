@@ -352,7 +352,7 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_Lnm"), "Length", "lnm");
     addItem(GM_getResourceURL("Icon_LED"), "LED", "LED");
     addItem(GM_getResourceURL("Icon_Lightbox"), "Lightbox", "lightbox", null, "loadedPredefinedParts");
-    addItem(ICON.billboard, "Billboard", "billboard", null, "loadedPredefinedParts");
+    addItem(GM_getResourceURL("Icon_Billboard"), "Billboard", "billboard", null, "loadedPredefinedParts");
     addItem(ICON.compare, "Compare", "compare", null, "loadedPredefinedParts");
     addItem(ICON.router, "Router", "router", null, "loadedPredefinedParts");
     addItem(ICON.window, "Window", "window", null, "loadedPredefinedParts");
