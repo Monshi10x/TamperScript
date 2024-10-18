@@ -347,7 +347,7 @@ async function initLHSMenu() {
     menu_Charts = new ChartMenu(900, 700, "ChartsMenu", "Charts");
     menu_POS = new MenuPOS(900, 700, "MenuPOS", "POS");
 
-    addItem(ICON.find, "Find", "finder");
+    addItem(GM_getResourceURL("Icon_Upload"), "Find", "finder");
     addItem(ICON.area, "Area", "m2");
     addItem(ICON.length, "Length", "lnm");
     addItem(ICON.LED, "LED", "LED");
