@@ -226,10 +226,10 @@ window.addEventListener("load", (event) => {
     console.log(blankVehicleTemplates);
     blankVehicleTemplates = blankVehicleTemplates.blankVehicleTemplates;
 
-    RouterToolpathTimeLookup = JSON.parse(GM_getResourceText("JSONLaser"));
+    RouterToolpathTimeLookup = JSON.parse(GM_getResourceText("JSONRouter"));
     console.log(RouterToolpathTimeLookup);
 
-    LaserToolpathTimeLookup = JSON.parse(GM_getResourceText("JSONRouter"));
+    LaserToolpathTimeLookup = JSON.parse(GM_getResourceText("JSONLaser"));
     console.log(LaserToolpathTimeLookup);
 
     PartItemsLookup = JSON.parse(GM_getResourceText("JSONPartItems"));
