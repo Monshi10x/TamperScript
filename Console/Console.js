@@ -21,7 +21,7 @@ function createLog() {
     var header = document.createElement("p");
     header.innerText = "Console";
     header.style = "width:100%;padding:8px;font:14px;margin:0px;color:white;text-align:center;font-weight:bold;";
-    logContainer.style = "width:160px;min-height:50px;max-height:200px;position:fixed;left:0px;bottom:50px;background-color:" + COLOUR.Blue + ";display:block;z-index:900;border-bottom: 1px solid " + COLOUR.Blue + ";border-top: 1px solid " + COLOUR.Blue + ";";
+    logContainer.style = "width:160px;min-height:50px;max-height:200px;position:fixed;left:0px;bottom:50px;background-color:" + COLOUR.DarkGrey + ";display:block;z-index:900;border-bottom: 1px solid " + COLOUR.DarkGrey + ";border-top: 1px solid " + COLOUR.DarkGrey + ";";
     log.style = "overflow-y: scroll;";
     log.id = "Log";
     logTextObject = document.createElement('p');

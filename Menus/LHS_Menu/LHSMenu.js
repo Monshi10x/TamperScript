@@ -369,7 +369,7 @@ async function initLHSMenu() {
         itemContainer.style = "display:block;float:left;width:100%;height:50px;margin:0px;cursor:pointer;background-color:" + COLOUR.DarkGrey + ";padding:0px;border-bottom:0px solid #00b;";
         itemContainer.style.cssText += overrideCss;
         itemContainer.onmouseover = function() {
-            itemContainer.style.backgroundColor = "#333";
+            itemContainer.style.backgroundColor = "rgb(36 36 36)";
         };
         itemContainer.onmouseout = function() {
             itemContainer.style.backgroundColor = COLOUR.DarkGrey;
