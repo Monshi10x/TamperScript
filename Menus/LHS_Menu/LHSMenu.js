@@ -359,7 +359,7 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_Layers"), "Panel Signs", "panel", null, "loadedPredefinedParts");
     addItem(GM_getResourceURL("Icon_Vehicle"), "Vehicles", "vehicle", null, "loadedPredefinedParts");
     addItem(ICON.admin, "Admin", "admin", "position:absolute;bottom:0px;");
-    addItem(ICON.creditCard, "Surcharge", "surcharge");
+    addItem(GM_getResourceURL("Icon_CreditCard"), "Surcharge", "surcharge");
     addItem(ICON._3D, "3D Letters", "3D", null, "loadedPredefinedParts");
     addItem(ICON.find, "Charts", "Charts", null, "loadedPredefinedParts");
     addItem(ICON.POS, "POS", "POS", null);
