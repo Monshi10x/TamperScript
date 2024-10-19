@@ -362,7 +362,7 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_CreditCard"), "Surcharge", "surcharge");
     addItem(GM_getResourceURL("Icon_3D"), "3D Letters", "3D", null, "loadedPredefinedParts");
     addItem(GM_getResourceURL("Icon_Chart"), "Charts", "Charts", null, "loadedPredefinedParts");
-    addItem(ICON.POS, "POS", "POS", null);
+    addItem(GM_getResourceURL("Icon_POS"), "POS", "POS", null);
 
     function addItem(imageSrc, text, openMenuName, overrideCss, unlockListenEvent) {
         var itemContainer = document.createElement('div');
