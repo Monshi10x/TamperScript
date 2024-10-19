@@ -360,7 +360,7 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_Vehicle"), "Vehicles", "vehicle", null, "loadedPredefinedParts");
     addItem(ICON.admin, "Admin", "admin", "position:absolute;bottom:0px;");
     addItem(GM_getResourceURL("Icon_CreditCard"), "Surcharge", "surcharge");
-    addItem(ICON._3D, "3D Letters", "3D", null, "loadedPredefinedParts");
+    addItem(GM_getResourceURL("Icon_3D"), "3D Letters", "3D", null, "loadedPredefinedParts");
     addItem(ICON.find, "Charts", "Charts", null, "loadedPredefinedParts");
     addItem(ICON.POS, "POS", "POS", null);
 
@@ -398,10 +398,12 @@ async function initLHSMenu() {
 
         if(unlockListenEvent) {
             itemContainer.style.pointerEvents = "none";
-            itemContainer.style.backgroundColor = "#2828ff";
+            //itemContainer.style.backgroundColor = COLOUR.Black;
+            let loader = new Loader(itemContainer);
             document.addEventListener(unlockListenEvent, () => {
                 itemContainer.style.pointerEvents = "inherit";
                 itemContainer.style.backgroundColor = COLOUR.DarkGrey;
+                loader.Delete();
             });
         }
 
