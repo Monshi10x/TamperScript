@@ -164,6 +164,11 @@
                         "installers": 1,
                         "minutes": 90,
                         "imageURL": "https://cdn.gorilladash.com/images/media/5077109/signarama-australia-img-1060-2-small-square-61611e488aba9.jpg?auto=webp&width=1600"
+                  },
+                  "(RBWH Base) 1200x1200": {
+                        "installers": 1,
+                        "minutes": 90,
+                        "imageURL": "https://cdn.gorilladash.com/images/media/12781654/signarama-australia-rbwh-square-66600628d2c21.jpg?auto=webp&width=1920"
                   }
             }
       }
