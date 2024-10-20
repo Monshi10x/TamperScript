@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.52
+// @version      10.5
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -25,6 +25,23 @@
 // @grant        window.onurlchange
 // @updateURL    https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
 // @downloadURL  https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
+// @resource     Icon_Download https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Download.svg
+// @resource     Icon_M2 https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-M2.svg
+// @resource     Icon_Lnm https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Lnm.svg
+// @resource     Icon_LED https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-LED.svg
+// @resource     Icon_Find https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Find.svg
+// @resource     Icon_Lightbox https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Lightbox.svg
+// @resource     Icon_Billboard https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Billboard.svg
+// @resource     Icon_Compare https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Compare.svg
+// @resource     Icon_Router https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Router.svg
+// @resource     Icon_Window https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Window.svg
+// @resource     Icon_Layers https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Layers.svg
+// @resource     Icon_Vehicle https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Vehicle.svg
+// @resource     Icon_CreditCard https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-CreditCard.svg
+// @resource     Icon_Chart https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Chart.svg
+// @resource     Icon_3D https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-3D.svg
+// @resource     Icon_POS https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-POS.svg
+// @resource     Icon_Admin https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Admin.svg
 // @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_Sales.css
 // @resource     JSONTransformers https://github.com/Monshi10x/TamperScript/raw/main/External Files/Transformers.json
 // @resource     JSONPredefinedVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/PredefinedVehicleTemplates.json
@@ -32,14 +49,16 @@
 // @resource     JSONRouter https://github.com/Monshi10x/TamperScript/raw/main/External Files/RouterToolpathTimes.json
 // @resource     JSONLaser https://github.com/Monshi10x/TamperScript/raw/main/External Files/LaserToolpathTimes.json
 // @resource     JSONPartItems https://github.com/Monshi10x/TamperScript/raw/main/External Files/PartItems.json
+// @resource     JSONInstallTimes https://github.com/Monshi10x/TamperScript/raw/main/External Files/InstallTimes.json
 // @resource     Image_Corflute https://github.com/Monshi10x/TamperScript/raw/main/Images/Corflute-Resized.jpg
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Charts/Chart.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Loaders/Loader.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/DragAndDrop/DragAndDrop.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/QWHD.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/QWH.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UI.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UIContainerType3.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Async_Functions/Async_Functions.js
