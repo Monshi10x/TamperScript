@@ -1,0 +1,170 @@
+{
+      "InstallTimes": {
+            "ACM": {
+                  "450x300": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "600x900": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "1200x1200": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "900x1800": {
+                        "installers": 2,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "2440x1220": {
+                        "installers": 2,
+                        "minutes": 45,
+                        "imageURL": null
+                  },
+                  "3050x1220": {
+                        "installers": 2,
+                        "minutes": 45,
+                        "imageURL": null
+                  },
+                  "3050x1500": {
+                        "installers": 2,
+                        "minutes": 45,
+                        "imageURL": null
+                  },
+                  "4000x1500": {
+                        "installers": 2,
+                        "minutes": 60,
+                        "imageURL": null
+                  }
+            },
+            "Acrylic on Standoffs": {
+                  "600x900": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "800x1500": {
+                        "installers": 2,
+                        "minutes": 45,
+                        "imageURL": null
+                  },
+                  "2440x1220": {
+                        "installers": 2,
+                        "minutes": 90,
+                        "imageURL": null
+                  }
+            },
+            "Window": {
+                  "1000x1000": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "1220x2440": {
+                        "installers": 2,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "1500x2400": {
+                        "installers": 2,
+                        "minutes": 45,
+                        "imageURL": null
+                  }
+            },
+            "Lightbox Face": {
+                  "1800x500": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "600x2400": {
+                        "installers": 2,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "1220x2440": {
+                        "installers": 2,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "3050x1500": {
+                        "installers": 2,
+                        "minutes": 45,
+                        "imageURL": null
+                  }
+            },
+            "Wall Graphics": {
+                  "600x2400": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "1300x2400": {
+                        "installers": 2,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "1500x2400": {
+                        "installers": 2,
+                        "minutes": 30,
+                        "imageURL": null
+                  }
+            },
+            "Vehicles": {
+                  "Single Door": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "Double Door": {
+                        "installers": 1,
+                        "minutes": 40,
+                        "imageURL": null
+                  },
+                  "Double Door Bottom Strip": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "Full Ute Wrap (Star Liquor w/o Torneau)": {
+                        "installers": 1,
+                        "minutes": 2400,
+                        "imageURL": null
+                  }
+            },
+            "Decals and RTA": {
+                  "1000x1000": {
+                        "installers": 1,
+                        "minutes": 30,
+                        "imageURL": null
+                  },
+                  "2000x1000": {
+                        "installers": 1,
+                        "minutes": 40,
+                        "imageURL": null
+                  },
+                  "3000x1000": {
+                        "installers": 2,
+                        "minutes": 40,
+                        "imageURL": null
+                  }
+            },
+            "10mm Cut Reception Letters": {
+                  "(Faith) 1500x500": {
+                        "installers": 1,
+                        "minutes": 90,
+                        "imageURL": null
+                  },
+                  "(Cosca) 1500x500": {
+                        "installers": 1,
+                        "minutes": 90,
+                        "imageURL": "https://cdn.gorilladash.com/images/media/5077109/signarama-australia-img-1060-2-small-square-61611e488aba9.jpg?auto=webp&width=1600"
+                  }
+            }
+      }
+}
