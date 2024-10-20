@@ -53,6 +53,11 @@ class Install extends SubMenu {
 		}, this.contentContainer, false);
 		this.UpdateInstallLookup();
 
+		makeFieldGroup("Checkbox", this.#quickLookup[1], false,
+			this.#quickItem[0],
+			this.#quickInstall_sub[0]
+		);
+
 		makeFieldGroup("Checkbox", this.requiredField[1], false,
 			this.l_installTimeTotalEach[0],
 			this.l_install_InstallMinutes[0],
@@ -95,21 +100,17 @@ class Install extends SubMenu {
 
 	UpdateInstallLookup() {
 		let chosenLookupType = this.#quickItem[1].value;
-		console.log(chosenLookupType);
 		let types = Object.getOwnPropertyNames(InstallTimesLookup[chosenLookupType]);
 		let array = [];
 		for(let i = 0; i < types.length; i++) {
 			let key = Object.keys(InstallTimesLookup[chosenLookupType])[i];
 			let obj = InstallTimesLookup[chosenLookupType][key];
-			console.log(types[i]);
 			array.push([types[i], obj.imageURL == null ? "null" : obj.imageURL]);
-			//array.push(createDropdownOption(types[i], obj.imageURL == null ? "null" : obj.imageURL));
 		}
 		deleteElement(this.#quickInstall_sub[0]);
 		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Sub", 0, null, 150, false, array, () => {
 			this.UpdateInstallTimes();
 		}, this.contentContainer, false);
-		//setOptions(this.#quickInstall_sub[1], array);
 	}
 
 	UpdateInstallTimes() {
