@@ -318,11 +318,11 @@ var menu_Charts;
 var menu_POS;
 async function initLHSMenu() {
     var container = document.createElement('div');
-    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + COLOUR.DarkGrey + ";box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
+    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + "rgb(36 36 36)" + ";box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
     container.id = "LHSMenu";
 
     let header = document.createElement('div');
-    header.style = StringCombine("display:flex;justify-content:center;align-items:center;width:100%;height:30px;background-color:", COLOUR.DarkGrey);
+    header.style = StringCombine("display:flex;justify-content:center;align-items:center;width:100%;height:30px;background-color:", "rgb(36 36 36)");
     container.appendChild(header);
 
     let headerIcon = document.createElement('img');
@@ -367,13 +367,13 @@ async function initLHSMenu() {
 
     function addItem(imageSrc, text, openMenuName, overrideCss, unlockListenEvent) {
         var itemContainer = document.createElement('div');
-        itemContainer.style = "display:block;float:left;width:100%;height:50px;margin:0px;cursor:pointer;background-color:" + COLOUR.DarkGrey + ";padding:0px;border-bottom:0px solid #00b;";
+        itemContainer.style = "display:block;float:left;width:100%;height:50px;margin:0px;cursor:pointer;background-color:" + "rgb(36 36 36)" + ";padding:0px;border-bottom:0px solid #00b;";
         itemContainer.style.cssText += overrideCss;
         itemContainer.onmouseover = function() {
-            itemContainer.style.backgroundColor = "rgb(36 36 36)";
+            itemContainer.style.backgroundColor = COLOUR.DarkGrey;
         };
         itemContainer.onmouseout = function() {
-            itemContainer.style.backgroundColor = COLOUR.DarkGrey;
+            itemContainer.style.backgroundColor = "rgb(36 36 36)";
         };
         itemContainer.onclick = function() {
             openMenu(openMenuName);
@@ -403,7 +403,7 @@ async function initLHSMenu() {
             let loader = new Loader(itemContainer);
             document.addEventListener(unlockListenEvent, () => {
                 itemContainer.style.pointerEvents = "inherit";
-                itemContainer.style.backgroundColor = COLOUR.DarkGrey;
+                itemContainer.style.backgroundColor = "rgb(36 36 36)";
                 loader.Delete();
             });
         }

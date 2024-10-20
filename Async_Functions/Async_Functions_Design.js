@@ -56,8 +56,7 @@ async function getProductionJobs() {
       return data.d.QueueEntries;
 }
 
-var awaitingApprovalJobs;
-async function getRowsData_awaitingApproval() {
+async function getAwaitingApprovalJobs() {
       const response = await fetch("https://sar10686.corebridge.net/SalesModule/Orders/OrderProduct.asmx/GetOrderProductQueueEntriesPaged", {
             "headers": {
                   "accept": "application/json, text/javascript, */*; q=0.01",
@@ -80,7 +79,8 @@ async function getRowsData_awaitingApproval() {
             "credentials": "include"
       });
       const data = await response.json();
-      awaitingApprovalJobs = data.d.QueueEntries;
+      console.log(data);
+      return data.d.QueueEntries;
 }
 
 async function getOrderData(CB_OrderID, CB_AccountID) {

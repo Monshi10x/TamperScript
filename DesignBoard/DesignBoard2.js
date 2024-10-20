@@ -14,12 +14,13 @@ class DesignBoard2 extends JobBoard {
                         
       VARIABLES         
 */
-      //StateID = production, design etc (WIP ID)
+      //StateID = OrderProductStatusId - production, design etc (WIP ID)
       //QueueID = QueuePrioritizationSettingId = colour number (Colour ID)
       #boards = [
             {title: "Hold", colour: "#a5a5a5", WIPStatus: "WIP : In Design", CBQueueID: "9", CBStateId: "7", fallbackPriority: 2},
             {title: "Urgent", colour: "#ff0000", WIPStatus: null, CBQueueID: "3", CBStateId: null, fallbackPriority: null},
             {title: "Design", colour: "#4472c4", WIPStatus: "WIP : In Design", CBQueueID: "5", CBStateId: "7", fallbackPriority: 1},
+            {title: "Awaiting Approval", colour: "#ed7d31", WIPStatus: "WIP : Awaiting Proof Approval", CBQueueID: "16", CBStateId: "9", fallbackPriority: 1},
             {title: "Design Revision", colour: "#a9d08e", WIPStatus: "WIP : In Design Revision", CBQueueID: "14", CBStateId: "10", fallbackPriority: 1},
             {title: "Print Files To Be Done", colour: "#d9e1f2", WIPStatus: "WIP : Proof Approved", CBQueueID: "13", CBStateId: "14", fallbackPriority: 1},
             {title: "T To Approve Print Files", colour: "#47ad8b", WIPStatus: "WIP : Proof Approved", CBQueueID: "6", CBStateId: "14", fallbackPriority: 2},
@@ -114,7 +115,7 @@ class DesignBoard2 extends JobBoard {
             await this.AddJobCardsToBoards();
             this.AddFiltersToHeader();
             this.ListenForWIPChanges();
-            await this.AddPaymentButtonToCards(); //TODO
+            await this.AddPaymentButtonToCards();
       }
 
       CreateBoards() {
@@ -126,11 +127,17 @@ class DesignBoard2 extends JobBoard {
       async LoadJobsData() {
             console.time("LoadJobsData");
             let data = await getDesignJobs();
+            let awaitingApprovalJobs = await getAwaitingApprovalJobs();
             console.timeEnd("LoadJobsData");
 
             this.#numJobs = data.length;
             for(let d = 0; d < this.#numJobs; d++) {
                   this.#jobObjects.push(data[d]);
+            }
+
+            this.#numJobs += awaitingApprovalJobs.length;
+            for(let d = 0; d < awaitingApprovalJobs.length; d++) {
+                  this.#jobObjects.push(awaitingApprovalJobs[d]);
             }
       }
 
@@ -192,7 +199,7 @@ class DesignBoard2 extends JobBoard {
 
       async ChangeJobColourToSuitWIPAndAddToBoard(jobObject) {
             let boardsMatchingWIP = this.GetBoardsOfWIPStatus(jobObject.OrderProductStatusTextWithOrderStatus);
-
+            console.log(boardsMatchingWIP);
             //choose lowest WIP status based on fallback priority
             let lowestFallbackPriority = 1000000;
             let lowestWIPStatusBoard;
@@ -203,7 +210,7 @@ class DesignBoard2 extends JobBoard {
                         lowestFallbackPriority = board.fallbackPriority;
                   }
             }
-
+            console.log(lowestWIPStatusBoard);
             //update job to match WIP Colour
             let newColour = lowestWIPStatusBoard.colour;
 
