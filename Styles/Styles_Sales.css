@@ -20,17 +20,27 @@
       100% { transform: rotate(360deg); }
 }
 
-@keyframes urgentPulse {
-      0% { border-color:#ffee00; }
-      50% { border-color:#000; }
-      100% { border-color:#ffee00; }
+
+
+.CPUChipIcon{
+      animation: spinChip 4s linear infinite;
 }
+
+@keyframes spinChip {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+}
+
 
 .urgentPulse{
       animation: urgentPulse 0.5s infinite ;
       border-width:5px !important;
 }
-
+@keyframes urgentPulse {
+      0% { border-color:#ffee00; }
+      50% { border-color:#000; }
+      100% { border-color:#ffee00; }
+}
 .selected{
       border:2px solid red;
 }

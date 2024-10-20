@@ -159,10 +159,10 @@ class Production extends SubMenu {
 	getQWH() {
 		for(let i = 0; i < this.subscriptions.length; i++) {
 			if(this.subscriptions[i].qty && this.subscriptions[i].width && this.subscriptions[i].height) {
-				return new QWH(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);
+				return new QWHD(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);
 			}
 		}
-		return new QWH(0, 0, 0);
+		return new QWHD(0, 0, 0);
 	};
 
 	get productionTimeMins() {

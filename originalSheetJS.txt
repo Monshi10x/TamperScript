@@ -110,7 +110,7 @@ class Sheet extends Material {
              */
       #inheritedData = [];
       /**
-       * @example [QWH(), QWH(),...]
+       * @example [QWHD(), QWHD(),...]
        */
       #inheritedSizes = [];
       #inheritedSizeTable;
@@ -374,7 +374,7 @@ class Sheet extends Material {
             }
 
             if(this.#inheritedData.length == 0) {
-                  this.#inheritedSizes.push(new QWH(this.qty, this.width, this.height));
+                  this.#inheritedSizes.push(new QWHD(this.qty, this.width, this.height));
                   this.#inheritedSizeTable.addRow(this.qty, this.width, this.height);
             }
       };
@@ -435,7 +435,7 @@ class Sheet extends Material {
                               this.UpdateTableTotals();
                         }, null);
 
-                        this.#dataForSubscribers.push(new QWH(qty, w, h));
+                        this.#dataForSubscribers.push(new QWHD(qty, w, h));
 
                         this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[0], cutsTotal, totalPerimeter);
                         this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[1], cutsTotal, totalPerimeter]);
@@ -668,7 +668,7 @@ class Sheet extends Material {
       }
 
       /**
-       * @returns [] i.e. [QWH(), QWH(), ...]
+       * @returns [] i.e. [QWHD(), QWHD(), ...]
        */
       static cutResultsByMethodWithOccurenceCount(method, width, height, sheetWidth, sheetHeight, flipSheet) {
             return uniqueSizeArrayWithOccurenceCount(Sheet.cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet));

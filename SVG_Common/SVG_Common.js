@@ -327,11 +327,14 @@ function drawFillCircle(ctx, xOffset, yOffset, radius, originPoint, colour, tran
       ctx.stroke();
 }
 
-function drawLine_WH(ctx, xOffset, yOffset, width, height, colour, thickness, transparency) {
+function drawLine_WH(ctx, xOffset, yOffset, width, height, colour, thickness, transparency, options = {stroke: null/*[5, 15]*/}) {
       ctx.beginPath();
       ctx.lineWidth = thickness;
       ctx.globalAlpha = transparency;
       ctx.strokeStyle = colour;
+      if(options.stroke) {
+            ctx.setLineDash(options.stroke);
+      }
       ctx.moveTo(xOffset, yOffset);
       ctx.lineTo(xOffset + width, yOffset + height);
       ctx.stroke();
@@ -339,6 +342,9 @@ function drawLine_WH(ctx, xOffset, yOffset, width, height, colour, thickness, tr
       ctx.globalAlpha = 1.0;
       ctx.strokeStyle = 'black';
       ctx.lineWidth = 0.1;
+      if(options.stroke) {
+            ctx.setLineDash([]);
+      }
 }
 
 function drawLine_To(ctx, xOffset, yOffset, newPosX, newPosY, colour, thickness, transparency) {

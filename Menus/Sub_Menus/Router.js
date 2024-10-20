@@ -73,10 +73,10 @@ class Router extends SubMenu {
 	getQWH() {
 		for(let i = 0; i < this.subscriptions.length; i++) {
 			if(this.subscriptions[i].Type.toLowerCase().includes("size")) {
-				return new QWH(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);
+				return new QWHD(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);
 			}
 		}
-		return new QWH(0, 0, 0);
+		return new QWHD(0, 0, 0);
 	};
 
 	get timeTE() {
@@ -179,7 +179,7 @@ class Router extends SubMenu {
 	}
 
 	runRowIndex = 0;
-	addRunRow(pathLength = 0, numberShapes = 0) {
+	addRunRow(pathLength = 0, numberShapes = 0, options = {material: null, profile: null, quality: null, speed: null}) {
 		this.runRowIndex++;
 		let internalIndex = this.runRowIndex;
 		let l_pathLength = createInput_Infield("Length", pathLength, "width:90%;min-width:90px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 10, {postfix: " mm"});
@@ -189,7 +189,13 @@ class Router extends SubMenu {
 		l_profile = createDropdown_Infield("Profile", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Profile", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer);
 		l_quality = createDropdown_Infield("Quality", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Quality", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer);
 		l_speed = createInput_Infield("Speed", 1000, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer, false, 10, {postfix: " mm/min"});
-		this.updateCutProfile("Material", l_material[1], l_profile[1], l_quality[1], l_speed[1]);
+		if(options.material != null) {
+			dropdownSetSelectedValue(l_material[1], options.material);
+			dropdownSetSelectedValue(l_profile[1], options.profile);
+			dropdownSetSelectedValue(l_quality[1], options.quality);
+		} else {
+			this.updateCutProfile("Material", l_material[1], l_profile[1], l_quality[1], l_speed[1]);
+		}
 		let l_deleteRowBtn = createButton("X", "Background-color:red;width:30px;margin:0px;", () => {
 			for(let i = 0; i < this.runRows.length; i++) {
 				if(this.runRows[i].index === internalIndex) {

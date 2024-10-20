@@ -181,7 +181,7 @@ function uniqueArray3DWithOccurenceCount(array) {
 
 /**
  * @argument array i.e. [[w,h], [w,h]...]
- * @returns [] i.e. [QWH(), QWH(), ...]
+ * @returns [] i.e. [QWHD(), QWHD(), ...]
  */
 function uniqueSizeArrayWithOccurenceCount(array) {
     let returnArray = [];
@@ -189,7 +189,7 @@ function uniqueSizeArrayWithOccurenceCount(array) {
         let itemWidth = array[i][0];
         let itemHeight = array[i][1];
         if(i == 0) {
-            returnArray.push(new QWH(1, itemWidth, itemHeight));
+            returnArray.push(new QWHD(1, itemWidth, itemHeight));
             continue;
         }
         for(let j = 0; j < returnArray.length; j++) {
@@ -198,7 +198,7 @@ function uniqueSizeArrayWithOccurenceCount(array) {
                 break;
             }
             if(j == returnArray.length - 1) {
-                returnArray.push(new QWH(1, itemWidth, itemHeight));
+                returnArray.push(new QWHD(1, itemWidth, itemHeight));
                 break;
             }
         }

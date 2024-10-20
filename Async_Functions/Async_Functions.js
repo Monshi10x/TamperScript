@@ -213,7 +213,6 @@ var Transformer;
 var predefinedVehicleTemplates;
 var blankVehicleTemplates;
 window.addEventListener("load", (event) => {
-    console.log(GM_getResourceText("JSONTransformers"));
     Transformer = JSON.parse(GM_getResourceText("JSONTransformers"));
     console.log(Transformer);
     Transformer = Transformer.transformers;
@@ -228,9 +227,11 @@ window.addEventListener("load", (event) => {
 
     RouterToolpathTimeLookup = JSON.parse(GM_getResourceText("JSONRouter"));
     console.log(RouterToolpathTimeLookup);
+    RouterToolpathTimeLookup = RouterToolpathTimeLookup.RouterToolpathTimes;
 
     LaserToolpathTimeLookup = JSON.parse(GM_getResourceText("JSONLaser"));
     console.log(LaserToolpathTimeLookup);
+    LaserToolpathTimeLookup = LaserToolpathTimeLookup.LaserToolpathTimes;
 
     PartItemsLookup = JSON.parse(GM_getResourceText("JSONPartItems"));
     console.log(PartItemsLookup);

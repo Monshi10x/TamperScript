@@ -185,6 +185,9 @@ class Size2 extends SubscriptionManager {
       get height() {return zeroIfNaNNullBlank(this.#height[1].value);}
       set height(value) {$(this.#height[1]).val(value).change();};
 
+      #depth;
+      get depth() {return zeroIfNaNNullBlank(this.#depth[1].value);}
+      set depth(value) {$(this.#depth[1]).val(value).change();};
       /**
        * @Subscribers
        * @Updated on table changes
@@ -220,11 +223,13 @@ class Size2 extends SubscriptionManager {
 
             this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;position:relative;border:1px solid " + this.#backgroundColor + ";", this.#container);
 
-            this.#qty = createInput_Infield("Qty", 1, "width:100px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 1);
+            this.#qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 1);
 
-            this.#width = createInput_Infield("Width", null, "width:15%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
+            this.#width = createInput_Infield("Width", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
 
-            this.#height = createInput_Infield("Height", null, "width:15%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
+            this.#height = createInput_Infield("Height", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
+
+            this.#depth = createInput_Infield("Depth", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, false, 10, {postfix: "mm"});
 
             let commonSizeButton = createButton("A4,...", "width:60px;height:40px;margin:0px;margin-left:5px;margin-right:10px", () => {
                   this.#openCommonSizeModal();
@@ -259,7 +264,7 @@ class Size2 extends SubscriptionManager {
             this.#matrixSizes = [];
 
             this.#dataForSubscribers.push(this.getQWH());
-            this.#matrixSizes.push([[[this.getQWH().width, this.getQWH().height]]]);
+            this.#matrixSizes.push([[[this.getQWH().width, this.getQWH().height, this.getQWH().depth]]]);
 
             this.dataToPushToSubscribers = {
                   parent: this,
@@ -272,7 +277,7 @@ class Size2 extends SubscriptionManager {
             let qty;
             if(this.#qtyIsEmbeddedInProduct) qty = this.qty;
             else qty = 1;
-            return new QWH(qty, this.width, this.height);
+            return new QWHD(qty, this.width, this.height, this.depth);
       }
 
       getProductQuantity() {

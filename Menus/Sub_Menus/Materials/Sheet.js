@@ -127,7 +127,7 @@ class Sheet extends Material {
              */
       #inheritedData = [];
       /**
-       * @example [QWH(), QWH(),...]
+       * @example [QWHD(), QWHD(),...]
        */
       #inheritedSizes = [];
       #inheritedSizeTable;
@@ -173,6 +173,13 @@ class Sheet extends Material {
       #router;
       #finishingHeader;
       #finishingProduction;
+      #f_foldSideContainer;
+
+      #isFolded;
+      #foldedTop;
+      #foldedLeft;
+      #foldedBottom;
+      #foldedRight;
 
       #flipSheet = false;
       #flip;
@@ -190,8 +197,8 @@ class Sheet extends Material {
             InheritedParentSizeSplits*/
             let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
             this.#inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
-            this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
-            this.#inheritedSizeTable.addRow("-", "-", "-");
+            this.#inheritedSizeTable.setHeading("Qty", "Width", "Height", "Depth");
+            this.#inheritedSizeTable.addRow("-", "-", "-", "-");
             this.#inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
             /*
@@ -218,6 +225,36 @@ class Sheet extends Material {
             }, f_container_sheetSize);
 
             /*
+            Folded*/
+            let f_container_folded = createDivStyle5(null, "Folded", this.container)[1];
+            this.#f_foldSideContainer = document.createElement('div');
+            this.#isFolded = createCheckbox_Infield("Is Folded", false, "width:60%;margin-right:30%;", () => {
+                  if(this.#isFolded[1].checked) {
+                        setFieldHidden(false, this.#foldedTop[1], this.#foldedTop[0]);
+                        setFieldHidden(false, this.#foldedLeft[1], this.#foldedLeft[0]);
+                        setFieldHidden(false, this.#foldedRight[1], this.#foldedRight[0]);
+                        setFieldHidden(false, this.#foldedBottom[1], this.#foldedBottom[0]);
+                  } else {
+                        setFieldHidden(true, this.#foldedTop[1], this.#foldedTop[0]);
+                        setFieldHidden(true, this.#foldedLeft[1], this.#foldedLeft[0]);
+                        setFieldHidden(true, this.#foldedRight[1], this.#foldedRight[0]);
+                        setFieldHidden(true, this.#foldedBottom[1], this.#foldedBottom[0]);
+                  }
+                  this.UpdateFromChange();
+            }, this.#f_foldSideContainer);
+
+
+
+            this.#foldedTop = createCheckbox_Infield("Top", false, "margin-left: 20%; width:20%;margin-right: 50%; ", () => {this.UpdateFromChange();}, this.#f_foldSideContainer);
+            this.#foldedLeft = createCheckbox_Infield("Left", false, "width:20%;margin-right: 20%;", () => {this.UpdateFromChange();}, this.#f_foldSideContainer);
+            this.#foldedRight = createCheckbox_Infield("Right", false, " width:20%;margin-right: 30%;", () => {this.UpdateFromChange();}, this.#f_foldSideContainer);
+            this.#foldedBottom = createCheckbox_Infield("Bottom", false, "margin-left: 20%;width:20%;", () => {this.UpdateFromChange();}, this.#f_foldSideContainer);
+            setFieldHidden(true, this.#foldedTop[1], this.#foldedTop[0]);
+            setFieldHidden(true, this.#foldedLeft[1], this.#foldedLeft[0]);
+            setFieldHidden(true, this.#foldedRight[1], this.#foldedRight[0]);
+            setFieldHidden(true, this.#foldedBottom[1], this.#foldedBottom[0]);
+            f_container_folded.appendChild(this.#f_foldSideContainer);
+            /*
             Joins*/
             let f_container_joins = createDivStyle5(null, "Joins", this.container)[1];
 
@@ -226,11 +263,14 @@ class Sheet extends Material {
                         this.UpdateFromChange();
                   }, this);
 
-                  this.#visualiser.borrowFields(...this.#filterContainersOrdered, this.#flip[0], this.#hasGrain[0], methodContainer);
+                  this.#visualiser.borrowFields(...this.#filterContainersOrdered, this.#flip[0], this.#hasGrain[0], methodContainer, this.#f_foldSideContainer);
                   this.#visualiser.setFlippedField(this.#flip[1]);
                   this.#visualiser.setSheetSizeField(this.#sheetSize[1]);
                   this.#visualiser.setHasGrainField(this.#hasGrain[1]);
                   this.#visualiser.setGrainDirectionField(this.#grainDirection[1]);
+                  this.#visualiser.setFoldFields(this.#foldedTop[1], this.#foldedLeft[1], this.#foldedRight[1], this.#foldedBottom[1]);
+                  this.#visualiser.setDepth(this.getQWH().depth);
+                  this.#visualiser.setIsFoldedField(this.#isFolded[1]);
                   this.#visualiser.width = this.getQWH().width;
                   this.#visualiser.height = this.getQWH().height;
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
@@ -425,13 +465,13 @@ class Sheet extends Material {
                   for(let i = 0; i < recievedInputSizes.length; i++) {
                         this.#inheritedSizes.push(recievedInputSizes[i]);
                         console.log(recievedInputSizes[i]);
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, recievedInputSizes[i].width, recievedInputSizes[i].height);
+                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, recievedInputSizes[i].width, recievedInputSizes[i].height, recievedInputSizes[i].depth);
                   }
             }
 
             if(this.#inheritedData.length == 0) {
-                  this.#inheritedSizes.push(new QWH(this.qty, this.width, this.height));
-                  this.#inheritedSizeTable.addRow(this.qty, this.width, this.height);
+                  this.#inheritedSizes.push(new QWHD(this.qty, this.width, this.height, this.depth));
+                  this.#inheritedSizeTable.addRow(this.qty, this.width, this.height, this.depth);
             }
       };
 
@@ -467,6 +507,17 @@ class Sheet extends Material {
                   let rowWidth = this.#inheritedSizes[i].width;
                   let rowHeight = this.#inheritedSizes[i].height;
 
+                  if(this.#isFolded[1].checked) {
+                        if(this.#foldedTop[1].checked)
+                              rowHeight += this.#inheritedSizes[i].depth;
+                        if(this.#foldedLeft[1].checked)
+                              rowWidth += this.#inheritedSizes[i].depth;
+                        if(this.#foldedRight[1].checked)
+                              rowWidth += this.#inheritedSizes[i].depth;
+                        if(this.#foldedBottom[1].checked)
+                              rowHeight += this.#inheritedSizes[i].depth;
+                  }
+
                   perimeter += rowQty * mmToM(rowWidth) * mmToM(rowHeight);
                   cutsEach = Sheet.getNumberOfGuillotineCuts(rowWidth, rowHeight, sheetSizeWidth, sheetSizeHeight);
                   suggestedCutQty += rowQty * cutsEach;
@@ -491,7 +542,7 @@ class Sheet extends Material {
                               this.UpdateTableTotals();
                         }, null);
 
-                        this.#dataForSubscribers.push(new QWH(qty, w, h));
+                        this.#dataForSubscribers.push(new QWHD(qty, w, h));
 
                         this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[0], cutsTotal, totalPerimeter);
                         this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[1], cutsTotal, totalPerimeter]);
@@ -553,6 +604,34 @@ class Sheet extends Material {
             }
             this.#router.deleteAllRunRows();
             this.#router.addRunRow(this.#totalRouterPerimeter, this.#totalRouterNumberOfShapes);
+            if(this.#isFolded[1].checked) {
+                  let totalPerimeter = 0;
+                  let numberShapes = 0;
+                  let foldedTop = this.#foldedTop[1].checked;
+                  let foldedLeft = this.#foldedLeft[1].checked;
+                  let foldedRight = this.#foldedRight[1].checked;
+                  let foldedBottom = this.#foldedBottom[1].checked;
+                  if(foldedTop) {
+                        totalPerimeter += this.width;
+                  } if(foldedLeft) {
+                        totalPerimeter += this.height;
+                  } if(foldedRight) {
+                        totalPerimeter += this.height;
+                  } if(foldedBottom) {
+                        totalPerimeter += this.width;
+                  }
+
+                  for(let i = 0; i < this.matrixSizes.length; i++) {
+                        let numberRows = this.matrixSizes[i].length; console.log(numberRows);
+                        let numberColumns = this.matrixSizes[i][0].length; console.log(numberColumns);
+                        numberShapes += foldedTop ? numberColumns : 0;
+                        numberShapes += foldedLeft ? numberRows : 0;
+                        numberShapes += foldedRight ? numberRows : 0;
+                        numberShapes += foldedBottom ? numberColumns : 0;
+                  }
+
+                  this.#router.addRunRow(totalPerimeter, numberShapes, {material: "ACM", profile: "Groove", quality: "Good Quality", speed: null});
+            }
             if(this.#totalRouterNumberOfShapes > 1) {
                   this.#router.setupMultiple = true;
                   this.#router.setupNumberOfSheets = this.#totalRouterNumberOfShapes;
@@ -596,12 +675,13 @@ class Sheet extends Material {
 
       createCuttingOptions = (width, height, sheetWidth, sheetHeight, material) => {
             let returnArray = [];
-            let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet";
+            let sheetIsFolded = this.#isFolded[1].checked;
+            let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet" && !sheetIsFolded;
             let canUseFactoryEdge = this.#materialsWithUsableFactoryEdge.includes(material);
-            let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material);
+            let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material) && !sheetIsFolded;
             let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material);
             let canLaserSheet = Sheet.canLaserSheet(width, height, sheetWidth, sheetHeight, material);
-            let canHandCutSheet = Sheet.canHandCutSheet(width, height, sheetWidth, sheetHeight, material);
+            let canHandCutSheet = Sheet.canHandCutSheet(width, height, sheetWidth, sheetHeight, material) && !sheetIsFolded;
             if(width === null && height === null && sheetWidth === null && sheetHeight === null) {
                   returnArray = [
                         createDropdownOption("None - (standard sheet)", "None"),
@@ -728,7 +808,7 @@ class Sheet extends Material {
       }
 
       /**
-       * @returns [] i.e. [QWH(), QWH(), ...]
+       * @returns [] i.e. [QWHD(), QWHD(), ...]
        */
       static cutResultsByMethodWithOccurenceCount(method, width, height, sheetWidth, sheetHeight, flipSheet) {
             return uniqueSizeArrayWithOccurenceCount(Sheet.cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet));

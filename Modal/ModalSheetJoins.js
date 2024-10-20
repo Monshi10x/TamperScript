@@ -50,12 +50,38 @@ class ModalSheetJoins extends ModalWidthHeight {
 
       #grainDirectionField;
       setGrainDirectionField(field) {
-            this.grainDirectionField = field;
+            this.#grainDirectionField = field;
       }
 
       get grainDirection() {
-            return this.grainDirectionField.value;
+            return this.#grainDirectionField.value;
       }
+
+      #isFoldedField;
+      setIsFoldedField(field) {
+            this.#isFoldedField = field;
+      }
+
+      get isFolded() {
+            return this.#isFoldedField.checked;
+      }
+
+      #foldFields = [];
+      setFoldFields(topField, leftField, rightField, bottomField) {
+            this.#foldFields = [topField, leftField, rightField, bottomField];
+      }
+
+      get folds() {
+            return [
+                  this.#foldFields[0],
+                  this.#foldFields[1],
+                  this.#foldFields[2],
+                  this.#foldFields[3]];
+      }
+
+      #depth;
+      setDepth(field) {this.#depth = field;}
+      get depth() {return this.#depth;}
 
       #gapBetweenX = 0;
       #gapBetweenXField;
@@ -103,14 +129,16 @@ class ModalSheetJoins extends ModalWidthHeight {
                   for(let j = 0; j < this.#sizeArrays[i].length; j++) {//per sheet subscription matrix
                         let matrixSize = this.#sizeArrays[i][j];
 
-                        let isFirstRow, isFirstColumn = false;
+                        let isFirstRow, isFirstColumn, isLastRow, isLastColumn = false;
 
                         for(let r = 0; r < matrixSize.length; r++) {//per matrix row
                               xo = 0;
                               isFirstRow = r == 0;
+                              isLastRow = r == matrixSize.length - 1;
 
                               for(let c = 0; c < matrixSize[r].length; c++) {//per matrix column i.e. size [w, h]
                                     isFirstColumn = c == 0;
+                                    isLastColumn = c == matrixSize[r].length - 1;
 
                                     let [rectWidth, rectHeight] = matrixSize[r][c];
 
@@ -148,6 +176,43 @@ class ModalSheetJoins extends ModalWidthHeight {
                                                       drawLine_WH(canvasCtx, xo, yo + ((g + 1) * 20), rectWidth, 0, COLOUR.Blue, 1, 1);
                                                 }
 
+                                          }
+                                    }
+
+                                    if(this.isFolded) {
+                                          console.log(this.folds);
+                                          //top
+                                          if(this.folds[0].checked && isFirstRow) {
+                                                drawLine_WH(canvasCtx, xo, yo + this.depth, rectWidth, 0, COLOUR.Black, 1, 1, {stroke: [10, 10]});
+                                          }
+                                          //left
+                                          if(this.folds[1].checked && isFirstColumn) {
+                                                drawLine_WH(canvasCtx, xo + this.depth, yo, 0, rectHeight, COLOUR.Black, 1, 1, {stroke: [10, 10]});
+                                          }
+                                          //right
+                                          if(this.folds[2].checked && isLastColumn) {
+                                                drawLine_WH(canvasCtx, xo + rectWidth - this.depth, yo, 0, rectHeight, COLOUR.Black, 1, 1, {stroke: [10, 10]});
+                                          }
+                                          //bottom
+                                          if(this.folds[3].checked && isLastRow) {
+                                                drawLine_WH(canvasCtx, xo, yo + rectHeight - this.depth, rectWidth, 0, COLOUR.Black, 1, 1, {stroke: [10, 10]});
+                                          }
+
+                                          //top/Left corner
+                                          if(this.folds[0].checked && this.folds[1].checked && isFirstRow && isFirstColumn) {
+                                                drawFillRect(canvasCtx, xo - 1, yo - 1, this.depth + 2, this.#depth + 2, "TL", COLOUR.White, 1);
+                                          }
+                                          //top/right corner
+                                          if(this.folds[0].checked && this.folds[2].checked && isFirstRow && isLastColumn) {
+                                                drawFillRect(canvasCtx, xo + rectWidth + 1, yo - 1, this.depth + 2, this.#depth + 2, "TR", COLOUR.White, 1);
+                                          }
+                                          //bottom/left corner
+                                          if(this.folds[3].checked && this.folds[1].checked && isLastRow && isFirstColumn) {
+                                                drawFillRect(canvasCtx, xo - 1, yo + rectHeight - this.depth - 1, this.depth + 2, this.#depth + 2, "TL", COLOUR.White, 1);
+                                          }
+                                          //bottom/right corner
+                                          if(this.folds[3].checked && this.folds[2].checked && isLastRow && isLastColumn) {
+                                                drawFillRect(canvasCtx, xo + rectWidth + 1, yo + rectHeight - this.depth - 1, this.depth + 2, this.#depth + 2, "TR", COLOUR.White, 1);
                                           }
                                     }
 

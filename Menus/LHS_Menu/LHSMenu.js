@@ -328,6 +328,7 @@ async function initLHSMenu() {
     let headerIcon = document.createElement('img');
     headerIcon.src = ICON.CPUChip;
     headerIcon.style = "height:70%;float:left;" + filterFromHex("#31efff");
+    headerIcon.classList.add("CPUChipIcon");
     header.appendChild(headerIcon);
 
     menu_Admin = new AdminPanel(300, 300, "Admin", "Admin");

@@ -1215,9 +1215,7 @@ function dropdownSetSelectedIndexToNextAvailable(field, leaveIfCurrentSelectedIs
 }
 function dropdownSetSelectedValue(field, value) {
     let allOptions = field.options;
-    console.log(allOptions);
     for(let i = 0; i < allOptions.length; i++) {
-        console.log(allOptions[i].value);
         if(allOptions[i].value === value) {
             field.selectedIndex = i;
             $(field).change();

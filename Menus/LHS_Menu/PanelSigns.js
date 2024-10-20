@@ -104,9 +104,9 @@ class MenuPanelSigns extends LHSMenuWindow {
 				ToggleClosed */
 			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
-			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 100, false,
+			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
 				[["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
-				["Lightbox Face - Opal Acrylic", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv2ViepnkaCu6NWbWfFrDPb0nNn7SBQ9r7oQ&usqp=CAU"],
+				["Lightbox Face - Opal Acrylic", "https://cdn.gorilladash.com/images/media/5077257/signarama-australia-img-6911-2-small-thumbnail-61611e9ab2f0f.jpg"],
 				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
 				["Foam PVC", "https://5.imimg.com/data5/RN/UM/MY-14219350/white-pvc-foam-sheet-500x500.jpg"],
 				["Signwhite", "https://img.archiexpo.com/images_ae/photo-g/158002-12419012.jpg"],
@@ -178,9 +178,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.finish = "Opal";
 
 				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
-				vinyl.material = VinylLookup["Translucent"];
+				vinyl.material = VinylLookup["Clear"];
+				vinyl.bleedDropdown = "Lightbox Faces";
 				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
-				laminate.material = LaminateLookup["Translucent"];
+				laminate.material = LaminateLookup["Gloss"];
 				appTape = null;
 				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
 				printMounting = this.#add(PrintMounting, "PRINT MOUNTING", this.page1, [Sheet]);
@@ -233,6 +234,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.thickness = "3.0";
 
 				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
+				vinyl.bleedDropdown = "ACM";
 				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
 				appTape = null;
 				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
@@ -257,6 +259,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.thickness = "0.55";
 
 				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
+				vinyl.bleedDropdown = "ACM";
 				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
 				appTape = null;
 				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);

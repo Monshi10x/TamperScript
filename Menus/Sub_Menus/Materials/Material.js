@@ -18,6 +18,7 @@ class Material extends SubscriptionManager {
       #f_qty;
       #f_width;
       #f_height;
+      #f_depth;
       #f_lockBtn;
       #f_deleteBtn;
       #f_container;
@@ -36,6 +37,7 @@ class Material extends SubscriptionManager {
       get qty() {return zeroIfNaNNullBlank(this.#f_qty[1].value);}
       get width() {return zeroIfNaNNullBlank(this.#f_width[1].value);}
       get height() {return zeroIfNaNNullBlank(this.#f_height[1].value);}
+      get depth() {return zeroIfNaNNullBlank(this.#f_depth[1].value);}
       get container() {return this.#f_container;}
       get Type() {return this.#Type;}
       get ID() {return this.#Type + "-" + this.#UNIQUEID;}
@@ -109,6 +111,9 @@ class Material extends SubscriptionManager {
             this.#f_height = createInput_Infield("Height", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100, {postfix: "mm"});
             setFieldDisabled(true, this.#f_height[1], this.#f_height[0]);
 
+            this.#f_depth = createInput_Infield("Depth", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100, {postfix: "mm"});
+            setFieldDisabled(true, this.#f_depth[1], this.#f_depth[0]);
+
             /*this.#f_lockBtn = createButton("", "font-size: 18px;display: block; float: left; width:10%; min-width:20px;max-width:30px;border:none;padding:2px; color:white;min-height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
                   this.#isLocked = toggleLock(this.#f_lockBtn);
                   this.UpdateFromChange();
@@ -158,23 +163,25 @@ class Material extends SubscriptionManager {
                   $(this.#f_qty[1]).val(roundNumber(this.getQWH().qty, 0));
                   $(this.#f_width[1]).val(roundNumber(this.getQWH().width, 2));
                   $(this.#f_height[1]).val(roundNumber(this.getQWH().height, 2));
+                  $(this.#f_depth[1]).val(roundNumber(this.getQWH().depth, 2));
             } else {
                   setDisabled = false;
             }
             setFieldDisabled(setDisabled, this.#f_width[1], this.#f_width[0]);
             setFieldDisabled(setDisabled, this.#f_height[1], this.#f_height[0]);
+            setFieldDisabled(setDisabled, this.#f_depth[1], this.#f_depth[0]);
             setFieldDisabled(setDisabled, this.#f_qty[1], this.#f_qty[0]);
       }
 
       getQWH() {
-            if(!this.#isLocked) return new QWH(this.qty, this.width, this.height);
+            if(!this.#isLocked) return new QWHD(this.qty, this.width, this.height, this.depth);
 
             for(let i = 0; i < this.subscriptions.length; i++) {
                   if(this.subscriptions[i].qty && this.subscriptions[i].width && this.subscriptions[i].height) {
-                        return this.subscriptions[i].getQWH();//new QWH(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);
+                        return this.subscriptions[i].getQWH();//new QWHD(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);
                   }
             }
-            return new QWH(0, 0, 0);
+            return new QWHD(0, 0, 0);
       };
 
       Delete() {
