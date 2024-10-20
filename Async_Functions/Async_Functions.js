@@ -204,7 +204,7 @@ var VinylLookup;
 var LaminateLookup;
 var AppTapeLookup;
 var InstallLookup;
-var InstallTimes;
+var InstallTimesLookup;
 var TravelLookup;
 var ACMLookup;
 var RouterToolpathTimeLookup;
@@ -243,9 +243,9 @@ window.addEventListener("load", (event) => {
     TravelLookup = PartItemsLookup.TravelLookup;
     ACMLookup = PartItemsLookup.ACMLookup;
 
-    InstallTimes = JSON.parse(GM_getResourceText("JSONInstallTimes"));
-    console.log(InstallTimes);
-    InstallTimes = InstallTimes.InstallTimes;
+    InstallTimesLookup = JSON.parse(GM_getResourceText("JSONInstallTimes"));
+    console.log(InstallTimesLookup);
+    InstallTimesLookup = InstallTimesLookup.InstallTimes;
 });
 
 document.addEventListener("loadedPredefinedParts", (event) => {

@@ -1,5 +1,9 @@
 class Install extends SubMenu {
 
+	#quickLookup;
+	#quickItem;
+	#quickInstall_sub;
+
 	constructor(parentObject, canvasCtx, updateFunction, sizeClass) {
 		super(parentObject, canvasCtx, updateFunction, "INSTALL");
 
@@ -30,6 +34,24 @@ class Install extends SubMenu {
 		this.l_install_TravelMinutes = createInput_Infield("Travel Minutes", null, "width:25%;display:block;margin-left:40px", () => {this.Update();}, this.contentContainer, false, 10);
 		this.l_install_TravelHours = createInput_Infield("Travel Hours", null, "width:25%;display:block;", () => {this.Update();}, this.contentContainer, false, 1);
 		this.l_install_TravelDays = createInput_Infield("Travel Days (8h)", null, "width:25%;display:block;", () => {this.Update();}, this.contentContainer, false, 1);
+
+		this.#quickLookup = createCheckbox_Infield("Quick Lookup", false, null, () => { }, this.contentContainer);
+
+		let installTypes = [];
+		let temp = function() {
+			let types = Object.getOwnPropertyNames(InstallTimesLookup);
+			for(let i = 0; i < types.length; i++) {
+				installTypes.push(createDropdownOption(types[i], types[i]));
+			}
+		}; temp();
+		this.#quickItem = createDropdown_Infield("Type", 0, null, installTypes, () => {
+			this.UpdateInstallLookup();
+		}, this.contentContainer);
+
+		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Sub", 0, null, 150, false, [], () => {
+			this.UpdateInstallTimes();
+		}, this.contentContainer, false);
+		this.UpdateInstallLookup();
 
 		makeFieldGroup("Checkbox", this.requiredField[1], false,
 			this.l_installTimeTotalEach[0],
@@ -70,6 +92,29 @@ class Install extends SubMenu {
 
 	get travelRate() {return this.l_install_TravelRate[1].value;}
 	set travelRate(value) {this.l_install_TravelRate[1].value = value;}
+
+	UpdateInstallLookup() {
+		let chosenLookupType = this.#quickItem[1].value;
+		console.log(chosenLookupType);
+		let types = Object.getOwnPropertyNames(InstallTimesLookup[chosenLookupType]);
+		let array = [];
+		for(let i = 0; i < types.length; i++) {
+			let key = Object.keys(InstallTimesLookup[chosenLookupType])[i];
+			let obj = InstallTimesLookup[chosenLookupType][key];
+			console.log(types[i]);
+			array.push([types[i], obj.imageURL == null ? "null" : obj.imageURL]);
+			//array.push(createDropdownOption(types[i], obj.imageURL == null ? "null" : obj.imageURL));
+		}
+		deleteElement(this.#quickInstall_sub[0]);
+		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Sub", 0, null, 150, false, array, () => {
+			this.UpdateInstallTimes();
+		}, this.contentContainer, false);
+		//setOptions(this.#quickInstall_sub[1], array);
+	}
+
+	UpdateInstallTimes() {
+
+	}
 
 	Update() {
 		this.callback();
