@@ -10,6 +10,7 @@ class Sheet extends Material {
             createDropdownOption("Foamed PVC", "Foamed PVC"),
             createDropdownOption("Corflute", "Corflute"),
             createDropdownOption("Polycarb", "Polycarb"),
+            createDropdownOption("Stainless", "Stainless"),
             createDropdownOption("HDPE", "HDPE"),
             createDropdownOption("Signwhite", "Signwhite")];
 
@@ -54,7 +55,7 @@ class Sheet extends Material {
             "Polycarb",
             "HDPE",
             "Corflute",
-            "Stainless Steel",
+            "Stainless",
             "Copper",
             "Brass",
             "MDF",
