@@ -3,6 +3,10 @@
 		{
 			"name": "TamperScript",
 			"path": "."
+		},
+		{
+			"name": "SignScheduler",
+			"path": "../SignScheduler"
 		}
 	],
 	"settings": {
