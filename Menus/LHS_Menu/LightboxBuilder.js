@@ -538,7 +538,7 @@ class LightboxMenu extends LHSMenuWindow {
                     partIndex++;
                     var ledMins = roundNumber(productionMinsPerLED * totalLEDs, 2);
                     await setProductionTime(productIndex, partIndex, ledMins);
-                    await setPartDescription(productIndex, partIndex, "[LED] Production @ (" + (60 / productionMinsPerLED) + " LED/h) = " + ledMins + "mins");
+                    await setPartDescription(productIndex, partIndex, "[LED] Production at (" + (60 / productionMinsPerLED) + " LED/h) = " + ledMins + "mins");
                     await savePart(productIndex, partIndex);
                 }
             }
