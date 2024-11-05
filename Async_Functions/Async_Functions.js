@@ -1493,7 +1493,7 @@ var Field = {
         return "#productQuantity_" + getRealProductNo(productNo);
     },
     MarkupField: function(productNo, partNo) {
-        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_104";
+        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_107";
     },
     MarkupFieldEach: function(productNo, partNo) {
         return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_96";
