@@ -34,7 +34,7 @@ class Leg {
 		this.l_legContainer.appendChild(this.l_addPowdercoatingBtn);
 		this.l_powdercoatingCost = createInput_Infield("Cost", null, "width:100px;display:none;margin-left:50px;", null, this.l_legContainer);
 		this.l_powdercoatingMarkup = createInput_Infield("Markup", 1.8, "width:100px;display:none", null, this.l_legContainer, false, 0.1);
-		this.l_powdercoatingTotalEach = createDropdown_Infield("Total or Each", 0, "width:100px;display:none;margin-right:50px;", [createDropdownOption("Total", "Total"), createDropdownOption("Each (Per Frame)", "Each")], this.callback, this.l_legContainer);
+		this.l_powdercoatingTotalEach = createDropdown_Infield("Total or Each", 1, "width:100px;display:none;margin-right:50px;", [createDropdownOption("Total", "Total"), createDropdownOption("Each (Per Frame)", "Each")], this.callback, this.l_legContainer);
 		this.l_add2PacBtn = createButton("2Pac +", "width:150px;margin-right:400px;", this.toggle2Pac);
 		this.l_legContainer.appendChild(this.l_add2PacBtn);
 		this.l_2PacLitres = createInput_Infield("Litres", null, "width:100px;display:none;margin-left:50px;margin-right:400px;", null, this.l_legContainer, false, 0.000000000001);
@@ -43,7 +43,7 @@ class Leg {
 		this.l_numberCoats = createInput_Infield("# Coats (2 std)", 2, "margin-left:50px;width:100px;display:none", null, this.l_legContainer, false, 1);
 		this.l_sprayTime = createInput_Infield("Spray Time (per coat)", null, "width:150px;display:none", null, this.l_legContainer, false, 5);
 		this.l_flashTime = createInput_Infield("Flash Time (15m std)", 15, "width:150px;display:none;margin-left:50px;margin-right:150px;", null, this.l_legContainer, false, 5);
-		this.l_2PacTotalEach = createDropdown_Infield("Total or Each", 0, "width:100px;display:none;margin-left:50px;", [createDropdownOption("Total", "Total"), createDropdownOption("Each (Per Frame)", "Each")], this.callback, this.l_legContainer);
+		this.l_2PacTotalEach = createDropdown_Infield("Total or Each", 1, "width:100px;display:none;margin-left:50px;", [createDropdownOption("Total", "Total"), createDropdownOption("Each (Per Frame)", "Each")], this.callback, this.l_legContainer);
 		parentObject.appendChild(this.l_legContainer);
 	}
 
