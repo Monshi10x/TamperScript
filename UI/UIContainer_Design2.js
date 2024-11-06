@@ -494,6 +494,7 @@ class UIContainer_Design2 {
       #f_itemNoBtn;
       #f_jobColour;
       #f_jobOrder;
+      #f_openInSalesBtn;
       #f_proofLink;
       #f_descriptionFieldContainer;
       #f_descriptionLoader;
@@ -638,14 +639,6 @@ class UIContainer_Design2 {
             this.#f_contentContainer.style = "width:100%;max-height:calc(100% - 30px);display:block;overflow: auto;background-color:" + COLOUR.MidGrey;
             this.#f_container.appendChild(this.#f_contentContainer);
             /*
-            Job Number*/
-            this.#f_jobNoBtn = createLink("display: block; float: left; width: " + 80 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Black + ";", this.#jobObject.OrderInvoiceNumber, "/DesignModule/DesignOrderView.aspx?OrderId=" + this.#jobObject.OrderId, "_blank", this.#f_contentContainer);
-            this.addHeadingButtons(this.#f_jobNoBtn);
-            /*
-            Item Number*/
-            this.#f_itemNoBtn = createLink("display: block; float: left; width: " + 40 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, this.#jobObject.LineItemOrder + "/" + this.#jobObject.TotalProductsInOrder, "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + this.#jobObject.Id + "&OrderId=" + this.#jobObject.OrderId, "_blank", this.#f_contentContainer);
-            this.addHeadingButtons(this.#f_itemNoBtn);
-            /*
             Job Colour*/
             this.#f_jobColour = document.createElement("div");
             this.#f_jobColour.style = "display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;padding:0px; position:relative;color:black;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + (this.#jobObject.QueuePrioritySettingColor == null ? "white" : this.#jobObject.QueuePrioritySettingColor) + ";";
@@ -657,6 +650,20 @@ class UIContainer_Design2 {
 
             this.#f_jobOrder.id = "queuePriority";
             this.addHeadingButtons(this.#f_jobOrder);
+            /*
+            Job Number*/
+            this.#f_jobNoBtn = createLink("display: block; float: left; width: " + 80 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Black + ";", this.#jobObject.OrderInvoiceNumber, "/DesignModule/DesignOrderView.aspx?OrderId=" + this.#jobObject.OrderId, "_blank", this.#f_contentContainer);
+            this.addHeadingButtons(this.#f_jobNoBtn);
+            /*
+            Item Number*/
+            this.#f_itemNoBtn = createLink("display: block; float: left; width: " + 40 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkGrey, this.#jobObject.LineItemOrder + "/" + this.#jobObject.TotalProductsInOrder, "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + this.#jobObject.Id + "&OrderId=" + this.#jobObject.OrderId, "_blank", this.#f_contentContainer);
+            this.addHeadingButtons(this.#f_itemNoBtn);
+            /*
+            Open In Sales*/
+            if(this.userCanSeeCosting) {
+                  this.#f_openInSalesBtn = createLink("display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Blue + ";cursor: pointer;font-size:13px;text-align:center;line-height:30px;", "S", "/SalesModule/Orders/Order.aspx?OrderId=" + this.#jobObject.OrderId, "new window", this.#f_contentContainer);
+                  this.addHeadingButtons(this.#f_openInSalesBtn);
+            }
             /*
             Proof*/
             if(this.#jobObject.ProofFileName != "") {
@@ -671,7 +678,8 @@ class UIContainer_Design2 {
             createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "UPLOAD PROOF", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + this.#jobObject.Id + "&OrderId=" + this.#jobObject.OrderId, "new window", buttonsContainer);
             createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "see ORDER", "/DesignModule/DesignOrderView.aspx?OrderId=" + this.#jobObject.OrderId, "new window", buttonsContainer);
             createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "see ITEM", "/DesignModule/DesignProductEdit.aspx?OrderProductId=" + this.#jobObject.Id + "&OrderId=" + this.#jobObject.OrderId, "new window", buttonsContainer);
-            if(this.userCanSeeCosting) createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "open in SALES", "/SalesModule/Orders/Order.aspx?OrderId=" + this.#jobObject.OrderId, "new window", buttonsContainer);
+            if(this.userCanSeeCosting)
+                  createLink("display: block; float: left; width: 200px; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;font-size:14px;text-align:center;line-height:35px;", "open in SALES", "/SalesModule/Orders/Order.aspx?OrderId=" + this.#jobObject.OrderId, "new window", buttonsContainer);
             /*
             Description*/
             this.#f_descriptionFieldContainer = createDivStyle5("width:calc(100%);", "DESCRIPTION", this.#f_contentContainer)[1];
