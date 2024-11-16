@@ -5,8 +5,7 @@
 			"path": "."
 		},
 		{
-			"name": "SignScheduler",
-			"path": "../SignScheduler"
+			"path": "../TestCode"
 		}
 	],
 	"settings": {
@@ -222,7 +221,6 @@
 			]
 		},
 		"editor.fontFamily": "Consolas, 'Courier New', monospace",
-		"editor.fontSize": 12,
-		"liveServer.settings.multiRootWorkspaceName": "SignScheduler"
+		"editor.fontSize": 12
 	}
 }

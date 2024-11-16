@@ -7,6 +7,10 @@ class MenuPOS extends LHSMenuWindow {
       #f_qty;
       #f_costForQty;
       #f_link_IBS;
+      #f_link_EasySigns;
+      #f_link_InhousePrint;
+      #f_link_DisplayMe;
+      #f_link_SlimlineWarehouse;
       #f_typeDropdown;
       #f_gsmDropdown;
       #f_dimensions;
@@ -42,8 +46,9 @@ class MenuPOS extends LHSMenuWindow {
                   ["Business Cards", "https://orders.ibscards.com.au/assets/images/Products/5400.png"],
                   ["Flyers", "https://orders.ibscards.com.au/assets/images/Products/5407.png"],
                   ["Corflute - Direct Print", "https://onespotprint.com.au/wp-content/uploads/2018/07/Corflute-Signs-1-One-Spot-Print.jpg"],
-                  ["Flags", "https://onespotprint.com.au/wp-content/uploads/2018/07/Corflute-Signs-1-One-Spot-Print.jpg"]], () => {
-                        setCheckboxChecked(this.#f_typeDropdown[1].value == "Corflute", this.#f_isPanelProduct[1]);
+                  ["Flags", ""],
+                  ["Snap Frames", ""]], () => {
+                        setCheckboxChecked(this.#f_typeDropdown[1].value == "Corflute - Direct Print", this.#f_isPanelProduct[1]);
                   }, container, true);
 
             this.#f_isPanelProduct = createCheckbox_Infield("Is Panel Product", false, "width:300px;", () => {
@@ -53,10 +58,10 @@ class MenuPOS extends LHSMenuWindow {
             let container2 = createDivStyle5(null, "Cost", this.#page1)[1];
 
             this.#f_qty = createInput_Infield("Quantity", null, null, () => {
-                  this.#f_costForQty[2].innerText = "Cost (for " + this.#f_qty[1].value + ")";
+                  this.#f_costForQty[2].innerText = "Cost (for " + this.#f_qty[1].value + ") +GST";
             }, container2, true, 1);
 
-            this.#f_costForQty = createInput_Infield("Cost (for 0)", null, null, () => { }, container2, true, 1, {prefix: "$"});
+            this.#f_costForQty = createInput_Infield("Cost (for 0) +GST", null, null, () => { }, container2, true, 1, {prefix: "$"});
 
             this.#f_markup = createInput_Infield("Markup", 2, null, () => { }, container2, true, 1);
 
@@ -108,6 +113,10 @@ class MenuPOS extends LHSMenuWindow {
             let container4 = createDivStyle5(null, "Links", this.#page1)[1];
 
             this.#f_link_IBS = createLink("float:left;display:block;background-color:" + COLOUR.Blue + ";text-decoration: none;padding:10px;margin:5px;", "IBS", "https://orders.ibscards.com.au/member/dashboard", "new window", container4);
+            this.#f_link_EasySigns = createLink("float:left;display:block;background-color:" + COLOUR.Blue + ";text-decoration: none;padding:10px;margin:5px;", "Easy Signs", "https://www.easysigns.com.au/", "new window", container4);
+            this.#f_link_InhousePrint = createLink("float:left;display:block;background-color:" + COLOUR.Blue + ";text-decoration: none;padding:10px;margin:5px;", "Inhouse Print", "https://inhouseprint.com.au/", "new window", container4);
+            this.#f_link_DisplayMe = createLink("float:left;display:block;background-color:" + COLOUR.Blue + ";text-decoration: none;padding:10px;margin:5px;", "DisplayMe", "https://www.displayme.com.au/", "new window", container4);
+            this.#f_link_SlimlineWarehouse = createLink("float:left;display:block;background-color:" + COLOUR.Blue + ";text-decoration: none;padding:10px;margin:5px;", "Slimline Warehouse", "https://www.slimlinewarehouse.com.au/", "new window", container4);
 
             let container5 = createDivStyle5(null, "Artwork", this.#page1)[1];
             this.#artwork = new Artwork(container5, null, null);
@@ -119,8 +128,18 @@ class MenuPOS extends LHSMenuWindow {
       }
 
       togglePanelProducts(show = true) {
-            if(show) $(this.#f_thickness[0]).fadeIn(200);
-            else $(this.#f_thickness[0]).fadeOut(200);
+            if(show) {
+                  $(this.#f_thickness[0]).fadeIn(200);
+
+                  $(this.#f_gsmDropdown[0]).fadeOut(200);
+                  $(this.#f_finishDropdown[0]).fadeOut(200);
+            }
+            else {
+                  $(this.#f_thickness[0]).fadeOut(200);
+
+                  $(this.#f_gsmDropdown[0]).fadeIn(200);
+                  $(this.#f_finishDropdown[0]).fadeIn(200);
+            }
       }
 
       hide() {

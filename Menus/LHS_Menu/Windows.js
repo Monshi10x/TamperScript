@@ -70,7 +70,7 @@ class WindowMenu extends LHSMenuWindow {
 
             var production = createInputCalculated_Infield("Production (1 Person $135/h)", 0, "width:47%", null, true, row);
             production[1].id = "windowField_Production";
-            var install = createInputCalculated_Infield("Install (2 Person $180/h)", 0, "width:47%", null, true, row);
+            var install = createInputCalculated_Infield("Install (2 Person $270/h)", 0, "width:47%", null, true, row);
             install[1].id = "windowField_Install";
 
             var setup = createCheckbox_Infield("Include Setup/Travel", false, "width:47%;margin-right:47%;", function() {
@@ -86,11 +86,11 @@ class WindowMenu extends LHSMenuWindow {
             var travelMinutes = createInput_Infield('Travel Minutes', null, "margin-left:50px;width:100px;display:none", null, row, false, 10);
             travelMinutes[1].id = "windowField_TravelMinutes";
             var travelRate = createDropdown_Infield('Travel Rate', 0, "display:none",
-                [createDropdownOption("Travel 1 Person (Min) $95/h", "Travel 1 Person (Min) $95/h"),
-                createDropdownOption("Travel 2 Person (Min) $135/h", "Travel 2 Person (Min) $135/h")], null, row);
+                [createDropdownOption("Travel 1 Person (Min) $135/h", "Travel 1 Person (Min) $95/h"),
+                createDropdownOption("Travel 2 Person (Min) $240/h", "Travel 2 Person (Min) $135/h")], null, row);
             travelRate[1].id = "windowField_TravelRate";
 
-            let artwork = new Artwork(row, null, function() {});
+            let artwork = new Artwork(row, null, function() { });
 
             var addSizeGroupButton = createButton("+", "width:96%", addSizeGroup);
             row.appendChild(addSizeGroupButton);
@@ -312,7 +312,7 @@ class WindowMenu extends LHSMenuWindow {
                 await setPartQty(productNo, partNo, 1);
                 await setPartDescription(productNo, partNo, "Install");
                 await setInstallTimeEa(productNo, partNo, parseFloat(install.value));
-                await setInstallPartTypeEa(productNo, partNo, InstallLookup["2P $180"]);
+                await setInstallPartTypeEa(productNo, partNo, InstallLookup["2P $270"]);
                 if(setup.checked) {
                     await setTravelTimeEa(productNo, partNo, travelMinutes.value);
                     await setTravelTypeEa(productNo, partNo, travelRate.value);

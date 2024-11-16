@@ -36,7 +36,7 @@
             "1P $135":"Travel 1 Person (Min) $135/h",
             "1P $120 SAR":"Travel 1 Person Signarama (Min) $120/h",
             "2P $135":"Travel 2 Person (Min) $180/h",
-            "2P $270":"Travel 2 Person (Min) $270/h",
+            "2P $240":"Travel 2 Person (Min) $240/h",
             "2P $240 SAR":"Travel 2 Person (Min) $240/h"
       },
       "ACMLookup":{
