@@ -99,9 +99,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 			/*
 			ToggleOpen */
 			let toggleOpenBtn = createButton("Open All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllOpen();}, this.page1);
-
 			/*
-				ToggleClosed */
+			ToggleClosed */
 			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
 			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
@@ -118,7 +117,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 			this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.#updateViewMode();}, this.page1);
 
-			this.#numProducts = getNumProducts() - 1;
+			//this.#numProducts = getNumProducts() - 1;
 		});
 
 		this.#createProductBtn = createButton("Create Product   " + "\u25BA", "width:100%;margin:0px;", () => {this.CreateProduct(this);});
@@ -325,7 +324,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 	#add(classType, headingText = "", container, subscribeToClasses = []) {
 		let newItem = new classType(container, this, headingText);
-		newItem.productNumber = this.#getproductNumber(classType);
+		newItem.productNumber = this.#getproductNumber();
 
 		for(let x = 0; x < subscribeToClasses.length; x++) {
 			objectLoop:
@@ -353,7 +352,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 		this.#updateFromChange();
 	}
 
-	#getproductNumber(classType) {
+	#getproductNumber() {
 		return this.#numProducts;
 	}
 
@@ -392,15 +391,22 @@ class MenuPanelSigns extends LHSMenuWindow {
 	}
 
 	DeleteProduct(productNumber) {
+		console.log("delete product from PanelSigns.js");
 		let materials = this.#allMaterials;
-		let productContainer;
 		for(let i = 0; i < materials.length; i++) {
 			if(materials[i].productNumber == productNumber) {
 				materials[i].Delete();
 				i--;
 			}
 		}
+		this.#numProducts--;
 		this.#updateViewMode();
+	}
+
+	DeleteProductsAll() {
+		for(let i = 0; i < this.#numProducts + 1; i++) {
+			this.DeleteProduct(i + 1);
+		}
 	}
 
 	#updateFromChange() { }
@@ -471,7 +477,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 				let currentProductNumber = uniqueProductNumbers[i];
 				//create product container
 				let newProductContainer = new UIContainerType3("max-height:450px;", "PRODUCT " + uniqueProductNumbers[i], this.page1);
-				newProductContainer.addHeadingButtons(createButton("x", "width:30px;height:30px;margin:0px;border:none;padding:2px;min-height:30px;float:right;background-color:" + COLOUR.Red + ";", () => {this.DeleteProduct(currentProductNumber);}, null));
+
+				newProductContainer.addHeadingButtons(createButton("x", "width:30px;height:30px;margin:0px;border:none;padding:2px;min-height:30px;float:right;background-color:" + COLOUR.Red + ";", () => {
+					this.DeleteProduct(currentProductNumber);
+				}, null));
 				this.#productContainers.push(newProductContainer);
 
 				//add items to it
@@ -554,5 +563,13 @@ class MenuPanelSigns extends LHSMenuWindow {
 		}
 
 		Ordui.Alert("done");
+	}
+
+	hide() {
+		super.hide();
+
+		if(this.#numProducts > 0) {
+			this.DeleteProductsAll();
+		}
 	}
 }
