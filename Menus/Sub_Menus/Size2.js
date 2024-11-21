@@ -274,10 +274,12 @@ class Size2 extends SubscriptionManager {
       }
 
       getQWH() {
+            TODO("Sort Out Qty issue here");
             let qty;
             if(this.#qtyIsEmbeddedInProduct) qty = this.qty;
             else qty = 1;
-            return new QWHD(qty, this.width, this.height, this.depth);
+
+            return new QWHD(this.qty, this.width, this.height, this.depth);
       }
 
       getProductQuantity() {

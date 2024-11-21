@@ -341,10 +341,12 @@ class DesignBoard2 extends JobBoard {
                   $(this.#jobObjects[j].containerObject.container).show();
 
                   //Payments
-                  let filterValue = this.#f_showPaymentsFilter[1].checked;
-                  if(filterValue === true) {
-                        if(paymentLoader == null) paymentLoader = new Loader(this.#f_showPaymentsFilter[0]);
-                        paymentPromises.push(this.#jobObjects[j].containerObject.loadSecondaryFields());
+                  if(this.#usersWithSalesPermissions.includes(this.currentUser)) {
+                        let filterValue = this.#f_showPaymentsFilter[1].checked;
+                        if(filterValue === true) {
+                              if(paymentLoader == null) paymentLoader = new Loader(this.#f_showPaymentsFilter[0]);
+                              paymentPromises.push(this.#jobObjects[j].containerObject.loadSecondaryFields());
+                        }
                   }
 
                   //Designer
