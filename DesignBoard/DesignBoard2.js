@@ -340,9 +340,11 @@ class DesignBoard2 extends JobBoard {
             for(let j = 0; j < numJobs; j++) {
                   $(this.#jobObjects[j].containerObject.container).show();
 
+                  let filterValue;
+                  
                   //Payments
                   if(this.#usersWithSalesPermissions.includes(this.currentUser)) {
-                        let filterValue = this.#f_showPaymentsFilter[1].checked;
+                        filterValue = this.#f_showPaymentsFilter[1].checked;
                         if(filterValue === true) {
                               if(paymentLoader == null) paymentLoader = new Loader(this.#f_showPaymentsFilter[0]);
                               paymentPromises.push(this.#jobObjects[j].containerObject.loadSecondaryFields());
