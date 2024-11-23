@@ -38,12 +38,10 @@ class Install extends SubMenu {
 		this.#quickLookup = createCheckbox_Infield("Quick Lookup", false, null, () => { }, this.contentContainer);
 
 		let installTypes = [];
-		let temp = function() {
-			let types = Object.getOwnPropertyNames(InstallTimesLookup);
-			for(let i = 0; i < types.length; i++) {
-				installTypes.push(createDropdownOption(types[i], types[i]));
-			}
-		}; temp();
+		let types = Object.getOwnPropertyNames(InstallTimesLookup);
+		for(let i = 0; i < types.length; i++) {
+			installTypes.push(createDropdownOption(types[i], types[i]));
+		}
 		this.#quickItem = createDropdown_Infield("Type", 0, null, installTypes, () => {
 			this.UpdateInstallLookup();
 		}, this.contentContainer);
@@ -69,6 +67,8 @@ class Install extends SubMenu {
 			this.l_install_TravelDays[0],
 			this.l_install_TravelRate[0]
 		);
+		$(this.#quickLookup[1]).click();
+		$(this.#quickLookup[1]).click();
 	}
 
 	get installTotalEach() {return this.l_installTimeTotalEach[1].value;}
@@ -114,7 +114,29 @@ class Install extends SubMenu {
 	}
 
 	UpdateInstallTimes() {
+		console.log(this.#quickItem[1].value);
+		console.log(this.#quickInstall_sub[1].value);
 
+		let chosenLookupType = this.#quickItem[1].value;
+
+		let types = Object.getOwnPropertyNames(InstallTimesLookup[chosenLookupType]);
+		for(let i = 0; i < types.length; i++) {
+
+			let key = Object.keys(InstallTimesLookup[chosenLookupType])[i];
+			let obj = InstallTimesLookup[chosenLookupType][key];
+
+			if(key == this.#quickInstall_sub[1].value) {
+				if(obj.installers == 1) {
+					dropdownSetSelectedValue(this.l_install_InstallRate[1], InstallLookup["1P $135"]);
+				}
+				if(obj.installers == 2) {
+					dropdownSetSelectedValue(this.l_install_InstallRate[1], InstallLookup["2P $270"]);
+				}
+				this.installMinutes = obj.minutes;
+				this.installHours = 0;
+				this.installDays = 0;
+			}
+		}
 	}
 
 	Update() {
