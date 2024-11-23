@@ -127,6 +127,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 	#addQuickTemplate() {
 		this.#numProducts++;
 
+		let productQty;
 		let size;
 		let productDetails;
 		let sheet;
@@ -142,6 +143,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 		switch(this.#addQuickTemplateBtn[1].value) {
 			case "ACM":
+				productQty = this.#add(ProductQty, "PRODUCT QTY", this.page1, []);
+
 				size = this.#add(Size2, "SIZE2", this.page1, []);
 				size.width = 2440;
 				size.height = 1220;
@@ -438,8 +441,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 		}
 		if(this.#viewMode[1].value == "Per Type") {
 
-			let creationOrder = [Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
-			this.#containers = [/*Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			let creationOrder = [ProductQty, Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+			this.#containers = [/*ProductQty, Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < creationOrder.length; i++) {
 				let UIContainer = new UIContainerType3("", creationOrder[i].DISPLAY_NAME, this.page1);
@@ -495,8 +498,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 			}
 		} else if(this.#viewMode[1].value == "Per Type2") {
 
-			let creationOrder = [Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
-			this.#containers = [/*Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			let creationOrder = [ProductQty, Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+			this.#containers = [/*ProductQty, Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < creationOrder.length; i++) {
 				let UIContainer = new Object();

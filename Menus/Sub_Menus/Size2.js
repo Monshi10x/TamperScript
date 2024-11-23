@@ -158,7 +158,7 @@ class Size2 extends SubscriptionManager {
       #heading;
       #minimizeBtn;
       #deleteBtn;
-      #setting_KeepQty1;
+      #setting_IncludeDepth;
       #setting_IncludeSizeInDescription;
       #includeSizeInDescription = false;
       #showIDInContainer = true;
@@ -230,6 +230,7 @@ class Size2 extends SubscriptionManager {
             this.#height = createInput_Infield("Height", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
 
             this.#depth = createInput_Infield("Depth", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, false, 10, {postfix: "mm"});
+            $(this.#depth[0]).hide();
 
             let commonSizeButton = createButton("A4,...", "width:60px;height:40px;margin:0px;margin-left:5px;margin-right:10px", () => {
                   this.#openCommonSizeModal();
@@ -240,14 +241,14 @@ class Size2 extends SubscriptionManager {
             }, this.#container);
             settingsButton.innerHTML = "&#9881";
 
-            this.#setting_KeepQty1 = createCheckbox_Infield("Keep Product Quantity as 1 when created (embed quantities)", false, "width: 450px;", () => {this.onKeepQty1Change();}, null, () => {this.onKeepQty1Change();});
-            this.#setting_IncludeSizeInDescription = createCheckbox_Infield("Include Size In Description", false, "width: 450px;", () => {
-                  this.#includeSizeInDescription = this.#setting_IncludeSizeInDescription[1].checked;
-            }, null, () => {
+            this.#setting_IncludeSizeInDescription = createCheckbox_Infield("Include Size(s) In Description", false, "width: 450px;", () => {
                   this.#includeSizeInDescription = this.#setting_IncludeSizeInDescription[1].checked;
             });
+            this.#setting_IncludeDepth = createCheckbox_Infield("Include Depth", false, "width: 450px;", () => {
+                  $(this.#depth[0]).toggle();
+            });
 
-            this.#deleteBtn = createButton("X", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
+            this.#deleteBtn = createIconButton(GM_getResourceURL("Icon_Bin"), "", "display: block; float: right; width: 35px;height:40px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
             this.#container.appendChild(this.#deleteBtn);
 
             this.UpdateDataForSubscribers();
@@ -257,7 +258,6 @@ class Size2 extends SubscriptionManager {
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();
       }
-
 
       UpdateDataForSubscribers() {
             this.#dataForSubscribers = [];
@@ -274,17 +274,7 @@ class Size2 extends SubscriptionManager {
       }
 
       getQWH() {
-            TODO("Sort Out Qty issue here");
-            let qty;
-            if(this.#qtyIsEmbeddedInProduct) qty = this.qty;
-            else qty = 1;
-
             return new QWHD(this.qty, this.width, this.height, this.depth);
-      }
-
-      getProductQuantity() {
-            if(this.#qtyIsEmbeddedInProduct) return 1;
-            else return this.qty;
       }
 
       #openCommonSizeModal() {
@@ -304,8 +294,8 @@ class Size2 extends SubscriptionManager {
       #openSettingsModal() {
             let modal = new Modal("Settings", () => { });
             modal.setContainerSize(500, 500);
-            modal.addBodyElement(this.#setting_KeepQty1[0]);
             modal.addBodyElement(this.#setting_IncludeSizeInDescription[0]);
+            modal.addBodyElement(this.#setting_IncludeDepth[0]);
             modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {modal.hide();}));
       }
 
@@ -314,9 +304,6 @@ class Size2 extends SubscriptionManager {
       }
 
       onKeepQty1Change() {
-            let isTicked = this.#setting_KeepQty1[1].checked;
-            console.log(isTicked);
-            this.#qtyIsEmbeddedInProduct = isTicked;
             this.UpdateFromChange();
       }
 
@@ -333,7 +320,6 @@ class Size2 extends SubscriptionManager {
        * @CorebridgeCreate
        */
       async Create(productNo, partIndex) {
-            await setProductQty(productNo, this.getProductQuantity());
             return partIndex;
       }
 

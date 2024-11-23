@@ -16,7 +16,8 @@ const COLOUR = {
       BrightGreen: "rgb(21, 193, 34)",
       Purple: "rgb(149, 0, 200)",
       Lime: "rgb(135 255 0)",
-      Green: "#008140"
+      Green: "#008140",
+      Pink: "rgb(255,0,255)"
 };
 
 const STYLE = {

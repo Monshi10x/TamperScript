@@ -272,7 +272,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
     var input = document.createElement('input');
     var containerDiv = document.createElement('div');
     var textDescription = document.createElement('p');
-    textDescription.style = "width:calc(100% - 15px);box-sizing:border-box;height:18px;margin: 0px;padding:2px;color:#666;font-size:11px;";
+    textDescription.style = "width:calc(100% - 15px);box-sizing:border-box;height:16px;margin: 0px;padding:2px;color:#666;font-size:11px;";
     textDescription.innerText = text;
     input.autocomplete = 'off';
     input.autocomplete = "one-time-code";
