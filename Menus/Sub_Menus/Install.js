@@ -132,9 +132,10 @@ class Install extends SubMenu {
 				if(obj.installers == 2) {
 					dropdownSetSelectedValue(this.l_install_InstallRate[1], InstallLookup["2P $270"]);
 				}
-				this.installMinutes = obj.minutes;
-				this.installHours = 0;
-				this.installDays = 0;
+				let mhd = getMHD(obj.minutes);
+				this.installMinutes = mhd[0];
+				this.installHours = mhd[1];
+				this.installDays = mhd[2];
 			}
 		}
 	}
