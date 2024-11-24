@@ -1425,6 +1425,40 @@ function makeFieldGroup(parentControllerType, masterControllerField, canOpenAlre
             break;
     }
 }
+/**
+ * 
+ * @param {*} parentControllerType any value within ["Checkbox","Div"]
+ * @param {*} masterControllerField the master field that will toggle the children
+ * @param  {...any} otherFields the children fields in that group
+ */
+function makeFieldGroupReverse(parentControllerType, masterControllerField, canOpenAlreadyHidden = true, ...otherFields) {
+    switch(parentControllerType) {
+        case "Checkbox":
+            masterControllerField.addEventListener("change", function(e) {
+                let nowState = !masterControllerField.checked;
+                for(let i = 0; i < otherFields.length; i++) {
+                    if(nowState == false) {
+                        if(otherFields[i].style.display == "none") {
+                            otherFields[i].dataset.wasAlreadyHidden = 'true';
+                        } else {
+                            otherFields[i].dataset.wasAlreadyHidden = 'false';
+                        }
+                        setFieldHidden(true, otherFields[i]);
+                    } else {
+                        if(otherFields[i].dataset.wasAlreadyHidden === 'true' && !canOpenAlreadyHidden) {
+                            setFieldHidden(true, otherFields[i]);
+                        } else {
+                            setFieldHidden(false, otherFields[i]);
+                        }
+                    }
+                }
+            });
+            break;
+        default:
+            console.error("No Case Available");
+            break;
+    }
+}
 
 function createWindowDragZones(container, windowGrabZoneWidth = 10, callbackOnResize) {
     let grabbedSide = null;

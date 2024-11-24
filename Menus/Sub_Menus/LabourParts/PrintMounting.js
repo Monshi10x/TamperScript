@@ -1,5 +1,5 @@
 class PrintMounting extends Material {
-      static DISPLAY_NAME = "PRINT MOUNTING";
+      /*override*/get Type() {return "PRINT MOUNTING";}
 
       static maxMountingWidth = 8000;
       static maxMountingHeight = 1750;
@@ -26,7 +26,7 @@ class PrintMounting extends Material {
       * @example 
       *          [{qty: 4, width: '2440', height: '1220'},
       *           {qty: 4, width: '2440', height: '580'},
-       *           {qty: 1, width: '240', height: '1220'},
+      *           {qty: 1, width: '240', height: '1220'},
       *           {qty: 1, width: '240', height: '580'}]
       */
       #dataForSubscribers = [];

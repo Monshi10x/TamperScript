@@ -1,5 +1,5 @@
 class ProductionSubscribable extends Material {
-      static DISPLAY_NAME = "PRODUCTION";
+      /*override*/get Type() {return "PRODUCTION";}
 
       /**
        * @Inherited

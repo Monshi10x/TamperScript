@@ -74,8 +74,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 	#subscriptionTree;
 	get subscriptionTree() {
 		return {
+			ProductDetails: [],
 			Size2: [],
-			ProductDetails: [Size2],
 			Sheet: [Size2],
 			Vinyl: [Sheet],
 			Laminate: [Vinyl],
@@ -127,9 +127,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 	#addQuickTemplate() {
 		this.#numProducts++;
 
-		let productQty;
-		let size;
 		let productDetails;
+		let size;
 		let sheet;
 		let vinyl;
 		let laminate;
@@ -143,181 +142,179 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 		switch(this.#addQuickTemplateBtn[1].value) {
 			case "ACM":
-				productQty = this.#add(ProductQty, "PRODUCT QTY", this.page1, []);
-
-				size = this.#add(Size2, "SIZE2", this.page1, []);
-				size.width = 2440;
-				size.height = 1220;
-
-				productDetails = this.#add(ProductDetails, "PRODUCT DETAILS", this.page1, [Size2]);
+				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "ACM Panel";
 
-				sheet = this.#add(Sheet, "SHEET", this.page1, [Size2]);
-				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
-				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
-				appTape = null;
-				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
-				printMounting = this.#add(PrintMounting, "PRINT MOUNTING", this.page1, [Sheet]);
-				production = null;
-				artwork = this.#add(ArtworkSubscribable, "ARTWORK", this.page1, [Size2]);
-				artwork.artworkItem.artworkTime = 60;
-				install = this.#add(InstallSubscribable, "INSTALL", this.page1, [Sheet]);
-				break;
-			case "Lightbox Face - Opal Acrylic":
-				size = this.#add(Size2, "SIZE2", this.page1, []);
+				size = this.#add(Size2, this.page1, []);
 				size.width = 2440;
 				size.height = 1220;
 
-				productDetails = this.#add(ProductDetails, "PRODUCT DETAILS", this.page1, [Size2]);
+				sheet = this.#add(Sheet, this.page1, [Size2]);
+				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
+				laminate = this.#add(Laminate, this.page1, [Vinyl]);
+				appTape = null;
+				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
+				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
+				production = null;
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
+				artwork.artworkItem.artworkTime = 60;
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+				break;
+			case "Lightbox Face - Opal Acrylic":
+				productDetails = this.#add(ProductDetails, "PRODUCT QTY", this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "Acrylic Lightbox Face";
 
-				sheet = this.#add(Sheet, "SHEET", this.page1, [Size2]);
+				size = this.#add(Size2, this.page1, []);
+				size.width = 2440;
+				size.height = 1220;
+
+				sheet = this.#add(Sheet, this.page1, [Size2]);
 				sheet.material = "Acrylic";
 				sheet.sheetSize = "2440mm x 1220mm";
 				sheet.thickness = "4.5";
 				sheet.finish = "Opal";
 
-				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
+				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
 				vinyl.material = VinylLookup["Clear"];
 				vinyl.bleedDropdown = "Lightbox Faces";
-				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
+				laminate = this.#add(Laminate, this.page1, [Vinyl]);
 				laminate.material = LaminateLookup["Gloss"];
 				appTape = null;
-				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
-				printMounting = this.#add(PrintMounting, "PRINT MOUNTING", this.page1, [Sheet]);
+				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
+				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, "ARTWORK", this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
 				artwork.artworkItem.artworkTime = 60;
-				install = this.#add(InstallSubscribable, "INSTALL", this.page1, [Sheet]);
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
 			case "Clear Acrylic":
-				size = this.#add(Size2, "SIZE2", this.page1, []);
-				size.width = 2440;
-				size.height = 1220;
-
-				productDetails = this.#add(ProductDetails, "PRODUCT DETAILS", this.page1, [Size2]);
+				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "Clear Acrylic Panel with Stand-offs";
 
-				sheet = this.#add(Sheet, "SHEET", this.page1, [Size2]);
+				size = this.#add(Size2, this.page1, []);
+				size.width = 2440;
+				size.height = 1220;
+
+				sheet = this.#add(Sheet, this.page1, [Size2]);
 				sheet.material = "Acrylic";
 				sheet.sheetSize = "2440mm x 1220mm";
 				sheet.thickness = "6";
 				sheet.finish = "Clear";
-				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
+				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
 				vinyl.material = VinylLookup["Clear"];
 				vinyl.bleedDropdown = "Reverse Acrylics";
-				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
+				laminate = this.#add(Laminate, this.page1, [Vinyl]);
 				laminate.material = VinylLookup["Whiteback"];
 				appTape = null;
-				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
-				printMounting = this.#add(PrintMounting, "PRINT MOUNTING", this.page1, [Sheet]);
-				finishing = this.#add(Finishing, "FINISHING", this.page1, [Sheet]);
+				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
+				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
+				finishing = this.#add(Finishing, this.page1, [Sheet]);
 				finishing.standOffRequired = true;
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, "ARTWORK", this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
 				artwork.artworkItem.artworkTime = 60;
-				install = this.#add(InstallSubscribable, "INSTALL", this.page1, [Sheet]);
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
 			case "Foam PVC":
-				size = this.#add(Size2, "SIZE2", this.page1, []);
-				size.width = 2440;
-				size.height = 1220;
-
-				productDetails = this.#add(ProductDetails, "PRODUCT DETAILS", this.page1, [Size2]);
+				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "Foam PVC Panel";
 
-				sheet = this.#add(Sheet, "SHEET", this.page1, [Size2]);
+				size = this.#add(Size2, this.page1, []);
+				size.width = 2440;
+				size.height = 1220;
+
+				sheet = this.#add(Sheet, this.page1, [Size2]);
 				sheet.material = "Foamed PVC";
 				sheet.sheetSize = "2440mm x 1220mm";
 				sheet.thickness = "3.0";
 
-				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
+				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
 				vinyl.bleedDropdown = "ACM";
-				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
+				laminate = this.#add(Laminate, this.page1, [Vinyl]);
 				appTape = null;
-				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
-				printMounting = this.#add(PrintMounting, "PRINT MOUNTING", this.page1, [Sheet]);
+				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
+				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, "ARTWORK", this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
 				artwork.artworkItem.artworkTime = 60;
-				install = this.#add(InstallSubscribable, "INSTALL", this.page1, [Sheet]);
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
 			case "Signwhite":
-				size = this.#add(Size2, "SIZE2", this.page1, []);
-				size.width = 2400;
-				size.height = 1200;
-
-				productDetails = this.#add(ProductDetails, "PRODUCT DETAILS", this.page1, [Size2]);
+				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "Signwhite Panel";
 
-				sheet = this.#add(Sheet, "SHEET", this.page1, [Size2]);
+				size = this.#add(Size2, this.page1, []);
+				size.width = 2400;
+				size.height = 1200;
+
+				sheet = this.#add(Sheet, this.page1, [Size2]);
 				sheet.material = "Signwhite";
 				sheet.sheetSize = "2400mm x 1200mm";
 				sheet.thickness = "0.55";
 
-				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
+				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
 				vinyl.bleedDropdown = "ACM";
-				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
+				laminate = this.#add(Laminate, this.page1, [Vinyl]);
 				appTape = null;
-				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
-				printMounting = this.#add(PrintMounting, "PRINT MOUNTING", this.page1, [Sheet]);
+				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
+				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, "ARTWORK", this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
 				artwork.artworkItem.artworkTime = 60;
-				install = this.#add(InstallSubscribable, "INSTALL", this.page1, [Sheet]);
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
 			case "Corflute":
-				size = this.#add(Size2, "SIZE2", this.page1, []);
-				size.width = 600;
-				size.height = 900;
-
-				productDetails = this.#add(ProductDetails, "PRODUCT DETAILS", this.page1, [Size2]);
+				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "Corflute Panel";
 
-				sheet = this.#add(Sheet, "SHEET", this.page1, [Size2]);
+				size = this.#add(Size2, this.page1, []);
+				size.width = 600;
+				size.height = 900;
+
+				sheet = this.#add(Sheet, this.page1, [Size2]);
 				sheet.material = "Corflute";
 				sheet.sheetSize = "600mm x 900mm";
 				sheet.thickness = "5.0";
 
-				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Sheet]);
+				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
 				vinyl.bleedDropdown = "Corflutes";
-				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
+				laminate = this.#add(Laminate, this.page1, [Vinyl]);
 				appTape = null;
-				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
-				printMounting = this.#add(PrintMounting, "PRINT MOUNTING", this.page1, [Sheet]);
+				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
+				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, "ARTWORK", this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
 				artwork.artworkItem.artworkTime = 60;
-				install = this.#add(InstallSubscribable, "INSTALL", this.page1, [Sheet]);
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
 			case "Wall Graphics":
-				size = this.#add(Size2, "SIZE2", this.page1, []);
-				size.width = 1000;
-				size.height = 1000;
-
-				productDetails = this.#add(ProductDetails, "PRODUCT DETAILS", this.page1, [Size2]);
+				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "Vinyl Wall Graphics";
 
-				vinyl = this.#add(Vinyl, "VINYL", this.page1, [Size2]);
+				size = this.#add(Size2, this.page1, []);
+				size.width = 1000;
+				size.height = 1000;
+
+				vinyl = this.#add(Vinyl, this.page1, [Size2]);
 				vinyl.material = VinylLookup["High Tack"];
 				vinyl.bleedDropdown = "Wall Graphics";
 				vinyl.isJoinHorizontal = false;
 
-				laminate = this.#add(Laminate, "LAMINATE", this.page1, [Vinyl]);
+				laminate = this.#add(Laminate, this.page1, [Vinyl]);
 				laminate.material = LaminateLookup["Satin"];
 				appTape = null;
-				handTrimming = this.#add(HandTrimming, "HAND TRIMMING", this.page1, [Vinyl]);
+				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, "ARTWORK", this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
 				artwork.artworkItem.artworkTime = 60;
-				install = this.#add(InstallSubscribable, "INSTALL", this.page1, [Size2]);
+				install = this.#add(InstallSubscribable, this.page1, [Size2]);
 				break;
 			default:
 				break;
@@ -325,8 +322,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 		this.#updateViewMode();
 	}
 
-	#add(classType, headingText = "", container, subscribeToClasses = []) {
-		let newItem = new classType(container, this, headingText);
+	#add(classType, container, subscribeToClasses = []) {
+		let newItem = new classType(container, this);
 		newItem.productNumber = this.#getproductNumber();
 
 		for(let x = 0; x < subscribeToClasses.length; x++) {
@@ -343,12 +340,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 		this.#updateFromChange();
 		return newItem;
+
 	}
 
-	/*
-	overload*/
-	#addBlank(classType, headingText = "", container) {
-		let newItem = new classType(container, this, headingText);
+	#addBlank(classType, container) {
+		let newItem = new classType(container, this);
 
 		this.#allMaterials.push(newItem);
 
@@ -441,8 +437,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 		}
 		if(this.#viewMode[1].value == "Per Type") {
 
-			let creationOrder = [ProductQty, Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
-			this.#containers = [/*ProductQty, Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			let creationOrder = [ProductDetails, Size2, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+			this.#containers = [/*ProductDetails, Size2, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < creationOrder.length; i++) {
 				let UIContainer = new UIContainerType3("", creationOrder[i].DISPLAY_NAME, this.page1);
@@ -498,8 +494,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 			}
 		} else if(this.#viewMode[1].value == "Per Type2") {
 
-			let creationOrder = [ProductQty, Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
-			this.#containers = [/*ProductQty, Size2, ProductDetails, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			let creationOrder = [ProductDetails, Size2, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+			this.#containers = [/*ProductDetails, Size2,Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < creationOrder.length; i++) {
 				let UIContainer = new Object();

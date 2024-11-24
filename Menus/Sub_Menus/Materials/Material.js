@@ -1,5 +1,6 @@
 class Material extends SubscriptionManager {
 
+      static DISPLAY_NAME = "";
       /*
                         
       Variables         */
@@ -56,11 +57,10 @@ class Material extends SubscriptionManager {
       /*
                         
       START             */
-      constructor(parentContainer, lhsMenuWindow, Type) {
+      constructor(parentContainer, lhsMenuWindow) {
             super();
             if(!lhsMenuWindow instanceof LHSMenuWindow) throw new Error('Parameter 2 must be an instance of LHSMenuWindow');
             this.#f_lhsMenuWindow = lhsMenuWindow;
-            this.#Type = Type;
 
             this.#f_container = document.createElement("div");
             this.#f_container.style =
@@ -80,7 +80,7 @@ class Material extends SubscriptionManager {
                   modal.value = this.productNumber;
             }, this.#f_container);
 
-            this.#f_typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:150px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", this.#f_container);
+            this.#f_typeLabel = createText(this.Type, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:150px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", this.#f_container);
             this.#f_typeLabel.addEventListener("click", () => {
                   this.onPopOut();
             });

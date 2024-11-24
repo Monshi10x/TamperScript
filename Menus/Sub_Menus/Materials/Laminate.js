@@ -1,5 +1,5 @@
 class Laminate extends Material {
-      static DISPLAY_NAME = "LAMINATE";
+      /*override*/get Type() {return "LAMINATE";}
 
       #materialHeader;
       #production;

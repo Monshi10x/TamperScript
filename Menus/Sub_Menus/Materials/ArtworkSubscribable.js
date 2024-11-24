@@ -1,5 +1,5 @@
 class ArtworkSubscribable extends Material {
-      static DISPLAY_NAME = "ARTWORK";
+      /*override*/get Type() {return "ARTWORK";}
       /**
        * @Inherited
        * @example

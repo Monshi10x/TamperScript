@@ -1,10 +1,10 @@
-class ProductQty extends SubscriptionManager {
-      static DISPLAY_NAME = "PRODUCT_QTY";
+class ProductDetails extends SubscriptionManager {
+      static DISPLAY_NAME = "PRODUCT_DETAILS";
 
       #container;
       get container() {return this.#container;}
 
-      #Type = "PRODUCT QTY";
+      #Type = "PRODUCT DETAILS";
       get Type() {return this.#Type;}
       set Type(type) {this.#Type = type;};
 
@@ -35,6 +35,14 @@ class ProductQty extends SubscriptionManager {
       get backgroundColor() {return this.#backgroundColor;}
       #textColor = COLOUR.White;
       get textColor() {return this.#textColor;}
+
+      #productLocationField = "";
+      set productLocation(value) {this.#productLocationField[1].value = value;}
+      get productLocation() {return this.#productLocationField;}
+
+      #productNameField = "";
+      set productName(value) {this.#productNameField[1].value = value;}
+      get productName() {return this.#productNameField;}
 
       /**
        * @SIZES
@@ -80,6 +88,11 @@ class ProductQty extends SubscriptionManager {
 
             this.#qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 1);
 
+            this.#productLocationField = createInput_Infield("Product Location", null, "margin:0px 5px;box-shadow:none;box-sizing: border-box;width:200px;", null, this.#container, false, null);
+            this.#productLocationField[1].placeholder = "i.e. Main Fascia";
+            this.#productNameField = createInput_Infield("Product Name", null, "margin:0px 5px;box-shadow:none;box-sizing: border-box;width:200px;", null, this.#container, false, null);
+            this.#productNameField[1].placeholder = "i.e. ACM Panel";
+
             this.#deleteBtn = createIconButton(GM_getResourceURL("Icon_Bin"), "", "display: block; float: right; width: 35px;height:40px; border:none;padding:10px; padding-left:8px;color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
             this.#container.appendChild(this.#deleteBtn);
 
@@ -92,19 +105,7 @@ class ProductQty extends SubscriptionManager {
       }
 
 
-      UpdateDataForSubscribers() {
-            /*this.#dataForSubscribers = [];
-            this.#matrixSizes = [];
-
-            this.#dataForSubscribers.push(this.getQWH());
-            this.#matrixSizes.push([[[this.getQWH().width, this.getQWH().height, this.getQWH().depth]]]);
-
-            this.dataToPushToSubscribers = {
-                  parent: this,
-                  data: this.#dataForSubscribers,
-                  matrixSizes: this.#matrixSizes
-            };*/
-      }
+      UpdateDataForSubscribers() { }
 
       /**
        * @DeleteThis
@@ -120,10 +121,11 @@ class ProductQty extends SubscriptionManager {
        */
       async Create(productNo, partIndex) {
             await setProductQty(productNo, this.qty);
+            await setProductName(productNo, "[" + this.#productLocationField[1].value + "] " + this.#productNameField[1].value);
             return partIndex;
       }
 
       Description() {
-
+            return "";
       }
 }

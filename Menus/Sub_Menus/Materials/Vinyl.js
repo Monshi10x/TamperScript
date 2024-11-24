@@ -3,7 +3,6 @@ class Vinyl extends Material {
       /*
                         
       Variables         */
-      static DISPLAY_NAME = "VINYL";
       /**
        * @Subscribers
        * @Updated on table changes
@@ -81,7 +80,7 @@ class Vinyl extends Material {
       get rollLengthUsed() {return zeroIfNaNNullBlank(this.#rollLengthUsed[1].value);};
       get rollWastage() {return zeroIfNaNNullBlank(this.#rollWastage[1].value);};
       get rollWidth() {return zeroIfNaNNullBlank(this.#rollWidth[1].value);};
-
+      /*override*/get Type() {return "VINYL";}
       /*
                         
       Setter            */
