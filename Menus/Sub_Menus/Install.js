@@ -27,8 +27,11 @@ class Install extends SubMenu {
 			createDropdownOption("Each", "Each"),
 		], () => {this.Update();}, this.contentContainer);
 
-		this.#isOutsourced = createCheckbox_Infield("Is Outsourced", false, null, () => { }, this.contentContainer);
-		this.#outsourceCost = createInput_Infield("Outsource Cost", null, "width:30%;display:block;", () => { }, this.contentContainer, true, 1, {prefix: "$"});
+		this.#isOutsourced = createCheckbox_Infield("Is Outsourced", false, null, () => {
+			$(this.#outsourceMarkup[0]).toggle();
+			$(this.#outsourceCost[0]).toggle();
+		}, this.contentContainer);
+		this.#outsourceCost = createInput_Infield("Outsource Cost", null, "width:30%;display:block;margin-left:40px;", () => { }, this.contentContainer, true, 1, {prefix: "$"});
 		$(this.#outsourceCost[0]).hide();
 		this.#outsourceMarkup = createInput_Infield("Markup", null, "width:30%;display:block;", () => { }, this.contentContainer, true, 1, {postfix: "x"});
 		$(this.#outsourceMarkup[0]).hide();
@@ -57,7 +60,10 @@ class Install extends SubMenu {
 		this.#install_TravelHours = createInput_Infield("Travel Hours", null, "width:25%;display:block;", () => {this.Update();}, this.contentContainer, false, 1);
 		this.#install_TravelDays = createInput_Infield("Travel Days (8h)", null, "width:25%;display:block;", () => {this.Update();}, this.contentContainer, false, 1);
 
-		this.#quickLookup = createCheckbox_Infield("Quick Lookup", false, null, () => { }, this.contentContainer);
+		this.#quickLookup = createCheckbox_Infield("Quick Lookup", false, null, () => {
+			$(this.#quickItem[0]).toggle();
+			$(this.#quickInstall_sub[0]).toggle();
+		}, this.contentContainer);
 
 		let installTypes = [];
 		let types = Object.getOwnPropertyNames(InstallTimesLookup);
@@ -77,45 +83,47 @@ class Install extends SubMenu {
 
 
 
-		makeFieldGroup("Checkbox", this.requiredField[1], false,
+		makeFieldGroup2("Checkbox", this.requiredField[1],
 			this.#qty[0],
 			this.#installTimeTotalEach[0],
+			this.#install_InstallRate[0],
 			this.#install_InstallMinutes[0],
 			this.#install_InstallHours[0],
 			this.#install_InstallDays[0],
-			this.#install_InstallRate[0],
+			this.#install_TravelRate[0],
 			this.#install_TravelMinutes[0],
 			this.#install_TravelHours[0],
 			this.#install_TravelDays[0],
-			this.#install_TravelRate[0],
 			this.#quickLookup[0],
 			this.#quickItem[0],
 			this.#quickInstall_sub[0],
 			this.#isOutsourced[0]
 		);
-		makeFieldGroupReverse("Checkbox", this.#isOutsourced[1], false,
+
+		makeFieldGroup2Reversed("Checkbox", this.#isOutsourced[1],
+			this.#install_InstallRate[0],
 			this.#install_InstallMinutes[0],
 			this.#install_InstallHours[0],
 			this.#install_InstallDays[0],
-			this.#install_InstallRate[0],
+			this.#install_TravelRate[0],
 			this.#install_TravelMinutes[0],
 			this.#install_TravelHours[0],
 			this.#install_TravelDays[0],
-			this.#install_TravelRate[0],
 			this.#quickLookup[0],
 			this.#quickItem[0],
 			this.#quickInstall_sub[0],
 		);
 
-		makeFieldGroup("Checkbox", this.#quickLookup[1], false,
+		makeFieldGroup2("Checkbox", this.#isOutsourced[1],
+			this.#outsourceCost[0],
+			this.#outsourceMarkup[0]
+		);
+		makeFieldGroup2("Checkbox", this.#quickLookup[1],
 			this.#quickItem[0],
 			this.#quickInstall_sub[0]
 		);
 
-		makeFieldGroup("Checkbox", this.#isOutsourced[1], false,
-			this.#outsourceCost[0],
-			this.#outsourceMarkup[0]
-		);
+
 	}
 
 	get installTotalEach() {return this.#installTimeTotalEach[1].value;}

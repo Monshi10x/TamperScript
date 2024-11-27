@@ -892,11 +892,12 @@ function createOptGroup(text, options) {
     }
     return optgroup;
 }
-function createDropdownOption(text, value) {
+function createDropdownOption(text, value, overrideCssStyles) {
     var dropdownOption = document.createElement("option");
     dropdownOption.text = text;
     if(!value) dropdownOption.value = text;
     else dropdownOption.value = value;
+    if(overrideCssStyles) dropdownOption.style.cssText += ";" + overrideCssStyles;
 
     return dropdownOption;
 }
@@ -1580,4 +1581,51 @@ function createWindowDragZones(container, windowGrabZoneWidth = 10, callbackOnRe
     container.appendChild(trCorner);
     container.appendChild(blCorner);
     container.appendChild(brCorner);
+}
+
+function makeFieldGroup2(parentControllerType, masterControllerField, ...otherFields) {
+    let container = document.createElement("div");
+    insertAfter(container, masterControllerField.parentElement);
+    for(let i = 0; i < otherFields.length; i++) {
+        container.appendChild(otherFields[i]);
+    }
+    switch(parentControllerType) {
+        case "Checkbox":
+            masterControllerField.addEventListener("change", function(e) {
+                let nowState = masterControllerField.checked;
+                if(nowState == true) {
+                    $(container).show();
+                } else {
+                    $(container).hide();
+                }
+
+            });
+            break;
+        default:
+            console.error("No Case Available");
+            break;
+    }
+}
+function makeFieldGroup2Reversed(parentControllerType, masterControllerField, ...otherFields) {
+    let container = document.createElement("div");
+    insertAfter(container, masterControllerField.parentElement);
+    for(let i = 0; i < otherFields.length; i++) {
+        container.appendChild(otherFields[i]);
+    }
+    switch(parentControllerType) {
+        case "Checkbox":
+            masterControllerField.addEventListener("change", function(e) {
+                let nowState = masterControllerField.checked;
+                if(nowState == true) {
+                    $(container).hide();
+                } else {
+                    $(container).show();
+                }
+
+            });
+            break;
+        default:
+            console.error("No Case Available");
+            break;
+    }
 }
