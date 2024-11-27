@@ -95,6 +95,11 @@ class Material extends SubscriptionManager {
                   if(e.target == this.#f_subscriptionsContainer) this.onPopOut();
             });
             this.#f_container.appendChild(this.#f_subscriptionsContainer);
+            $(this.#f_container).hover(function() {
+                  $(this).css("box-shadow", "rgba(0, 0, 0, 1) 3px 4px 10px 0px");
+            }, function() {
+                  $(this).css("box-shadow", "rgba(0, 0, 0, 0.8) 3px 4px 10px 0px");
+            });
 
             this.#f_deleteBtn = createIconButton(GM_getResourceURL("Icon_Bin"), "", "display: block; float: right; width: 35px;height:40px; border:none;padding:0px;color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
             this.#f_container.appendChild(this.#f_deleteBtn);

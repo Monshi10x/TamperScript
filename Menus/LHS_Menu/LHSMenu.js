@@ -318,7 +318,7 @@ var menu_Charts;
 var menu_POS;
 async function initLHSMenu() {
     var container = document.createElement('div');
-    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + "rgb(36 36 36)" + ";box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
+    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + "rgb(36 36 36)" + ";box-shadow: rgb(0, 0, 0) 6px 1px 20px -2px,rgb(0, 0, 0) 6px 1px 60px -2px;";
     container.id = "LHSMenu";
 
     let header = document.createElement('div');
@@ -378,7 +378,7 @@ async function initLHSMenu() {
         itemContainer.onclick = function() {
             openMenu(openMenuName);
             deselectSelectorBars();
-            selectorBar.style.backgroundColor = "red";
+            selectorBar.style.backgroundColor = "#0099FF";
         };
 
         var selectorBar = document.createElement('div');

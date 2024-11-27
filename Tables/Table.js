@@ -11,8 +11,7 @@ class Table {
             this.tableHeading = document.createElement("table");
             this.tableHeading.style = STYLE.Table;
             if(Number.isInteger(widthPx)) widthPx = widthPx + "px";
-            console.log("calc(" + widthPx + " - 16px);");
-            this.tableHeading.style.width = "calc(" + widthPx + " - 16px)";
+            this.tableHeading.style.width = "calc(" + widthPx + " - 8px)";
 
             this.rowContainer = document.createElement("div");
             if(Number.isInteger(minHeightPx)) minHeightPx = minHeightPx + "px;";
@@ -35,7 +34,7 @@ class Table {
 
       /**
        * 
-       * @param  {...any} data note: use ...arg if passing array i.e. addRow(...data);
+       * @param  {...any} data note: use ...arg if passing array i.e. addRow(...dataArray);
        */
       addRow(...data) {
             var row = document.createElement('tr');

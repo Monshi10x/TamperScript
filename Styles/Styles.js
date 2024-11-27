@@ -36,7 +36,7 @@ const STYLE = {
       HeaderFont: "font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;font-weight:bold;font-size:14px;",
       HeadingStyle1: "height:30px;z-index:99;position: relative;margin:0px;background-color:" + COLOUR.DarkBlue + ";width:100%;box-sizing: border-box;padding:0px;font-size:10px;color:white;text-align:center;line-height:30px;box-shadow: rgb(61 61 61) 0px 6px 14px 2px;margin:20px 0px;border:1px solid " + COLOUR.DarkBlue + ";",
       Table: "float:left;width:100%;border-collapse: collapse;table-layout: auto;color:white;",
-      TableHeader: "font-weight: bold; font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;background-color:" + COLOUR.Blue + ";colour:white;table-layout: auto;",
+      TableHeader: "font-weight: bold; box-sizing: border-box;outline: 1px solid #000;outline-offset:-1px;font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;background-color:" + COLOUR.Blue + ";colour:white;table-layout: auto;",
       TableData: "box-sizing: border-box;outline: 1px solid #000;outline-offset:-1px;text-align:left;padding: 5px;color:black;background-color:white;table-layout: fixed;",
       Div: "float:left;box-sizing:border-box;border:1px solid #000;border-collapse: collapse;background-color:" + COLOUR.MidBlue + ";",
       Div2: "display: block; float: left; width: 88%; background-color: white; min-height: 10px; margin: 10px 20px 30px; box-shadow: rgba(0, 0, 0, 0.8) 3px 4px 10px 0px; padding: 10px; accent-color: blue;overflow-y:auto;max-height:800px;",

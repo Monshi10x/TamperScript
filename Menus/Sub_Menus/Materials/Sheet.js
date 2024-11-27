@@ -119,6 +119,8 @@ class Sheet extends Material {
       #sheetSize;
       set sheetSize(value) {$(this.#sheetSize[1]).val(value).change();}
 
+      #sheetMaterial;
+
       #updateOrderBtn;
 
       /**
@@ -205,7 +207,7 @@ class Sheet extends Material {
 
             /*
             Sheet Size*/
-            let f_container_sheetSize = createDivStyle5(null, "Sheet Size", this.container)[1];
+            let f_container_sheetSize = createDivStyle5(null, "Sheet To Use", this.container)[1];
 
             this.#material = createDropdown_Infield("Material", 0, "width:80px", this.#materialOptions, () => {this.UpdateFilters("Material");}, f_container_sheetSize);
             this.#searchTerms.push(this.#material[1].value + " - (sqm)");
@@ -226,24 +228,32 @@ class Sheet extends Material {
                   }, ...items);
             }, f_container_sheetSize);
 
+            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:50%;", 10, false, this.getSheetDropdown(), () => { }, f_container_sheetSize, false);
+
             /*
             Folded*/
             let f_container_folded = createDivStyle5(null, "Folded", this.container)[1];
             this.#f_foldSideContainer = document.createElement('div');
+            let alertDiv;
             this.#isFolded = createCheckbox_Infield("Is Folded", false, "width:60%;margin-right:30%;", () => {
                   if(this.#isFolded[1].checked) {
                         setFieldHidden(false, this.#foldedTop[1], this.#foldedTop[0]);
                         setFieldHidden(false, this.#foldedLeft[1], this.#foldedLeft[0]);
                         setFieldHidden(false, this.#foldedRight[1], this.#foldedRight[0]);
                         setFieldHidden(false, this.#foldedBottom[1], this.#foldedBottom[0]);
+                        if(this.depth == 0) {
+                              $(alertDiv).show();
+                        }
                   } else {
                         setFieldHidden(true, this.#foldedTop[1], this.#foldedTop[0]);
                         setFieldHidden(true, this.#foldedLeft[1], this.#foldedLeft[0]);
                         setFieldHidden(true, this.#foldedRight[1], this.#foldedRight[0]);
                         setFieldHidden(true, this.#foldedBottom[1], this.#foldedBottom[0]);
+                        $(alertDiv).hide();
                   }
                   this.UpdateFromChange();
             }, this.#f_foldSideContainer);
+            alertDiv = createFloatingDiv("Depth is 0, has no effect", "width:120px;padding-left:4px;top:10px;", this.#isFolded[0]);
 
 
 
@@ -677,7 +687,7 @@ class Sheet extends Material {
 
       createCuttingOptions = (width, height, sheetWidth, sheetHeight, material) => {
             let returnArray = [];
-            let sheetIsFolded = this.#isFolded[1].checked;
+            let sheetIsFolded = this.#isFolded[1].checked && this.depth > 0;
             let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet" && !sheetIsFolded;
             let canUseFactoryEdge = this.#materialsWithUsableFactoryEdge.includes(material);
             let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material) && !sheetIsFolded;
@@ -898,6 +908,23 @@ class Sheet extends Material {
 
       sheetSizeHeight() {
             return this.getSheetSizeWH()[1];
+      }
+
+      getSheetDropdown() {
+
+            let materialsToUse = ["ACM", "Acrylic"];
+            let optionsArray = [];
+            for(let i = 0; i < materialsToUse.length; i++) {
+                  let foundParts = getPredefinedParts_RefinedSearch(materialsToUse[i] + " - ");
+                  for(let j = 0; j < foundParts.length; j++) {
+                        console.log(foundParts[j].Name);
+                        optionsArray.push([foundParts[j].Name, foundParts[j].Name]);
+                  }
+
+            }
+            //console.log(optionsArray);
+            return optionsArray;//createDropdownOption(keys[i], keys[i])
+
       }
 
       UpdateFilters(updateFromFilter) {

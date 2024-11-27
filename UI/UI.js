@@ -1167,6 +1167,16 @@ function createToken(text, selectedTF, overrideCssStyles, parentObjectToAppendTo
     }
     return [token, fakeValueContainer];
 }
+function createFloatingDiv(text, overrideCssStyles = "", parentObjectToAppendTo) {
+    let element = document.createElement("div");
+    element.innerText = text;
+    element.style = "display:none;width:20px;height:15px;background-color:red;border-radius:10px;font-size:10px;font-weight:bold;position:absolute;top:0px;left:calc(50% - 10px);color:white;padding-top:4px;";
+    element.style.cssText += overrideCssStyles;
+    if(parentObjectToAppendTo != null) {
+        parentObjectToAppendTo.appendChild(element);
+    }
+    return element;
+}
 
 /**
  * 
@@ -1358,12 +1368,32 @@ function setFieldDisabled(disabledTF, field, optionalParentContainer) {
         }
     }
     if(optionalParentContainer) {
-        var children = optionalParentContainer.childNodes;
-        children.forEach(function(item) {
-            item.disabled = disabledTF;
-        });
-        disabledTF == true ? optionalParentContainer.style.backgroundColor = "rgb(221, 221, 221)" : optionalParentContainer.style.backgroundColor = "white";
+        let temp = function() {
+            var children = optionalParentContainer.childNodes;
+            children.forEach(function(item) {
+                item.disabled = disabledTF;
+            });
+            disabledTF == true ? optionalParentContainer.style.backgroundColor = "rgb(221, 221, 221)" : optionalParentContainer.style.backgroundColor = "white";
+        };
+        temp();
+
+        showCustomContextMenu(optionalParentContainer,
+            newContextItem("Enable", () => {
+                disabledTF = false;
+                temp();
+                closeCustomContextMenu();
+            }),
+            newContextItem("Disable", () => {
+                disabledTF = true;
+                temp();
+                closeCustomContextMenu();
+            }),
+        );
+
     }
+
+
+
 
     return field || optionalParentContainer;
 }

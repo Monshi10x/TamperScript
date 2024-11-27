@@ -12,6 +12,7 @@ function initCustomContextMenu() {
 var contextParentContainer;
 function showCustomContextMenu(container, ...args) {
       contextParentContainer = container;
+      console.log(container);
 
       contextParentContainer.oncontextmenu = null;
       contextParentContainer.oncontextmenu = function(event) {

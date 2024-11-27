@@ -211,6 +211,11 @@ class Size2 extends SubscriptionManager {
                   COLOUR.White +
                   ";border:2px solid;border-color: black;margin:8px;box-shadow: rgb(0 0 0 / 80%) 3px 4px 10px 0px;padding:0px;overflow:hidden;box-sizing: border-box;";
             parentContainer.appendChild(this.#container);
+            $(this.#container).hover(function() {
+                  $(this).css("box-shadow", "rgba(0, 0, 0, 1) 3px 4px 10px 0px");
+            }, function() {
+                  $(this).css("box-shadow", "rgba(0, 0, 0, 0.8) 3px 4px 10px 0px");
+            });
 
             this.#productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {

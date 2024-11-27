@@ -74,6 +74,11 @@ class ProductDetails extends SubscriptionManager {
                   COLOUR.White +
                   ";border:2px solid;border-color: black;margin:8px;box-shadow: rgb(0 0 0 / 80%) 3px 4px 10px 0px;padding:0px;overflow:hidden;box-sizing: border-box;";
             parentContainer.appendChild(this.#container);
+            $(this.#container).hover(function() {
+                  $(this).css("box-shadow", "rgba(0, 0, 0, 1) 3px 4px 10px 0px");
+            }, function() {
+                  $(this).css("box-shadow", "rgba(0, 0, 0, 0.8) 3px 4px 10px 0px");
+            });
 
             this.#productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
@@ -93,7 +98,7 @@ class ProductDetails extends SubscriptionManager {
             this.#productNameField = createInput_Infield("Product Name", null, "margin:0px 5px;box-shadow:none;box-sizing: border-box;width:200px;", null, this.#container, false, null);
             this.#productNameField[1].placeholder = "i.e. ACM Panel";
 
-            this.#deleteBtn = createIconButton(GM_getResourceURL("Icon_Bin"), "", "display: block; float: right; width: 35px;height:40px; border:none;padding:10px; padding-left:8px;color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
+            this.#deleteBtn = createIconButton(GM_getResourceURL("Icon_Bin"), "", "display: block; float: right; width: 35px;height:40px; border:none;padding:0px;color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
             this.#container.appendChild(this.#deleteBtn);
 
             this.UpdateDataForSubscribers();

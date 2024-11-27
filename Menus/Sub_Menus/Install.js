@@ -205,25 +205,46 @@ class Install extends SubMenu {
 		partIndex = await super.Create(productNo, partIndex);
 		if(this.required) {
 			if(this.installTotalEach == "Total") {
-				await AddPart("Install - IH", productNo);
-				partIndex++;
-				await setPartQty(productNo, partIndex, this.qty);
-				await setPartDescription(productNo, partIndex, "[INSTALL (total)]");
-				await setInstallTimeMHD(productNo, partIndex, this.installMinutes, this.installHours, this.installDays);
-				await setInstallPartType(productNo, partIndex, this.installRate);
-				await setTravelTimeMHD(productNo, partIndex, this.travelMinutes, this.travelHours, this.travelDays);
-				await setTravelType(productNo, partIndex, this.travelRate);
-				await savePart(productNo, partIndex);
+				if(this.#isOutsourced[1].checked) {
+					await AddPart("Custom Item Cost-Markup (Total)", productNo);
+					partIndex++;
+					await setPartQty(productNo, partIndex, this.qty);
+					await setPartDescription(productNo, partIndex, "OUTSOURCED INSTALL");
+					await setPartVendorCostEa(productNo, partIndex, zeroIfNaNNullBlank(this.#outsourceCost[1].value));
+					await setPartMarkup(productNo, partIndex, zeroIfNaNNullBlank(this.#outsourceMarkup[1].value));
+					await savePart(productNo, partIndex);
+				}
+				else {
+					await AddPart("Install - IH", productNo);
+					partIndex++;
+					await setPartQty(productNo, partIndex, this.qty);
+					await setPartDescription(productNo, partIndex, "[INSTALL (total)]");
+					await setInstallTimeMHD(productNo, partIndex, this.installMinutes, this.installHours, this.installDays);
+					await setInstallPartType(productNo, partIndex, this.installRate);
+					await setTravelTimeMHD(productNo, partIndex, this.travelMinutes, this.travelHours, this.travelDays);
+					await setTravelType(productNo, partIndex, this.travelRate);
+					await savePart(productNo, partIndex);
+				}
 			} else {
-				await AddPart("Install - IH (ea)", productNo);
-				partIndex++;
-				await setPartQty(productNo, partIndex, this.qty);
-				await setPartDescription(productNo, partIndex, "[INSTALL (ea)]");
-				await setInstallTimeMHDEa(productNo, partIndex, this.installMinutes, this.installHours, this.installDays);
-				await setInstallPartTypeEa(productNo, partIndex, this.installRate);
-				await setTravelTimeMHDEa(productNo, partIndex, this.travelMinutes, this.travelHours, this.travelDays);
-				await setTravelTypeEa(productNo, partIndex, this.travelRate);
-				await savePart(productNo, partIndex);
+				if(this.#isOutsourced[1].checked) {
+					await AddPart("Custom Item Cost-Markup (Ea)", productNo);
+					partIndex++;
+					await setPartQty(productNo, partIndex, this.qty);
+					await setPartDescription(productNo, partIndex, "OUTSOURCED INSTALL");
+					await setPartVendorCostEa(productNo, partIndex, zeroIfNaNNullBlank(this.#outsourceCost[1].value));
+					await setPartMarkupEa(productNo, partIndex, zeroIfNaNNullBlank(this.#outsourceMarkup[1].value));
+					await savePart(productNo, partIndex);
+				} else {
+					await AddPart("Install - IH (ea)", productNo);
+					partIndex++;
+					await setPartQty(productNo, partIndex, this.qty);
+					await setPartDescription(productNo, partIndex, "[INSTALL (ea)]");
+					await setInstallTimeMHDEa(productNo, partIndex, this.installMinutes, this.installHours, this.installDays);
+					await setInstallPartTypeEa(productNo, partIndex, this.installRate);
+					await setTravelTimeMHDEa(productNo, partIndex, this.travelMinutes, this.travelHours, this.travelDays);
+					await setTravelTypeEa(productNo, partIndex, this.travelRate);
+					await savePart(productNo, partIndex);
+				}
 			}
 		}
 		return partIndex;
