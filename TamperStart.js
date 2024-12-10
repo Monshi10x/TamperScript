@@ -128,6 +128,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/ProductDetails.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Size.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Size2.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/ProductDetails.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/InstallSubscribable.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/ArtworkSubscribable.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/ProductionSubscribable.js
