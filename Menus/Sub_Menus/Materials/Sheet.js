@@ -1198,7 +1198,8 @@ class Sheet extends Material {
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
             var name = this.#material[1].value + " - (sqm) - " + this.#finish[1].value + " " + this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", "") + "x" + this.#thickness[1].value;
-            var partFullName = getPredefinedParts_Name_FromLimitedName(name);
+            //var partFullName = getPredefinedParts_Name_FromLimitedName(name);
+            var partFullName = this.#sheetMaterial[1].value;
 
             for(let i = 0; i < this.#outputSizeTableData.length; i++) {
                   let [partQty, partWidth, partHeight, aaa, aab, aac, aad] = this.#outputSizeTableData[i];
