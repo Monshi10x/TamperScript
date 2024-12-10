@@ -249,6 +249,7 @@ class Laminate extends Material {
       Description() {
             super.Description();
 
-            return "Laminated in " + '___' + " for UV protection and longevity";
+            TODO("laminate gloss levels");
+            return "Laminated in " + 'gloss' + " for UV protection and longevity";
       }
 }
