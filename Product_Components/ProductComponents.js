@@ -160,6 +160,8 @@ function partInfoTick() {
 				parts[part].querySelector(".ord-prod-part-header").style.backgroundColor = "#eee";
 			}
 
+
+
 			if(part == 0) prevPartNameNumber = partNameNumber;
 			partsInGroup++;
 			productNumber = product + 1;
@@ -188,6 +190,7 @@ function partInfoTick() {
 
 			partPrice = koPartTotalPrice;
 
+			/*
 			if(parts[part].querySelectorAll(".partCombinedPrice").length == 0) {
 				createPartCombinedPrice(parts[part].querySelector(".ord-prod-part-header"), "partCombinedPrice", parts[part]);
 			}
@@ -196,6 +199,15 @@ function partInfoTick() {
 					partCombinedPrice += partPrice;
 					partCombinedPrice_anyIsTicked = true;
 				}
+			}*/
+
+			if(parts[part].querySelectorAll(".partPrice").length == 0) {
+				let label = createLabel("$" + partPrice, "color:blue;font-weight:bold;width:80px;height:30px;font-size:14px;float:right;", parts[part].querySelector(".ord-prod-part-header"));
+				label.className = "partPrice";
+
+				parts[part].querySelector(".txtPartDescription").style.cssText += "width:240px;";
+			} else {
+				parts[part].querySelector(".partPrice").innerText = "$" + partPrice;
 			}
 
 
