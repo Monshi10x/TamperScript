@@ -130,6 +130,33 @@ function pixelToMM(pixels) {
     return (pixels * 25.4) / DPI;
 }
 
+let ArrayContainsAnotherArray = (arr, target) => target.every(v => arr.includes(v));
+
+function stringContainsWords(mainString, searchWordsString) {
+    let matchesSearchTerm = false;
+    let dropdownContainInstances = 0;
+
+    mainString = mainString.toLowerCase();
+    let mainString_AsArray = mainString.split(" ");
+
+    searchWordsString = searchWordsString.toLowerCase().trim();
+    let searchWords_AsArray = searchWordsString.split(" ");
+
+    topLoop:
+    for(let x = 0; x < searchWords_AsArray.length; x++) {
+        secondLoop:
+        for(let y = 0; y < mainString_AsArray.length; y++) {
+            if(mainString_AsArray[y].includes(searchWords_AsArray[x])) {
+                dropdownContainInstances++;
+                break secondLoop;
+            }
+        }
+        if(dropdownContainInstances >= searchWords_AsArray.length) matchesSearchTerm = true;
+    }
+
+    return matchesSearchTerm;
+}
+
 /**
  * Returns a new cloned (non-pointer) array 
  * @param {Array} array 

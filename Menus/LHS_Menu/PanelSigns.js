@@ -151,6 +151,9 @@ class MenuPanelSigns extends LHSMenuWindow {
 				size.height = 1220;
 
 				sheet = this.#add(Sheet, this.page1, [Size2]);
+				sheet.material = "ACM";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)";
 				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
 				laminate = this.#add(Laminate, this.page1, [Vinyl]);
 				appTape = null;
@@ -344,6 +347,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 	}
 
 	#addBlank(classType, container) {
+		console.log(container);
 		let newItem = new classType(container, this);
 
 		this.#allMaterials.push(newItem);
@@ -442,9 +446,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 			for(let i = 0; i < creationOrder.length; i++) {
 				let UIContainer = new UIContainerType3("", creationOrder[i].DISPLAY_NAME, this.page1);
+
 				this.#containers.push(UIContainer);
 				let addBtn = createButton("Add +", "width:100px;min-height:30px;margin:0px;border:0px;", () => {
-					this.#addBlank(creationOrder[i], creationOrder[i].DISPLAY_NAME, this.#containers[i].contentContainer);
+					this.#addBlank(creationOrder[i], this.#containers[i].contentContainer);
 				}, null);
 				UIContainer.addHeadingButtons(addBtn);
 			}
@@ -476,6 +481,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 				let currentProductNumber = uniqueProductNumbers[i];
 				//create product container
 				let newProductContainer = new UIContainerType3("max-height:450px;", "PRODUCT " + uniqueProductNumbers[i], this.page1);
+				newProductContainer.contentContainer.style.cssText += "max-height:800px;";
+				newProductContainer.container.style.cssText += "max-height:800px;";
 
 				newProductContainer.addHeadingButtons(createButton("x", "width:30px;height:30px;margin:0px;border:none;padding:2px;min-height:30px;float:right;background-color:" + COLOUR.Red + ";", () => {
 					this.DeleteProduct(currentProductNumber);
@@ -504,7 +511,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				UIContainer.contentContainer = d[1];
 				this.#containers.push(UIContainer);
 				let addBtn = createButton("+", "width:50px;min-height:100%;margin:0px;border:0px;", () => {
-					this.#addBlank(creationOrder[i], creationOrder[i].DISPLAY_NAME, this.#containers[i].contentContainer);
+					this.#addBlank(creationOrder[i], this.#containers[i].contentContainer);
 				}, UIContainer.contentContainer);
 				//UIContainer.addHeadingButtons(addBtn);
 			}

@@ -17,24 +17,30 @@ function createOptionsContainer() {
     togglePartsText.style = "float:left;width:150px;margin-bottom:5px;";
     togglePartsText.innerText = "Toggle All Parts";
 
-    //document.createElement('div');
-    //leftBtn.style = "float: left; width: 100px; height: 20px; background-color: " + COLOUR.Blue + ";text-align:center;font-size:13px;cursor: pointer;color:white";
-    //leftBtn.innerText = "open";
-    //leftBtn.addEventListener("click", togglePartsOpen);
-
-    //var rightBtn = document.createElement('div');
-    //rightBtn.style = "float:right;width:100px;height:20px;background-color:" + COLOUR.Blue + ";text-align:center;font-size:13px;cursor: pointer;color:white;";
-    //rightBtn.innerText = "close";
-    //rightBtn.addEventListener("click", togglePartsClosed);
-
     newPanelContent2.appendChild(togglePartsText);
     var leftBtn = createButton("Open", "width: 90px; height: 20px;font-size:12px;cursor: pointer;margin:5px", togglePartsOpen, newPanelContent2);
     var rightBtn = createButton("Close", "width: 90px; height: 20px; font-size:12px;cursor: pointer;margin:5px", togglePartsClosed, newPanelContent2);
 
-    // newPanelContent2.appendChild(leftBtn);
-    //newPanelContent2.appendChild(rightBtn);
     newPanel.appendChild(newPanelHeader2);
     newPanel.appendChild(newPanelContent2);
+
+    let togglePartsVisible = createCheckbox_Infield("Toggle Parts Visible", true, "", () => {
+        let elements = document.querySelectorAll(".ord-prod-part");
+        let elementFooters = document.querySelectorAll(".ord-prod-footer");
+        for(let i = 0; i < elements.length; i++) {
+            if(togglePartsVisible[1].checked) {
+                $(elements[i]).show();
+                $(elementFooters[i]).show();
+            } else {
+                $(elements[i]).hide();
+                $(elementFooters[i]).hide();
+            }
+
+        }
+
+    }, newPanelContent2);
+
+
     sidePanel.appendChild(newPanel);
 }
 function togglePartsOpen() {

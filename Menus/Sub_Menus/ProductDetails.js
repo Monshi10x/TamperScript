@@ -93,9 +93,9 @@ class ProductDetails extends SubscriptionManager {
 
             this.#qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 1);
 
-            this.#productLocationField = createInput_Infield("Product Location", null, "margin:0px 5px;box-shadow:none;box-sizing: border-box;width:200px;", null, this.#container, false, null);
+            this.#productLocationField = createInput_Infield("Product Location", null, "margin:0px 5px;box-shadow:none;box-sizing: border-box;width:180px;", null, this.#container, false, null);
             this.#productLocationField[1].placeholder = "i.e. Main Fascia";
-            this.#productNameField = createInput_Infield("Product Name", null, "margin:0px 5px;box-shadow:none;box-sizing: border-box;width:200px;", null, this.#container, false, null);
+            this.#productNameField = createInput_Infield("Product Name", null, "margin:0px 5px;box-shadow:none;box-sizing: border-box;width:180px;", null, this.#container, false, null);
             this.#productNameField[1].placeholder = "i.e. ACM Panel";
 
             this.#deleteBtn = createIconButton(GM_getResourceURL("Icon_Bin"), "", "display: block; float: right; width: 35px;height:40px; border:none;padding:0px;color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});

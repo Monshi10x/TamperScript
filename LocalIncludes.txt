@@ -42,7 +42,8 @@
 // @resource     Icon_3D https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-3D.svg
 // @resource     Icon_POS https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-POS.svg
 // @resource     Icon_Admin https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Admin.svg
-// @resource     IMPORTED_CSS file://C:\Users\monsh\Documents\TamperScript\Styles\Styles_Sales.css
+// @resource     Icon_Bin https://github.com/Monshi10x/TamperScript/raw/main/Images/BinIcon.svg
+// @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/tree/main/Styles/Styles_Sales.css
 // @resource     JSONTransformers https://github.com/Monshi10x/TamperScript/raw/main/External Files/Transformers.json
 // @resource     JSONPredefinedVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/PredefinedVehicleTemplates.json
 // @resource     JSONBlankVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/BlankVehicleTemplates.json
@@ -50,7 +51,7 @@
 // @resource     JSONLaser https://github.com/Monshi10x/TamperScript/raw/main/External Files/LaserToolpathTimes.json
 // @resource     JSONPartItems https://github.com/Monshi10x/TamperScript/raw/main/External Files/PartItems.json
 // @resource     JSONInstallTimes https://github.com/Monshi10x/TamperScript/raw/main/External Files/InstallTimes.json
-// @resource     Image_Corflute file://C:\Users\monsh\Documents\TamperScript\Images\Corflute-Resized.jpg
+// @resource     Image_Corflute https://github.com/Monshi10x/TamperScript/raw/main/Images/Corflute-Resized.jpg
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
@@ -65,6 +66,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\Common.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Subscription\SubscriptionManager.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\ObjectArray.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Common\TArray.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Console\Console.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\FileIO\FileIO.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Tables\Table.js
@@ -123,9 +125,9 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Router.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Laser.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\Material.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\ProductDetails.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Size.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Size2.js
-// @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\ProductDetails.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\InstallSubscribable.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\ArtworkSubscribable.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\ProductionSubscribable.js

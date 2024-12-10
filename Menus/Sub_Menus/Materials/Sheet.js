@@ -106,7 +106,7 @@ class Sheet extends Material {
 
       #supplierCuts;
       #filtersHeader;
-      #filterContainersOrdered = [null, null, null, null];
+      //#filterContainersOrdered = [null, null, null, null];
       #material;
       set material(value) {$(this.#material[1]).val(value).change();}
 
@@ -120,6 +120,7 @@ class Sheet extends Material {
       set sheetSize(value) {$(this.#sheetSize[1]).val(value).change();}
 
       #sheetMaterial;
+      set sheetMaterial(value) {$(this.#sheetMaterial[1]).val(value).change();}
 
       #updateOrderBtn;
 
@@ -209,33 +210,27 @@ class Sheet extends Material {
             Sheet Size*/
             let f_container_sheetSize = createDivStyle5(null, "Sheet To Use", this.container)[1];
 
-            this.#material = createDropdown_Infield("Material", 0, "width:80px", this.#materialOptions, () => {this.UpdateFilters("Material");}, f_container_sheetSize);
+            let sheetFilterContainer = createDivStyle5(null, "Filters", f_container_sheetSize)[1];
+
+            this.#material = createDropdown_Infield("Material", 0, "width:80px", [createDropdownOption("", "")].concat(this.#materialOptions), () => {this.UpdateFilters("Material");}, sheetFilterContainer);
             this.#searchTerms.push(this.#material[1].value + " - (sqm)");
 
-            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters("Thickness");}, f_container_sheetSize);
-
-            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters("Finish");}, f_container_sheetSize);
-
-            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters('Sheet Size');}, f_container_sheetSize);
+            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters('Sheet Size');}, sheetFilterContainer);
             this.#sheetSize[1].id = "Sheet Size";
 
-            this.#updateOrderBtn = createIconButton("https://cdn.gorilladash.com/images/media/6144512/signarama-australia-icons8-numeric-50-635d113e9382c.png", "Set Order", "width: 120px; height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
-                  let items = this.#filterOrder;
-                  items.shift();
-                  let modal = new ModalSetOrder("Filter Order", () => {
-                        this.#filterOrder = ['Material', ...modal.getOrder()];
-                        this.UpdateFilters('Material');
-                  }, ...items);
-            }, f_container_sheetSize);
+            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters("Thickness");}, sheetFilterContainer);
 
-            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:50%;", 10, false, this.getSheetDropdown(), () => { }, f_container_sheetSize, false);
+            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters("Finish");}, sheetFilterContainer);
+
+
+            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 10, true, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize, false);
 
             /*
             Folded*/
             let f_container_folded = createDivStyle5(null, "Folded", this.container)[1];
             this.#f_foldSideContainer = document.createElement('div');
             let alertDiv;
-            this.#isFolded = createCheckbox_Infield("Is Folded", false, "width:60%;margin-right:30%;", () => {
+            this.#isFolded = createCheckbox_Infield("Is Folded", false, "width:calc(50% - 20px);margin:10px;", () => {
                   if(this.#isFolded[1].checked) {
                         setFieldHidden(false, this.#foldedTop[1], this.#foldedTop[0]);
                         setFieldHidden(false, this.#foldedLeft[1], this.#foldedLeft[0]);
@@ -275,7 +270,7 @@ class Sheet extends Material {
                         this.UpdateFromChange();
                   }, this);
 
-                  this.#visualiser.borrowFields(...this.#filterContainersOrdered, this.#flip[0], this.#hasGrain[0], methodContainer, this.#f_foldSideContainer);
+                  this.#visualiser.borrowFields(f_container_sheetSize, this.#flip[0], this.#hasGrain[0], methodContainer, this.#f_foldSideContainer);
                   this.#visualiser.setFlippedField(this.#flip[1]);
                   this.#visualiser.setSheetSizeField(this.#sheetSize[1]);
                   this.#visualiser.setHasGrainField(this.#hasGrain[1]);
@@ -404,8 +399,9 @@ class Sheet extends Material {
       UpdateGrainDirection() {
             let hasGrain = false;
             let grainDirection = "";
-            var name = this.#material[1].value + " - (sqm) - " + this.#finish[1].value + " " + this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", "") + "x" + this.#thickness[1].value;
-            var partFullName = getPredefinedParts_Name_FromLimitedName(name);
+            //var name = this.#material[1].value + " - (sqm) - " + this.#finish[1].value + " " + this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", "") + "x" + this.#thickness[1].value;
+            //var partFullName = getPredefinedParts_Name_FromLimitedName(name);
+            var partFullName = this.#sheetMaterial[1].value;
             var part = getPredefinedParts(partFullName)[0];
 
             if(part) {
@@ -898,8 +894,8 @@ class Sheet extends Material {
        * @Sheets
        */
       getSheetSizeWH() {
-            var arr = this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", "").split("x");
-            return [zeroIfNaN(parseFloat(arr[0])), zeroIfNaN(parseFloat(arr[1]))];
+            var arr = getPredefinedParts(this.#sheetMaterial[1].value)[0].ParentSize.replaceAll("mm", "").replaceAll(" ", "").split("x");
+            return [zeroIfNaNNullBlank(parseFloat(arr[0])), zeroIfNaNNullBlank(parseFloat(arr[1]))];
       }
 
       sheetSizeWidth() {
@@ -910,25 +906,102 @@ class Sheet extends Material {
             return this.getSheetSizeWH()[1];
       }
 
-      getSheetDropdown() {
+      getSheetDropdownOptions() {
+            let materialsToUse = [];
+            this.#materialOptions.forEach((item) => {
+                  materialsToUse.push(item.value);
+            });
 
-            let materialsToUse = ["ACM", "Acrylic"];
             let optionsArray = [];
             for(let i = 0; i < materialsToUse.length; i++) {
                   let foundParts = getPredefinedParts_RefinedSearch(materialsToUse[i] + " - ");
+                  //Color,Finish,Id,IncomeAccountId,JoinedPartCategoryNames,MaterialType,Name,ParentSize,
+                  //ParentSizeNumber,PartCategoryIds,PartGroupId,PartGroupName,PartIsRollMaterial,PricingTemplateId
+                  //PricingTemplateIdMaterialType,SearchEncodedPartCategoryIds,SearchEncodedPartGroupId,Thickness,Weight
+
                   for(let j = 0; j < foundParts.length; j++) {
-                        console.log(foundParts[j].Name);
-                        optionsArray.push([foundParts[j].Name, foundParts[j].Name]);
+                        let itemIsStocked = foundParts[j].Weight.includes("Stocked:true");
+                        optionsArray.push([foundParts[j].Name, itemIsStocked ? "blue" : "white"]);
                   }
-
+                  console.log(foundParts);
             }
-            //console.log(optionsArray);
-            return optionsArray;//createDropdownOption(keys[i], keys[i])
 
+            return optionsArray;
+      }
+
+      getSheetSizeOptions() {
+            let optionsArray = new TArray();
+            optionsArray.push("");
+
+            let selectedMaterial = this.#material[1].value;
+
+            let foundParts = getPredefinedParts_RefinedSearch(selectedMaterial + " - ");
+
+            for(let i = 0; i < foundParts.length; i++) {
+                  var arr = foundParts[i].ParentSize.replaceAll("mm", "").replaceAll(" ", "").split("x");
+                  let wh = "" + zeroIfNaNNullBlank(parseFloat(arr[0])) + "x" + zeroIfNaNNullBlank(parseFloat(arr[1]));
+
+                  optionsArray.push(wh);
+            }
+
+            return optionsArray.uniqueArrayElements().sort();
+      }
+
+      getThicknessOptions() {
+            let optionsArray = new TArray();
+            optionsArray.push("");
+
+            let selectedMaterial = this.#material[1].value;
+            let selectedSize = this.#sheetSize[1].value;
+
+            let foundParts = getPredefinedParts_RefinedSearch(selectedMaterial + " - (sqm) - " + selectedSize);
+
+            for(let i = 0; i < foundParts.length; i++) {
+                  optionsArray.push(foundParts[i].Thickness);
+            }
+
+            return optionsArray.uniqueArrayElements().sort();
+      }
+
+      getFinishOptions() {
+            let optionsArray = new TArray();
+            optionsArray.push("");
+
+            let selectedMaterial = this.#material[1].value;
+            let selectedSize = this.#sheetSize[1].value;
+            let selectedThickness = this.#thickness[1].value;
+
+            let foundParts = getPredefinedParts_RefinedSearch(selectedMaterial + " - (sqm) - " + selectedSize + "x" + selectedThickness);
+
+            for(let i = 0; i < foundParts.length; i++) {
+                  optionsArray.push(foundParts[i].Finish);
+            }
+
+            return optionsArray.uniqueArrayElements().sort();
       }
 
       UpdateFilters(updateFromFilter) {
-            this.#filterContainersOrdered[0] = this.#material[0];
+            if(updateFromFilter == "Material") {
+                  this.setSheetSizeOptions(...this.getSheetSizeOptions());
+                  this.setThicknessOptions(...this.getThicknessOptions());
+            }
+            if(updateFromFilter == "Sheet Size") {
+                  this.setThicknessOptions(...this.getThicknessOptions());
+            }
+            if(updateFromFilter == "Thickness") {
+                  this.setFinishOptions(...this.getFinishOptions());
+            }
+
+
+            $(this.#sheetMaterial[4]).val(
+                  this.#material[1].value + " " +
+                  this.#sheetSize[1].value + " " +
+                  this.#thickness[1].value + " " +
+                  this.#finish[1].value).change();
+
+            this.#sheetMaterial[5]();
+            //$(this.#sheetMaterial[1]).change();
+            /**this.#filterContainersOrdered[0] = this.#material[0];
 
             for(let i = this.#filterOrder.length - 1; i >= 0; i--) {
                   var firstNode = this.#material[0];
@@ -1068,7 +1141,7 @@ class Sheet extends Material {
                         }
                   }
             }
-            this.UpdateFromChange();
+            this.UpdateFromChange();*/
       }
 
       setSheetSizeOptions(...options) {
@@ -1104,7 +1177,7 @@ class Sheet extends Material {
       }
 
       setFinishOptions(...options) {
-            this.#finishOptions = [];
+            /**this.#finishOptions = [];
 
             for(let x = 0; x < options.length; x++) {
                   this.#finishOptions[x] = createDropdownOption(options[x], options[x]);
@@ -1116,7 +1189,7 @@ class Sheet extends Material {
 
             for(var l = 0; l < options.length; l++) {
                   this.#finish[1].add(this.#finishOptions[l]);
-            }
+            }*/
       }
 
       /**

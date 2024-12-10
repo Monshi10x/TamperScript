@@ -67,5 +67,4 @@ class ObjectArray extends Array {
             }
             return uniqueElements;
       }
-
 }

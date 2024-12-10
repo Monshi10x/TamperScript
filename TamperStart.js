@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.55
+// @version      10.44
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -42,7 +42,8 @@
 // @resource     Icon_3D https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-3D.svg
 // @resource     Icon_POS https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-POS.svg
 // @resource     Icon_Admin https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Admin.svg
-// @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_Sales.css
+// @resource     Icon_Bin https://github.com/Monshi10x/TamperScript/raw/main/Images/BinIcon.svg
+// @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/tree/main/Styles/Styles_Sales.css
 // @resource     JSONTransformers https://github.com/Monshi10x/TamperScript/raw/main/External Files/Transformers.json
 // @resource     JSONPredefinedVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/PredefinedVehicleTemplates.json
 // @resource     JSONBlankVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/BlankVehicleTemplates.json
@@ -65,6 +66,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Common.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Subscription/SubscriptionManager.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/ObjectArray.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/TArray.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Console/Console.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/FileIO/FileIO.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Tables/Table.js
@@ -123,9 +125,9 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Router.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Laser.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/Material.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/ProductDetails.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Size.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Size2.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/ProductDetails.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/InstallSubscribable.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/ArtworkSubscribable.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Sub_Menus/Materials/ProductionSubscribable.js

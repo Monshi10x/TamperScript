@@ -259,6 +259,7 @@ function createInput(text, defaultValue, overrideCssStyles, optionalCallback, pa
     if(overrideCssStyles) input.style.cssText += overrideCssStyles;
     if(optionalCallback) {
         input.onkeyup = optionalCallback;
+        input.onchange = optionalCallback;
     }
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(input);
@@ -661,16 +662,34 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
     dropdownArrow.onclick = toggleMenu;
     containerDiv.appendChild(dropdownArrow);
 
-    var searchBar = createInput("", null, "width:" + 600 + "px;height:30px;position:fixed;top:40px;left:0px;display:none;margin:0;padding:5px;box-sizing:border-box;z-index:1000;border:0px;outline:none;", narrowSearches, containerDiv);
-    searchBar.placeholder = "Search or Type Custom...";
+    var dropdownContainer = document.createElement("div");
+    dropdownContainer.style = "width:" + 600 + "px;height:450px;position:fixed;top:40px;left:0px;display:none;margin:0;padding:0px;box-sizing:border-box;z-index:1001;box-shadow:" + STYLE.DropShadow;
+    containerDiv.appendChild(dropdownContainer);
+
+    var searchBar = createInput_Infield("Search" + (canAddCustom ? " or Type Custom..." : ""), null, "width:100%;margin:0;box-sizing:border-box;z-index:1001;box-shadow:none;",
+        () => {
+            narrowSearches();
+            if(searchBar[1].value != "") {
+                $(clearSearchBtn).show();
+            } else {
+                $(clearSearchBtn).hide();
+            }
+        }, dropdownContainer, false, null);
+
+    //searchBar[1].placeholder = "Search" + canAddCustom ? " or Type Custom..." : "";
+    let clearSearchBtn = createButton("Clear", "display:none;width:50px;height:20px;background-color:red;border-radius:10px;top:10px;padding:1px;font-size:10px;margin:0px;left:calc(100% - 70px);position:absolute;min-height:0px;", () => {
+        $(searchBar[1]).val("").change();
+        $(searchBar[1]).focus();
+    }, searchBar[0]);
+
 
     function narrowSearches() {
-        let currentSearchTerm = searchBar.value.toLowerCase();
         let atLeastOneSearchTermfound = false;
+
         for(let i = 0; i < options.length; i++) {
-            let optionValue = options[i][0].toLowerCase();
-            let matchesSearchTerm = optionValue.includes(currentSearchTerm);
-            if(matchesSearchTerm) {
+            let optionMatchesSearchTerm = stringContainsWords(options[i][0], searchBar[1].value);
+
+            if(optionMatchesSearchTerm) {
                 atLeastOneSearchTermfound = true;
                 internalOptionDivs[i].style.display = "block";
             } else {
@@ -688,7 +707,7 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
         if(canAddCustom) {
             for(let i = options.length; i < options.length + 1; i++) {
                 internalOptionDivs[i].style.display = "block";
-                containerDiv.querySelectorAll("#optionText")[i].innerText = searchBar.value;
+                containerDiv.querySelectorAll("#optionText")[i].innerText = searchBar[1].value;
             }
         }
     }
@@ -710,28 +729,30 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
 
     document.addEventListener("wheel", (event) => {
         if(!isScrollInside) {
-            $(dropdownBody).hide();
-            $(searchBar).hide();
-            searchBar.value = "";
+            $(dropdownContainer).hide();
+            //$(dropdownBody).hide();
+            //$(searchBar[0]).hide();
+            //searchBar.value = "";
         }
     });
 
     function toggleMenu() {
-        $(dropdownBody).toggle();
-        $(searchBar).toggle();
-        searchBar.value = "";
-        searchBar.focus();
-        searchBar.style.top = containerDiv.getBoundingClientRect().y + containerDiv.getBoundingClientRect().height + 0 + "px";
-        searchBar.style.left = containerDiv.getBoundingClientRect().x + "px";
-        resetSearches();
+        $(dropdownContainer).toggle();
+        //$(dropdownBody).toggle();
+        //$(searchBar[0]).toggle();
+        //searchBar.value = "";
+        $(searchBar[1]).focus();
+        dropdownContainer.style.top = containerDiv.getBoundingClientRect().y + containerDiv.getBoundingClientRect().height + 0 + "px";
+        dropdownContainer.style.left = containerDiv.getBoundingClientRect().x + "px";
+        //resetSearches();
         hideCustom();
-        dropdownBody.style.top = containerDiv.getBoundingClientRect().y + containerDiv.getBoundingClientRect().height + 40 + "px";
-        dropdownBody.style.left = containerDiv.getBoundingClientRect().x + "px";
+        //dropdownBody.style.top = containerDiv.getBoundingClientRect().y + containerDiv.getBoundingClientRect().height + 50 + "px";
+        //dropdownBody.style.left = containerDiv.getBoundingClientRect().x + "px";
     }
 
     var dropdownBody = document.createElement('div');
-    dropdownBody.style = "width:" + 600 + "px;height:400px;position:fixed;top:200px;left:0px;display:block;background-color:white;z-index:100;display:none; border:1px solid black;" + STYLE.DropShadow + ";overflow-y:scroll;z-index:1000;";
-    containerDiv.appendChild(dropdownBody);
+    dropdownBody.style = "width:100%;height:400px;display:block;background-color:white;z-index:100;border:1px solid black;" + STYLE.DropShadow + ";overflow-y:scroll;z-index:1000;box-sizing:border-box;box-shadow:none;";
+    dropdownContainer.appendChild(dropdownBody);
     containerDiv.appendChild(dummyInput);
     dropdownBody.style.top = containerDiv.getBoundingClientRect().bottom;
     dropdownBody.style.left = containerDiv.getBoundingClientRect().left;
@@ -772,8 +793,9 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
                 });
                 $(document).click((event) => {
                     if(!$(event.target).closest(containerDiv).length) {
-                        dropdownBody.style.display = "none";
-                        searchBar.style.display = "none";
+                        //dropdownBody.style.display = "none";
+                        //searchBar[0].style.display = "none";
+                        $(dropdownContainer).hide();
                     }
                 });
 
@@ -805,24 +827,38 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
         internalOptionDivs[i].style.display = "none";
     }
 
+    function clickFirstVisibleItem() {
+        topLoop:
+        for(let i = 0; i < internalOptionDivs.length; i++) {
+            if(internalOptionDivs[i].style.display != "none") {
+                $(internalOptionDivs[i]).click();
+                break topLoop;
+            }
+        }
+    }
+
     if(selectedIndex !== null) {
         dropdownText.innerText = containerDiv.querySelectorAll("#optionText")[selectedIndex].innerText;
         dummyInput.value = dropdownText.innerText;
     }
 
     dummyInput.onchange = function() {
+        console.log("dummyInput.onchange");
         dropdownText.innerText = dummyInput.value;
     };
 
-    return [containerDiv, dummyInput, textDescription, dropdownBody];
+    return [containerDiv, dummyInput, textDescription, dropdownBody, searchBar, clickFirstVisibleItem];
 }
-function createFloatingTag(text, overrideCssStyles, parentObjectToAppendTo) {
+function createFloatingTag(text, overrideCssStyles, parentObjectToAppendTo, optionalCallback) {
     let floatingTag = document.createElement("div");
     floatingTag.innerText = text;
     floatingTag.style = STYLE.FloatingTag;
     if(overrideCssStyles) floatingTag.style.cssText += overrideCssStyles;
-    if(parentObjectToAppendTo != null) {
+    if(parentObjectToAppendTo) {
         parentObjectToAppendTo.appendChild(floatingTag);
+    }
+    if(optionalCallback) {
+        floatingTag.onclick = optionalCallback;
     }
     return floatingTag;
 }
