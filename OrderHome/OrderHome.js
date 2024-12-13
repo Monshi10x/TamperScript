@@ -11,60 +11,74 @@ class OrderHome {
 
       #emailTemplateContainer;
       #emailTemplate_OrderAcknowledgement;
+      #emailModalIsOpen = false;
 
       constructor() {
             this.Start();
+
+            setInterval(() => {this.Tick();}, 100);
       }
 
       async Start() {
-            this.InitEmailTemplates();
+            this.FetchEmailTemplates();
             this.InitEvents();
+            this.InitPaymentModal();
       }
 
-      InitEmailTemplates() {
+      Tick() {
+            this.TickEmailModal();
+      }
+
+      FetchEmailTemplates() {
             this.#emailTemplate_OrderAcknowledgement = GM_getResourceText("EmailTemplate_OrderAcknowledgement");
       }
 
       InitEvents() {
             console.log("in init events");
-            let emailBtn = document.getElementById("hlEmailInvoiceOrEstimate");
+            /*let emailBtn = document.getElementById("hlEmailInvoiceOrEstimate");
             emailBtn.addEventListener("click", () => {
                   this.OnEmailBtnClicked();
-            });
+            });*/
 
-            let sendBtn = document.getElementById("btnClientEmailFormOne");
+            /*let sendBtn = document.getElementById("btnClientEmailFormOne");
             sendBtn.addEventListener("click", () => {
                   this.OnSendBtnClicked();
-            });
+            });*/
       }
 
-      OnEmailBtnClicked() {
-            console.log("OnEmailBtnClicked");
-
-
-            let self = this;
-            let overlayF = setInterval(function() {
-                  console.log("in timeout");
-                  if(document.getElementById("simplemodal-overlay")) {
+      TickEmailModal() {
+            if(document.getElementById("simplemodal-overlay")) {
+                  if(this.#emailModalIsOpen == false) {
                         let overlay = document.getElementById("simplemodal-overlay");
                         let contentArea = document.getElementsByClassName("trumbowyg-editor notranslate")[0];
+                        let customerFullName = document.querySelectorAll(".eItem")[0].childNodes[0];
+                        let customerFirstName = customerFullName.split(" ")[0];
 
-                        self.#emailTemplateContainer = document.createElement("div");
-                        self.#emailTemplateContainer.style = "position:absolute;top:200px;left:0;width:200px;height:500px;background-color:white;display:block;z-index: 2010 !important;";
+                        this.#emailTemplateContainer = document.createElement("div");
+                        this.#emailTemplateContainer.style = "position:absolute;top:200px;left:0;width:200px;height:500px;background-color:white;display:block;z-index: 2010 !important;";
 
                         let orderAcknowledgementBtn = createButton("Order Acknowledgement", "width:calc(100% - 20px);", (e) => {
                               e.preventDefault();
-                              contentArea.innerHTML = self.#emailTemplate_OrderAcknowledgement;
-                        }, self.#emailTemplateContainer);
+                              this.#emailTemplate_OrderAcknowledgement.replace("<%CustomerName%>", customerFirstName);
+                              console.log(this.#emailTemplate_OrderAcknowledgement);
+                              contentArea.innerHTML = this.#emailTemplate_OrderAcknowledgement;
+                        }, this.#emailTemplateContainer);
 
-                        insertAfter(self.#emailTemplateContainer, overlay);
-
-                        clearInterval(overlayF);
+                        insertAfter(this.#emailTemplateContainer, overlay);
                   }
-            }, 100);
+
+                  this.#emailModalIsOpen = true;
+            } else {
+                  this.#emailModalIsOpen = false;
+
+                  if(this.#emailTemplateContainer != null) {
+                        deleteElement(this.#emailTemplateContainer);
+                        this.#emailTemplateContainer == null;
+                  }
+            }
       }
 
-      OnSendBtnClicked() {
-            deleteElement(this.#emailTemplateContainer);
+      InitPaymentModal() {
+            document.querySelector("#txtOfflineCcLast4Digits").value = "0000";
       }
 }

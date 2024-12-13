@@ -273,7 +273,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
     var input = document.createElement('input');
     var containerDiv = document.createElement('div');
     var textDescription = document.createElement('p');
-    textDescription.style = "width:calc(100% - 15px);box-sizing:border-box;height:16px;margin: 0px;padding:2px;color:#666;font-size:11px;";
+    textDescription.style = "width:calc(100% - 15px);box-sizing:border-box;user-select: none;height:16px;margin: 0px;padding:2px;color:#666;font-size:11px;";
     textDescription.innerText = text;
     input.autocomplete = 'off';
     input.autocomplete = "one-time-code";
@@ -351,15 +351,33 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         }
     };
 
-    containerDiv.addEventListener("click", (event) => {
-        if(event.target == containerDiv) {
+    textDescription.addEventListener("click", (event) => {
+        if(event.target == textDescription) {
             input.focus();
+            let val = input.value; //store the value of the element
+            input.value = ''; //clear the value of the element
+            input.value = val; //set that value back.  
+        }
+    });
+    textDescription.addEventListener("dblclick", (event) => {
+        if(event.target == textDescription) {
+            input.select();
         }
     });
 
-    textDescription.onclick = function() {
-        input.focus();
-    };
+    containerDiv.addEventListener("click", (event) => {
+        if(event.target == containerDiv) {
+            input.focus();
+            let val = input.value; //store the value of the element
+            input.value = ''; //clear the value of the element
+            input.value = val; //set that value back.  
+        }
+    });
+    containerDiv.addEventListener("dblclick", (event) => {
+        if(event.target == containerDiv) {
+            input.select();
+        }
+    });
 
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(containerDiv);
@@ -367,7 +385,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
 
     if(options.prefix) {
         let prefixField = document.createElement("p");
-        prefixField.style = "float:left; field-sizing: content;color:#555;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-family:Arial;font-size: 14px;line-height: 18px;";
+        prefixField.style = "float:left; field-sizing: content;user-select: none;color:#555;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-family:Arial;font-size: 14px;line-height: 18px;";
         prefixField.innerText = options.prefix;
         prefixField.onclick = function() {
             input.focus();
@@ -377,7 +395,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
     }
     if(options.postfix) {
         let postfixField = document.createElement("p");
-        postfixField.style = "float:left; field-sizing: content;color:#555;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-family:Arial;font-size: 14px;line-height: 18px;";
+        postfixField.style = "float:left; field-sizing: content;user-select: none;color:#555;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-family:Arial;font-size: 14px;line-height: 18px;";
         postfixField.innerText = options.postfix;
         postfixField.onclick = function() {
             input.focus();

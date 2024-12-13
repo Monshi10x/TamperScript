@@ -9,7 +9,7 @@ class Laminate extends Material {
       #materialTotalArea;
       #materialContainer;
       #material;
-      #useRollLength = true;
+      #useRollLength = false;
       #useRollLengthField;
       set material(value) {$(this.#material[1]).val(value).change();}
 
