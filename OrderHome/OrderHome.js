@@ -60,7 +60,7 @@ class OrderHome {
                         let orderAcknowledgementBtn = createButton("Order Acknowledgement", "width:calc(100% - 20px);", (e) => {
                               e.preventDefault();
                               this.#emailTemplate_OrderAcknowledgement.replace("<%CustomerName%>", customerFirstName);
-                              console.log(this.#emailTemplate_OrderAcknowledgement);
+
                               contentArea.innerHTML = this.#emailTemplate_OrderAcknowledgement;
                         }, this.#emailTemplateContainer);
 
