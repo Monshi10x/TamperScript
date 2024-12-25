@@ -9,7 +9,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 	#createProductBtn;
 	/**
-	 * @Size2
+	 * @Size
 	 */
 	#sizeContainer;
 	#addSizeBtn;
@@ -75,15 +75,15 @@ class MenuPanelSigns extends LHSMenuWindow {
 	get subscriptionTree() {
 		return {
 			ProductDetails: [],
-			Size2: [],
-			Sheet: [Size2],
+			Size: [],
+			Sheet: [Size],
 			Vinyl: [Sheet],
 			Laminate: [Vinyl],
 			AppTaping: [Vinyl],
 			HandTrimming: [Vinyl],
 			PrintMounting: [Sheet],
 			ProductionSubscribable: [Sheet],
-			ArtworkSubscribable: [Size2],
+			ArtworkSubscribable: [Size],
 			InstallSubscribable: [Sheet]
 		};
 	}
@@ -104,7 +104,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
 			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
-				[["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
+				[["test", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
+				["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
 				["Lightbox Face - Opal Acrylic", "https://cdn.gorilladash.com/images/media/5077257/signarama-australia-img-6911-2-small-thumbnail-61611e9ab2f0f.jpg"],
 				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
 				["Foam PVC", "https://5.imimg.com/data5/RN/UM/MY-14219350/white-pvc-foam-sheet-500x500.jpg"],
@@ -141,16 +142,18 @@ class MenuPanelSigns extends LHSMenuWindow {
 		let install;
 
 		switch(this.#addQuickTemplateBtn[1].value) {
-			case "ACM":
+			case "test":
 				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "ACM Panel";
 
-				size = this.#add(Size2, this.page1, []);
+				size = this.#add(Size, this.page1, []);
 				size.width = 2440;
 				size.height = 1220;
 
-				sheet = this.#add(Sheet, this.page1, [Size2]);
+				let temp = this.#add(PathLength, this.page1, []);
+
+				sheet = this.#add(Sheet, this.page1, [Size]);
 				sheet.material = "ACM";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)";
@@ -160,7 +163,30 @@ class MenuPanelSigns extends LHSMenuWindow {
 				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
 				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
+				artwork.artworkItem.artworkTime = 60;
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+				break;
+			case "ACM":
+				productDetails = this.#add(ProductDetails, this.page1, []);
+				productDetails.productLocation = "";
+				productDetails.productName = "ACM Panel";
+
+				size = this.#add(Size, this.page1, []);
+				size.width = 2440;
+				size.height = 1220;
+
+				sheet = this.#add(Sheet, this.page1, [Size]);
+				sheet.material = "ACM";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)";
+				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
+				laminate = this.#add(Laminate, this.page1, [Vinyl]);
+				appTape = null;
+				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
+				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
+				production = null;
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
 				artwork.artworkItem.artworkTime = 60;
 				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
@@ -169,11 +195,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 				productDetails.productLocation = "";
 				productDetails.productName = "Acrylic Lightbox Face";
 
-				size = this.#add(Size2, this.page1, []);
+				size = this.#add(Size, this.page1, []);
 				size.width = 2440;
 				size.height = 1220;
 
-				sheet = this.#add(Sheet, this.page1, [Size2]);
+				sheet = this.#add(Sheet, this.page1, [Size]);
 				sheet.material = "Acrylic";
 				sheet.sheetSize = "2440mm x 1220mm";
 				sheet.thickness = "4.5";
@@ -188,7 +214,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
 				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
 				artwork.artworkItem.artworkTime = 60;
 				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
@@ -197,11 +223,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 				productDetails.productLocation = "";
 				productDetails.productName = "Clear Acrylic Panel with Stand-offs";
 
-				size = this.#add(Size2, this.page1, []);
+				size = this.#add(Size, this.page1, []);
 				size.width = 2440;
 				size.height = 1220;
 
-				sheet = this.#add(Sheet, this.page1, [Size2]);
+				sheet = this.#add(Sheet, this.page1, [Size]);
 				sheet.material = "Acrylic";
 				sheet.sheetSize = "2440mm x 1220mm";
 				sheet.thickness = "6";
@@ -217,7 +243,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				finishing = this.#add(Finishing, this.page1, [Sheet]);
 				finishing.standOffRequired = true;
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
 				artwork.artworkItem.artworkTime = 60;
 				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
@@ -226,11 +252,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 				productDetails.productLocation = "";
 				productDetails.productName = "Foam PVC Panel";
 
-				size = this.#add(Size2, this.page1, []);
+				size = this.#add(Size, this.page1, []);
 				size.width = 2440;
 				size.height = 1220;
 
-				sheet = this.#add(Sheet, this.page1, [Size2]);
+				sheet = this.#add(Sheet, this.page1, [Size]);
 				sheet.material = "Foamed PVC";
 				sheet.sheetSize = "2440mm x 1220mm";
 				sheet.thickness = "3.0";
@@ -242,7 +268,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
 				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
 				artwork.artworkItem.artworkTime = 60;
 				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
@@ -251,11 +277,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 				productDetails.productLocation = "";
 				productDetails.productName = "Signwhite Panel";
 
-				size = this.#add(Size2, this.page1, []);
+				size = this.#add(Size, this.page1, []);
 				size.width = 2400;
 				size.height = 1200;
 
-				sheet = this.#add(Sheet, this.page1, [Size2]);
+				sheet = this.#add(Sheet, this.page1, [Size]);
 				sheet.material = "Signwhite";
 				sheet.sheetSize = "2400mm x 1200mm";
 				sheet.thickness = "0.55";
@@ -267,7 +293,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
 				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
 				artwork.artworkItem.artworkTime = 60;
 				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
@@ -276,11 +302,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 				productDetails.productLocation = "";
 				productDetails.productName = "Corflute Panel";
 
-				size = this.#add(Size2, this.page1, []);
+				size = this.#add(Size, this.page1, []);
 				size.width = 600;
 				size.height = 900;
 
-				sheet = this.#add(Sheet, this.page1, [Size2]);
+				sheet = this.#add(Sheet, this.page1, [Size]);
 				sheet.material = "Corflute";
 				sheet.sheetSize = "600mm x 900mm";
 				sheet.thickness = "5.0";
@@ -292,7 +318,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
 				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
 				artwork.artworkItem.artworkTime = 60;
 				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
@@ -301,11 +327,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 				productDetails.productLocation = "";
 				productDetails.productName = "Vinyl Wall Graphics";
 
-				size = this.#add(Size2, this.page1, []);
+				size = this.#add(Size, this.page1, []);
 				size.width = 1000;
 				size.height = 1000;
 
-				vinyl = this.#add(Vinyl, this.page1, [Size2]);
+				vinyl = this.#add(Vinyl, this.page1, [Size]);
 				vinyl.material = VinylLookup["High Tack"];
 				vinyl.bleedDropdown = "Wall Graphics";
 				vinyl.isJoinHorizontal = false;
@@ -315,9 +341,9 @@ class MenuPanelSigns extends LHSMenuWindow {
 				appTape = null;
 				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
 				production = null;
-				artwork = this.#add(ArtworkSubscribable, this.page1, [Size2]);
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
 				artwork.artworkItem.artworkTime = 60;
-				install = this.#add(InstallSubscribable, this.page1, [Size2]);
+				install = this.#add(InstallSubscribable, this.page1, [Size]);
 				break;
 			default:
 				break;
@@ -441,8 +467,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 		}
 		if(this.#viewMode[1].value == "Per Type") {
 
-			let creationOrder = [ProductDetails, Size2, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
-			this.#containers = [/*ProductDetails, Size2, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			let creationOrder = [ProductDetails, Size, PathLength, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+			this.#containers = [/*ProductDetails, Size, PathLength, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < creationOrder.length; i++) {
 				let UIContainer = new UIContainerType3("", creationOrder[i].DISPLAY_NAME, this.page1);
@@ -501,8 +527,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 			}
 		} else if(this.#viewMode[1].value == "Per Type2") {
 
-			let creationOrder = [ProductDetails, Size2, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
-			this.#containers = [/*ProductDetails, Size2,Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			let creationOrder = [ProductDetails, Size, PathLength, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+			this.#containers = [/*ProductDetails, Size,PathLength, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < creationOrder.length; i++) {
 				let UIContainer = new Object();
@@ -513,7 +539,6 @@ class MenuPanelSigns extends LHSMenuWindow {
 				let addBtn = createButton("+", "width:50px;min-height:100%;margin:0px;border:0px;", () => {
 					this.#addBlank(creationOrder[i], this.#containers[i].contentContainer);
 				}, UIContainer.contentContainer);
-				//UIContainer.addHeadingButtons(addBtn);
 			}
 			for(let x = 0; x < this.#containers.length; x++) {
 				let sameItemCount = 0;

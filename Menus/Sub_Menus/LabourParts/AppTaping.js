@@ -1,4 +1,5 @@
 class AppTaping extends Material {
+      static DISPLAY_NAME = "APP TAPING";
       /*override*/get Type() {return "APP TAPE";}
 
       #materialHeader;

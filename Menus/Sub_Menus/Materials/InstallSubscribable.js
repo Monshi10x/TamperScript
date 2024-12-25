@@ -1,4 +1,5 @@
 class InstallSubscribable extends Material {
+      static DISPLAY_NAME = "INSTALL";
       /*override*/get Type() {return "INSTALL";}
 
       /**

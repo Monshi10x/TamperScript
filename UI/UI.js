@@ -392,6 +392,20 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         };
         input.style.cssText += "";
         insertBefore(prefixField, input);
+
+        prefixField.addEventListener("click", (event) => {
+            if(event.target == prefixField) {
+                input.focus();
+                let val = input.value; //store the value of the element
+                input.value = ''; //clear the value of the element
+                input.value = val; //set that value back.  
+            }
+        });
+        prefixField.addEventListener("dblclick", (event) => {
+            if(event.target == prefixField) {
+                input.select();
+            }
+        });
     }
     if(options.postfix) {
         let postfixField = document.createElement("p");
@@ -402,9 +416,53 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         };
         input.style.cssText += "";
         insertAfter(postfixField, input);
+
+        postfixField.addEventListener("click", (event) => {
+            if(event.target == postfixField) {
+                input.focus();
+                let val = input.value; //store the value of the element
+                input.value = ''; //clear the value of the element
+                input.value = val; //set that value back.  
+            }
+        });
+        postfixField.addEventListener("dblclick", (event) => {
+            if(event.target == postfixField) {
+                input.select();
+            }
+        });
     }
 
     return [containerDiv, input, textDescription];
+}
+function createFileChooserButton(text, overrideCssStyles, optionalCallback, parentObjectToAppendTo) {
+    var itemChooseBtn = document.createElement('input');
+    itemChooseBtn.style = STYLE.Button + "width:200px;";
+    itemChooseBtn.type = "file";
+    itemChooseBtn.id = "itemChooseBtn";
+    itemChooseBtn.multiple = false;
+    itemChooseBtn.accept = ".txt, text/plain, .svg";
+
+    if(overrideCssStyles) itemChooseBtn.style.cssText += overrideCssStyles;
+
+    if(parentObjectToAppendTo != null) {
+        parentObjectToAppendTo.appendChild(itemChooseBtn);
+    }
+
+    itemChooseBtn.onchange = e => {
+        var file = e.target.files[0];
+
+        if(file) {
+            var reader = new FileReader();
+            reader.readAsText(file, 'UTF-8');
+
+            reader.onload = readerEvent => {
+                var content = readerEvent.target.result;
+                optionalCallback(content);
+            };
+        }
+    };
+
+    return itemChooseBtn;
 }
 function createInputCalculated_Infield(text, defaultValue, overrideCssStyles, optionalCallback, locked, parentObjectToAppendTo) {
     var input = document.createElement('input');

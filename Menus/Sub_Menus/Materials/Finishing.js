@@ -1,4 +1,5 @@
 class Finishing extends Material {
+      static DISPLAY_NAME = "FINISHING";
       /*override*/get Type() {return "FINISHING";}
 
       #production;

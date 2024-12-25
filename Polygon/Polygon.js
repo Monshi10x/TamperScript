@@ -398,14 +398,14 @@ function filterPolygons(polygons, fig1, fig2, mode) {
 function removeSmallPolygons(polygons, minSize) {
       var big = [];
       for(var i = 0; i < polygons.length; i++) {
-            if(polygonArea(polygons[i]) >= minSize) {
+            if(polygonArea_(polygons[i]) >= minSize) {
                   big.push(polygons[i]);
             }
       }
       return big;
 }
 
-function polygonArea(p) {
+function polygonArea_(p) {
       var len = p.length;
       var s = 0;
       for(var i = 0; i < len; i++) {

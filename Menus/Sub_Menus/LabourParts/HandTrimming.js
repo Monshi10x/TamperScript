@@ -1,4 +1,5 @@
 class HandTrimming extends Material {
+      static DISPLAY_NAME = "HAND TRIMMING";
       /*override*/get Type() {return "HAND TRIMMING";}
 
       #materialHeader;

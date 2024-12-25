@@ -378,3 +378,285 @@ function drawDashGrid(ctx, xo, yo, w, h) {
             ctx.stroke();
       }
 }
+
+var svg_DPI = 72;
+function svg_mmToPixel(mm) {
+      return (mm * svg_DPI) / 25.4;
+}
+function svg_pixelToMM(pixels) {
+      return (pixels * 25.4) / svg_DPI;
+}
+
+function svg_getTotalPathLength_pixels(svgElement) {
+      let totalPathLength = 0;
+      for(let i = 0; i < svgElement.childNodes.length; i++) {
+            totalPathLength += svgElement.childNodes[i].getTotalLength();
+      }
+      return totalPathLength;
+}
+
+function svg_getTotalPathLength_mm(svgElement) {
+      let totalPathLength = 0;
+      for(let i = 0; i < svgElement.childNodes.length; i++) {
+            totalPathLength += svgElement.childNodes[i].getTotalLength();
+      }
+      return svg_pixelToMM(totalPathLength);
+}
+
+function svg_getPathLength_mm(svgElement) {
+      return svg_pixelToMM(svgElement.getTotalLength());
+}
+
+function svg_getRectLength_mm(svgElement) {
+      return svg_pixelToMM(svgElement.getTotalLength());
+}
+
+
+function addScrollToSVG(svg) {
+      svg.onwheel = function(event) {
+            event.preventDefault();
+
+            // set the scaling factor (and make sure it's at least 10%)
+            let scale = event.deltaY / 1000;
+            scale = Math.abs(scale) < .1 ? .1 * event.deltaY / Math.abs(event.deltaY) : scale;
+
+            // get point in SVG space
+            let pt = new DOMPoint(event.clientX, event.clientY);
+            pt = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+            // get viewbox transform
+            let [x, y, width, height] = svg.getAttribute('viewBox').split(' ').map(Number);
+
+            // get pt.x as a proportion of width and pt.y as proportion of height
+            let [xPropW, yPropH] = [(pt.x - x) / width, (pt.y - y) / height];
+
+            // calc new width and height, new x2, y2 (using proportions and new width and height)
+            let [width2, height2] = [width + width * scale, height + height * scale];
+            let x2 = pt.x - xPropW * width2;
+            let y2 = pt.y - yPropH * height2;
+
+            svg.setAttribute('viewBox', `${x2} ${y2} ${width2} ${height2}`);
+      };
+}
+
+function svg_convertShapesToPaths(svgElement) {
+      let svgElements = svgElement.getElementsByTagName("*");
+
+      for(let i = 0; i < svgElements.length; i++) {
+            if(svgElements[i].nodeName != "g" && svgElements[i].nodeName != "path") {
+                  let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
+            }
+      }
+      return svgElement;
+}
+
+function svg_getTotalPathLengths(svgElement) {
+      let totalPathLength = 0;
+      svg_convertShapesToPaths(svgElement);
+      let svgElements = svgElement.getElementsByTagName("*");
+
+      for(let i = 0; i < svgElements.length; i++) {
+            if(svgElements[i].nodeName == "g") continue;
+
+            totalPathLength += svg_getPathLength_mm(svgElements[i]);
+      }
+      console.log(totalPathLength);
+      return totalPathLength;
+}
+
+function svg_makeElementFromString(svgString) {
+      let empty = document.createElement("div");
+      empty.innerHTML += svgString;
+
+      let svgElement = empty.querySelector("svg");
+
+      let g = document.createElementNS('http://www.w3.org/2000/svg', "g");
+      g.id = "main G created by T";
+      let numChildren = svgElement.children.length;
+
+      for(let i = 0; i < numChildren; i++) {
+            g.appendChild(svgElement.children[0]);
+      }
+      svgElement.appendChild(g);
+
+      return svgElement;
+}
+
+function calculateAreaOfPolygon(vertices) {
+      var total = 0;
+
+      for(var i = 0, l = vertices.length; i < l; i++) {
+            var addX = vertices[i].x;
+            var addY = vertices[i == vertices.length - 1 ? 0 : i + 1].y;
+            var subX = vertices[i == vertices.length - 1 ? 0 : i + 1].x;
+            var subY = vertices[i].y;
+
+            total += (addX * addY * 0.5);
+            total -= (subX * subY * 0.5);
+      }
+
+      return Math.abs(total);
+}
+
+function convertPathToPolygon(pathElement, numberStepsPerPoint = 1) {
+      var pathLen = pathElement.getTotalLength();
+      //var numSteps = Math.floor(pathLen * 2);
+      var numSteps = Math.floor(pathLen * numberStepsPerPoint);
+      console.log("num of steps: " + numSteps);
+      var points = [];
+      for(var i = 0; i < numSteps; i++) {
+            var p = pathElement.getPointAtLength(i * pathLen / numSteps);
+            points.push(p);
+      }
+      console.log(points);
+      return points;
+}
+
+function createPolygonFromPoints(points) {
+      let newPolygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      let pointsStr = "";
+      for(let i = 0; i < points.length; i++) {
+            pointsStr += points[i].x + "," + points[i].y + " ";
+      }
+      newPolygon.setAttribute("points", pointsStr);
+      newPolygon.style = "stroke:purple;stroke-width:0.1;fill:grey;opacity:0.3;";
+      return newPolygon;
+}
+
+// returns the rectangular bounding box of the given polygon
+function getPolygonBounds(polygon) {
+      if(!polygon || polygon.length < 3) {
+            return null;
+      }
+
+      var xmin = polygon[0].x;
+      var xmax = polygon[0].x;
+      var ymin = polygon[0].y;
+      var ymax = polygon[0].y;
+
+      for(var i = 1; i < polygon.length; i++) {
+            if(polygon[i].x > xmax) {
+                  xmax = polygon[i].x;
+            }
+            else if(polygon[i].x < xmin) {
+                  xmin = polygon[i].x;
+            }
+
+            if(polygon[i].y > ymax) {
+                  ymax = polygon[i].y;
+            }
+            else if(polygon[i].y < ymin) {
+                  ymin = polygon[i].y;
+            }
+      }
+
+      return {
+            x: xmin,
+            y: ymin,
+            width: xmax - xmin,
+            height: ymax - ymin
+      };
+}
+
+// return true if point is in the polygon, false if outside, and null if exactly on a point or edge
+function pointInPolygon(point, polygon) {
+      if(!polygon || polygon.length < 3) {
+            return null;
+      }
+
+      var inside = false;
+      var offsetx = polygon.offsetx || 0;
+      var offsety = polygon.offsety || 0;
+
+      for(var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            var xi = polygon[i].x + offsetx;
+            var yi = polygon[i].y + offsety;
+            var xj = polygon[j].x + offsetx;
+            var yj = polygon[j].y + offsety;
+
+            if(_almostEqual(xi, point.x) && _almostEqual(yi, point.y)) {
+                  return null; // no result
+            }
+
+            if(_onSegment({x: xi, y: yi}, {x: xj, y: yj}, point)) {
+                  return null; // exactly on the segment
+            }
+
+            if(_almostEqual(xi, xj) && _almostEqual(yi, yj)) { // ignore very small lines
+                  continue;
+            }
+
+            var intersect = ((yi > point.y) != (yj > point.y)) && (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi);
+            if(intersect) inside = !inside;
+      }
+
+      return inside;
+}
+
+class TSVGRect {
+      #x;
+      set x(value) {
+            this.#x = value;
+            this.#element.setAttribute('x', value);
+      }
+      get x() {return this.#x;}
+
+      #y;
+      set y(value) {
+            this.#y = value;
+            this.#element.setAttribute('y', value);
+      }
+      get y() {return this.#y;}
+
+      #width;
+      set width(value) {
+            this.#width = value;
+            this.#element.setAttribute('width', value);
+      }
+
+      #height;
+      set height(value) {
+            this.#height = value;
+            this.#element.setAttribute('height', value);
+      }
+
+      #rx;
+      #ry;
+      #parentToAppendTo;
+      #overrideCssStyles;
+
+      #element;
+      get element() {return this.#element;}
+
+      constructor(parentToAppendTo, overrideCssStyles, x = 0, y = 0, width = 0, height = 0, rx = 0, ry = 0) {
+            this.#parentToAppendTo = parentToAppendTo;
+            this.#overrideCssStyles = overrideCssStyles;
+            this.#x = x;
+            this.#y = y;
+            this.#width = width;
+            this.#height = height;
+            this.#rx = rx;
+            this.#ry = ry;
+
+            this.createElement();
+      }
+
+      createElement() {
+            this.#element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            this.#element.setAttribute('x', this.#x);
+            this.#element.setAttribute('y', this.#y);
+            this.#element.setAttribute('width', this.#width);
+            this.#element.setAttribute('height', this.#height);
+            this.#element.setAttribute('rx', this.#rx);
+            this.#element.setAttribute('ry', this.#ry);
+            this.#element.style = STYLE.SVGRect;
+
+            if(this.#overrideCssStyles) this.#element.style.cssText += this.#overrideCssStyles;
+            if(this.#parentToAppendTo) this.#parentToAppendTo.appendChild(this.#element);
+      }
+
+      Delete() {
+            deleteElement(this.element);
+      }
+}
+

@@ -1,6 +1,6 @@
 
 class Sheet extends Material {
-
+      static DISPLAY_NAME = "SHEET";
       /*override*/get Type() {return "SHEET";}
 
       #materialOptions = [

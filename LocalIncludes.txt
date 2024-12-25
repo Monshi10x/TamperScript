@@ -127,7 +127,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\Material.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\ProductDetails.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Size.js
-// @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Size2.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Size.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\InstallSubscribable.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\ArtworkSubscribable.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\Sub_Menus\Materials\ProductionSubscribable.js

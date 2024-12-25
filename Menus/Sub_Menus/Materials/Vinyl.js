@@ -1,5 +1,5 @@
 class Vinyl extends Material {
-
+      static DISPLAY_NAME = "VINYL";
       /*
                         
       Variables         */
