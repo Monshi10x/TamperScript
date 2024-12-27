@@ -37,10 +37,10 @@ class ModalSVG extends Modal {
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
 
-            this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width, 500, svgText, this.draw, this.getBodyElement());
+            this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width, 500, svgText, this.getBodyElement());
 
             this.#statsContainer = createDivStyle5(null, "Stats", this.getBodyElement())[1];
-            this.#totalPathLength = createInput_Infield("Total Paths Length", this.#dragZoomSVG.getTotalPathLengths(), null, () => { }, this.#statsContainer, false, 1, {postfix: "mm"});
+            this.#totalPathLength = createInput_Infield("Total Paths Length", this.#dragZoomSVG.totalPathLengths, null, () => { }, this.#statsContainer, false, 1, {postfix: "mm"});
             this.#totalShapeAreas = createInput_Infield("Total Shape Areas", null, null, () => { }, this.#statsContainer, false, 1, {postfix: "m2"});
 
             this.#viewSettingsContainer = createDivStyle5(null, "View Settings", this.getBodyElement())[1];
@@ -67,8 +67,9 @@ class ModalSVG extends Modal {
 
             this.#controlsContainer = createDivStyle5(null, "Controls", this.getBodyElement())[1];
 
-            let selectionTool = createIconButton("", "Select", "width:100px;", () => {
-                  this.#dragZoomSVG.setCurrentTool("Selection Tool");
+            let selectionTool = createIconButton(GM_getResourceURL("Icon_Select"), null, "width:50px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
+                  IFELSEF(this.#dragZoomSVG.getCurrentTool() != "Selection Tool", () => {this.#dragZoomSVG.setCurrentTool("Selection Tool");}, () => {this.#dragZoomSVG.setCurrentTool("null");});
+                  IFELSEF(selectionTool.style.borderColor != "red", () => {selectionTool.style.borderColor = "red";}, () => {selectionTool.style.borderColor = COLOUR.DarkGrey;});
             }, this.#controlsContainer, true);
 
             this.loadPathArea();

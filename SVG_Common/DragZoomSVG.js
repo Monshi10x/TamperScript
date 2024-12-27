@@ -1,94 +1,100 @@
+/**
+ * @see https://github.com/timmywil/panzoom/
+ * @see https://github.com/anvaka/panzoom/blob/main/README.md
+ * @see https://github.com/thednp/svg-path-commander
+ */
 class DragZoomSVG {
-
-      //@see https://github.com/timmywil/panzoom/
-      //@see https://github.com/anvaka/panzoom/blob/main/README.md
-      //@see https://github.com/thednp/svg-path-commander
-
-      #xOffset = 0;
-      #yOffset = 0;
-
+      /*
+                         
+      Variables         */
       #scale = 1;
-      get scale() {return this.#scale;}
-      set scale(value) {this.#scale = value;}
-
       #scrollSpeed = 0.2;
-
-      #ctxLineWidth = 3;
-
       #measurementOffset_Small = 10;
       #measurementOffset_Large = 50;
       #textOffset = 5;
-
-      #holding;
-
+      #defaultStrokeWidth = 2;
+      #holding = false;
       #allowPanning = true;
       #allowZoom = true;
-
       #activeTool;
-
-
       #mouseXY = {x: 0, y: 0};
-
-      #originToMouseOffset = {x: 0, y: 0};
-
-      #svg;
-      get svg() {return this.#svg;}
-
-      set svgWidth(width) {this.#svg.width.baseVal.value = width;}
-      get svgWidth() {return this.#svg.width.baseVal.value;}
-      set svgHeight(height) {this.#svg.height.baseVal.value = height;}
-      get svgHeight() {return this.#svg.height.baseVal.value;}
-
-      #container;
-
-      #svgIsLoaded = false;
-
-      #drawFunction = null;
-
-      moveFunctionRef;
-      mouseupFunctionRef;
-
       #panZoomInstance;
-
       #addOverallMeasure = true;
-
       #totalArea = 0;
-
+      #allElements = [];
+      #allPathElements = [];
       #outerPathElements = [];
       #innerPathElements = [];
-
       #measurementElements = [];
       #areaElements = [];
+      #shapeAreaPolygons = [];
       #scaleMeasurementsWithScale = false;
+      #scaleStrokeOnScroll = true;
+      #scaleFontOnScroll = false;
+      #defaultFontSize = 12;
+      /*
+                        
+      Fields            */
+      #f_svg;
+      #f_container;
+      #f_moveFunctionRef;
+      #f_mouseupFunctionRef;
+      #f_svgG;
 
-      constructor(svgWidth, svgHeight, svgText, drawFunction, parentToAppendTo) {
-            this.#drawFunction = drawFunction;
+      /*
+                        
+      Getter            */
+      get scale() {return this.#scale;}
+      get svg() {return this.#f_svg;}
+      set svgWidth(width) {this.#f_svg.width.baseVal.value = width;}
+      get svgWidth() {return this.#f_svg.width.baseVal.value;}
+      set svgHeight(height) {this.#f_svg.height.baseVal.value = height;}
+      get svgHeight() {return this.#f_svg.height.baseVal.value;}
+      /*
+                        
+      Setter            */
+      set scale(value) {this.#scale = value;}
 
-            this.#container = document.createElement("div");
-            this.#container.innerHTML += svgText;
-            this.#container.style = "display: block;float: left;outline:1px solid black;";
-            this.#container.style.cssText += "width:" + svgWidth + "px;height:" + svgHeight + "px;";
-            this.#container.className = "svgContainerDiv";
 
-            this.#svg = this.#container.querySelector("svg");
-
-            this.#svg.setAttribute("width", svgWidth);
-            this.#svg.setAttribute("height", svgHeight);
-
-            if(parentToAppendTo) parentToAppendTo.appendChild(this.#container);
-
-            let g = document.createElementNS('http://www.w3.org/2000/svg', "g");
-            g.id = "mainGcreatedByT";
-            let numChildren = this.#svg.children.length;
-
-            for(let i = 0; i < numChildren; i++) {
-                  g.appendChild(this.#svg.children[0]);
-            }
-            this.#svg.appendChild(g);
-
+      /*
+                        
+      Start             */
+      constructor(svgWidth, svgHeight, svgText, parentToAppendTo, options = {
+            convertShapesToPaths: true,
+            splitCompoundPaths: true,
+            scaleStrokeOnScroll: true,
+            scaleFontOnScroll: true,
+            defaultStrokeWidth: 2,
+            defaultFontSize: 12
+      }) {
             let _this = this;
+            this.#scaleStrokeOnScroll = options.scaleStrokeOnScroll;
+            this.#defaultStrokeWidth = options.defaultStrokeWidth;
+            this.#scaleFontOnScroll = options.scaleFontOnScroll;
+            this.#defaultFontSize = options.defaultFontSize;
 
-            this.#panZoomInstance = panzoom(g, {
+            this.#f_container = document.createElement("div");
+            this.#f_container.innerHTML += svgText;
+            this.#f_container.style = "display: block;float: left;outline:1px solid black;";
+            this.#f_container.style.cssText += "width:" + svgWidth + "px;height:" + svgHeight + "px;";
+            this.#f_container.className = "svgContainerDiv";
+            if(parentToAppendTo) parentToAppendTo.appendChild(this.#f_container);
+
+            this.#f_svg = this.#f_container.querySelector("svg");
+            this.#f_svg.setAttribute("width", svgWidth);
+            this.#f_svg.setAttribute("height", svgHeight);
+
+            this.#f_svgG = document.createElementNS('http://www.w3.org/2000/svg', "g");
+            this.#f_svgG.id = "mainGcreatedByT";
+            let numChildren = this.#f_svg.children.length;
+            for(let i = 0; i < numChildren; i++) {
+                  this.#f_svgG.appendChild(this.#f_svg.children[0]);
+            }
+            this.#f_svg.appendChild(this.#f_svgG);
+
+            this.#allElements = this.#f_svgG.getElementsByTagName("*");
+
+            this.#panZoomInstance = panzoom(this.#f_svgG, {
                   zoomSpeed: this.#scrollSpeed,
                   beforeMouseDown: function(e) {
                         return !_this.onBeforeMouseDown(e);
@@ -102,39 +108,35 @@ class DragZoomSVG {
             });
 
 
-            this.scale = this.#panZoomInstance.getTransform().scale;
+            this.#scale = this.#panZoomInstance.getTransform().scale;
 
-            this.convertShapesToPaths();
+            if(options.convertShapesToPaths) this.convertShapesToPaths();
+            if(options.splitCompoundPaths) this.splitCompoundPaths();
 
-            this.formatCompoundPaths();
-            this.addSVGStyles();
-            this.addOverallMeasures();
+            this.initSVGStyles();
 
-            this.getTotalPathLengths();
+            _this.#f_moveFunctionRef = function(e) {_this.onMouseMove(e);};//necessary for removeEventListener
+            _this.#f_mouseupFunctionRef = function(e) {_this.onMouseUp(e);};//necessary for removeEventListener
 
-            let self = this;
-            self.moveFunctionRef = function(e) {self.onMouseMove(e);};//necessary for removeEventListener
-            self.mouseupFunctionRef = function(e) {self.onMouseUp(e);};//necessary for removeEventListener
+            window.addEventListener('mousemove', _this.#f_moveFunctionRef);
+            $(this.#f_svg).mousedown((e) => {this.onMouseDown(e);});
+            window.addEventListener('mouseup', _this.#f_mouseupFunctionRef);
 
-            window.addEventListener('mousemove', self.moveFunctionRef);
-            $(this.#svg).mousedown((e) => {this.onMouseDown(e);});
-            window.addEventListener('mouseup', self.mouseupFunctionRef);
-
-            this.#container.onmouseover = (e) => this.onHoverEnter(e);
-            this.#container.onmouseout = (e) => this.onHoverExit(e);
+            this.#f_container.onmouseover = (e) => this.onHoverEnter(e);
+            this.#f_container.onmouseout = (e) => this.onHoverExit(e);
       }
 
       Close() {
-            window.removeEventListener('mousemove', this.moveFunctionRef);
-            window.removeEventListener('mouseup', this.mouseupFunctionRef);
+            window.removeEventListener('mousemove', this.#f_moveFunctionRef);
+            window.removeEventListener('mouseup', this.#f_mouseupFunctionRef);
       }
 
       onHoverEnter(e) {
-            this.#container.style.outlineColor = COLOUR.Blue;
+            this.#f_container.style.outlineColor = COLOUR.Blue;
       }
 
       onHoverExit(e) {
-            this.#container.style.outlineColor = COLOUR.Black;
+            this.#f_container.style.outlineColor = COLOUR.Black;
       }
 
       onMouseDown(e) {
@@ -142,7 +144,7 @@ class DragZoomSVG {
 
             this.updateMouseXY(e);
 
-            this.#svg.style.cursor = "grabbing";
+            this.#f_svg.style.cursor = "grabbing";
             this.#holding = true;
 
             this.updateTools("Mouse Down");
@@ -154,16 +156,12 @@ class DragZoomSVG {
             this.updateMouseXY(e);
 
             this.updateTools("Mouse Move");
-
-            if(this.#holding) {
-                  this.draw();
-            }
       }
 
       onMouseUp(e) {
             this.updateMouseXY(e);
 
-            this.#svg.style.cursor = "auto";
+            this.#f_svg.style.cursor = "auto";
             this.#holding = false;
 
             this.updateTools("Mouse Up");
@@ -182,41 +180,32 @@ class DragZoomSVG {
       onZoom(e) {
             this.scale = this.#panZoomInstance.getTransform().scale;
 
-            for(let i = 0; i < this.#innerPathElements.length; i++) {
-                  this.#innerPathElements[i].style.cssText += 'stroke-width:' + (2 / this.scale) + ";";
+            for(let i = 0; i < this.#allElements.length; i++) {
+                  if(this.#scaleStrokeOnScroll) this.#allElements[i].style.cssText += 'stroke-width:' + (this.#defaultStrokeWidth / this.scale) + ";";
+                  if(this.#scaleFontOnScroll) this.#allElements[i].style.cssText += "font-size:" + (this.#defaultFontSize / this.scale) + "px;";
             }
-            for(let i = 0; i < this.#outerPathElements.length; i++) {
-                  this.#outerPathElements[i].style.cssText += 'stroke-width:' + (2 / this.scale) + ";";
-            }
-
-            if(this.#scaleMeasurementsWithScale) {
-                  for(let i = 0; i < this.#measurementElements.length; i++) {
-                        this.#measurementElements[i].setAttribute('stroke-width', 2 / this.scale);
-                        this.#measurementElements[i].style.cssText += "font-size:" + 25 / this.scale + "px;";
-                  }
-            }
-
       }
 
       convertShapesToPaths() {
-            let svgElements = this.#svg.getElementsByTagName("*");
+            let svgElements = this.#f_svg.getElementsByTagName("*");
 
             for(let i = 0; i < svgElements.length; i++) {
                   if(svgElements[i].nodeName != "g" && svgElements[i].nodeName != "path") {
-                        let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
+                        let element = SVGPathCommander.shapeToPath(svgElements[i], true);
                   }
             }
+
+            this.#allElements = this.#f_svgG.getElementsByTagName("*");
       }
 
-      getTotalPathLengths() {
+      get totalPathLengths() {
             let totalPathLength = 0;
-            let svgElements = this.#svg.getElementsByTagName("path");
+            let svgElements = this.#f_svg.getElementsByTagName("path");
 
             for(let i = 0; i < svgElements.length; i++) {
-                  console.log(svgElements[i]);
                   totalPathLength += svg_getPathLength_mm(svgElements[i]);
             }
-            console.log("Total Path Length: " + totalPathLength);
+
             return totalPathLength;
       }
 
@@ -232,7 +221,6 @@ class DragZoomSVG {
 
             let self = this;
             if(typeof (Worker) !== "undefined") {
-                  console.log("window enabled worker");
                   webWorker = new Worker(GM_getResourceURL("SVGWebWorker"));
 
                   let elementDs = [];
@@ -249,6 +237,7 @@ class DragZoomSVG {
                   webWorker.onmessage = async function(event) {
                         console.log("DragZoomSVG.js recieves message from Webworker", event);
                         if(event.data.totalArea) self.#totalArea = event.data.totalArea;
+                        if(event.data.shapeAreaPolygons) self.#shapeAreaPolygons = event.data.shapeAreaPolygons;
                         if(event.data.shapeAreas) {
                               for(let i = 0; i < svgElements.length; i++) {
                                     svgElements[i].setAttribute("data-area", event.data.shapeAreas[i]);
@@ -278,58 +267,37 @@ class DragZoomSVG {
             }
       }
 
-      addSVGStyles() {
-            let svgElements = this.#svg.getElementsByTagName("path");
-            let mainGroup = this.svg.querySelector("#mainGcreatedByT");
+      initSVGStyles() {
+            let svgElements = this.#f_svg.getElementsByTagName("path");
 
             for(let i = 0; i < svgElements.length; i++) {
-                  //if(svgElements[i].nodeName == "g") continue;
-
                   svgElements[i].setAttribute('stroke-miterlimit', `0`);
 
-                  let isSelected = false;
-
                   svgElements[i].addEventListener("mouseover", (e) => {
-                        if(isSelected) return;
-
-                        if(svgElements[i].classList.contains("outerPath")) {
-                              svgElements[i].style.cssText += 'stroke:#00ff00';
-                        }
-                        if(svgElements[i].classList.contains("innerPath")) {
-                              svgElements[i].style.cssText += 'stroke:maroon';
-                        }
+                        svgElements[i].classList.add("SVGHover");
                   });
                   svgElements[i].addEventListener("mouseout", (e) => {
-                        if(isSelected) return;
-
-                        if(svgElements[i].classList.contains("outerPath")) {
-                              svgElements[i].style.cssText += 'stroke:green';
-                        }
-                        if(svgElements[i].classList.contains("innerPath")) {
-                              svgElements[i].style.cssText += 'stroke:red';
-                        }
+                        svgElements[i].classList.remove("SVGHover");
                   });
                   svgElements[i].addEventListener("click", (e) => {
-
-                        isSelected = !isSelected;
-                        if(isSelected) {
-                              svgElements[i].setAttribute('stroke-dasharray', `35,10`);
-                        } else {
-                              svgElements[i].removeAttribute('stroke-dasharray');
-                        }
+                        svgElements[i].classList.toggle("SVGSelected");
                   });
             }
       }
 
-      formatCompoundPaths() {
-            console.log("is formatted", (2 / this.scale));
-            let mainGroup = this.svg.querySelector("#mainGcreatedByT");
+      /**
+       * @summary separates path elements with inner paths into separate outer/inner path elements
+       * @example letter 'B' will be split into 1 outer + 2 inner separate path elements 
+       * @satisfies only SVGPath elements, not shapes i.e. SVGRect
+       */
+      splitCompoundPaths() {
+            this.#allPathElements = [];
 
             let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             newGroup.id = "pathGroup";
-            mainGroup.appendChild(newGroup);
+            this.#f_svgG.appendChild(newGroup);
 
-            let svgElements = mainGroup.getElementsByTagName("path");
+            let svgElements = this.#f_svgG.getElementsByTagName("path");
             let svgElementsLength = svgElements.length;
 
             //format outer/inner paths
@@ -341,28 +309,30 @@ class DragZoomSVG {
                   let outerPathParent_id;
                   for(let j = 0; j < pathStringSplitOverZ.length; j++) {
                         if(pathStringSplitOverZ[j] == "") continue;
-                        //Outer Compound
 
+                        //Outer Compound
                         if(j == 0) {
-                              let compoundPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                              compoundPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                              compoundPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
-                              compoundPathElement.className.baseVal = "outerPath";
+                              let outerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                              outerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
+                              outerPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
+                              outerPathElement.className.baseVal = "outerPath";
                               outerPathParent_id = generateUniqueID("outerPath-");
-                              compoundPathElement.id = outerPathParent_id;
-                              newGroup.appendChild(compoundPathElement);
-                              this.#outerPathElements.push(compoundPathElement);
-                              ;
+                              outerPathElement.id = outerPathParent_id;
+                              newGroup.appendChild(outerPathElement);
+                              this.#outerPathElements.push(outerPathElement);
+                              this.#allPathElements.push(outerPathElement);
                         }
+
                         //if has Inner compound paths
                         else {
-                              let compoundPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                              compoundPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                              compoundPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
-                              compoundPathElement.className.baseVal = "innerPath";
-                              compoundPathElement.setAttribute("data-outerPathParent", outerPathParent_id);
-                              newGroup.appendChild(compoundPathElement);
-                              this.#innerPathElements.push(compoundPathElement);
+                              let innerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                              innerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
+                              innerPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
+                              innerPathElement.className.baseVal = "innerPath";
+                              innerPathElement.setAttribute("data-outerPathParent", outerPathParent_id);
+                              newGroup.appendChild(innerPathElement);
+                              this.#innerPathElements.push(innerPathElement);
+                              this.#allPathElements.push(innerPathElement);
                         }
                   }
             }
@@ -376,53 +346,58 @@ class DragZoomSVG {
                   deleteElement(elemsToDelete[i]);
             }
 
+            this.#allElements = this.#f_svgG.getElementsByTagName("*");
       }
-
-      async showArea_PolygonApproximation() {
-            console.log("showArea_PolygonApproximation");
-            let mainGroup = this.svg.querySelector("#mainGcreatedByT");
-            let svgElements = mainGroup.getElementsByTagName("path");
-
-            for(let i = 0; i < svgElements.length; i++) {
-
-                  let pathPointsArray = convertPathToPolygon(svgElements[i]);
-                  let area = svg_pixelToMM(svg_pixelToMM(calculateAreaOfPolygon(pathPointsArray))) / 1000000;
-
-                  mainGroup.appendChild(createPolygonFromPoints(pathPointsArray));
-                  this.createText(roundNumber(area, 2), pathPointsArray[0], mainGroup);
+      /*
+            async showArea_PolygonApproximation() {
+                  console.log("showArea_PolygonApproximation");
+                  let mainGroup = this.svg.querySelector("#mainGcreatedByT");
+                  let svgElements = mainGroup.getElementsByTagName("path");
+      
+                  for(let i = 0; i < svgElements.length; i++) {
+      
+                        let pathPointsArray = convertPathToPolygon(svgElements[i]);
+                        let area = svg_pixelToMM(svg_pixelToMM(calculateAreaOfPolygon(pathPointsArray))) / 1000000;
+      
+                        mainGroup.appendChild(createPolygonFromPoints(pathPointsArray));
+                        this.createText(roundNumber(area, 2), pathPointsArray[0], mainGroup);
+                  }
             }
-      }
+      
+            showArea_Real() {
+                  console.log("showArea_Real");
+                  let mainGroup = this.svg.querySelector("#mainGcreatedByT");
+                  let svgElements = mainGroup.getElementsByTagName("path");
+      
+                  for(let i = 0; i < svgElements.length; i++) {
+                        let area = getShapeArea(svgElements[i], 7);
+                        this.createText2(roundNumber(area, 3), svgElements[i]);
+                  }
+      
+      
+            }*/
 
-      showArea_Real() {
-            console.log("showArea_Real");
-            let mainGroup = this.svg.querySelector("#mainGcreatedByT");
-            let svgElements = mainGroup.getElementsByTagName("path");
-
-            for(let i = 0; i < svgElements.length; i++) {
-                  let area = getShapeArea(svgElements[i], 7);
-                  this.createText2(roundNumber(area, 3), svgElements[i]);
-            }
 
 
-      }
+      /*
+     createText(textString, locationPoint, parentToAppendTo) {
+           let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+           text.innerHTML = textString;
+           text.setAttribute('fill', `#ff00ff`);
+           text.setAttribute('x', locationPoint.x);
+           text.setAttribute('y', locationPoint.y);
+           parentToAppendTo.appendChild(text);
+     }
+ 
+     createText2(textString, parentToAppendTo) {
+           let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+           text.innerHTML = textString;
+           text.setAttribute('fill', `#ff00ff`);
+ 
+           parentToAppendTo.appendChild(text);
+     }*/
 
-      createText(textString, locationPoint, parentToAppendTo) {
-            let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text.innerHTML = textString;
-            text.setAttribute('fill', `#ff00ff`);
-            text.setAttribute('x', locationPoint.x);
-            text.setAttribute('y', locationPoint.y);
-            parentToAppendTo.appendChild(text);
-      }
-
-      createText2(textString, parentToAppendTo) {
-            let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text.innerHTML = textString;
-            text.setAttribute('fill', `#ff00ff`);
-
-            parentToAppendTo.appendChild(text);
-      }
-
+      /////////////////////////
       showOverallMeasures() {
             let elements = this.svg.querySelector("#overallMeasures");
             if(elements) {
@@ -433,11 +408,13 @@ class DragZoomSVG {
             this.addOverallMeasures();
       }
 
+      ////////////////////
       hideOverallMeasures() {
             let elements = this.svg.querySelector("#overallMeasures");
             $(elements).hide();
       }
 
+      /////////////////////
       addOverallMeasures() {
             let timer = setInterval(function() {next();}, 100);
 
@@ -513,6 +490,7 @@ class DragZoomSVG {
             };
       }
 
+      //////////////
       showElementMeasures() {
             let elements = this.svg.querySelector("#itemMeasures");
             if(elements) {
@@ -526,11 +504,13 @@ class DragZoomSVG {
             }
       }
 
+      ///////
       hideElementMeasures() {
             let elements = this.svg.querySelector("#itemMeasures");
             $(elements).hide();
       }
 
+      ///////
       addElementMeasures(element) {
             let timer = setInterval(function() {next();}, 100);
 
@@ -608,6 +588,7 @@ class DragZoomSVG {
             };
       }
 
+      /////////
       showShapeAreas() {
             let elements = this.svg.querySelector("#shapeAreas");
             if(elements) {
@@ -621,11 +602,13 @@ class DragZoomSVG {
 
       }
 
+      /////////////
       hideShapeAreas() {
             let elements = this.svg.querySelector("#shapeAreas");
             $(elements).hide();
       }
 
+      //////////
       addShapeAreas() {
 
             let mainGroup = this.svg.querySelector("#mainGcreatedByT");
@@ -688,6 +671,7 @@ class DragZoomSVG {
             }
       }
 
+      //////////
       showPartAreas() {
             let elements = this.svg.querySelector("#partAreas");
             if(elements) {
@@ -701,11 +685,13 @@ class DragZoomSVG {
             }
       }
 
+      //////////
       hidePartAreas() {
             let elements = this.svg.querySelector("#partAreas");
             $(elements).hide();
       }
 
+      /////////////
       addPartAreas(element) {
             let timer = setInterval(function() {next();}, 100);
 
@@ -749,55 +735,56 @@ class DragZoomSVG {
       }
 
       updateMouseXY(e) {
-
             this.#mouseXY = {
-                  //x: clamp(e.clientX - this.#svg.getBoundingClientRect().x, 0, this.svgWidth),
-                  //y: clamp(e.clientY - this.#svg.getBoundingClientRect().y, 0, this.svgHeight),
-                  x: e.clientX - this.#svg.getBoundingClientRect().x,
-                  y: e.clientY - this.#svg.getBoundingClientRect().y
+                  x: e.clientX - this.#f_svg.getBoundingClientRect().x,
+                  y: e.clientY - this.#f_svg.getBoundingClientRect().y
             };
-
-            console.log(this.#mouseXY);
       }
 
       updateFromFields() {
 
       }
 
-      draw() {
-            if(this.#drawFunction != null) {
-                  this.#drawFunction();
-            } else {
-                  console.log("no draw function provided");
-            }
-      }
-
+      /////////////
       setCurrentTool(tool) {
             this.#activeTool = tool;
             this.updateTools("Tool Selected");
       }
 
+      /////////////////////
+      getCurrentTool() {
+            return this.#activeTool;
+      }
+
+      //////////////////
       updateTools(state) {
-            console.log("current tool " + this.#activeTool, state);
             switch(this.#activeTool) {
                   case "Selection Tool":
                         this.#allowPanning = false;
 
                         if(state == "Mouse Down") {
-                              this.selectionRect = new TSVGRect(this.svg, null, this.#mouseXY.x, this.#mouseXY.y, 0, 0);
-                              this.selectionRect_mouseDownPos = this.#mouseXY;
+                              this.selectionRect_mouseDownPos = {
+                                    x: ((this.#mouseXY.x - this.#panZoomInstance.getTransform().x) / this.scale),
+                                    y: ((this.#mouseXY.y - this.#panZoomInstance.getTransform().y) / this.scale)
+                              };
+                              this.selectionRect = new TSVGRect(this.svg.querySelector("#mainGcreatedByT"), "stroke-width:" + (1 / this.scale), this.selectionRect_mouseDownPos.x, this.selectionRect_mouseDownPos.y, 0, 0);
+
                         } else if(state == "Mouse Move") {
+                              let mousePos = {
+                                    x: ((this.#mouseXY.x - this.#panZoomInstance.getTransform().x) / this.scale),
+                                    y: ((this.#mouseXY.y - this.#panZoomInstance.getTransform().y) / this.scale)
+                              };
                               if(this.#holding) {
-                                    let distX = this.#mouseXY.x - this.selectionRect_mouseDownPos.x;
-                                    let distY = this.#mouseXY.y - this.selectionRect_mouseDownPos.y;
+                                    let distX = mousePos.x - this.selectionRect_mouseDownPos.x;
+                                    let distY = mousePos.y - this.selectionRect_mouseDownPos.y;
 
                                     if(distX >= 0) {
                                           this.selectionRect.width = distX;
                                           this.selectionRect.x = this.selectionRect_mouseDownPos.x;
                                     }
                                     else {
-                                          this.selectionRect.width = Math.abs(this.selectionRect_mouseDownPos.x - this.#mouseXY.x);
-                                          this.selectionRect.x = this.#mouseXY.x;
+                                          this.selectionRect.width = Math.abs(this.selectionRect_mouseDownPos.x - mousePos.x);
+                                          this.selectionRect.x = mousePos.x;
                                     }
 
                                     if(distY >= 0) {
@@ -805,16 +792,32 @@ class DragZoomSVG {
                                           this.selectionRect.y = this.selectionRect_mouseDownPos.y;
                                     }
                                     else {
-                                          this.selectionRect.height = Math.abs(this.selectionRect_mouseDownPos.y - this.#mouseXY.y);
-                                          this.selectionRect.y = this.#mouseXY.y;
+                                          this.selectionRect.height = Math.abs(this.selectionRect_mouseDownPos.y - mousePos.y);
+                                          this.selectionRect.y = mousePos.y;
                                     }
-
-
-                                    //this.selectionRect.width = this.#mouseXY.x - this.selectionRect.x;
-                                    //this.selectionRect.height = this.#mouseXY.y - this.selectionRect.y;
                               }
                         } else if(state == "Mouse Up") {
-                              this.selectionRect.Delete();
+                              let _x = (this.selectionRect.x),
+                                    _y = (this.selectionRect.y),
+                                    _width = (this.selectionRect.width),
+                                    _height = (this.selectionRect.height);
+
+                              let selectionPolygon = [
+                                    {x: _x, y: _y},
+                                    {x: _x + _width, y: _y},
+                                    {x: _x + _width, y: _y + _height},
+                                    {x: _x, y: _y + _height}
+                              ];
+
+                              for(let i = 0; i < this.#outerPathElements.length + this.#innerPathElements.length; i++) {
+                                    let element = i < this.#outerPathElements.length ? this.#outerPathElements[i] : this.#innerPathElements[i - this.#outerPathElements.length];
+                                    let elementFirstPoint = element.getPointAtLength(0);
+                                    let isWithinSelection = pointInPolygon(elementFirstPoint, selectionPolygon);
+                                    if(isWithinSelection) {
+                                          element.classList.add("SVGSelected");
+                                    }
+                              }
+                              if(this.selectionRect) this.selectionRect.Delete();
                         }
                         break;
                   default:
@@ -822,5 +825,4 @@ class DragZoomSVG {
                         break;
             }
       }
-
 }

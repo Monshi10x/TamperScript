@@ -1,10 +1,10 @@
-class PathLength extends SubscriptionManager {
-      static DISPLAY_NAME = "PATH LENGTH";
+class SVGCutfile extends SubscriptionManager {
+      static DISPLAY_NAME = "SVG CUTFILE";
 
       #container;
       get container() {return this.#container;}
 
-      #Type = "PATH LENGTH";
+      #Type = "SVG CUTFILE";
       get Type() {return this.#Type;}
       set Type(type) {this.#Type = type;};
 
@@ -28,12 +28,14 @@ class PathLength extends SubscriptionManager {
       #svgFile;
       #minimizeBtn;
       #deleteBtn;
-      #getPathLengthFromSVG;
+      #f_fileChooser;
       #setting_IncludeDepth;
       #setting_IncludeSizeInDescription;
       #includeSizeInDescription = false;
       #showIDInContainer = true;
       #rowName;
+      #pathArea;
+      #f_pathArea;
       #lhsMenuWindow;
       #backgroundColor = COLOUR.BrightGreen;
       get backgroundColor() {return this.#backgroundColor;}
@@ -95,14 +97,22 @@ class PathLength extends SubscriptionManager {
 
             this.#pathLength = createInput_Infield("Path Length", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
 
-            this.#getPathLengthFromSVG = createFileChooserButton("", "margin:0px;min-height:32px;", (fileContent) => {
+            this.#f_pathArea = createInput_Infield("Shape Areas", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "m2"});
+
+
+            this.#f_fileChooser = createFileChooserButton("", "margin:0px;min-height:32px;", async (fileContent) => {
                   this.#svgFile = fileContent;
                   console.log("svg file set to");
                   console.log(this.#svgFile);
                   if(this.#svgFile) $(this.#visualiserBtn).show();
                   else $(this.#visualiserBtn).hide();
 
-                  $(this.#pathLength[1]).val(roundNumber(svg_getTotalPathLengths(svg_makeElementFromString(this.#svgFile)), 2)).change();
+                  $(this.#pathLength[1]).val(roundNumber(svg_getTotalPathLengths(svg_makeFromString(this.#svgFile)), 2)).change();
+
+                  let loader = new Loader(this.#f_pathArea[0]);
+                  this.#pathArea = await svg_getTotalPathArea_m2(this.#svgFile);
+                  $(this.#f_pathArea[1]).val(roundNumber(this.#pathArea, 4)).change();
+                  loader.Delete();
             }, this.#container);
 
             this.#visualiserBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "", "width:calc(60px);display:none;height:40px;margin:0px;background-color:" + COLOUR.Orange + ";", () => {
@@ -130,23 +140,25 @@ class PathLength extends SubscriptionManager {
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();
       }
-
+      /**
+       * @summary this.#dataForSubscribers = { pathLength, totalAreas }
+       */
       UpdateDataForSubscribers() {
             this.#dataForSubscribers = [];
-            this.#matrixSizes = [];
 
-            this.#dataForSubscribers.push(this.getQWH());
-            this.#matrixSizes.push([[[this.getQWH().width]]]);
+            this.#dataForSubscribers.push({
+                  pathLength: zeroIfNaNNullBlank(this.pathLength),
+                  totalAreas: zeroIfNaNNullBlank(this.#pathArea)
+            });
 
             this.dataToPushToSubscribers = {
                   parent: this,
-                  data: this.#dataForSubscribers,
-                  matrixSizes: this.#matrixSizes
+                  data: this.#dataForSubscribers
             };
       }
 
       getQWH() {
-            return new QWHD(this.qty, this.pathLength, 0, 0);
+            return new QWHD(this.qty, 0, 0, 0);
       }
 
       #openSettingsModal() {
@@ -155,15 +167,6 @@ class PathLength extends SubscriptionManager {
             modal.addBodyElement(this.#setting_IncludeSizeInDescription[0]);
             modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {modal.hide();}));
       }
-
-      onproductNumberChange() {
-            this.UpdateFromChange();
-      }
-
-      onKeepQty1Change() {
-            this.UpdateFromChange();
-      }
-
       /**
        * @DeleteThis
        */
@@ -181,8 +184,6 @@ class PathLength extends SubscriptionManager {
       }
 
       Description() {
-            let qwh = this.getQWH();
-            if(this.#includeSizeInDescription) return "x" + qwh.qty + " @ " + qwh.width + "mm";
             return "";
       }
 }

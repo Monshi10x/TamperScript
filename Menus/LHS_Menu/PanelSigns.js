@@ -3,10 +3,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 	/** @ViewMode */
 	#viewMode;
 	#numProducts = 0;
+	#creationOrder = [ProductDetails, Size, SVGCutfile, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+
 
 	/** @QuickTemplate */
 	#addQuickTemplateBtn;
-
 	#createProductBtn;
 	/**
 	 * @Size
@@ -151,7 +152,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				size.width = 2440;
 				size.height = 1220;
 
-				let temp = this.#add(PathLength, this.page1, []);
+				let temp = this.#add(SVGCutfile, this.page1, []);
 
 				sheet = this.#add(Sheet, this.page1, [Size]);
 				sheet.material = "ACM";
@@ -373,7 +374,6 @@ class MenuPanelSigns extends LHSMenuWindow {
 	}
 
 	#addBlank(classType, container) {
-		console.log(container);
 		let newItem = new classType(container, this);
 
 		this.#allMaterials.push(newItem);
@@ -393,17 +393,6 @@ class MenuPanelSigns extends LHSMenuWindow {
 			}
 		}
 		return numberOfInstances;
-	}
-
-	#renameAllMaterialInstancesOfClass(className) {
-		console.log(className);
-		let counter = 0;
-		for(let i = 0; i < this.#allMaterials.length; i++) {
-			if(this.#allMaterials[i].constructor.name == className) {
-				counter++;
-				this.#allMaterials[i].productNumber = counter;
-			}
-		}
 	}
 
 	DeleteMaterial(materialObject) {
@@ -467,15 +456,14 @@ class MenuPanelSigns extends LHSMenuWindow {
 		}
 		if(this.#viewMode[1].value == "Per Type") {
 
-			let creationOrder = [ProductDetails, Size, PathLength, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
-			this.#containers = [/*ProductDetails, Size, PathLength, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			this.#containers = [/*ProductDetails, Size, SVGCutfile, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
-			for(let i = 0; i < creationOrder.length; i++) {
-				let UIContainer = new UIContainerType3("", creationOrder[i].DISPLAY_NAME, this.page1);
+			for(let i = 0; i < this.#creationOrder.length; i++) {
+				let UIContainer = new UIContainerType3("", this.#creationOrder[i].DISPLAY_NAME, this.page1);
 
 				this.#containers.push(UIContainer);
 				let addBtn = createButton("Add +", "width:100px;min-height:30px;margin:0px;border:0px;", () => {
-					this.#addBlank(creationOrder[i], this.#containers[i].contentContainer);
+					this.#addBlank(this.#creationOrder[i], this.#containers[i].contentContainer);
 				}, null);
 				UIContainer.addHeadingButtons(addBtn);
 			}
@@ -483,7 +471,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				let sameItemCount = 0;
 				for(let y = 0; y < this.#allMaterials.length; y++) {
 					let item = this.#allMaterials[y];
-					if(item instanceof creationOrder[x]) {
+					if(item instanceof this.#creationOrder[x]) {
 						if(sameItemCount == 0) {
 
 						}
@@ -527,24 +515,23 @@ class MenuPanelSigns extends LHSMenuWindow {
 			}
 		} else if(this.#viewMode[1].value == "Per Type2") {
 
-			let creationOrder = [ProductDetails, Size, PathLength, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
-			this.#containers = [/*ProductDetails, Size,PathLength, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			this.#containers = [/*ProductDetails, Size,SVGCutfile, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
-			for(let i = 0; i < creationOrder.length; i++) {
+			for(let i = 0; i < this.#creationOrder.length; i++) {
 				let UIContainer = new Object();
-				let d = createDivStyle5("", creationOrder[i].DISPLAY_NAME, this.page1);
+				let d = createDivStyle5("", this.#creationOrder[i].DISPLAY_NAME, this.page1);
 				UIContainer.container = d[0];
 				UIContainer.contentContainer = d[1];
 				this.#containers.push(UIContainer);
 				let addBtn = createButton("+", "width:50px;min-height:100%;margin:0px;border:0px;", () => {
-					this.#addBlank(creationOrder[i], this.#containers[i].contentContainer);
+					this.#addBlank(this.#creationOrder[i], this.#containers[i].contentContainer);
 				}, UIContainer.contentContainer);
 			}
 			for(let x = 0; x < this.#containers.length; x++) {
 				let sameItemCount = 0;
 				for(let y = 0; y < this.#allMaterials.length; y++) {
 					let item = this.#allMaterials[y];
-					if(item instanceof creationOrder[x]) {
+					if(item instanceof this.#creationOrder[x]) {
 						if(sameItemCount == 0) {
 
 						}

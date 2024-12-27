@@ -413,6 +413,13 @@ function IFELSE(expression, valueIf, valueElse) {
         return valueElse;
     }
 }
+function IFELSEF(expression, functionIf, functionElse) {
+    if(expression) {
+        functionIf();
+    } else {
+        functionElse();
+    }
+}
 
 function isVisible(element) {
     if(element.style.display != "none") return true;

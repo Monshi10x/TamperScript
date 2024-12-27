@@ -464,14 +464,14 @@ function svg_getTotalPathLengths(svgElement) {
       return totalPathLength;
 }
 
-function svg_makeElementFromString(svgString) {
+function svg_makeFromString(svgString) {
       let empty = document.createElement("div");
       empty.innerHTML += svgString;
 
       let svgElement = empty.querySelector("svg");
 
       let g = document.createElementNS('http://www.w3.org/2000/svg', "g");
-      g.id = "main G created by T";
+      g.id = "mainGcreatedByT";
       let numChildren = svgElement.children.length;
 
       for(let i = 0; i < numChildren; i++) {
@@ -523,6 +523,117 @@ function createPolygonFromPoints(points) {
       return newPolygon;
 }
 
+var TOL = Math.pow(10, -9); // Floating point error is likely to be above 1 epsilon
+
+function _almostEqual(a, b, tolerance) {
+      if(!tolerance) {
+            tolerance = TOL;
+      }
+      return Math.abs(a - b) < tolerance;
+}
+
+// returns true if p lies on the line segment defined by AB, but not at any endpoints
+// may need work!
+function _onSegment(A, B, p, tolerance) {
+      if(!tolerance) {
+            tolerance = TOL;
+      }
+
+      // vertical line
+      if(_almostEqual(A.x, B.x, tolerance) && _almostEqual(p.x, A.x, tolerance)) {
+            if(!_almostEqual(p.y, B.y, tolerance) && !_almostEqual(p.y, A.y, tolerance) && p.y < Math.max(B.y, A.y, tolerance) && p.y > Math.min(B.y, A.y, tolerance)) {
+                  return true;
+            }
+            else {
+                  return false;
+            }
+      }
+
+      // horizontal line
+      if(_almostEqual(A.y, B.y, tolerance) && _almostEqual(p.y, A.y, tolerance)) {
+            if(!_almostEqual(p.x, B.x, tolerance) && !_almostEqual(p.x, A.x, tolerance) && p.x < Math.max(B.x, A.x) && p.x > Math.min(B.x, A.x)) {
+                  return true;
+            }
+            else {
+                  return false;
+            }
+      }
+
+      //range check
+      if((p.x < A.x && p.x < B.x) || (p.x > A.x && p.x > B.x) || (p.y < A.y && p.y < B.y) || (p.y > A.y && p.y > B.y)) {
+            return false;
+      }
+
+
+      // exclude end points
+      if((_almostEqual(p.x, A.x, tolerance) && _almostEqual(p.y, A.y, tolerance)) || (_almostEqual(p.x, B.x, tolerance) && _almostEqual(p.y, B.y, tolerance))) {
+            return false;
+      }
+
+      var cross = (p.y - A.y) * (B.x - A.x) - (p.x - A.x) * (B.y - A.y);
+
+      if(Math.abs(cross) > tolerance) {
+            return false;
+      }
+
+      var dot = (p.x - A.x) * (B.x - A.x) + (p.y - A.y) * (B.y - A.y);
+
+
+
+      if(dot < 0 || _almostEqual(dot, 0, tolerance)) {
+            return false;
+      }
+
+      var len2 = (B.x - A.x) * (B.x - A.x) + (B.y - A.y) * (B.y - A.y);
+
+
+
+      if(dot > len2 || _almostEqual(dot, len2, tolerance)) {
+            return false;
+      }
+
+      return true;
+}
+
+// return true if point is in the polygon, false if outside, and null if exactly on a point or edge
+function pointInPolygon(point, polygon, tolerance) {
+      if(!polygon || polygon.length < 3) {
+            return null;
+      }
+
+      if(!tolerance) {
+            tolerance = TOL;
+      }
+
+      var inside = false;
+      var offsetx = polygon.offsetx || 0;
+      var offsety = polygon.offsety || 0;
+
+      for(var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            var xi = polygon[i].x + offsetx;
+            var yi = polygon[i].y + offsety;
+            var xj = polygon[j].x + offsetx;
+            var yj = polygon[j].y + offsety;
+
+            if(_almostEqual(xi, point.x, tolerance) && _almostEqual(yi, point.y, tolerance)) {
+                  return null; // no result
+            }
+
+            if(_onSegment({x: xi, y: yi}, {x: xj, y: yj}, point, tolerance)) {
+                  return null; // exactly on the segment
+            }
+
+            if(_almostEqual(xi, xj, tolerance) && _almostEqual(yi, yj, tolerance)) { // ignore very small lines
+                  continue;
+            }
+
+            var intersect = ((yi > point.y) != (yj > point.y)) && (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi);
+            if(intersect) inside = !inside;
+      }
+
+      return inside;
+}
+
 // returns the rectangular bounding box of the given polygon
 function getPolygonBounds(polygon) {
       if(!polygon || polygon.length < 3) {
@@ -558,39 +669,132 @@ function getPolygonBounds(polygon) {
       };
 }
 
-// return true if point is in the polygon, false if outside, and null if exactly on a point or edge
-function pointInPolygon(point, polygon) {
-      if(!polygon || polygon.length < 3) {
-            return null;
+async function svg_getTotalPathArea_m2(svgString) {
+      let svg = svg_makeFromString(svgString);
+      svg_convertShapesToPaths(svg);
+      svg_formatCompoundPaths(svg);
+
+      let mainGroup = svg.querySelector("#mainGcreatedByT");
+      let svgElements = mainGroup.getElementsByTagName("path");
+
+      let totalArea = 0;
+
+      let webWorker;
+      let webWorkerFinished = false;
+
+      if(typeof (Worker) !== "undefined") {
+            console.log("window enabled worker");
+            webWorker = new Worker(GM_getResourceURL("SVGWebWorker"));
+
+            let elementDs = [];
+            let isElementInnerPath = [];
+            for(let i = 0; i < svgElements.length; i++) {
+                  elementDs.push(svgElements[i].getAttribute("d"));
+                  isElementInnerPath.push(svgElements[i].classList.contains("innerPath"));
+            }
+
+            webWorker.postMessage({
+                  elementDs: elementDs,
+                  isElementInnerPath: isElementInnerPath
+            });
+            webWorker.onmessage = async function(event) {
+                  console.log("DragZoomSVG.js recieves message from Webworker", event);
+                  if(event.data.totalArea) totalArea = event.data.totalArea;
+                  if(event.data.shapeAreas) {
+                        for(let i = 0; i < svgElements.length; i++) {
+                              svgElements[i].setAttribute("data-area", event.data.shapeAreas[i]);
+                        }
+                        console.log(event.data.shapeAreas);
+                  }
+                  webWorker.terminate();
+                  webWorkerFinished = true;
+            };
+
+            await new Promise(resolve => {
+                  var resolvedStatus = 'reject';
+                  var timer = setInterval(() => {
+                        if(webWorkerFinished == true) {
+                              resolvedStatus = 'fulfilled';
+                              resolve();
+                              clearInterval(timer);
+                              timer = undefined;
+                        } else {
+                              resolvedStatus = 'reject';
+                        }
+                  }, 10);
+            });
+            return totalArea;
+      } else {
+            console.error("window disabled worker :(");
+      }
+}
+
+function svg_convertShapesToPaths(svgObject) {
+      let svgElements = svgObject.getElementsByTagName("*");
+
+      for(let i = 0; i < svgElements.length; i++) {
+            if(svgElements[i].nodeName != "g" && svgElements[i].nodeName != "path") {
+                  let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
+            }
       }
 
-      var inside = false;
-      var offsetx = polygon.offsetx || 0;
-      var offsety = polygon.offsety || 0;
+      return svgObject;
+}
 
-      for(var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-            var xi = polygon[i].x + offsetx;
-            var yi = polygon[i].y + offsety;
-            var xj = polygon[j].x + offsetx;
-            var yj = polygon[j].y + offsety;
+function svg_formatCompoundPaths(svgObject) {
+      console.log(svgObject);
+      let mainGroup = svgObject.querySelector("#mainGcreatedByT");
+      console.log(mainGroup);
+      let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      console.log(newGroup);
+      newGroup.id = "pathGroup";
+      mainGroup.appendChild(newGroup);
 
-            if(_almostEqual(xi, point.x) && _almostEqual(yi, point.y)) {
-                  return null; // no result
+      let svgElements = mainGroup.getElementsByTagName("path");
+      let svgElementsLength = svgElements.length;
+
+      //format outer/inner paths
+      for(let i = 0; i < svgElementsLength; i++) {
+
+            let pathString = svgElements[i].getAttribute("d");
+            let pathStringSplitOverZ = pathString.split("Z");
+
+            let outerPathParent_id;
+            for(let j = 0; j < pathStringSplitOverZ.length; j++) {
+                  if(pathStringSplitOverZ[j] == "") continue;
+                  //Outer Compound
+
+                  if(j == 0) {
+                        let compoundPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        compoundPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
+                        compoundPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
+                        compoundPathElement.className.baseVal = "outerPath";
+                        outerPathParent_id = generateUniqueID("outerPath-");
+                        compoundPathElement.id = outerPathParent_id;
+                        newGroup.appendChild(compoundPathElement);
+                  }
+                  //if has Inner compound paths
+                  else {
+                        let compoundPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        compoundPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
+                        compoundPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
+                        compoundPathElement.className.baseVal = "innerPath";
+                        compoundPathElement.setAttribute("data-outerPathParent", outerPathParent_id);
+                        newGroup.appendChild(compoundPathElement);
+                  }
             }
-
-            if(_onSegment({x: xi, y: yi}, {x: xj, y: yj}, point)) {
-                  return null; // exactly on the segment
-            }
-
-            if(_almostEqual(xi, xj) && _almostEqual(yi, yj)) { // ignore very small lines
-                  continue;
-            }
-
-            var intersect = ((yi > point.y) != (yj > point.y)) && (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi);
-            if(intersect) inside = !inside;
       }
 
-      return inside;
+      //remove previous unformatted elements
+      let elemsToDelete = [];
+      for(let i = 0; i < svgElementsLength; i++) {
+            elemsToDelete.push(svgElements[i]);
+      }
+      for(let i = 0; i < elemsToDelete.length; i++) {
+            deleteElement(elemsToDelete[i]);
+      }
+
+      return svgObject;
 }
 
 class TSVGRect {
@@ -613,12 +817,14 @@ class TSVGRect {
             this.#width = value;
             this.#element.setAttribute('width', value);
       }
+      get width() {return this.#width;}
 
       #height;
       set height(value) {
             this.#height = value;
             this.#element.setAttribute('height', value);
       }
+      get height() {return this.#height;}
 
       #rx;
       #ry;
