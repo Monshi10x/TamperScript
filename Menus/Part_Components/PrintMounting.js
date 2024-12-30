@@ -1,5 +1,4 @@
 class PrintMounting extends Material {
-      static DISPLAY_NAME = "PRINT MOUNTING";
       /*override*/get Type() {return "PRINT MOUNTING";}
 
       static maxMountingWidth = 8000;
@@ -17,7 +16,7 @@ class PrintMounting extends Material {
        * [{parent: 'SHEET-1699952073332-95570559', data: []},
        * {parent: 'SHEET-1699952073332-95574529', data: []}]
        */
-      #inheritedData = [];
+      //#inheritedData2 = [];
       #inheritedSizes = [];
       #inheritedSizeTable;
 
@@ -165,18 +164,18 @@ class PrintMounting extends Material {
             this.#inheritedSizeTable.deleteAllRows();
 
             //Per Parent Subscription:
-            for(let a = 0; a < this.#inheritedData.length; a++) {
-                  let recievedInputSizes = this.#inheritedData[a].data;
+            for(let a = 0; a < this.INHERITED_DATA.length; a++) {
+                  let recievedInputSizes = this.INHERITED_DATA[a].data;
                   for(let i = 0; i < recievedInputSizes.length; i++) {
-                        this.#inheritedSizes.push(recievedInputSizes[i]);
-                        this.canRollover(recievedInputSizes[i].width, recievedInputSizes[i].height) ? this.#RolloverSheetsQty += recievedInputSizes[i].qty : this.#HandSheetsQty += recievedInputSizes[i].qty;
-                        this.#numberOfPanels += recievedInputSizes[i].qty;
-                        this.#totalLinearMetres += mmToM((recievedInputSizes[i].height * recievedInputSizes[i].qty + recievedInputSizes[i].width * recievedInputSizes[i].qty) * 2);
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty,
-                              recievedInputSizes[i].width,
-                              recievedInputSizes[i].height,
-                              Math.max(recievedInputSizes[i].width, recievedInputSizes[i].height),
-                              "" + this.canRollover(recievedInputSizes[i].width, recievedInputSizes[i].height));
+                        this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
+                        this.canRollover(recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height) ? this.#RolloverSheetsQty += recievedInputSizes[i].QWHD.qty : this.#HandSheetsQty += recievedInputSizes[i].QWHD.qty;
+                        this.#numberOfPanels += recievedInputSizes[i].QWHD.qty;
+                        this.#totalLinearMetres += mmToM((recievedInputSizes[i].QWHD.height * recievedInputSizes[i].QWHD.qty + recievedInputSizes[i].QWHD.width * recievedInputSizes[i].QWHD.qty) * 2);
+                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty,
+                              recievedInputSizes[i].QWHD.width,
+                              recievedInputSizes[i].QWHD.height,
+                              Math.max(recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height),
+                              "" + this.canRollover(recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height));
                   }
             }
       };
@@ -237,28 +236,28 @@ class PrintMounting extends Material {
 
       /*
       Override */
-      ReceiveSubscriptionData(data) {
+      /*ReceiveSubscriptionData(data) {
             let dataIsNew = true;
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(data.parent == this.#inheritedData[i].parent) {
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(data.parent == this.INHERITED_DATA[i].parent) {
                         dataIsNew = false;
-                        this.#inheritedData[i] = data;
+                        this.INHERITED_DATA[i] = data;
                         break;
                   }
             }
             if(dataIsNew) {
-                  this.#inheritedData.push(data);
+                  this.INHERITED_DATA.push(data);
             }
 
             super.ReceiveSubscriptionData(data);
-      }
+      }*/
 
       /*
       Override */
       UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(this.#inheritedData[i].parent == parent) {
-                        this.#inheritedData.splice(i, 1);
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(this.INHERITED_DATA[i].parent == parent) {
+                        this.INHERITED_DATA.splice(i, 1);
                         break;
                   }
             }

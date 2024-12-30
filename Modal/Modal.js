@@ -18,6 +18,11 @@ class Modal {
 
       shouldHideOnEnterKeyPress = true;
 
+      #borrowedFields = [];
+      #borrowFieldsContainer;
+      get borrowFieldsContainer() {return this.#borrowFieldsContainer;}
+      set borrowFieldsContainer(containerElement) {this.#borrowFieldsContainer = containerElement;}
+
       setContainerSize(width = 300, height = 300) {
             this.#modalContainer.style.width = width + 'px';
             this.#modalContainer.style.height = height + 'px';
@@ -101,9 +106,7 @@ class Modal {
       };
 
       onMouseDown(event) {
-            if(event.target.className == "modalOpaqueBackground") {
-                  this.onMouseOut();
-            }
+            if(event.target.className == "modalOpaqueBackground") this.onMouseOut();
       }
 
       onMouseOut() {
@@ -115,8 +118,38 @@ class Modal {
       onWindowResize(event) { }
 
       onKeyUp(event) {
-            if(event.key === "Enter") {
-                  if(this.shouldHideOnEnterKeyPress) this.hide();
+            if(event.key === "Enter" && this.shouldHideOnEnterKeyPress) this.hide();
+      }
+
+      borrowFields(...fieldContainers) {
+            if(!this.borrowFieldsContainer) return Error("must set a borrowFieldsContainer");
+
+            for(let i = 0; i < fieldContainers.length; i++) {
+                  let elementToBorrow = fieldContainers[i];
+                  let placeholderBefore = document.createElement("div");
+                  let placeholderAfter = document.createElement("div");
+
+                  insertBefore(placeholderBefore, elementToBorrow);
+                  insertAfter(placeholderAfter, elementToBorrow);
+
+                  this.#borrowedFields.push({
+                        elementToBorrow: elementToBorrow,
+                        placeholderBefore: placeholderBefore,
+                        placeholderAfter: placeholderAfter,
+                        currentCssStyle: elementToBorrow.style.cssText
+                  });
+            }
+            for(let i = 0; i < fieldContainers.length; i++) {
+                  let elementToBorrow = fieldContainers[i];
+                  this.borrowFieldsContainer.appendChild(elementToBorrow);
+            }
+      }
+
+      returnAllBorrowedFields() {
+            for(let i = this.#borrowedFields.length - 1; i >= 0; i--) {
+                  insertAfter(this.#borrowedFields[i].elementToBorrow, this.#borrowedFields[i].placeholderBefore);
+                  deleteElement(this.#borrowedFields[i].placeholderBefore);
+                  deleteElement(this.#borrowedFields[i].placeholderAfter);
             }
       }
 }

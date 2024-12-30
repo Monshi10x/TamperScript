@@ -1,6 +1,11 @@
 var yes = true;
 var no = false;
 
+const assert = function(condition, message) {
+    if(!condition)
+        throw Error('Assert failed: ' + (message || ''));
+};
+
 function getMHD(minutes) {
     var days = Math.floor((minutes / 60) / dayHours);
     var days_remainderMinutes = minutes - (dayHours * days * 60);
@@ -353,6 +358,24 @@ function combinedSqm(array, inMM = true) {
     return sqm;
 }
 
+
+/**
+ * 
+ * @param {[]} array with objects that contain keys: qty, width, height
+ * @example
+ * [{qty: 1, totalLength: 1},
+ * {qty: 1, totalLength: 1}
+ * ...]
+ */
+function combinedLnm(array, inMM = true) {
+    let lnm = 0;
+    for(let i = 0; i < array.length; i++) {
+        lnm += zeroIfNaNNullBlank(array[i].qty) *
+            zeroIfNaNNullBlank(array[i].totalLength) *
+            (inMM ? 1 / 1000000 : 1);
+    }
+    return lnm;
+}
 /**
  * 
  * @returns percentage of browser window zoom as integer (100 is standard no zoom)

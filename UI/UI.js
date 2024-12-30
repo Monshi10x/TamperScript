@@ -1126,7 +1126,9 @@ function createCheckbox(text, defaultValue, overrideCssStyles, optionalCallback,
     }
     return checkbox;
 }
-function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo) {
+function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo, options = {
+    triggerCallbackWhenFirstCreated: false
+}) {
     var input = document.createElement('input');
     input.type = "checkbox";
     input.name = "checkbox";
@@ -1159,8 +1161,13 @@ function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalC
             optionalCallback();
         };
     }
+
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(containerDiv);
+    }
+
+    if(options.triggerCallbackWhenFirstCreated) {
+        optionalCallback();
     }
     return [containerDiv, input];
 }

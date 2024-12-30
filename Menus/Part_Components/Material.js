@@ -1,9 +1,7 @@
 class Material extends SubscriptionManager {
-
-      static DISPLAY_NAME = "";
       /*
-                        
-      Variables         */
+                         
+       Variables         */
       #isMinimized = true;
       #showIDInContainer = false;
       #productNumber = -1;
@@ -47,6 +45,7 @@ class Material extends SubscriptionManager {
       get inheritedRowSizeLabel() {return this.#f_subscribedToLabel;}
       get backgroundColor() {return this.#backgroundColor;}
       get textColor() {return this.#textColor;}
+
       /*
                         
       SETTER            */

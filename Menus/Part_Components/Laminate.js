@@ -1,5 +1,4 @@
 class Laminate extends Material {
-      static DISPLAY_NAME = "LAMINATE";
       /*override*/get Type() {return "LAMINATE";}
 
       #materialHeader;
@@ -20,7 +19,7 @@ class Laminate extends Material {
        * [{parent: Object, data: [], finalRollSize:[]},
        * {parent: Object, data: [], finalRollSize:[]}]
        */
-      #inheritedData = [];
+      //#inheritedData2 = [];
       #inheritedSizes = [];
       #inheritedSizeTable;
 
@@ -33,13 +32,13 @@ class Laminate extends Material {
        *           {qty: 1, width: '240', height: '1220'},
       *           {qty: 1, width: '240', height: '580'}]
       */
-      #dataForSubscribers = [];
+      //#dataForSubscribers = [];
 
       /**
        * @Output
        */
       #outputSizeTable;
-      #outputSizes = [];
+      #dataForSubscribers = [];
 
       /** @Machine */
       #machineSetupTime;
@@ -153,18 +152,19 @@ class Laminate extends Material {
             this.#inheritedSizeTable.deleteAllRows();
 
             //Per Parent Subscription:
-            for(let a = 0; a < this.#inheritedData.length; a++) {
-                  if(this.#inheritedData[a].finalRollSize && this.#useRollLength) {
-                        let recievedInputSizes = this.#inheritedData[a].finalRollSize;
+            for(let a = 0; a < this.INHERITED_DATA.length; a++) {
+                  if(this.INHERITED_DATA[a].data.finalRollSize && this.#useRollLength) {
+                        let recievedInputSizes = this.INHERITED_DATA[a].data.finalRollSize;
                         let i = 0;
                         this.#inheritedSizes.push(recievedInputSizes[i]);
                         this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, roundNumber(recievedInputSizes[i].width, 2), roundNumber(recievedInputSizes[i].height, 2));
                   } else {
-                        let recievedInputSizes = this.#inheritedData[a].data;
+                        let recievedInputSizes = this.INHERITED_DATA[a].data;
 
                         for(let i = 0; i < recievedInputSizes.length; i++) {
-                              this.#inheritedSizes.push(recievedInputSizes[i]);
-                              this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, roundNumber(recievedInputSizes[i].width, 2), roundNumber(recievedInputSizes[i].height, 2));
+                              console.log(recievedInputSizes[i]);
+                              this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
+                              this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, roundNumber(recievedInputSizes[i].QWHD.width, 2), roundNumber(recievedInputSizes[i].QWHD.height, 2));
                         }
                   }
             }
@@ -187,44 +187,42 @@ class Laminate extends Material {
       }
 
       UpdateOutputSizeTable() {
-            this.#outputSizes = [];
+            this.#dataForSubscribers = [];
             this.#outputSizeTable.deleteAllRows();
 
             for(let i = 0; i < this.#inheritedSizes.length; i++) {
                   let qtyVal = this.#inheritedSizes[i].qty;
                   let widthVal = this.#inheritedSizes[i].width;
                   let heightVal = this.#inheritedSizes[i].height;
-                  this.#outputSizes.push({qty: qtyVal, width: widthVal, height: heightVal});
+                  this.#dataForSubscribers.push({QWHD: new QWHD(qtyVal, widthVal, heightVal)});
                   this.#outputSizeTable.addRow(qtyVal, roundNumber(widthVal, 2), roundNumber(heightVal, 2));
             }
-            $(this.#materialTotalArea[1]).val(combinedSqm(this.#outputSizes)).change();
-
-            this.#dataForSubscribers = this.#outputSizes;
+            $(this.#materialTotalArea[1]).val(combinedSqm(this.#dataForSubscribers)).change();
       };
 
-      ReceiveSubscriptionData(data) {
+      /*ReceiveSubscriptionData(data) {
             let dataIsNew = true;
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(data.parent == this.#inheritedData[i].parent) {
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(data.parent == this.INHERITED_DATA[i].parent) {
                         dataIsNew = false;
-                        this.#inheritedData[i] = data;
+                        this.INHERITED_DATA[i] = data;
                         break;
                   }
             }
 
             if(dataIsNew) {
-                  this.#inheritedData.push(data);
+                  this.INHERITED_DATA.push(data);
             }
 
             super.ReceiveSubscriptionData(data);
-      }
+      }*/
 
       /*
       Override*/
       UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(this.#inheritedData[i].parent == parent) {
-                        this.#inheritedData.splice(i, 1);
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(this.INHERITED_DATA[i].parent == parent) {
+                        this.INHERITED_DATA.splice(i, 1);
                         break;
                   }
             }
@@ -236,10 +234,10 @@ class Laminate extends Material {
             var name = this.#material[1].value;
             var partFullName = getPredefinedParts_Name_FromLimitedName(name);
 
-            for(let i = 0; i < this.#outputSizes.length; i++) {
-                  let partQty = this.#outputSizes[i].qty;
-                  let partWidth = this.#outputSizes[i].width;
-                  let partHeight = this.#outputSizes[i].height;
+            for(let i = 0; i < this.#dataForSubscribers.length; i++) {
+                  let partQty = this.#dataForSubscribers[i].qty;
+                  let partWidth = this.#dataForSubscribers[i].width;
+                  let partHeight = this.#dataForSubscribers[i].height;
                   partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, "", false);
             }
             partIndex = await this.#production.Create(productNo, partIndex);

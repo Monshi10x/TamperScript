@@ -42,13 +42,15 @@ self.addEventListener("message", function(e) {
       let shapeAreas = [];
       let shapeAreaPolygons = [];
 
+      console.log(e.data);
+
       for(let i = 0; i < e.data.elementDs.length; i++) {
 
             let pathPointsArray = convertPathToPolygon(e.data.elementDs[i]);
             shapeAreaPolygons.push(pathPointsArray);
 
             let shapeArea = (svg_pixelToMM(svg_pixelToMM(calculateAreaOfPolygon(pathPointsArray))) / 1000000);
-            if(e.data.isElementInnerPath[i] == true) shapeArea *= -1;
+            if(e.data.innerPathElements[i] == true) shapeArea *= -1;
 
             shapeAreas.push(shapeArea);
 

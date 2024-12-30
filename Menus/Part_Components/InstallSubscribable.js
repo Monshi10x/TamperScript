@@ -1,13 +1,13 @@
-class ArtworkSubscribable extends Material {
-      static DISPLAY_NAME = "ARTWORK";
-      /*override*/get Type() {return "ARTWORK";}
+class InstallSubscribable extends Material {
+      /*override*/get Type() {return "INSTALL";}
+
       /**
        * @Inherited
        * @example
        * [{parent: 'SHEET-1699952073332-95570559', data: []},
        * {parent: 'SHEET-1699952073332-95574529', data: []}]
        */
-      #inheritedData = [];
+      //#inheritedData2 = [];
       #inheritedSizes = [];
       #inheritedSizeTable;
 
@@ -22,8 +22,8 @@ class ArtworkSubscribable extends Material {
       */
       #dataForSubscribers = [];
 
-      #artworkItem;
-      get artworkItem() {return this.#artworkItem;}
+      #installItem;
+      get installItem() {return this.#installItem;}
 
       constructor(parentObject, sizeClass, type) {
             super(parentObject, sizeClass, type);
@@ -37,12 +37,10 @@ class ArtworkSubscribable extends Material {
             this.#inheritedSizeTable.setHeading("Qty", "Width", "Height");
             this.#inheritedSizeTable.addRow("-", "-", "-");
 
-            let f_container_artwork = createDivStyle5(null, "Artwork", this.container)[1];
+            let f_container_install = createDivStyle5(null, "Install", this.container)[1];
 
-            this.#artworkItem = new Artwork(f_container_artwork, null, () => { }, null);
+            this.#installItem = new Install(f_container_install, null, () => { }, null);
 
-            /*
-            Update*/
             this.UpdateDataForSubscribers();
       }
 
@@ -69,37 +67,37 @@ class ArtworkSubscribable extends Material {
             this.#inheritedSizeTable.deleteAllRows();
 
             //Per Parent Subscription:
-            for(let a = 0; a < this.#inheritedData.length; a++) {
-                  let recievedInputSizes = this.#inheritedData[a].data;
+            for(let a = 0; a < this.INHERITED_DATA.length; a++) {
+                  let recievedInputSizes = this.INHERITED_DATA[a].data;
                   for(let i = 0; i < recievedInputSizes.length; i++) {
-                        this.#inheritedSizes.push(recievedInputSizes[i]);
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, recievedInputSizes[i].width, recievedInputSizes[i].height);
+                        this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
+                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height);
                   }
             }
       };
 
-      ReceiveSubscriptionData(data) {
+      /*ReceiveSubscriptionData(data) {
             let dataIsNew = true;
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(data.parent == this.#inheritedData[i].parent) {
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(data.parent == this.INHERITED_DATA[i].parent) {
                         dataIsNew = false;
-                        this.#inheritedData[i] = data;
+                        this.INHERITED_DATA[i] = data;
                         break;
                   }
             }
             if(dataIsNew) {
-                  this.#inheritedData.push(data);
+                  this.INHERITED_DATA.push(data);
             }
 
             super.ReceiveSubscriptionData(data);
-      }
+      }*/
 
       /*
       Override*/
       UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(this.#inheritedData[i].parent == parent) {
-                        this.#inheritedData.splice(i, 1);
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(this.INHERITED_DATA[i].parent == parent) {
+                        this.INHERITED_DATA.splice(i, 1);
                         break;
                   }
             }
@@ -108,13 +106,13 @@ class ArtworkSubscribable extends Material {
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
-            partIndex = await this.#artworkItem.Create(productNo, partIndex);
+            partIndex = await this.#installItem.Create(productNo, partIndex);
             return partIndex;
       }
 
       Description() {
             super.Description();
 
-            return this.#artworkItem.Description();
+            return this.#installItem.Description();
       }
 }

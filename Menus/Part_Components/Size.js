@@ -1,5 +1,4 @@
 class Size extends SubscriptionManager {
-      static DISPLAY_NAME = "SIZE";
 
       #commonSizes = {
             "DL": {
@@ -220,8 +219,8 @@ class Size extends SubscriptionManager {
             this.#productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
                         this.productNumber = modal.value;
-                        console.log(modal.value);
-                        this.onproductNumberChange();
+
+                        this.UpdateFromChange();
                   });
                   modal.value = this.productNumber;
             }, this.#container);
@@ -268,13 +267,12 @@ class Size extends SubscriptionManager {
             this.#dataForSubscribers = [];
             this.#matrixSizes = [];
 
-            this.#dataForSubscribers.push(this.getQWH());
+            this.#dataForSubscribers.push({QWHD: this.getQWH(), matrixSizes: this.#matrixSizes});
             this.#matrixSizes.push([[[this.getQWH().width, this.getQWH().height, this.getQWH().depth]]]);
 
             this.dataToPushToSubscribers = {
                   parent: this,
-                  data: this.#dataForSubscribers,
-                  matrixSizes: this.#matrixSizes
+                  data: this.#dataForSubscribers
             };
       }
 
@@ -302,14 +300,6 @@ class Size extends SubscriptionManager {
             modal.addBodyElement(this.#setting_IncludeSizeInDescription[0]);
             modal.addBodyElement(this.#setting_IncludeDepth[0]);
             modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {modal.hide();}));
-      }
-
-      onproductNumberChange() {
-            this.UpdateFromChange();
-      }
-
-      onKeepQty1Change() {
-            this.UpdateFromChange();
       }
 
       /**

@@ -610,3 +610,11 @@ class Size extends SubMenu {
         f_headingText.style.height = entries[0].target.getBoundingClientRect().height + "px";//must be after append, otherwise values are 0
         f_headingText.style.lineHeight = entries[0].target.getBoundingClientRect().height + "px";//must be after append, otherwise values are 0
     }).observe(f_div);*/
+
+
+
+
+    sendData = {
+	from:this,
+	data:[{},{}]
+    }

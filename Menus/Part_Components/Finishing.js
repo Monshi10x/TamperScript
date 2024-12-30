@@ -1,5 +1,4 @@
 class Finishing extends Material {
-      static DISPLAY_NAME = "FINISHING";
       /*override*/get Type() {return "FINISHING";}
 
       #production;
@@ -13,7 +12,7 @@ class Finishing extends Material {
        * [{parent: 'SHEET-1699952073332-95570559', data: []},
        *  {parent: 'SHEET-1699952073332-95574529', data: []}]
        */
-      #inheritedData = [];
+      //#inheritedData2 = [];
       #inheritedSizes = [];
       #inheritedSizeTable;
 
@@ -124,10 +123,13 @@ class Finishing extends Material {
                   this.#standOffHelper.height = this.getQWH().height;
 
                   let matrixSizeArrays = [];
-                  for(let i = 0; i < this.#inheritedData.length; i++) {
-                        matrixSizeArrays.push(this.#inheritedData[i].matrixSizes);
+                  this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
-                  }
+                        subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                              matrixSizeArrays.push(dataEntry.matrixSizes);
+                        });
+                  });
                   this.#standOffHelper.setSizeArrays(...matrixSizeArrays);
             }, f_container_standOff, true);
 
@@ -172,8 +174,8 @@ class Finishing extends Material {
                   this.#eyeletsHelper.height = this.getQWH().height;
 
                   let matrixSizeArrays = [];
-                  for(let i = 0; i < this.#inheritedData.length; i++) {
-                        matrixSizeArrays.push(this.#inheritedData[i].matrixSizes);
+                  for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                        matrixSizeArrays.push(this.INHERITED_DATA[i].data.matrixSizes);
                   }
                   this.#eyeletsHelper.setSizeArrays(...matrixSizeArrays);
             }, f_container_eyelets, true);
@@ -267,12 +269,19 @@ class Finishing extends Material {
       }
 
       getCalcQty(fieldType) {
+
             let matrixSizeArrays = [];
             let qty = 0;
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  matrixSizeArrays.push(this.#inheritedData[i].matrixSizes);
-            }
 
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                        matrixSizeArrays.push(dataEntry.matrixSizes);
+                  });
+            });
+
+            console.log(matrixSizeArrays);
             for(let i = 0; i < matrixSizeArrays.length; i++) {//per parent subscriptions matrix (i.e. Sheet or Size Matrix)
                   for(let j = 0; j < matrixSizeArrays[i].length; j++) {//per sheet subscription matrix
                         let matrixSize = matrixSizeArrays[i][j];
@@ -328,39 +337,39 @@ class Finishing extends Material {
             this.#inheritedSizeTable.deleteAllRows();
 
             //Per Parent Subscription:
-            for(let a = 0; a < this.#inheritedData.length; a++) {
-                  let recievedInputSizes = this.#inheritedData[a].data;
+            for(let a = 0; a < this.INHERITED_DATA.length; a++) {
+                  let recievedInputSizes = this.INHERITED_DATA[a].data;
                   for(let i = 0; i < recievedInputSizes.length; i++) {
-                        this.#inheritedSizes.push(recievedInputSizes[i]);
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, recievedInputSizes[i].width, recievedInputSizes[i].height);
+                        this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
+                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height);
                   }
             }
       };
 
       /*
       Override*/
-      ReceiveSubscriptionData(data) {
+      /*ReceiveSubscriptionData(data) {
             let dataIsNew = true;
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(data.parent == this.#inheritedData[i].parent) {
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(data.parent == this.INHERITED_DATA[i].parent) {
                         dataIsNew = false;
-                        this.#inheritedData[i] = data;
+                        this.INHERITED_DATA[i] = data;
                         break;
                   }
             }
             if(dataIsNew) {
-                  this.#inheritedData.push(data);
+                  this.INHERITED_DATA.push(data);
             }
 
             super.ReceiveSubscriptionData(data);
-      }
+      }*/
 
       /*
       Override*/
       UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(this.#inheritedData[i].parent == parent) {
-                        this.#inheritedData.splice(i, 1);
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(this.INHERITED_DATA[i].parent == parent) {
+                        this.INHERITED_DATA.splice(i, 1);
                         break;
                   }
             }

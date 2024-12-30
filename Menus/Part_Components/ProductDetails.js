@@ -1,5 +1,4 @@
 class ProductDetails extends SubscriptionManager {
-      static DISPLAY_NAME = "PRODUCT_DETAILS";
 
       #container;
       get container() {return this.#container;}
@@ -60,8 +59,7 @@ class ProductDetails extends SubscriptionManager {
        *           {qty: 1, width: '240', height: '1220'},
        *           {qty: 1, width: '240', height: '580'}]
        */
-      #dataForSubscribers = [];
-      #matrixSizes = [];
+      //#dataForSubscribers = [];
 
       constructor(parentContainer, lhsMenuWindow) {
             super();
@@ -84,7 +82,7 @@ class ProductDetails extends SubscriptionManager {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
                         this.productNumber = modal.value;
                         console.log(modal.value);
-                        this.onproductNumberChange();
+                        this.onProductNumberChange();
                   });
                   modal.value = this.productNumber;
             }, this.#container);

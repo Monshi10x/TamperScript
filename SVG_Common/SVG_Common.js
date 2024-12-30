@@ -669,36 +669,41 @@ function getPolygonBounds(polygon) {
       };
 }
 
-async function svg_getTotalPathArea_m2(svgString) {
-      let svg = svg_makeFromString(svgString);
-      svg_convertShapesToPaths(svg);
-      svg_formatCompoundPaths(svg);
+async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true) {
+      let svg;
+
+      if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
+            svg = svg_makeFromString(svgStringOrObject);
+            svg_convertShapesToPaths(svg);
+            svg_formatCompoundPaths(svg);
+      } else if(useShallowCopy == false) {
+            svg = svgStringOrObject;
+      } else {
+            console.error("cannot use parameters");
+      }
 
       let mainGroup = svg.querySelector("#mainGcreatedByT");
       let svgElements = mainGroup.getElementsByTagName("path");
 
       let totalArea = 0;
 
-      let webWorker;
-      let webWorkerFinished = false;
-
       if(typeof (Worker) !== "undefined") {
-            console.log("window enabled worker");
-            webWorker = new Worker(GM_getResourceURL("SVGWebWorker"));
+
+            let webWorker = new Worker(GM_getResourceURL("SVGWebWorker"));
+            let webWorkerFinished = false;
 
             let elementDs = [];
-            let isElementInnerPath = [];
+            let innerPathElements = [];
             for(let i = 0; i < svgElements.length; i++) {
                   elementDs.push(svgElements[i].getAttribute("d"));
-                  isElementInnerPath.push(svgElements[i].classList.contains("innerPath"));
+                  innerPathElements.push(svgElements[i].classList.contains("innerPath"));
             }
 
             webWorker.postMessage({
                   elementDs: elementDs,
-                  isElementInnerPath: isElementInnerPath
+                  innerPathElements: innerPathElements
             });
             webWorker.onmessage = async function(event) {
-                  console.log("DragZoomSVG.js recieves message from Webworker", event);
                   if(event.data.totalArea) totalArea = event.data.totalArea;
                   if(event.data.shapeAreas) {
                         for(let i = 0; i < svgElements.length; i++) {
@@ -710,32 +715,57 @@ async function svg_getTotalPathArea_m2(svgString) {
                   webWorkerFinished = true;
             };
 
-            await new Promise(resolve => {
-                  var resolvedStatus = 'reject';
-                  var timer = setInterval(() => {
-                        if(webWorkerFinished == true) {
-                              resolvedStatus = 'fulfilled';
-                              resolve();
-                              clearInterval(timer);
-                              timer = undefined;
-                        } else {
-                              resolvedStatus = 'reject';
-                        }
-                  }, 10);
-            });
+            await LoopUntil(() => {if(webWorkerFinished == true) return true; else return false;});
             return totalArea;
       } else {
             console.error("window disabled worker :(");
       }
 }
 
+function svg_getTotalBoundingRectAreas_m2(svgStringOrObject, useShallowCopy = true) {
+      let newSvg;
+      if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
+            newSvg = svg_makeFromString(svgStringOrObject);
+
+            svg_convertShapesToPaths(newSvg);
+            svg_formatCompoundPaths(newSvg);
+
+            document.body.appendChild(newSvg);
+            newSvg.style = "display:block;visibility:hidden";
+
+            svgStringOrObject = newSvg.querySelector("#pathGroup").querySelectorAll(".outerPath");
+      }
+
+      let totalArea = 0;
+
+      for(let i = 0; i < svgStringOrObject.length; i++) {
+            if(svgStringOrObject[i].nodeName == "g") continue;
+
+            let element = svgStringOrObject[i];
+
+            let boundingBox = element.getBBox();
+
+            let elementWidth_mm = svg_pixelToMM(boundingBox.width);
+            let elementHeight_mm = svg_pixelToMM(boundingBox.height);
+
+            totalArea += elementWidth_mm * elementHeight_mm;
+      }
+
+      totalArea /= 1000000;
+
+      if(newSvg) deleteElement(newSvg);
+
+      return totalArea;
+}
+
 function svg_convertShapesToPaths(svgObject) {
       let svgElements = svgObject.getElementsByTagName("*");
 
       for(let i = 0; i < svgElements.length; i++) {
-            if(svgElements[i].nodeName != "g" && svgElements[i].nodeName != "path") {
-                  let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
-            }
+            if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "path") continue;
+
+            let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
+
       }
 
       return svgObject;
@@ -865,4 +895,3 @@ class TSVGRect {
             deleteElement(this.element);
       }
 }
-

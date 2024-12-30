@@ -105,7 +105,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
 			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
-				[["test", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
+				[["3D Front-lit Letters", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
 				["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
 				["Lightbox Face - Opal Acrylic", "https://cdn.gorilladash.com/images/media/5077257/signarama-australia-img-6911-2-small-thumbnail-61611e9ab2f0f.jpg"],
 				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
@@ -143,16 +143,17 @@ class MenuPanelSigns extends LHSMenuWindow {
 		let install;
 
 		switch(this.#addQuickTemplateBtn[1].value) {
-			case "test":
+			case "3D Front-lit Letters":
 				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
-				productDetails.productName = "ACM Panel";
+				productDetails.productName = "3D Front-lit Letters";
 
 				size = this.#add(Size, this.page1, []);
 				size.width = 2440;
 				size.height = 1220;
 
 				let temp = this.#add(SVGCutfile, this.page1, []);
+				let temp2 = this.#add(Coil, this.page1, [SVGCutfile]);
 
 				sheet = this.#add(Sheet, this.page1, [Size]);
 				sheet.material = "ACM";
@@ -456,10 +457,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 		}
 		if(this.#viewMode[1].value == "Per Type") {
 
-			this.#containers = [/*ProductDetails, Size, SVGCutfile, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			this.#containers = [/*ProductDetails, Size, SVGCutfile, Sheet, Vinyl, Laminate, Coil, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < this.#creationOrder.length; i++) {
-				let UIContainer = new UIContainerType3("", this.#creationOrder[i].DISPLAY_NAME, this.page1);
+				let UIContainer = new UIContainerType3("", this.#creationOrder[i].Type, this.page1);
 
 				this.#containers.push(UIContainer);
 				let addBtn = createButton("Add +", "width:100px;min-height:30px;margin:0px;border:0px;", () => {
@@ -515,11 +516,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 			}
 		} else if(this.#viewMode[1].value == "Per Type2") {
 
-			this.#containers = [/*ProductDetails, Size,SVGCutfile, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			this.#containers = [/*ProductDetails, Size, SVGCutfile, Sheet, Vinyl, Laminate, Coil, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < this.#creationOrder.length; i++) {
 				let UIContainer = new Object();
-				let d = createDivStyle5("", this.#creationOrder[i].DISPLAY_NAME, this.page1);
+				let d = createDivStyle5("", this.#creationOrder[i].Type, this.page1);
 				UIContainer.container = d[0];
 				UIContainer.contentContainer = d[1];
 				this.#containers.push(UIContainer);

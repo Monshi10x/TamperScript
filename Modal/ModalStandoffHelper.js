@@ -181,6 +181,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
             setFieldDisabled(true, this.heightField[1], this.heightField[0]);
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
+            this.borrowFieldsContainer = this.#containerBeforeCanvas;
 
             this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
 
@@ -275,25 +276,6 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
                         }
                         yo += this.#distanceBetweenParentDraws;
                   }
-            }
-      }
-
-      borrowFields(...fieldContainers) {
-            for(let i = 0; i < fieldContainers.length; i++) {
-                  let elementToBorrow = fieldContainers[i];
-                  this.#borrowedFields.push({
-                        fieldContainer: elementToBorrow,
-                        returnAfterElement: elementToBorrow.previousElementSibling,
-                        returnBeforeElement: elementToBorrow.nextElementSibling
-                  });
-                  this.#containerBeforeCanvas.appendChild(elementToBorrow);
-            }
-      }
-
-      returnAllBorrowedFields() {
-            for(let i = this.#borrowedFields.length - 1; i >= 0; i--) {
-                  if(this.#borrowedFields[i].returnAfterElement) insertAfter(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnAfterElement);
-                  else insertBefore(this.#borrowedFields[i].fieldContainer, this.#borrowedFields[i].returnBeforeElement);
             }
       }
 

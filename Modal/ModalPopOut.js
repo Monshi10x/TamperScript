@@ -10,6 +10,7 @@ class ModalPopOut extends Modal {
             this.#containersToBorrow = containersToBorrow;
 
             this.setContainerSize(900, 900);
+            this.borrowFieldsContainer = this.getBodyElement();
             this.borrowFields(...containersToBorrow);
 
             this.btn = createButton("Close", "width:100px;float:right;", () => {
@@ -21,6 +22,7 @@ class ModalPopOut extends Modal {
             this.addFooterElement(this.btn);
       }
 
+      /**@Override */
       borrowFields(...fieldContainers) {
             for(let i = 0; i < fieldContainers.length; i++) {
                   let borrowedElement = fieldContainers[i];
@@ -39,6 +41,7 @@ class ModalPopOut extends Modal {
             }
       }
 
+      /**@Override */
       returnAllBorrowedFields() {
             for(let i = 0; i < this.#borrowedFields.length; i++) {
                   this.#borrowedFields[i].placeholder.replaceWith(this.#borrowedFields[i].fieldContainer);
@@ -47,6 +50,7 @@ class ModalPopOut extends Modal {
                   deleteElement(this.#borrowedFields[i].placeholder);
             }
       }
+
 
       /**@Override */
       onMouseOut() {

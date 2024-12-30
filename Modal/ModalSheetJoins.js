@@ -100,6 +100,7 @@ class ModalSheetJoins extends ModalWidthHeight {
             setFieldDisabled(true, this.heightField[1], this.heightField[0]);
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
+            this.borrowFieldsContainer = this.#containerBeforeCanvas;
 
             this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 500, () => this.draw(), this.getBodyElement());
 
@@ -222,35 +223,6 @@ class ModalSheetJoins extends ModalWidthHeight {
                         }
                         yo += this.#distanceBetweenParentDraws;
                   }
-            }
-      }
-
-      borrowFields(...fieldContainers) {
-            for(let i = 0; i < fieldContainers.length; i++) {
-                  let elementToBorrow = fieldContainers[i];
-                  let placeholderBefore = document.createElement("div");
-                  let placeholderAfter = document.createElement("div");
-
-                  insertBefore(placeholderBefore, elementToBorrow);
-                  insertAfter(placeholderAfter, elementToBorrow);
-
-                  this.#borrowedFields.push({
-                        elementToBorrow: elementToBorrow,
-                        placeholderBefore: placeholderBefore,
-                        placeholderAfter: placeholderAfter
-                  });
-            }
-            for(let i = 0; i < fieldContainers.length; i++) {
-                  let elementToBorrow = fieldContainers[i];
-                  this.#containerBeforeCanvas.appendChild(elementToBorrow);
-            }
-      }
-
-      returnAllBorrowedFields() {
-            for(let i = this.#borrowedFields.length - 1; i >= 0; i--) {
-                  insertAfter(this.#borrowedFields[i].elementToBorrow, this.#borrowedFields[i].placeholderBefore);
-                  deleteElement(this.#borrowedFields[i].placeholderBefore);
-                  deleteElement(this.#borrowedFields[i].placeholderAfter);
             }
       }
 

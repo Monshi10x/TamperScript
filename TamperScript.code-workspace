@@ -35,7 +35,7 @@
 		},{
 				"text": "//:",
 				"color": "black",
-				"backgroundColor": "#ffff0055",
+				"backgroundColor": "#ffff0088",
 				"overviewRulerColor": "grey",
 				"padding": "5px",
 				"isWholeLine": true
@@ -51,6 +51,14 @@
 				"color": "#ffffff",
 				"fontWeight": "bold",
 				"backgroundColor": "blue",
+				"overviewRulerColor": "grey",
+				"padding": "5px"
+		},{
+				"text": "overrideable",
+				"color": "#0051ff",
+				"fontStyle": "bold",
+				"fontWeight":"bold",
+				"backgroundColor": "#181818",
 				"overviewRulerColor": "grey",
 				"padding": "5px"
 		}],

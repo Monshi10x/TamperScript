@@ -1,6 +1,4 @@
-class Vinyl extends Material {
-      static DISPLAY_NAME = "VINYL";
-      /*
+class Vinyl extends Material {      /*
                         
       Variables         */
       /**
@@ -23,9 +21,8 @@ class Vinyl extends Material {
        * [{parent: 'SHEET-1699952073332-95570559', data: []},
        *  {parent: 'SHEET-1699952073332-95574529', data: []}]
       */
-      #inheritedData = [];
+      //#inheritedData2 = [];
       #inheritedSizes = [];
-      #outputSizes = [];
 
       /*
                         
@@ -171,9 +168,13 @@ class Vinyl extends Material {
                   this.#visualiser.height = this.getQWH().height;
 
                   let matrixSizeArrays = [];
-                  for(let i = 0; i < this.#inheritedData.length; i++) {
-                        matrixSizeArrays.push(this.#inheritedData[i].matrixSizes);
-                  }
+                  this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                        subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                              matrixSizeArrays.push(dataEntry.matrixSizes);
+                        });
+                  });
                   this.#visualiser.setSizeArrays(...matrixSizeArrays);
             }, f_container_joins, true);
             this.#joinOverlap = createInput_Infield("Join Overlap", 10, "width:30%;", () => {this.UpdateFromChange();}, f_container_joins, false, 5, {postfix: "mm"});
@@ -259,8 +260,7 @@ class Vinyl extends Material {
       UpdateDataForSubscribers() {
             this.dataToPushToSubscribers = {
                   parent: this,
-                  data: this.#dataForSubscribers,
-                  finalRollSize: this.#finalRollSize
+                  data: this.#dataForSubscribers
             };
       }
 
@@ -274,14 +274,14 @@ class Vinyl extends Material {
 
             let rowNumber = 0;
 
-            for(let a = 0; a < this.#inheritedData.length; a++) {//Per Parent Subscription:
-                  let recievedInputSizes = this.#inheritedData[a].data;
+            for(let a = 0; a < this.INHERITED_DATA.length; a++) {//Per Parent Subscription:
+                  let recievedInputSizes = this.INHERITED_DATA[a].data;
                   for(let i = 0; i < recievedInputSizes.length; i++) {
 
-                        this.#inheritedSizes.push(recievedInputSizes[i]);
-                        let needsJoins = Vinyl.isSizeBiggerThanRoll(recievedInputSizes[i].width, recievedInputSizes[i].height, this.rollWidth);
+                        this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
+                        let needsJoins = Vinyl.isSizeBiggerThanRoll(recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height, this.rollWidth);
 
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, recievedInputSizes[i].width, recievedInputSizes[i].height, "" + (needsJoins ? "yes" : "no"));
+                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height, "" + (needsJoins ? "yes" : "no"));
                         rowNumber++;
                         if(needsJoins) {
                               this.#inheritedSizeTable.getCell(rowNumber, 4).style.backgroundColor = "red";
@@ -369,7 +369,7 @@ class Vinyl extends Material {
       }
 
       UpdateOutputTable() {
-            this.#outputSizes = [];
+            this.#dataForSubscribers = [];
             this.#outputSizeTable.deleteAllRows();
 
             for(let i = 0; i < this.#inheritedSizes.length; i++) {
@@ -380,41 +380,41 @@ class Vinyl extends Material {
                   if(Vinyl.isSizeBiggerThanRoll(widthVal, heightVal, this.rollWidth)) {
                         let sizes = Vinyl.createJoins(qtyVal, widthVal, heightVal, this.isJoinHorizontal, true, this.rollWidth, this.joinOverlap);
                         for(let j = 0; j < sizes.length; j++) {
-                              this.#outputSizes.push({qty: sizes[j].qty, width: sizes[j].width, height: sizes[j].height});
+                              this.#dataForSubscribers.push({QWHD: new QWHD(sizes[j].qty, sizes[j].width, sizes[j].height)});
                               this.#outputSizeTable.addRow(sizes[j].qty, sizes[j].width, sizes[j].height);
                         }
                   } else {
-                        this.#outputSizes.push({qty: qtyVal, width: widthVal, height: heightVal});
+                        this.#dataForSubscribers.push({QWHD: new QWHD(qtyVal, widthVal, heightVal)});
                         this.#outputSizeTable.addRow(qtyVal, widthVal, heightVal);
                   }
             }
 
-            $(this.#materialUsageArea[1]).val(combinedSqm(this.#outputSizes));//.change();
+            $(this.#materialUsageArea[1]).val(combinedSqm(this.#dataForSubscribers));//.change();
 
-            this.#dataForSubscribers = this.#outputSizes;
+            this.#dataForSubscribers = this.#dataForSubscribers;
       };
 
-      ReceiveSubscriptionData(data) {
+      /*ReceiveSubscriptionData(data) {
             let dataIsNew = true;
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(data.parent == this.#inheritedData[i].parent) {
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(data.parent == this.INHERITED_DATA[i].parent) {
                         dataIsNew = false;
-                        this.#inheritedData[i] = data;
+                        this.INHERITED_DATA[i] = data;
                         break;
                   }
             }
             if(dataIsNew) {
-                  this.#inheritedData.push(data);
+                  this.INHERITED_DATA.push(data);
             }
 
             super.ReceiveSubscriptionData(data);
-      }
+      }*/
 
       /**@Override */
       UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.#inheritedData.length; i++) {
-                  if(this.#inheritedData[i].parent == parent) {
-                        this.#inheritedData.splice(i, 1);
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(this.INHERITED_DATA[i].parent == parent) {
+                        this.INHERITED_DATA.splice(i, 1);
                         break;
                   }
             }
@@ -426,10 +426,10 @@ class Vinyl extends Material {
             var name = this.#material[1].value;
             var partFullName = getPredefinedParts_Name_FromLimitedName(name);
 
-            for(let i = 0; i < this.#outputSizes.length; i++) {
-                  let partQty = this.#outputSizes[i].qty;
-                  let partWidth = this.#outputSizes[i].width;
-                  let partHeight = this.#outputSizes[i].height;
+            for(let i = 0; i < this.#dataForSubscribers.length; i++) {
+                  let partQty = this.#dataForSubscribers[i].qty;
+                  let partWidth = this.#dataForSubscribers[i].width;
+                  let partHeight = this.#dataForSubscribers[i].height;
                   partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, "", false);
             }
             partIndex = await this.#production.Create(productNo, partIndex);

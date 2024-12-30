@@ -1701,3 +1701,26 @@ var executed = false;
 function resetExecuted() {
     executed = false;
 }
+
+async function LoopUntil(condition, intervalMS = 10) {
+
+    await new Promise(resolve => {
+        var resolvedStatus = 'reject';
+        var timer = setInterval(() => {
+
+            let conditionMet = false;
+            if(typeof (condition) == "function") {
+                conditionMet = condition();
+            } else condition = condition;
+
+            if(conditionMet == true) {
+                resolvedStatus = 'fulfilled';
+                resolve();
+                clearInterval(timer);
+                timer = undefined;
+            } else {
+                resolvedStatus = 'reject';
+            }
+        }, intervalMS);
+    });
+}

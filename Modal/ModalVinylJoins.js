@@ -82,6 +82,7 @@ class ModalVinylJoins extends ModalWidthHeight {
             this.#maintainGapBetweenBleedField = createCheckbox_Infield("maintainGapBetweenBleed", this.#maintainGapBetweenBleed, null, () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.updateFromFields();}, this.#gapSettingsContainer, () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.updateFromFields();});
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
+            this.borrowFieldsContainer = this.#containerBeforeCanvas;
 
             this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
 
@@ -169,35 +170,6 @@ class ModalVinylJoins extends ModalWidthHeight {
                         }
                         yo += distanceBetweenParentDraws;
                   }
-            }
-      }
-
-      borrowFields(...fieldContainers) {
-            for(let i = 0; i < fieldContainers.length; i++) {
-                  let elementToBorrow = fieldContainers[i];
-                  let placeholderBefore = document.createElement("div");
-                  let placeholderAfter = document.createElement("div");
-
-                  insertBefore(placeholderBefore, elementToBorrow);
-                  insertAfter(placeholderAfter, elementToBorrow);
-
-                  this.#borrowedFields.push({
-                        elementToBorrow: elementToBorrow,
-                        placeholderBefore: placeholderBefore,
-                        placeholderAfter: placeholderAfter
-                  });
-            }
-            for(let i = 0; i < fieldContainers.length; i++) {
-                  let elementToBorrow = fieldContainers[i];
-                  this.#containerBeforeCanvas.appendChild(elementToBorrow);
-            }
-      }
-
-      returnAllBorrowedFields() {
-            for(let i = this.#borrowedFields.length - 1; i >= 0; i--) {
-                  insertAfter(this.#borrowedFields[i].elementToBorrow, this.#borrowedFields[i].placeholderBefore);
-                  deleteElement(this.#borrowedFields[i].placeholderBefore);
-                  deleteElement(this.#borrowedFields[i].placeholderAfter);
             }
       }
 

@@ -1,34 +1,28 @@
 class SubscriptionManager {
 
-      /**
-       * @Subscribers
-       */
+      ///Subscribers
       #subscribers = [];
       get subscribers() {return this.#subscribers;}
-      #dataToPushToSubscribers = {
+
+      dataToPushToSubscribers = {
             parent: null,
             data: null
       };
-      set dataToPushToSubscribers(info) {this.#dataToPushToSubscribers = info;}
 
-      /**
-       * @Subscription
-       */
+      ///Subscription
       #subscriptions = [];
       get subscriptions() {return this.#subscriptions;};
+      INHERITED_DATA = [];
+      /*overrideable*/get Type() {return "SubscriptionManager";}
+      /*overrideable*/UpdateFromChange() { }
 
-      constructor() { }
 
-      UpdateFromChange() { }
-
-      /**
-       * @Subscription
-       */
+      ///Subscriptions
 
       SubscribeTo(parent) {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.ID, " issues Subscription request to ", parent.ID);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " issues Subscription request to ", parent.ID);
 
-            this.#subscriptions.push(parent);
+            if(!this.isSubscribedTo(parent)) this.#subscriptions.push(parent);
 
             if(!parent.AddSubscriber) return new Error("parent does not contain AddSubscriber method");
             parent.AddSubscriber(this);
@@ -43,8 +37,29 @@ class SubscriptionManager {
       }
 
       ReceiveSubscriptionData(data) {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.ID, "has recieved data", data);
             if(data.parent == null) return;
+
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, "has recieved data", data);
+
+            //:Only update subscriptions for relevant parent so that others are not erased
+
+            let dataIsNew = true;
+
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(data.parent == this.INHERITED_DATA[i].parent) {
+                        dataIsNew = false;
+
+                        this.INHERITED_DATA[i] = data;
+                        break;
+                  }
+            }
+
+            if(dataIsNew) {
+                  this.INHERITED_DATA.push(data);
+            }
+
+            //:Add Parent to subscriptions if is new
+
             let dataFromNewParent = true;
             for(let i = 0; i < this.#subscriptions.length; i++) {
                   if(this.#subscriptions[i].ID == data.parent.ID) {
@@ -54,11 +69,12 @@ class SubscriptionManager {
                   }
             }
             if(dataFromNewParent) this.#subscriptions.push(data.parent);
+
             this.UpdateFromChange();
       }
 
       UnSubscribeFrom(parent) {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.ID, " issues UnSubscribe request to ", parent.ID);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " issues UnSubscribe request to ", parent.ID);
 
             for(let i = 0; i < this.#subscriptions.length; i++) {
                   if(this.#subscriptions[i].ID == parent.ID) {
@@ -67,27 +83,26 @@ class SubscriptionManager {
                   }
             }
 
-            parent.UpdateFromChange();
+            if(parent.UpdateFromChange) parent.UpdateFromChange();
             this.UpdateFromChange();
       }
 
-      /**
-       * @Subscribers
-       */
+      ///Subscribers
+
       AddSubscriber(subscriber) {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.ID, " adds Subscriber ", subscriber.ID);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " adds Subscriber ", subscriber.ID);
             this.#subscribers.push(subscriber);
       }
 
       PushToSubscribers() {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.ID, " sends data to x" + this.#subscribers.length + " Subscribers, data: ", this.#dataToPushToSubscribers);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " sends data to x" + this.#subscribers.length + " Subscribers, data: ", this.dataToPushToSubscribers);
             for(let i = 0; i < this.#subscribers.length; i++) {
-                  this.#subscribers[i].ReceiveSubscriptionData(this.#dataToPushToSubscribers);
+                  this.#subscribers[i].ReceiveSubscriptionData(this.dataToPushToSubscribers);
             }
       }
 
       RemoveSubscriber(subscriber) {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.ID, " removes Subscriber ", subscriber.ID);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " removes Subscriber ", subscriber.ID);
             for(let i = 0; i < this.#subscribers.length; i++) {
                   if(this.#subscribers[i] == subscriber) {
                         this.#subscribers.splice(i, 1);//I remove subscriber
@@ -96,9 +111,8 @@ class SubscriptionManager {
             }
       }
 
-      /**
-       * @DeleteThis
-       */
+      ///Delete all subscriptions, parent<->me and me<->subscribers
+
       Delete() {
             console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", "Delete called SubscriptionManager", this.subscriptions.length);
 
