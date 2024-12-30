@@ -126,7 +126,7 @@ class Coil extends Material {
       }
 
       UpdateDataForSubscribers() {
-            this.dataToPushToSubscribers = {
+            this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
                   data: this.#dataForSubscribers
             };
@@ -184,45 +184,6 @@ class Coil extends Material {
 
             $(this.#f_materialTotalLength[1]).val(combinedLnm(this.#dataForSubscribers, false)).change();
       };
-
-      /**
-       * Add or Update data from
-       * @param {*} data 
-       */
-      /*ReceiveSubscriptionData(data) {
-            let dataIsNew = true;
-
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(data.parent == this.INHERITED_DATA[i].parent) {
-                        dataIsNew = false;
-
-                        //replace data
-                        this.INHERITED_DATA[i] = data;
-                        break;
-                  }
-            }
-
-            if(dataIsNew) {
-                  this.INHERITED_DATA.push(data);
-            }
-
-            console.log("%cINFO", "background-color:green;color:white;");
-            console.table(this.INHERITED_DATA);
-
-            super.ReceiveSubscriptionData(data);
-      }*/
-
-      /*
-      Override*/
-      UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(this.INHERITED_DATA[i].parent == parent) {
-                        this.INHERITED_DATA.splice(i, 1);
-                        break;
-                  }
-            }
-            super.UnSubscribeFrom(parent);
-      }
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);

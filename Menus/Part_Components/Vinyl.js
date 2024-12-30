@@ -12,9 +12,9 @@ class Vinyl extends Material {      /*
       */
       #dataForSubscribers = [];
       /** 
-       * @Example [{qty: 1, width: 1370, height: 25000}] as in 1370 being roll width, 25000 being roll length 
+       * @Example {qty: 1, width: 1370, height: 25000} as in 1370 being roll width, 25000 being roll length 
        */
-      #finalRollSize = [];
+      #finalRollSize = {};
       /**
        * @Inherited
        * @example
@@ -247,7 +247,7 @@ class Vinyl extends Material {      /*
             super.UpdateFromChange();
 
             this.UpdateInheritedTable();
-            this.UpdateOutputTable();
+            this.UpdateOutputSizes();
             this.UpdateRollOptions();
             this.UpdateVisualizer();
             this.UpdateMachineTimes();
@@ -258,7 +258,7 @@ class Vinyl extends Material {      /*
       }
 
       UpdateDataForSubscribers() {
-            this.dataToPushToSubscribers = {
+            this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
                   data: this.#dataForSubscribers
             };
@@ -321,12 +321,11 @@ class Vinyl extends Material {      /*
                   console.log("%cNeed to implement multiple roll quantities for rollLengthUsed > 50, Vinyl.js", "background-color:red;color:white;font-weight:bold");
             }
 
-            this.#finalRollSize = [{qty: 1, width: this.rollWidth, height: mToMM(rollLengthUsed)}];
+            this.#finalRollSize = new QWHD(1, this.rollWidth, mToMM(rollLengthUsed));
 
             this.#outputSizeTable2.deleteAllRows();
-            for(let j = 0; j < this.#finalRollSize.length; j++) {
-                  this.#outputSizeTable2.addRow(this.#finalRollSize[j].qty, roundNumber(this.#finalRollSize[j].width, 2), roundNumber(this.#finalRollSize[j].height, 2));
-            }
+            this.#outputSizeTable2.addRow(this.#finalRollSize.qty, roundNumber(this.#finalRollSize.width, 2), roundNumber(this.#finalRollSize.height, 2));
+
       }
 
       static isSizeBiggerThanRoll(width, height, rollWidth) {
@@ -368,57 +367,38 @@ class Vinyl extends Material {      /*
             }
       }
 
-      UpdateOutputTable() {
+      UpdateOutputSizes() {
             this.#dataForSubscribers = [];
             this.#outputSizeTable.deleteAllRows();
 
-            for(let i = 0; i < this.#inheritedSizes.length; i++) {
-                  let qtyVal = this.#inheritedSizes[i].qty;
-                  let widthVal = this.#inheritedSizes[i].width + zeroIfNaNNullBlank(this.#bleedLeft[1].value) + zeroIfNaNNullBlank(this.#bleedRight[1].value);
-                  let heightVal = this.#inheritedSizes[i].height + zeroIfNaNNullBlank(this.#bleedTop[1].value) + zeroIfNaNNullBlank(this.#bleedBottom[1].value);
+            let sizeArray = [];
 
-                  if(Vinyl.isSizeBiggerThanRoll(widthVal, heightVal, this.rollWidth)) {
-                        let sizes = Vinyl.createJoins(qtyVal, widthVal, heightVal, this.isJoinHorizontal, true, this.rollWidth, this.joinOverlap);
-                        for(let j = 0; j < sizes.length; j++) {
-                              this.#dataForSubscribers.push({QWHD: new QWHD(sizes[j].qty, sizes[j].width, sizes[j].height)});
-                              this.#outputSizeTable.addRow(sizes[j].qty, sizes[j].width, sizes[j].height);
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                        let qtyVal = dataEntry.QWHD.qty;
+                        let widthVal = dataEntry.QWHD.width + zeroIfNaNNullBlank(this.#bleedLeft[1].value) + zeroIfNaNNullBlank(this.#bleedRight[1].value);
+                        let heightVal = dataEntry.QWHD.height + zeroIfNaNNullBlank(this.#bleedTop[1].value) + zeroIfNaNNullBlank(this.#bleedBottom[1].value);
+
+                        if(Vinyl.isSizeBiggerThanRoll(widthVal, heightVal, this.rollWidth)) {
+                              let sizes = Vinyl.createJoins(qtyVal, widthVal, heightVal, this.isJoinHorizontal, true, this.rollWidth, this.joinOverlap);
+                              for(let j = 0; j < sizes.length; j++) {
+                                    this.#dataForSubscribers.push({QWHD: new QWHD(sizes[j].qty, sizes[j].width, sizes[j].height), finalRollSize: this.#finalRollSize});
+                                    this.#outputSizeTable.addRow(sizes[j].qty, sizes[j].width, sizes[j].height);
+                                    sizeArray.push(new QWHD(sizes[j].qty, sizes[j].width, sizes[j].height));
+                              }
+                        } else {
+                              this.#dataForSubscribers.push({QWHD: new QWHD(qtyVal, widthVal, heightVal), finalRollSize: this.#finalRollSize});
+                              this.#outputSizeTable.addRow(qtyVal, widthVal, heightVal);
+                              sizeArray.push(new QWHD(qtyVal, widthVal, heightVal));
                         }
-                  } else {
-                        this.#dataForSubscribers.push({QWHD: new QWHD(qtyVal, widthVal, heightVal)});
-                        this.#outputSizeTable.addRow(qtyVal, widthVal, heightVal);
-                  }
-            }
 
-            $(this.#materialUsageArea[1]).val(combinedSqm(this.#dataForSubscribers));//.change();
+                  });
+            });
 
-            this.#dataForSubscribers = this.#dataForSubscribers;
-      };
+            $(this.#materialUsageArea[1]).val(combinedSqm(sizeArray));
 
-      /*ReceiveSubscriptionData(data) {
-            let dataIsNew = true;
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(data.parent == this.INHERITED_DATA[i].parent) {
-                        dataIsNew = false;
-                        this.INHERITED_DATA[i] = data;
-                        break;
-                  }
-            }
-            if(dataIsNew) {
-                  this.INHERITED_DATA.push(data);
-            }
-
-            super.ReceiveSubscriptionData(data);
-      }*/
-
-      /**@Override */
-      UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(this.INHERITED_DATA[i].parent == parent) {
-                        this.INHERITED_DATA.splice(i, 1);
-                        break;
-                  }
-            }
-            super.UnSubscribeFrom(parent);
       }
 
       async Create(productNo, partIndex) {

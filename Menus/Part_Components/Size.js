@@ -270,7 +270,7 @@ class Size extends SubscriptionManager {
             this.#dataForSubscribers.push({QWHD: this.getQWH(), matrixSizes: this.#matrixSizes});
             this.#matrixSizes.push([[[this.getQWH().width, this.getQWH().height, this.getQWH().depth]]]);
 
-            this.dataToPushToSubscribers = {
+            this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
                   data: this.#dataForSubscribers
             };

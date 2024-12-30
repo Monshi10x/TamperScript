@@ -4,7 +4,7 @@ class SubscriptionManager {
       #subscribers = [];
       get subscribers() {return this.#subscribers;}
 
-      dataToPushToSubscribers = {
+      DATA_FOR_SUBSCRIBERS = {
             parent: null,
             data: null
       };
@@ -76,6 +76,15 @@ class SubscriptionManager {
       UnSubscribeFrom(parent) {
             console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " issues UnSubscribe request to ", parent.ID);
 
+            //:Remove Parent data from my subscriptions
+            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
+                  if(this.INHERITED_DATA[i].parent == parent) {
+                        this.INHERITED_DATA.splice(i, 1);
+                        break;
+                  }
+            }
+
+            //:Parent<->Me remove each other
             for(let i = 0; i < this.#subscriptions.length; i++) {
                   if(this.#subscriptions[i].ID == parent.ID) {
                         this.#subscriptions[i].RemoveSubscriber(this);//parent remove me
@@ -95,9 +104,9 @@ class SubscriptionManager {
       }
 
       PushToSubscribers() {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " sends data to x" + this.#subscribers.length + " Subscribers, data: ", this.dataToPushToSubscribers);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " sends data to x" + this.#subscribers.length + " Subscribers, data: ", this.DATA_FOR_SUBSCRIBERS);
             for(let i = 0; i < this.#subscribers.length; i++) {
-                  this.#subscribers[i].ReceiveSubscriptionData(this.dataToPushToSubscribers);
+                  this.#subscribers[i].ReceiveSubscriptionData(this.DATA_FOR_SUBSCRIBERS);
             }
       }
 

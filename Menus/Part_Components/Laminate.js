@@ -141,7 +141,7 @@ class Laminate extends Material {
       }
 
       UpdateDataForSubscribers() {
-            this.dataToPushToSubscribers = {
+            this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
                   data: this.#dataForSubscribers
             };
@@ -151,23 +151,26 @@ class Laminate extends Material {
             this.#inheritedSizes = [];
             this.#inheritedSizeTable.deleteAllRows();
 
-            //Per Parent Subscription:
-            for(let a = 0; a < this.INHERITED_DATA.length; a++) {
-                  if(this.INHERITED_DATA[a].data.finalRollSize && this.#useRollLength) {
-                        let recievedInputSizes = this.INHERITED_DATA[a].data.finalRollSize;
-                        let i = 0;
-                        this.#inheritedSizes.push(recievedInputSizes[i]);
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, roundNumber(recievedInputSizes[i].width, 2), roundNumber(recievedInputSizes[i].height, 2));
-                  } else {
-                        let recievedInputSizes = this.INHERITED_DATA[a].data;
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
-                        for(let i = 0; i < recievedInputSizes.length; i++) {
-                              console.log(recievedInputSizes[i]);
-                              this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
-                              this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, roundNumber(recievedInputSizes[i].QWHD.width, 2), roundNumber(recievedInputSizes[i].QWHD.height, 2));
+                  subscription.data.forEach((dataEntry/**{QWHD: QWHD, finalRollSize: QWHD}*/) => {
+
+                        //If using roll length
+                        if(dataEntry.finalRollSize && this.#useRollLength) {
+                              let recievedInputSizes = dataEntry.finalRollSize;
+
+                              this.#inheritedSizes.push(recievedInputSizes);
+                              this.#inheritedSizeTable.addRow(recievedInputSizes.qty, roundNumber(recievedInputSizes.width, 2), roundNumber(recievedInputSizes.height, 2));
                         }
-                  }
-            }
+                        //If using individual sizes
+                        else {
+                              let recievedInputSizes = dataEntry.QWHD;
+
+                              this.#inheritedSizes.push(recievedInputSizes);
+                              this.#inheritedSizeTable.addRow(recievedInputSizes.qty, roundNumber(recievedInputSizes.width, 2), roundNumber(recievedInputSizes.height, 2));
+                        }
+                  });
+            });
       };
 
       UpdateMachineTimes() {
@@ -190,44 +193,21 @@ class Laminate extends Material {
             this.#dataForSubscribers = [];
             this.#outputSizeTable.deleteAllRows();
 
-            for(let i = 0; i < this.#inheritedSizes.length; i++) {
-                  let qtyVal = this.#inheritedSizes[i].qty;
-                  let widthVal = this.#inheritedSizes[i].width;
-                  let heightVal = this.#inheritedSizes[i].height;
-                  this.#dataForSubscribers.push({QWHD: new QWHD(qtyVal, widthVal, heightVal)});
-                  this.#outputSizeTable.addRow(qtyVal, roundNumber(widthVal, 2), roundNumber(heightVal, 2));
-            }
-            $(this.#materialTotalArea[1]).val(combinedSqm(this.#dataForSubscribers)).change();
+            let sizeArray = [];
+
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{QWHD: QWHD}*/) => {
+
+                        this.#dataForSubscribers.push({QWHD: new QWHD(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height)});
+                        this.#outputSizeTable.addRow(dataEntry.QWHD.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
+
+                        sizeArray.push(new QWHD(dataEntry.QWHD.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2)));
+                  });
+            });
+
+            $(this.#materialTotalArea[1]).val(combinedSqm(sizeArray));
       };
-
-      /*ReceiveSubscriptionData(data) {
-            let dataIsNew = true;
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(data.parent == this.INHERITED_DATA[i].parent) {
-                        dataIsNew = false;
-                        this.INHERITED_DATA[i] = data;
-                        break;
-                  }
-            }
-
-            if(dataIsNew) {
-                  this.INHERITED_DATA.push(data);
-            }
-
-            super.ReceiveSubscriptionData(data);
-      }*/
-
-      /*
-      Override*/
-      UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(this.INHERITED_DATA[i].parent == parent) {
-                        this.INHERITED_DATA.splice(i, 1);
-                        break;
-                  }
-            }
-            super.UnSubscribeFrom(parent);
-      }
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);

@@ -198,7 +198,7 @@ class SVGCutfile extends SubscriptionManager {
                   QWHD: this.getQWH()
             });
 
-            this.dataToPushToSubscribers = {
+            this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
                   data: this.#dataForSubscribers
             };

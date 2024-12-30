@@ -145,7 +145,7 @@ class AppTaping extends Material {
       }
 
       UpdateDataForSubscribers() {
-            this.dataToPushToSubscribers = {
+            this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
                   data: this.#dataForSubscribers
             };
@@ -167,23 +167,6 @@ class AppTaping extends Material {
                         }
                   });
             });
-
-            //Per Parent Subscription:
-            /* for(let a = 0; a < this.INHERITED_DATA.length; a++) {
-                   if(this.INHERITED_DATA[a].data.finalRollSize) {
-                         let recievedInputSizes = this.INHERITED_DATA[a].data.finalRollSize;
-                         let i = 0;
-                         this.#inheritedSizes.push(recievedInputSizes[i]);
-                         this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, roundNumber(recievedInputSizes[i].width, 2), roundNumber(recievedInputSizes[i].height, 2));
-                   } else {
-                         let recievedInputSizes = this.INHERITED_DATA[a].data.QWHD;
- 
-                         for(let i = 0; i < recievedInputSizes.length; i++) {
-                               this.#inheritedSizes.push(recievedInputSizes[i]);
-                               this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, roundNumber(recievedInputSizes[i].width, 2), roundNumber(recievedInputSizes[i].height, 2));
-                         }
-                   }
-             }*/
       };
 
       UpdateMachineDefaults() {
@@ -240,38 +223,8 @@ class AppTaping extends Material {
                   });
             });
 
-            $(this.#materialTotalArea[1]).val(combinedSqm(sizeArray)).change();
+            $(this.#materialTotalArea[1]).val(combinedSqm(sizeArray));
       };
-
-      /*
-      Override*/
-      /*ReceiveSubscriptionData(data) {
-            let dataIsNew = true;
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(data.parent == this.INHERITED_DATA[i].parent) {
-                        dataIsNew = false;
-                        this.INHERITED_DATA[i] = data;
-                        break;
-                  }
-            }
-            if(dataIsNew) {
-                  this.INHERITED_DATA.push(data);
-            }
-
-            super.ReceiveSubscriptionData(data);
-      }*/
-
-      /*
-      Override*/
-      UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(this.INHERITED_DATA[i].parent == parent) {
-                        this.INHERITED_DATA.splice(i, 1);
-                        break;
-                  }
-            }
-            super.UnSubscribeFrom(parent);
-      }
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);

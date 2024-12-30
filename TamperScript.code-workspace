@@ -40,6 +40,20 @@
 				"padding": "5px",
 				"isWholeLine": true
 		},{
+				"text": "DATA_FOR_SUBSCRIBERS",
+				"color": "#ffffff",
+				"fontWeight": "bold",
+				"backgroundColor": "blue",
+				"overviewRulerColor": "grey",
+				"padding": "5px"
+		},{
+				"text": "INHERITED_DATA",
+				"color": "#ffffff",
+				"fontWeight": "bold",
+				"backgroundColor": "blue",
+				"overviewRulerColor": "grey",
+				"padding": "5px"
+		},{
 				"text": "//VARIABLES",
 				"color": "#ffffff",
 				"fontWeight": "bold",

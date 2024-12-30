@@ -56,7 +56,7 @@ class ProductionSubscribable extends Material {
       }
 
       UpdateDataForSubscribers() {
-            this.dataToPushToSubscribers = {
+            this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
                   data: this.#dataForSubscribers
             };
@@ -75,34 +75,6 @@ class ProductionSubscribable extends Material {
                   }
             }
       };
-
-      /*ReceiveSubscriptionData(data) {
-            let dataIsNew = true;
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(data.parent == this.INHERITED_DATA[i].parent) {
-                        dataIsNew = false;
-                        this.INHERITED_DATA[i] = data;
-                        break;
-                  }
-            }
-            if(dataIsNew) {
-                  this.INHERITED_DATA.push(data);
-            }
-
-            super.ReceiveSubscriptionData(data);
-      }*/
-
-      /*
-      Override*/
-      UnSubscribeFrom(parent) {
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(this.INHERITED_DATA[i].parent == parent) {
-                        this.INHERITED_DATA.splice(i, 1);
-                        break;
-                  }
-            }
-            super.UnSubscribeFrom(parent);
-      }
 
       async Create(productNo, partIndex) {
             super.Create(productNo, partIndex);
