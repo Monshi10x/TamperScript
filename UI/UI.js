@@ -1165,10 +1165,6 @@ function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalC
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(containerDiv);
     }
-
-    if(options.triggerCallbackWhenFirstCreated) {
-        optionalCallback();
-    }
     return [containerDiv, input];
 }
 function createRadio(text, defaultValue, overrideCssStyles, optionalCallback) {
