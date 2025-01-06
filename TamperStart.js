@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.48
+// @version      10.49
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -55,7 +55,9 @@
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
+// @require      https://cdn.jsdelivr.net/npm/svg-path-commander/dist/svg-path-commander.js
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
+// @require      https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Charts/Chart.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Loaders/Loader.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/DragAndDrop/DragAndDrop.js
@@ -72,6 +74,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Tables/Table.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_Common.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/DragZoomCanvas.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/DragZoomSVG.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/LHSMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/VehicleBuilder.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/Windows.js
@@ -89,7 +92,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/PanelSigns.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/ChartMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/MenuPOS.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/TogglePartsMenu.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/TogglePartsMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/Modal.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalManageSubscriptions.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInput.js
@@ -106,10 +109,10 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSheetJoins.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalVinylJoins.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Mouse/ContextMenu.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/SummaryHelper.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/CostAnalysisSummary.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/InstallSummary.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Product_Components/ProductComponents.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/SummaryHelper.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/CostAnalysisSummary.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/InstallSummary.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/ProductComponents.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Images.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Colour.js
