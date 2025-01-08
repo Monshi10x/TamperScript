@@ -1,0 +1,200 @@
+class Painting extends Material {
+      /*
+                        
+      Variables         */
+      static DISPLAY_NAME = "PAINTING";
+
+      #dataForSubscribers = [{qty: 0, totalLength: 0}];
+
+      #defaultSetupTime = 30;
+      #defaultFlashTime = 20;
+      #defaultCoatTime = 10;
+      #defaultColourMatchTime = 0;
+      #defaultLitres = 0.5;
+      #defaultUseLitresFormula = true;
+      #defaultLitresPerSquareMetrePerCoat = 0.3;
+      /*
+                        
+      Fields            */
+      #f_inheritedSizeTable;
+      #f_outputSizeTable;
+      #f_setupTime;
+
+      #f_numberCoats;
+      #f_flashTime;
+      #f_perCoatTime;
+      #f_colourMatchTime;
+      #f_litres;
+      #f_litresFormulas;
+      #f_useLitresFormula;
+      #f_areaToPaint;
+      #f_litresPerSquareMetrePerCoat;
+      /*
+                        
+      Getter            */
+      /*override*/get Type() {return "PAINTING";}
+      get backgroundColor() {return "grey";}
+      get textColor() {return COLOUR.Black;}
+      get DEBUG_SHOW() {return true;}
+      /*
+                        
+      Setter            */
+      /*
+                        
+      Start             */
+      constructor(parentObject, sizeClass, type) {
+            super(parentObject, sizeClass, type);
+            /*
+            InheritedParentSizeSplits*/
+            let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
+
+            this.#f_inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
+            this.#f_inheritedSizeTable.setHeading("Qty", "Square Metres", "From");
+            this.#f_inheritedSizeTable.addRow("-", "-", "-");
+            this.#f_inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
+
+            /*
+            Machine*/
+            let f_timeContainer = createDivStyle5(null, "Time", this.container)[1];
+
+            createText("Setup", "width:100%;height:20px", f_timeContainer);
+            this.#f_setupTime = createInput_Infield("Setup Time", this.#defaultSetupTime, "width:30%;", () => {this.UpdateFromChange();}, f_timeContainer, false, 0.1, {postfix: "min"});
+
+            createText("Colour Match", "width:100%;height:20px", f_timeContainer);
+            this.#f_colourMatchTime = createInput_Infield("Colour Match Time", this.#defaultColourMatchTime, "width:30%;margin-right:60%;", () => {this.UpdateFromChange();}, f_timeContainer, false, 5, {postfix: "min"});
+
+            createText("Run", "width:100%;height:20px", f_timeContainer);
+            this.#f_numberCoats = createDropdown_Infield("Number of Coats", 0, "width:50%;", [createDropdownOption("x2 (2K for Acrylic/ACM)", 2), createDropdownOption("x3 (2K for Raw Metals Alum/Steel/Stainless...)", 3)], () => {this.UpdateFromChange();}, f_timeContainer);
+            this.#f_perCoatTime = createInput_Infield("Per Coat Time", this.#defaultCoatTime, "width:20%;", () => {this.UpdateFromChange();}, f_timeContainer, false, 1, {postfix: "min"});
+            this.#f_flashTime = createInput_Infield("Flash Time", this.#defaultFlashTime, "width:20%;", () => {this.UpdateFromChange();}, f_timeContainer, false, 5, {postfix: "min"});
+
+            let f_litresContainer = createDivStyle5(null, "Litres", this.container)[1];
+            this.#f_useLitresFormula = createCheckbox_Infield("Use Formula", this.#defaultUseLitresFormula, "width:30%;", () => {
+                  if(!this.#f_useLitresFormula[1].checked) $(this.#f_litres[0]).show();
+                  this.UpdateFromChange();
+            }, f_litresContainer);
+            this.#f_litresFormulas = createDropdown_Infield_Icons_Search("Use Formula", 0, "width:30%;margin-right:30%;", 10, true, [["Flat Panels", "blue"], ["10-20mmD Letters", "green"], ["Fabricated Front-lit Letters", "yellow"], ["Fabricated Back-lit Letters", "yellow"], ["Fabricated Non-lit Letters", "yellow"]], () => {this.UpdateFromChange();}, f_litresContainer, false);
+
+            this.#f_areaToPaint = createInput_Infield("Area To Paint", 0, "width:25%;", () => {this.UpdateFromChange();}, f_litresContainer, false, 0.1, {postfix: "m2"});
+            createText("X", "width:30px;height:50px;font-size:32px;color:blue;", f_litresContainer);
+            setFieldDisabled(true, this.#f_areaToPaint[1], this.#f_areaToPaint[0]);
+            this.#f_litresPerSquareMetrePerCoat = createInput_Infield("Litres Per m2 Per Coat", this.#defaultLitresPerSquareMetrePerCoat, "width:25%;", () => {this.UpdateFromChange();}, f_litresContainer, false, 0.1, {postfix: "m2"});
+            createText("=", "width:30px;height:50px;font-size:32px;color:blue;", f_litresContainer);
+            setFieldDisabled(true, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
+
+            this.#f_litres = createInput_Infield("Litres", this.#defaultLitres, "width:25%;", () => {this.UpdateFromChange();}, f_litresContainer, false, 0.1, {postfix: "L"});
+
+            makeFieldGroup("Checkbox", this.#f_useLitresFormula[1], true, this.#f_litresFormulas[0]);
+            /*
+            OutputSizes*/
+            let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.container)[1];
+
+            this.#f_outputSizeTable = new Table(f_container_outputSizes, "100%", 20, 250);
+            this.#f_outputSizeTable.setHeading("Litres");
+            this.#f_outputSizeTable.addRow("-");
+            this.#f_outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
+
+            /*
+            Update*/
+            this.UpdateFromChange();
+      }
+
+      /*
+      Inherited*/
+      UpdateFromChange() {
+            super.UpdateFromChange();
+
+            this.UpdateFromInheritedData();
+
+            this.UpdateLitres();
+
+            this.UpdateOutput();
+            this.UpdateDataForSubscribers();
+            this.PushToSubscribers();
+      }
+
+      UpdateDataForSubscribers() {
+            this.DATA_FOR_SUBSCRIBERS = {
+                  parent: this,
+                  data: this.#dataForSubscribers
+            };
+      }
+
+      UpdateFromInheritedData = () => {
+            this.#f_inheritedSizeTable.deleteAllRows();
+
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{pathLength: 0, shapeAreas: 0, boundingRectAreas: 0, QWHD: QWHD}*/) => {
+
+                        if(!dataEntry.paintedArea) return /**only this entry */;
+                        let qty = 1; if(dataEntry.QWHD) qty = dataEntry.QWHD.qty;
+
+                        this.#f_inheritedSizeTable.addRow(qty, roundNumber(dataEntry.paintedArea, 2), subscription.parent.constructor.name);
+                  });
+            });
+      };
+
+      UpdateLitres() {
+            if(!this.#f_useLitresFormula[1].checked) return;
+
+            let calculatedArea = 0;
+
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{paintedArea: 0}*/) => {
+
+                        if(!dataEntry.paintedArea) return/**just this entry*/;
+
+                        switch(this.#f_litresFormulas[1].value) {
+                              case "Flat Panels":
+                                    if(subscription.parent.constructor.name != "Coil") calculatedArea += dataEntry.paintedArea; /**exclude backs from painting, only Coil returns */
+                                    break;
+                              case "10-20mmD Letters":
+                                    if(subscription.parent.constructor.name != "Coil") calculatedArea += dataEntry.paintedArea; /**exclude backs from painting, only Coil returns */
+                                    break;
+                              case "Fabricated Front-lit Letters":
+                                    if(!["Sheet", "SVGCutfile"].includes(subscription.parent.constructor.name)) calculatedArea += dataEntry.paintedArea; /**exclude backs from painting, only Coil returns */
+                                    break;
+                              case "Fabricated Back-lit Letters":
+                                    calculatedArea += dataEntry.paintedArea;
+                                    break;
+                              case "Fabricated Non-lit Letters":
+                                    calculatedArea += dataEntry.paintedArea;
+                                    break;
+                              default: break;
+                        }
+                  });
+            });
+
+            $(this.#f_areaToPaint[1]).val(calculatedArea);
+            $(this.#f_litres[1]).val(zeroIfNaNNullBlank(this.#f_litresPerSquareMetrePerCoat[1].value) * zeroIfNaNNullBlank(this.#f_numberCoats[1].value) * calculatedArea);
+      }
+
+      UpdateOutput() {
+            this.#dataForSubscribers = [];
+            this.#f_outputSizeTable.deleteAllRows();
+
+            this.#f_outputSizeTable.addRow(this.#f_litres[1].value);
+            this.#dataForSubscribers = [{litres: this.#f_litres[1].value}];
+      };
+
+      async Create(productNo, partIndex) {
+            console.log(productNo, partIndex, true, false, this.qty, this.#f_litres[1].value, this.#f_colourMatchTime[1].value, this.#f_numberCoats[1].value, this.#f_setupTime[1].value, this.#f_flashTime[1].value, this.#f_perCoatTime[1].value, "2Pac Painting");
+            partIndex = await q_AddPart_Painting(productNo, partIndex, true, false, this.qty,
+                  zeroIfNaNNullBlank(this.#f_litres[1].value),
+                  zeroIfNaNNullBlank(this.#f_colourMatchTime[1].value),
+                  zeroIfNaNNullBlank(this.#f_numberCoats[1].value),
+                  zeroIfNaNNullBlank(this.#f_setupTime[1].value),
+                  zeroIfNaNNullBlank(this.#f_flashTime[1].value),
+                  zeroIfNaNNullBlank(this.#f_perCoatTime[1].value),
+                  "2Pac Painting");
+            return partIndex;
+      }
+
+      Description() {
+            super.Description();
+
+            return "";
+      }
+}

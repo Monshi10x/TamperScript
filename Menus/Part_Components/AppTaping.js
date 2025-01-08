@@ -1,4 +1,5 @@
 class AppTaping extends Material {
+      static DISPLAY_NAME = "APP TAPE";
       /*override*/get Type() {return "APP TAPE";}
 
       #materialHeader;
@@ -135,10 +136,10 @@ class AppTaping extends Material {
       UpdateFromChange() {
             super.UpdateFromChange();
 
-            this.UpdateInheritedSizeTable();
+            this.UpdateFromInheritedData();
             this.UpdateMachineTimes();
             this.UpdateProductionTimes();
-            this.UpdateOutputSizeTable();
+            this.UpdateOutput();
             this.UpdateDataForSubscribers();
             this.UpdateSubscribedLabel();
             this.PushToSubscribers();
@@ -151,17 +152,19 @@ class AppTaping extends Material {
             };
       }
 
-      UpdateInheritedSizeTable = () => {
+      UpdateFromInheritedData = () => {
             this.#inheritedSizeTable.deleteAllRows();
 
             this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD, finalRollSize: [...]}*/) => {
 
+                        if(!dataEntry.QWHD || !dataEntry.finalRollSize) return/**Only this iteration*/;
+
                         if(dataEntry.finalRollSize) {
                               let recievedInputSizes = dataEntry.finalRollSize;
-                              let i = 0;
-                              this.#inheritedSizeTable.addRow(recievedInputSizes[i].qty, roundNumber(recievedInputSizes[i].width, 2), roundNumber(recievedInputSizes[i].height, 2));
+
+                              this.#inheritedSizeTable.addRow(recievedInputSizes[0].qty, roundNumber(recievedInputSizes[0].width, 2), roundNumber(recievedInputSizes[0].height, 2));
                         } else {
                               this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
                         }
@@ -206,7 +209,7 @@ class AppTaping extends Material {
             this.#production.productionTime = this.machineSetupTime + this.machineRunTime;
       }
 
-      UpdateOutputSizeTable() {
+      UpdateOutput() {
             this.#dataForSubscribers = [];
             this.#outputSizeTable.deleteAllRows();
 
@@ -216,10 +219,10 @@ class AppTaping extends Material {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD}*/) => {
 
-                        this.#dataForSubscribers.push({QWHD: new QWHD(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height)});
-                        this.#outputSizeTable.addRow(dataEntry.QWHD.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
+                        this.#dataForSubscribers.push({QWHD: new QWHD(dataEntry.QWHD.qty * this.qty, dataEntry.QWHD.width, dataEntry.QWHD.height)});
+                        this.#outputSizeTable.addRow(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
 
-                        sizeArray.push(new QWHD(dataEntry.QWHD.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2)));
+                        sizeArray.push(new QWHD(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2)));
                   });
             });
 

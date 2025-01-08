@@ -1,4 +1,5 @@
 class InstallSubscribable extends Material {
+      static DISPLAY_NAME = "INSTALL";
       /*override*/get Type() {return "INSTALL";}
 
       /**
@@ -49,7 +50,7 @@ class InstallSubscribable extends Material {
       UpdateFromChange() {
             super.UpdateFromChange();
 
-            this.UpdateInheritedTable();
+            this.UpdateFromInheritedData();
             this.UpdateDataForSubscribers();
             this.UpdateSubscribedLabel();
             this.PushToSubscribers();
@@ -62,7 +63,7 @@ class InstallSubscribable extends Material {
             };
       }
 
-      UpdateInheritedTable = () => {
+      UpdateFromInheritedData = () => {
             this.#inheritedSizes = [];
             this.#inheritedSizeTable.deleteAllRows();
 

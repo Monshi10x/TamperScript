@@ -136,6 +136,7 @@ class Size extends SubscriptionManager {
       #container;
       get container() {return this.#container;}
 
+      static DISPLAY_NAME = "SIZE";
       #Type = "SIZE";
       get Type() {return this.#Type;}
       set Type(type) {this.#Type = type;};

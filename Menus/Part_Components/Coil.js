@@ -2,13 +2,7 @@ class Coil extends Material {
       /*
                         
       Variables         */
-      #useRollLength = false;
-      /**
-       * @Inherited
-       * @example
-       * [{parent: SVGCutfile, data: {…}},
-       * {parent: SVGCutfile, data: {…}}]*/
-      //#inheritedData2 = [];
+      static DISPLAY_NAME = "COIL";
       /**
       /**
        * @Inherited*/
@@ -35,6 +29,17 @@ class Coil extends Material {
       get machineSetupTime() {return zeroIfNaNNullBlank(this.#f_machineSetupTime[1].value);}
       get backgroundColor() {return COLOUR.Purple;}
       get textColor() {return COLOUR.White;}
+      get returnDepth() {
+            let material = this.#f_material[1].value;
+            let actualDepth = 0;
+            material.split(" ").forEach((value) => {
+                  if(value.includes("x")) {
+                        actualDepth = parseFloat(value.split("x")[0]);
+                  }
+            });
+            return actualDepth || 0;
+      }
+      get DEBUG_SHOW() {return true;}
       /*
                         
       Setter            */
@@ -91,7 +96,7 @@ class Coil extends Material {
             this.#f_production = new Production(f_container_production, null, function() { }, this.sizeClass);
             this.#f_production.showContainerDiv = true;
             this.#f_production.productionTime = 20;
-            this.#f_production.headerName = "Bending Production";
+            this.#f_production.headerName = "Channel Bending Production";
             this.#f_production.required = true;
             this.#f_production.showRequiredCkb = false;
             this.#f_production.requiredName = "Required";
@@ -107,7 +112,7 @@ class Coil extends Material {
 
             /*
             Update*/
-            this.UpdateDataForSubscribers();
+            this.UpdateFromChange();
       }
 
       /*
@@ -115,13 +120,13 @@ class Coil extends Material {
       UpdateFromChange() {
             super.UpdateFromChange();
 
-            this.UpdateInheritedSizeTable();
+            this.UpdateFromInheritedData();
 
             this.UpdateMachineTimes();
             this.UpdateProductionTimes();
-            this.UpdateOutputSizeTable();
+
+            this.UpdateOutput();
             this.UpdateDataForSubscribers();
-            this.UpdateSubscribedLabel();
             this.PushToSubscribers();
       }
 
@@ -132,7 +137,7 @@ class Coil extends Material {
             };
       }
 
-      UpdateInheritedSizeTable = () => {
+      UpdateFromInheritedData = () => {
             this.#f_inheritedSizeTable.deleteAllRows();
 
             this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
@@ -165,8 +170,7 @@ class Coil extends Material {
             this.#f_production.productionTime = this.machineTotalTime;
       }
 
-      UpdateOutputSizeTable() {
-            console.log(this);
+      UpdateOutput() {
             this.#dataForSubscribers = [];
             this.#f_outputSizeTable.deleteAllRows();
 
@@ -177,7 +181,7 @@ class Coil extends Material {
                         let qtyVal = zeroIfNaNNullBlank(dataEntry.QWHD.qty);
                         let lengthVal = zeroIfNaNNullBlank(dataEntry.pathLength);
 
-                        this.#dataForSubscribers.push({qty: qtyVal, totalLength: lengthVal});
+                        this.#dataForSubscribers.push({qty: qtyVal, totalLength: lengthVal, returnDepth: this.returnDepth, paintedArea: mmToM(lengthVal) * mmToM(this.returnDepth)});
                         this.#f_outputSizeTable.addRow(qtyVal, roundNumber(lengthVal, 2));
                   });
             });
@@ -188,12 +192,11 @@ class Coil extends Material {
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
             var name = this.#f_material[1].value;
-            //var partFullName = getPredefinedParts_Name_FromLimitedName(name);
 
             for(let i = 0; i < this.#dataForSubscribers.length; i++) {
                   let partQty = this.#dataForSubscribers[i].qty;
                   let partLength = this.#dataForSubscribers[i].totalLength;
-                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, name, partQty, partLength, null, partFullName, "", false);
+                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, name, partQty, partLength, null, name, "", false);
             }
             partIndex = await this.#f_production.Create(productNo, partIndex);
 
@@ -203,8 +206,6 @@ class Coil extends Material {
       Description() {
             super.Description();
 
-
-
-            return "mmD returns";
+            return this.returnDepth + "mmD returns";
       }
 }

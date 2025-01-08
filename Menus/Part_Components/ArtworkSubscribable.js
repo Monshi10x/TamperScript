@@ -1,4 +1,5 @@
 class ArtworkSubscribable extends Material {
+      static DISPLAY_NAME = "ARTWORK";
       /*override*/get Type() {return "ARTWORK";}
       /**
        * @Inherited
@@ -41,7 +42,7 @@ class ArtworkSubscribable extends Material {
       UpdateFromChange() {
             super.UpdateFromChange();
 
-            this.UpdateInheritedTable();
+            this.UpdateFromInheritedData();
             this.UpdateDataForSubscribers();
             this.UpdateSubscribedLabel();
             this.PushToSubscribers();
@@ -54,7 +55,7 @@ class ArtworkSubscribable extends Material {
             };
       }
 
-      UpdateInheritedTable = () => {
+      UpdateFromInheritedData = () => {
             this.#inheritedSizes = [];
             this.#inheritedSizeTable.deleteAllRows();
 

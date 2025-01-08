@@ -1,4 +1,5 @@
 class ProductionSubscribable extends Material {
+      static DISPLAY_NAME = "PRODUCTION";
       /*override*/get Type() {return "PRODUCTION";}
 
       /**
@@ -49,7 +50,7 @@ class ProductionSubscribable extends Material {
       UpdateFromChange() {
             super.UpdateFromChange();
 
-            this.UpdateInheritedTable();
+            this.UpdateFromInheritedData();
             this.UpdateDataForSubscribers();
             this.UpdateSubscribedLabel();
             this.PushToSubscribers();
@@ -62,7 +63,7 @@ class ProductionSubscribable extends Material {
             };
       }
 
-      UpdateInheritedTable = () => {
+      UpdateFromInheritedData = () => {
             this.#inheritedSizes = [];
             this.#inheritedSizeTable.deleteAllRows();
 
@@ -70,15 +71,15 @@ class ProductionSubscribable extends Material {
             for(let a = 0; a < this.INHERITED_DATA.length; a++) {
                   let recievedInputSizes = this.INHERITED_DATA[a].data;
                   for(let i = 0; i < recievedInputSizes.length; i++) {
-                        this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height);
+                        //this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
+                        //this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height);
                   }
             }
       };
 
       async Create(productNo, partIndex) {
             super.Create(productNo, partIndex);
-            this.#productionItem.Create(productNo, partIndex);
+            partIndex = this.#productionItem.Create(productNo, partIndex);
             return partIndex;
       }
 }

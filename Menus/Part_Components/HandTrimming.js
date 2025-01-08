@@ -1,4 +1,5 @@
 class HandTrimming extends Material {
+      static DISPLAY_NAME = "HAND TRIMMING";
       /*override*/get Type() {return "HAND TRIMMING";}
 
       #materialHeader;
@@ -113,23 +114,32 @@ class HandTrimming extends Material {
             this.#inheritedSizes = [];
             this.#inheritedSizeTable.deleteAllRows();
 
-            //Per Parent Subscription:
-            for(let a = 0; a < this.INHERITED_DATA.length; a++) {
-                  let recievedInputSizes = this.INHERITED_DATA[a].data;
-                  for(let i = 0; i < recievedInputSizes.length; i++) {
-                        this.#inheritedSizes.push(recievedInputSizes[i]);
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height);
-                  }
-            }
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{QWHD: QWHD, finalRollSize: [...]}*/) => {
+
+                        if(!dataEntry.QWHD || !dataEntry.finalRollSize) return/**Only this iteration*/;
+
+                        this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height);
+                  });
+            });
       };
 
       UpdateTrimmingTimes = () => {
             let totalLinearMetres = 0;
             let numberOfShapes = 0;
-            for(let i = 0; i < this.#inheritedSizes.length; i++) {
-                  totalLinearMetres += mmToM(this.#inheritedSizes[i].qty * 2 * (this.#inheritedSizes[i].width + this.#inheritedSizes[i].height));
-                  numberOfShapes += this.#inheritedSizes[i].qty;
-            }
+
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{QWHD: QWHD, finalRollSize: [...]}*/) => {
+
+                        if(!dataEntry.QWHD || !dataEntry.finalRollSize) return/**Only this iteration*/;
+
+                        totalLinearMetres += mmToM(dataEntry.QWHD.qty * 2 * (dataEntry.QWHD.width + dataEntry.QWHD.height)) * this.qty;
+                        numberOfShapes += dataEntry.QWHD.qty * this.qty;
+                  });
+            });
+
             this.#totalLinearMetresField[1].value = roundNumber(totalLinearMetres, 2);
 
             let calculatedTrimmingTime = totalLinearMetres * secondsToMinutes(zeroIfNaNNullBlank(this.#trimmingSecondsPerMetreField[1].value));

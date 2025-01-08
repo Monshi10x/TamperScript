@@ -827,6 +827,38 @@ function svg_formatCompoundPaths(svgObject) {
       return svgObject;
 }
 
+const SummarizePathString = (function() {
+      const
+            regSplit = /([\+\-.0-9]+)|\s*[\s,]\s*/
+            , isLowerCase = str => /^[a-z]*$/.test(str)
+            , codPath =
+            {
+                  M: ['x', 'y']
+                  , L: ['x', 'y']
+                  , H: ['x']
+                  , V: ['y']
+                  , Z: []
+                  , C: ['x1', 'y1', 'x2', 'y2', 'x', 'y']
+                  , S: ['x2', 'y2', 'x', 'y']
+                  , Q: ['x1', 'y1', 'x', 'y']
+                  , T: ['x', 'y']
+                  , A: ['rX', 'rY', 'rotation', 'arc', 'sweep', 'x', 'y']
+            };
+      return function(pathStr) {
+            let
+                  res = []
+                  , arr = pathStr.split(regSplit).filter(Boolean)
+                  , relativ = false
+                  ;
+            for(let i = 0; i < arr.length;) {
+                  let cmd = isNaN(arr[i]) ? arr[i++] : relativ ? 'l' : 'L';
+                  relativ = isLowerCase(cmd);
+                  res.push(codPath[cmd.toUpperCase()].reduce((a, c) => {a[c] = Number(arr[i++]); return a;}, {cmd}));
+            }
+            return res;
+      };
+})();
+
 class TSVGRect {
       #x;
       set x(value) {

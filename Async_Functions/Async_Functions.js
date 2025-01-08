@@ -210,13 +210,13 @@ var ACMLookup;
 var RouterToolpathTimeLookup;
 var LaserToolpathTimeLookup;
 var PartItemsLookup;
-var Transformer;
+var TransformerLookup;
 var predefinedVehicleTemplates;
 var blankVehicleTemplates;
 window.addEventListener("load", (event) => {
-    Transformer = JSON.parse(GM_getResourceText("JSONTransformers"));
-    console.log(Transformer);
-    Transformer = Transformer.transformers;
+    TransformerLookup = JSON.parse(GM_getResourceText("JSONTransformers"));
+    console.log(TransformerLookup);
+    TransformerLookup = TransformerLookup.transformers;
 
     predefinedVehicleTemplates = JSON.parse(GM_getResourceText("JSONPredefinedVehicleTemplates"));
     console.log(predefinedVehicleTemplates);
@@ -1025,7 +1025,7 @@ async function setPaintSprayTimeTotal(productNo, partNo, value) {
 //          newOrEdit: True if new part, false if edit
 //          totalOrEach: True if total, false if each
 //***********************************************************************//
-async function q_AddPart_Painting(productNo, partNo, newOrEdit, totalOrEach, partQty, paintLitres, colourMatchTime, numberCoats, setupTime, flashTime, sprayTime, partDescription) {
+async function q_AddPart_Painting(productNo, partNo, newOrEdit, totalOrEach = false, partQty, paintLitres, colourMatchTime, numberCoats, setupTime, flashTime, sprayTime, partDescription) {
     //if new
     if(newOrEdit) {
         await AddPart(totalOrEach ? "Painting - Valtspar 2Pac 2K" : "Painting - Valtspar 2Pac 2K (ea)", productNo);
@@ -1576,10 +1576,10 @@ var Field = {
     },
     //--------PAINTING-------//
     PaintLitresEach: function(productNo, partNo) {
-        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_497";
+        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_521";
     },
     PaintLitresTotal: function(productNo, partNo) {
-        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_496";
+        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_522";
     },
     PaintColourMatchTimeEach: function(productNo, partNo) {
         return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_491";

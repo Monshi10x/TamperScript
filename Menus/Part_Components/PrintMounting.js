@@ -1,4 +1,5 @@
 class PrintMounting extends Material {
+      static DISPLAY_NAME = "PRINT MOUNTING";
       /*override*/get Type() {return "PRINT MOUNTING";}
 
       static maxMountingWidth = 8000;

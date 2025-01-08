@@ -3,7 +3,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 	/** @ViewMode */
 	#viewMode;
 	#numProducts = 0;
-	#creationOrder = [ProductDetails, Size, SVGCutfile, Sheet, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+	#creationOrder = [ProductDetails, Size, SVGCutfile, Sheet, LED, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
 
 
 	/** @QuickTemplate */
@@ -129,18 +129,23 @@ class MenuPanelSigns extends LHSMenuWindow {
 	#addQuickTemplate() {
 		this.#numProducts++;
 
-		let productDetails;
-		let size;
-		let sheet;
-		let vinyl;
-		let laminate;
-		let appTape;
-		let handTrimming;
-		let printMounting;
-		let finishing;
-		let production;
-		let artwork;
-		let install;
+		let productDetails = null;
+		let size = null;
+		let svgCutfile = null;
+		let sheet = null;
+		let coil = null;
+		let led = null;
+		let transformer = null;
+		let vinyl = null;
+		let laminate = null;
+		let appTape = null;
+		let handTrimming = null;
+		let printMounting = null;
+		let finishing = null;
+		let painting = null;
+		let production = null;
+		let artwork = null;
+		let install = null;
 
 		switch(this.#addQuickTemplateBtn[1].value) {
 			case "3D Front-lit Letters":
@@ -148,24 +153,33 @@ class MenuPanelSigns extends LHSMenuWindow {
 				productDetails.productLocation = "";
 				productDetails.productName = "3D Front-lit Letters";
 
-				size = this.#add(Size, this.page1, []);
-				size.width = 2440;
-				size.height = 1220;
+				svgCutfile = this.#add(SVGCutfile, this.page1, []);
+				coil = this.#add(Coil, this.page1, [SVGCutfile]);
 
-				let temp = this.#add(SVGCutfile, this.page1, []);
-				let temp2 = this.#add(Coil, this.page1, [SVGCutfile]);
+				production = this.#add(ProductionSubscribable, this.page1, [Coil]);
 
-				sheet = this.#add(Sheet, this.page1, [Size]);
+				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+				sheet.material = "Stainless";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
+
+				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+				sheet.material = "Acrylic";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
+
+				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
 				sheet.material = "ACM";
 				sheet.sheetSize = "2440x1220";
-				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)";
-				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
-				laminate = this.#add(Laminate, this.page1, [Vinyl]);
-				appTape = null;
-				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
-				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
-				production = null;
-				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
+				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
+
+				led = this.#add(LED, this.page1, [SVGCutfile]);
+				transformer = this.#add(Transformer, this.page1, [LED]);
+
+				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
+
+
+				artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
 				artwork.artworkItem.artworkTime = 60;
 				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
@@ -374,6 +388,21 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 	}
 
+	#add2(classType, container, subscribeTo) {
+		let newItem = new classType(container, this);
+		newItem.productNumber = this.#getproductNumber();
+
+		for(let x = 0; x < subscribeTo.length; x++) {
+			newItem.SubscribeTo(subscribeTo[i]);//subscribe to last of kind
+		}
+
+		this.#allMaterials.push(newItem);
+
+		this.#updateFromChange();
+		return newItem;
+
+	}
+
 	#addBlank(classType, container) {
 		let newItem = new classType(container, this);
 
@@ -460,7 +489,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 			this.#containers = [/*ProductDetails, Size, SVGCutfile, Sheet, Vinyl, Laminate, Coil, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
 
 			for(let i = 0; i < this.#creationOrder.length; i++) {
-				let UIContainer = new UIContainerType3("", this.#creationOrder[i].Type, this.page1);
+				let UIContainer = new UIContainerType3("", this.#creationOrder[i].DISPLAY_NAME, this.page1);
 
 				this.#containers.push(UIContainer);
 				let addBtn = createButton("Add +", "width:100px;min-height:30px;margin:0px;border:0px;", () => {
@@ -520,7 +549,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 			for(let i = 0; i < this.#creationOrder.length; i++) {
 				let UIContainer = new Object();
-				let d = createDivStyle5("", this.#creationOrder[i].Type, this.page1);
+				let d = createDivStyle5("", this.#creationOrder[i].DISPLAY_NAME, this.page1);
 				UIContainer.container = d[0];
 				UIContainer.contentContainer = d[1];
 				this.#containers.push(UIContainer);

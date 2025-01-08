@@ -270,6 +270,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
     prefix: "",
     postfix: ""
 }) {
+    var _pauseCallback = false;
     var input = document.createElement('input');
     var containerDiv = document.createElement('div');
     var textDescription = document.createElement('p');
@@ -331,7 +332,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         containerDiv.appendChild(downArrow);
     }
     input.onkeyup = function() {
-        if(optionalCallback) {
+        if(optionalCallback && !_pauseCallback) {
             optionalCallback();
         }
         if(input.value != "" || !fieldRequired) {
@@ -341,7 +342,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         }
     };
     input.onchange = function() {
-        if(optionalCallback) {
+        if(optionalCallback && !_pauseCallback) {
             optionalCallback();
         }
         if(input.value != "" || !fieldRequired) {
@@ -432,11 +433,19 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         });
     }
 
-    return [containerDiv, input, textDescription];
+    function pauseCallback() {
+        _pauseCallback = true;
+    }
+
+    function resumeCallback() {
+        _pauseCallback = false;
+    }
+
+    return [containerDiv, input, textDescription, pauseCallback, resumeCallback];
 }
 function createFileChooserButton(text, overrideCssStyles, optionalCallback, parentObjectToAppendTo) {
     var itemChooseBtn = document.createElement('input');
-    itemChooseBtn.style = STYLE.Button + "width:200px;";
+    itemChooseBtn.style = STYLE.Button + "width:200px;box-sizing:border-box;";
     itemChooseBtn.type = "file";
     itemChooseBtn.id = "itemChooseBtn";
     itemChooseBtn.multiple = false;
@@ -459,6 +468,8 @@ function createFileChooserButton(text, overrideCssStyles, optionalCallback, pare
                 var content = readerEvent.target.result;
                 optionalCallback(content);
             };
+        } else {
+            optionalCallback(null);
         }
     };
 
@@ -701,7 +712,8 @@ function createDropdown_Infield_Icons(text, selectedIndex, overrideCssStyles, wi
 
     return [containerDiv, dummyInput, dropdownBody];
 }
-function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssStyles, widthOfIcon, iconIsColour, options, optionalCallback, parentObjectToAppendTo, canAddCustom = false) {
+function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssStyles, widthOfIcon, iconIsColour, options = [/**[url, text],... */], optionalCallback, parentObjectToAppendTo, canAddCustom = false) {
+    var _pauseCallback = false;
     var containerDiv = document.createElement('div');
     containerDiv.style = STYLE.DropDownInfield;
     containerDiv.style.cursor = "pointer";
@@ -863,7 +875,7 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
                     dropdownText.innerText = optionDiv.querySelector("#optionText").innerText;
                     dummyInput.value = dropdownText.innerText;
                     toggleMenu();
-                    if(optionalCallback) {
+                    if(optionalCallback && !_pauseCallback) {
                         optionalCallback();
                     }
                 });
@@ -908,6 +920,7 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
         for(let i = 0; i < internalOptionDivs.length; i++) {
             if(internalOptionDivs[i].style.display != "none") {
                 $(internalOptionDivs[i]).click();
+                console.log("clicked");
                 break topLoop;
             }
         }
@@ -918,12 +931,20 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
         dummyInput.value = dropdownText.innerText;
     }
 
+    function pauseCallback() {
+        _pauseCallback = true;
+    }
+
+    function resumeCallback() {
+        _pauseCallback = false;
+    }
+
     dummyInput.onchange = function() {
         console.log("dummyInput.onchange");
         dropdownText.innerText = dummyInput.value;
     };
 
-    return [containerDiv, dummyInput, textDescription, dropdownBody, searchBar, clickFirstVisibleItem];
+    return [containerDiv, dummyInput, textDescription, dropdownBody, searchBar, clickFirstVisibleItem, pauseCallback, resumeCallback];
 }
 function createFloatingTag(text, overrideCssStyles, parentObjectToAppendTo, optionalCallback) {
     let floatingTag = document.createElement("div");
@@ -1126,9 +1147,7 @@ function createCheckbox(text, defaultValue, overrideCssStyles, optionalCallback,
     }
     return checkbox;
 }
-function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo, options = {
-    triggerCallbackWhenFirstCreated: false
-}) {
+function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalCallback, parentObjectToAppendTo) {
     var input = document.createElement('input');
     input.type = "checkbox";
     input.name = "checkbox";
@@ -1166,9 +1185,6 @@ function createCheckbox_Infield(text, defaultValue, overrideCssStyles, optionalC
         parentObjectToAppendTo.appendChild(containerDiv);
     }
 
-    if(options.triggerCallbackWhenFirstCreated) {
-        optionalCallback();
-    }
     return [containerDiv, input];
 }
 function createRadio(text, defaultValue, overrideCssStyles, optionalCallback) {

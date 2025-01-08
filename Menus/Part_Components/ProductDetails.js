@@ -3,6 +3,7 @@ class ProductDetails extends SubscriptionManager {
       #container;
       get container() {return this.#container;}
 
+      static DISPLAY_NAME = "PRODUCT DETAILS";
       #Type = "PRODUCT DETAILS";
       get Type() {return this.#Type;}
       set Type(type) {this.#Type = type;};

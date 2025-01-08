@@ -34,12 +34,15 @@ class ModalSVG extends Modal {
       #controlsContainer;
       #showShapeBoundingRect;
       #totalBoundingRectAreas;
+      #svgText;
+      #showPoints;
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
 
       constructor(headerText, incrementAmount, callback, svgText) {
             super(headerText, incrementAmount, callback);
+            this.#svgText = svgText;
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
 
@@ -78,6 +81,11 @@ class ModalSVG extends Modal {
             let shapeBoundingRectToggle = new Toggle(() => {this.hideShapeBoundingRect();}, () => {this.showShapeBoundingRect();});
             this.#showShapeBoundingRect = createCheckbox_Infield("Show Shape Bounding Rect", false, "width:250px;", () => {
                   shapeBoundingRectToggle.toggle();
+            }, this.#viewSettingsContainer);
+
+            let pointsToggle = new Toggle(() => {this.hideElementPoints();}, () => {this.showElementPoints();});
+            this.#showPoints = createCheckbox_Infield("Show Points", false, "width:250px;", () => {
+                  pointsToggle.toggle();
             }, this.#viewSettingsContainer);
 
             this.#controlsContainer = createDivStyle5(null, "Controls", this.getBodyElement())[1];
@@ -472,6 +480,73 @@ class ModalSVG extends Modal {
                   newGroup.appendChild(text);
             };
       }
+
+
+      addElementPoints() {
+
+
+            let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
+            let svgScale = this.#dragZoomSVG.scale;
+
+            let newGroup = mainGroup.querySelector("#itemPoints");
+
+            if(!newGroup) {
+                  newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                  newGroup.id = "itemPoints";
+                  mainGroup.appendChild(newGroup);
+            }
+
+
+            this.#dragZoomSVG.allPathElements.forEach((element) => {
+
+                  let d2 = element.getAttribute("d");
+
+                  let path2 = {
+                        type: 'path',
+                        d: d2
+                  };
+
+                  const points = SVGPoints.toPoints(path2);
+
+                  console.log();
+                  console.log(points);
+
+                  points.forEach((entry) => {
+                        if(!entry.x || !entry.y) return;
+
+
+                        let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        circle.setAttribute('fill', `rgb(0,0,255)`);
+                        circle.setAttribute('r', 1 / svgScale);
+                        circle.setAttribute('cx', entry.x);
+                        circle.setAttribute('cy', entry.y);
+
+                        newGroup.appendChild(circle);
+                  });
+
+            });
+
+
+
+
+      }
+
+      showElementPoints() {
+            let elements = this.#dragZoomSVG.svg.querySelector("#itemPoints");
+            if(elements) {
+                  $(elements).show();
+                  return;
+            }
+
+            this.addElementPoints();
+
+      }
+
+      hideElementPoints() {
+            let elements = this.#dragZoomSVG.svg.querySelector("#itemPoints");
+            $(elements).hide();
+      }
+
 
       setCurrentTool(tool) {
             this.#activeTool = tool;

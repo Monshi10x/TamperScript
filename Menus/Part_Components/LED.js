@@ -1,5 +1,263 @@
+class LED extends Material {
+      /*
+                        
+      Variables         */
+      static DISPLAY_NAME = "LED";
+      /**
+      /**
+       * @Inherited*/
+      #dataForSubscribers = [{qty: 0, totalWattage: 0, voltage: 12}];
+      #defaultUseFormula = true;
+      #defaultLEDPerHour = 50;
+      /*
+                        
+      Fields            */
+      #f_production;
+      #f_material;
+      #f_inheritedSizeTable;
+      #f_outputSizeTable;
+      #f_useQtyFormula;
+      #f_LEDPerHour;
 
-class LED extends SubMenu {
+      #f_area;
+      #f_formula;
+      /*
+                        
+      Getter            */
+      /*override*/get Type() {return "LED";}
+      get backgroundColor() {return COLOUR.Yellow;}
+      get textColor() {return COLOUR.Black;}
+
+      get DEBUG_SHOW() {return true;}
+      get wattage() {
+            let material = this.#f_material[1].value;
+            let ledPart = null;
+            for(let i = 0; i < predefinedParts_obj.length; i++) {
+                  if(predefinedParts_obj[i].Name == material) {
+                        ledPart = predefinedParts_obj[i];
+                        break;
+                  }
+            }
+            if(!ledPart) return false;
+
+            return JSON.parse(ledPart.Weight).wattage;
+      }
+      get voltage() {
+            let material = this.#f_material[1].value;
+            let ledPart = null;
+            for(let i = 0; i < predefinedParts_obj.length; i++) {
+                  if(predefinedParts_obj[i].Name == material) {
+                        ledPart = predefinedParts_obj[i];
+                        break;
+                  }
+            }
+            if(!ledPart) return false;
+
+            return JSON.parse(ledPart.Weight).voltage;
+      }
+
+      //return (qty * (wattage / (loadingPercentage / 100))) / voltage;
+      /*
+                        
+      Setter            */
+      set material(value) {$(this.#f_material[1]).val(value).change();}
+      /*
+                        
+      Start             */
+      constructor(parentObject, sizeClass, type) {
+            super(parentObject, sizeClass, type);
+
+            /*
+            InheritedParentSizeSplits*/
+            let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
+
+            this.#f_inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
+            this.#f_inheritedSizeTable.setHeading("Qty", "Width (mm)", "Height (mm)");
+            this.#f_inheritedSizeTable.addRow("-", "-", "-");
+            this.#f_inheritedSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
+
+            /*
+            Area*/
+            let f_container_area = createDivStyle5(null, "Area", this.container)[1];
+            this.#f_area = createInput_Infield("Total Area", 0, null, () => { }, f_container_area, false, 1, {postfix: "m2"});
+            setFieldDisabled(true, this.#f_area[1], this.#f_area[0]);
+
+            /*
+            Formula*/
+            let f_formula = createDivStyle5(null, "Formula", this.container)[1];
+            this.#f_useQtyFormula = createCheckbox_Infield("Use Formula", this.#defaultUseFormula, "width:30%;", () => {
+                  if(!this.#f_useQtyFormula[1].checked) $(this.#f_formula[0]).hide();
+                  else $(this.#f_formula[0]).show();
+
+                  this.UpdateFromChange();
+            }, f_formula);
+            this.#f_formula = createDropdown_Infield("Formula", 0, "", [
+                  createDropdownOption("Lightbox 150D - 50 per m2", "50"/**per square meter*/),
+                  createDropdownOption("Lightbox 100D - 100 per m2", "100"/**per square meter*/),
+                  createDropdownOption("Lightbox 50D - 380 per m2", "380"/**per square meter*/),
+                  createDropdownOption("3D Letters 100D - 80 per m2", "80"/**per square meter*/),
+                  createDropdownOption("3D Letters 80D - 156 per m2", "156"/**per square meter*/),
+                  createDropdownOption("3D Letters 50D - 380 per m2", "380"/**per square meter*/)
+            ], () => {this.UpdateFromChange();}, f_formula);
+
+            /*
+            Material*/
+            let f_container_material = createDivStyle5(null, "LEDs", this.container)[1]; 2;
+
+            var parts = getPredefinedParts("LED Module - ");
+            var dropdownElements = [];
+            parts.forEach(element => dropdownElements.push([element.Name, "https://sa-led.com/wp-content/uploads/2021/06/1541_123456.jpg"]));
+
+            this.#f_material = createDropdown_Infield_Icons_Search("LED", 0, "width:60%;", 50, false, dropdownElements, () => {this.UpdateFromChange();}, f_container_material);
+
+            /*
+            Production*/
+            let f_container_production = createDivStyle5(null, "LED Production", this.container)[1];
+
+            this.#f_LEDPerHour = createInput_Infield("LEDs per Hour", this.#defaultLEDPerHour, null, () => {this.UpdateFromChange();}, f_container_production, false, 1, {postfix: "LED/h"});
+
+            this.#f_production = new Production(f_container_production, null, function() { }, this.sizeClass);
+            this.#f_production.showContainerDiv = true;
+            this.#f_production.productionTime = 20;
+            this.#f_production.headerName = "LED Production";
+            this.#f_production.required = true;
+            this.#f_production.showRequiredCkb = false;
+            this.#f_production.requiredName = "Required";
+
+            /*
+            OutputSizes*/
+            let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.container)[1];
+
+            this.#f_outputSizeTable = new Table(f_container_outputSizes, "100%", 20, 250);
+            this.#f_outputSizeTable.setHeading("Qty", "Wattage (W)", "Voltage (V)");
+            this.#f_outputSizeTable.addRow("-", "-", "-");
+            this.#f_outputSizeTable.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
+
+            /*
+            Update*/
+            this.UpdateFromChange();
+      }
+
+      /*
+      Inherited*/
+      UpdateFromChange() {
+            super.UpdateFromChange();
+
+            this.UpdateFromInheritedData();
+
+            this.UpdateArea();
+            this.UpdateQty();
+            this.UpdateProductionTimes();
+
+            this.UpdateOutput();
+            this.UpdateDataForSubscribers();
+            this.PushToSubscribers();
+      }
+
+      UpdateDataForSubscribers() {
+            this.DATA_FOR_SUBSCRIBERS = {
+                  parent: this,
+                  data: this.#dataForSubscribers
+            };
+      }
+
+      UpdateFromInheritedData = () => {
+            this.#f_inheritedSizeTable.deleteAllRows();
+
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{pathLength: 0, shapeAreas: 0, boundingRectAreas: 0, QWHD: QWHD}*/) => {
+
+                        if(!dataEntry.QWHD || !dataEntry.shapeAreas) return/**just this entry*/;
+
+                        if(dataEntry.shapeAreas) {
+                              this.#f_inheritedSizeTable.addRow(1, roundNumber(Math.sqrt(dataEntry.shapeAreas * 1000000), 3), roundNumber(Math.sqrt(dataEntry.shapeAreas * 1000000), 3));
+                        } else if(dataEntry.QWHD) {
+                              this.#f_inheritedSizeTable.addRow(dataEntry.QWHD.qty, roundNumber(dataEntry.QWHD.width, 3), roundNumber(dataEntry.QWHD.height, 3));
+                        }
+                  });
+            });
+      };
+
+      UpdateArea() {
+            let area = 0;
+
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{pathLength: 0, shapeAreas: 0, boundingRectAreas: 0, QWHD: QWHD}*/) => {
+
+                        if(!dataEntry.QWHD || !dataEntry.shapeAreas) return/**just this entry*/;
+
+                        if(dataEntry.shapeAreas) {
+                              area += dataEntry.shapeAreas;
+                        } else if(dataEntry.QWHD) {
+                              area += dataEntry.QWHD.qty * dataEntry.QWHD.width * dataEntry.QWHD.height;
+                        }
+                  });
+            });
+
+            $(this.#f_area[1]).val(area);
+      }
+
+      UpdateQty() {
+            if(!this.#f_useQtyFormula[1].checked) return;
+
+            let area = 0;
+
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{pathLength: 0, shapeAreas: 0, boundingRectAreas: 0, QWHD: QWHD}*/) => {
+
+                        if(!dataEntry.QWHD || !dataEntry.shapeAreas) return/**just this entry*/;
+
+                        if(dataEntry.shapeAreas) {
+                              area += dataEntry.shapeAreas;
+                        } else if(dataEntry.QWHD) {
+                              area += dataEntry.QWHD.qty * dataEntry.QWHD.width * dataEntry.QWHD.height;
+                        }
+                  });
+            });
+
+            $(this.qtyField).val(roundNumberUp(area * zeroIfNaNNullBlank(parseFloat(this.#f_formula[1].selectedOptions[0].value))));
+      }
+
+      UpdateProductionTimes() {
+            this.#f_production.productionTime = this.qty / zeroIfNaNNullBlank(this.#f_LEDPerHour[1].value) * 60;
+      }
+
+      UpdateOutput() {
+            this.#dataForSubscribers = [];
+            this.#f_outputSizeTable.deleteAllRows();
+
+            this.#dataForSubscribers.push({qty: this.qty, wattage: this.wattage, voltage: this.voltage});
+            this.#f_outputSizeTable.addRow(this.qty, this.wattage, this.voltage);
+
+      };
+
+      async Create(productNo, partIndex) {
+            partIndex = await super.Create(productNo, partIndex);
+            var name = this.#f_material[1].value;
+
+            for(let i = 0; i < this.#dataForSubscribers.length; i++) {
+                  let partQty = this.#dataForSubscribers[i].qty;
+                  partIndex = await q_AddPart_Dimensionless(productNo, partIndex, true, name, partQty, "LED", "");
+            }
+            partIndex = await this.#f_production.Create(productNo, partIndex);
+
+            return partIndex;
+      }
+
+      Description() {
+            super.Description();
+
+            return "";
+      }
+}
+
+
+
+
+/*class LED extends SubMenu {
 
       LEDParts = [];
       partSearchTerm = "LED";
@@ -189,4 +447,4 @@ class LED extends SubMenu {
             setFieldHidden(false, this.#LEDLongevity[1], this.#LEDLongevity[0]);
             setFieldHidden(false, this.#LEDSize[1], this.#LEDSize[0]);
       };
-}
+}*/

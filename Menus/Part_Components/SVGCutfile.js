@@ -2,6 +2,7 @@ class SVGCutfile extends SubscriptionManager {
       /*
                         
       Variables         */
+      static DISPLAY_NAME = "SVG CUTFILE";
       #Type = "SVG CUTFILE";
       #UNIQUEID = generateUniqueID();
       #productNumber = -1;
@@ -43,6 +44,7 @@ class SVGCutfile extends SubscriptionManager {
       #f_height;
       #f_qty;
       #f_pathLength;
+      #f_svgStringChooser;
       /*
                         
       Getter            */
@@ -102,8 +104,47 @@ class SVGCutfile extends SubscriptionManager {
 
             this.#f_totalBoundingRectAreas = createInput_Infield("Bounding Rect Areas", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#f_container, true, 100, {postfix: "m2"});
 
-            this.#f_fileChooser = createFileChooserButton("", "margin:0px;min-height:32px;", async (fileContent) => {
-                  this.#f_svgFile = fileContent;
+            let settingsButton = createButton("", "width:40px;height:40px;margin:0px;margin-left:5px;margin-right:10px;font-size:20px;", () => {
+                  this.#openSettingsModal();
+            }, this.#f_container);
+            settingsButton.innerHTML = "&#9881";
+
+            this.#f_deleteBtn = createIconButton(GM_getResourceURL("Icon_Bin"), "", "display: block; float: right; width: 35px;height:40px; border:none;padding:0px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();}, this.#f_container);
+
+
+
+            let f_container_fileChooser = createDivStyle5(null, "File", this.#f_container)[1];
+
+            createText("Use SVG Text or Select File...", "width:100%;", f_container_fileChooser);
+
+            this.#f_svgStringChooser = createTextarea("SVG Text", "", "width:calc(50% - 10px);box-sizing:border-box;", async () => {
+                  if(this.#f_svgStringChooser.value == "") return;
+                  this.#f_svgFile = this.#f_svgStringChooser.value;
+                  console.log("svg file set to");
+                  console.log(this.#f_svgFile);
+                  if(this.#f_svgFile) $(this.#f_visualiserBtn).show();
+                  else $(this.#f_visualiserBtn).hide();
+
+                  $(this.#f_pathLength[1]).val(roundNumber(svg_getTotalPathLengths(svg_makeFromString(this.#f_svgFile)), 2)).change();
+
+                  //path Area
+                  let loader = new Loader(this.#f_pathArea[0]);
+                  this.#f_shapeAreas = await svg_getTotalPathArea_m2(this.#f_svgFile);
+                  $(this.#f_pathArea[1]).val(roundNumber(this.#f_shapeAreas, 4)).change();
+                  loader.Delete();
+
+                  //Bounding Rects
+                  let loader2 = new Loader(this.#f_totalBoundingRectAreas[0]);
+                  this.#totalBoundingRectAreas = svg_getTotalBoundingRectAreas_m2(this.#f_svgFile, yes);
+                  $(this.#f_totalBoundingRectAreas[1]).val(roundNumber(this.#totalBoundingRectAreas, 4)).change();
+                  loader2.Delete();
+
+                  this.UpdateFromChange();
+            }, f_container_fileChooser);
+
+            this.#f_fileChooser = createFileChooserButton("", "margin:5px;min-height:40px;width:calc(50% - 10px);box-sizing:border-box;", async (fileContent) => {
+                  if(fileContent)
+                        this.#f_svgFile = fileContent;
                   console.log("svg file set to");
                   console.log(this.#f_svgFile);
                   if(this.#f_svgFile) $(this.#f_visualiserBtn).show();
@@ -125,34 +166,35 @@ class SVGCutfile extends SubscriptionManager {
 
                   this.UpdateFromChange();
 
-            }, this.#f_container);
+            }, f_container_fileChooser);
 
-            this.#f_visualiserBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "", "width:calc(60px);display:none;height:40px;margin:0px;background-color:" + COLOUR.Orange + ";", () => {
+            this.#f_visualiserBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "", "width:calc(100% - 10px);display:none;height:40px;margin:5px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#f_visualiser = new ModalSVG("SVG", 100, () => {
                         this.UpdateFromChange();
                   }, this.#f_svgFile);
-            }, this.#f_container, true);
+            }, f_container_fileChooser, true);
 
-            let settingsButton = createButton("", "width:40px;height:40px;margin:0px;margin-left:5px;margin-right:10px;font-size:20px;", () => {
-                  this.#openSettingsModal();
-            }, this.#f_container);
-            settingsButton.innerHTML = "&#9881";
+
 
             this.#f_setting_IncludeSizeInDescription = createCheckbox_Infield("Include Size(s) In Description", false, "width: 450px;", () => {
                   this.#includeSizeInDescription = this.#f_setting_IncludeSizeInDescription[1].checked;
             });
 
-            this.#f_deleteBtn = createIconButton(GM_getResourceURL("Icon_Bin"), "", "display: block; float: right; width: 35px;height:40px; border:none;padding:0px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();});
-            this.#f_container.appendChild(this.#f_deleteBtn);
-
             let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.#f_container)[1];
 
-            let temp;
-            this.#f_sizeMethod1 = createCheckbox_Infield("Method 1 - Use Bounding Rect Areas", true, "width:300px;", temp = () => {
+            this.#f_sizeMethod1 = createCheckbox_Infield("Method 1 - Use Bounding Rect Areas", true, "width:300px;", () => {
                   setFieldDisabled(true, this.#f_pathArea[1], this.#f_pathArea[0]);
                   setFieldDisabled(false, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
                   this.UpdateFromChange();
             }, f_container_outputSizes);
+
+            let icon_boundingArea = document.createElement('img');
+            icon_boundingArea.src = GM_getResourceURL("Icon_BoundingArea");
+
+            icon_boundingArea.style = "display:block;float:left;width:45px;height:50px;;background-size:cover;";
+            this.#f_sizeMethod1[0].appendChild(icon_boundingArea);
+
+
             this.#f_sizeMethod2 = createCheckbox_Infield("Method 2 - Use Shape Areas", false, "width:300px;", () => {
                   setFieldDisabled(false, this.#f_pathArea[1], this.#f_pathArea[0]);
                   setFieldDisabled(true, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
@@ -182,8 +224,12 @@ class SVGCutfile extends SubscriptionManager {
                   () => {sqrtWidth = sqrtHeight = Math.sqrt(this.#totalBoundingRectAreas * 1000000);},
                   () => {sqrtWidth = sqrtHeight = Math.sqrt(this.#f_shapeAreas * 1000000);});
 
-            $(this.#f_width[1]).val(zeroIfNaNNullBlank(roundNumber(sqrtWidth, 3)));
-            $(this.#f_height[1]).val(zeroIfNaNNullBlank(roundNumber(sqrtHeight, 3)));
+            this.#f_width[3]();//pause Callback
+            this.#f_height[3]();//pause Callback
+            $(this.#f_width[1]).val(zeroIfNaNNullBlank(roundNumber(sqrtWidth, 3))).change();
+            $(this.#f_height[1]).val(zeroIfNaNNullBlank(roundNumber(sqrtHeight, 3))).change();
+            this.#f_width[4]();//resume Callback
+            this.#f_height[4]();//resume Callback
       }
       /**
        * @summary this.#dataForSubscribers = [{ qty, pathLength, shapeAreas, boundingRectAreas },...]
@@ -195,6 +241,7 @@ class SVGCutfile extends SubscriptionManager {
                   pathLength: zeroIfNaNNullBlank(this.pathLength),
                   shapeAreas: zeroIfNaNNullBlank(this.#f_shapeAreas),
                   boundingRectAreas: zeroIfNaNNullBlank(this.#totalBoundingRectAreas),
+                  paintedArea: this.#f_sizeMethod1[1].checked ? zeroIfNaNNullBlank(this.#totalBoundingRectAreas) : zeroIfNaNNullBlank(this.#f_shapeAreas),
                   QWHD: this.getQWH()
             });
 

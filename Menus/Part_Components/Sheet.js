@@ -1,5 +1,6 @@
 
 class Sheet extends Material {
+      static DISPLAY_NAME = "SHEET";
       /*override*/get Type() {return "SHEET";}
 
       #materialOptions = [
@@ -91,6 +92,8 @@ class Sheet extends Material {
       #totalNumberSupplierCuts = 0;
       #totalRouterPerimeter = 0;
       #totalRouterNumberOfShapes = 0;
+      #totalLaserPerimeter;
+      #totalLaserNumberOfShapes;
       #totalNumberHandCuts = 0;
 
       /**
@@ -176,6 +179,7 @@ class Sheet extends Material {
       #guillotineProduction;
       #cutByHandProduction;
       #router;
+      #laser;
       #finishingHeader;
       #finishingProduction;
       #f_foldSideContainer;
@@ -194,6 +198,7 @@ class Sheet extends Material {
 
       get backgroundColor() {return COLOUR.Orange;}
       get textColor() {return COLOUR.White;}
+      get DEBUG_SHOW() {return true;}
 
       constructor(parentContainer, LHSMenuWindow, type) {
             super(parentContainer, LHSMenuWindow, type);
@@ -345,6 +350,11 @@ class Sheet extends Material {
             this.#router.showContainer = false;
             this.#router.SubscribeTo(this);
 
+            //Laser
+            this.#laser = new Laser(f_container_cutting, null, null, null);
+            this.#laser.showContainer = false;
+            this.#laser.SubscribeTo(this);
+
             //Supplier
             this.#supplierCuts = new Supplier(f_container_cutting, null, () => { });
             this.#supplierCuts.SubscribeTo(this);
@@ -366,7 +376,7 @@ class Sheet extends Material {
             this.thickness = "3x0.21";
             this.finish = "Primer";
 
-            this.UpdateDataForSubscribers();
+            this.UpdateFromChange();
       }
 
       /*
@@ -374,13 +384,14 @@ class Sheet extends Material {
       UpdateFromChange() {
             super.UpdateFromChange();
 
+
+            this.UpdateFromInheritedData();
             this.UpdateGrainDirection();
-            this.UpdateInheritedTable();
-            this.UpdateOutputSizes();
+            this.UpdateOutput();
+            this.UpdateOutputTable();
             this.UpdateVisualizer();
+
             this.UpdateDataForSubscribers();
-            this.UpdateTableTotals();
-            this.UpdateSubscribedLabel();
             this.PushToSubscribers();
       }
 
@@ -399,25 +410,20 @@ class Sheet extends Material {
       UpdateGrainDirection() {
             let hasGrain = false;
             let grainDirection = "";
-            //var name = this.#material[1].value + " - (sqm) - " + this.#finish[1].value + " " + this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", "") + "x" + this.#thickness[1].value;
-            //var partFullName = getPredefinedParts_Name_FromLimitedName(name);
+
             var partFullName = this.#sheetMaterial[1].value;
             var part = getPredefinedParts(partFullName)[0];
 
             if(part) {
-                  console.log(part);
                   if(part.Color) {
-                        console.log(part.Color);
                         if(part.Color.includes("{")) {
                               let colourString = JSON.parse(part.Color.substring(1, part.Color.length - 1));
-                              console.log(colourString.grainDirection);
                               if(colourString.grainDirection) {
                                     hasGrain = true;
                                     grainDirection = colourString.grainDirection;
                               }
                         }
                   }
-
             }
 
             if(hasGrain) {
@@ -435,23 +441,25 @@ class Sheet extends Material {
             };
       }
 
-      UpdateInheritedTable = () => {
+      UpdateFromInheritedData = () => {
             this.#inheritedSizes = [];
             this.#inheritedSizeTable.deleteAllRows();
 
-            //Per Parent Subscription:
-            for(let a = 0; a < this.INHERITED_DATA.length; a++) {
-                  let recievedInputSizes = this.INHERITED_DATA[a].data;
-                  for(let i = 0; i < recievedInputSizes.length; i++) {
-                        this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
-                        console.log(recievedInputSizes[i]);
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height, recievedInputSizes[i].QWHD.depth);
-                  }
-            }
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{QWHD: QWHD}*/) => {
+
+                        if(!dataEntry.QWHD) return/**Only this iteration*/;
+
+                        this.#inheritedSizes.push(dataEntry.QWHD);
+                        this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height, dataEntry.QWHD.depth);
+                  });
+            });
+
 
             if(this.INHERITED_DATA.length == 0) {
-                  this.#inheritedSizes.push(new QWHD(this.qty, this.width, this.height, this.depth));
-                  this.#inheritedSizeTable.addRow(this.qty, this.width, this.height, this.depth);
+                  this.#inheritedSizes.push(new QWHD(this.qty, 0, 0, 0));
+                  this.#inheritedSizeTable.addRow(this.qty, 0, 0, 0);
             }
       };
 
@@ -459,7 +467,7 @@ class Sheet extends Material {
        * @Cutting
        */
 
-      UpdateOutputSizes = () => {
+      UpdateOutput = () => {
             this.#outputSizeTable.deleteAllRows();
             this.#outputSizeTableData = [];
 
@@ -519,10 +527,10 @@ class Sheet extends Material {
                         let options = this.createCuttingOptions(w, h, sheetSizeWidth, sheetSizeHeight, currentMaterial);
 
                         let cuttingTypeDropDown = createDropdown_Infield("Panel Cutting Type", 0, ";width:-webkit-fill-available;", options, () => {
-                              this.UpdateTableTotals();
+                              this.UpdateOutputTable();
                         }, null);
 
-                        this.#dataForSubscribers.push({QWHD: new QWHD(qty, w, h), matrixSizes: this.#matrixSizes});
+                        this.#dataForSubscribers.push({QWHD: new QWHD(qty, w, h), matrixSizes: this.#matrixSizes, paintedArea: mmToM(width) * mmToM(height) * qty});
 
                         this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[0], cutsTotal, totalPerimeter);
                         this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[1], cutsTotal, totalPerimeter]);
@@ -531,12 +539,14 @@ class Sheet extends Material {
             }
       };
 
-      UpdateTableTotals() {
+      UpdateOutputTable() {
             this.#totalNumberGuillotineCuts = 0;
             this.#totalNumberHandCuts = 0;
             this.#totalNumberSupplierCuts = 0;
             this.#totalRouterPerimeter = 0;
             this.#totalRouterNumberOfShapes = 0;
+            this.#totalLaserPerimeter = 0;
+            this.#totalLaserNumberOfShapes = 0;
 
             for(let i = 0; i < this.#outputSizeTableData.length; i++) {
                   this.#outputSizeTable.getCell(i + 1, 6).style.backgroundColor = "white";
@@ -545,6 +555,11 @@ class Sheet extends Material {
                         case "Router":
                               this.#totalRouterPerimeter += this.#outputSizeTableData[i][6];
                               this.#totalRouterNumberOfShapes += this.#outputSizeTableData[i][0];
+                              this.#outputSizeTable.getCell(i + 1, 7).style.backgroundColor = COLOUR.LightBlue;
+                              break;
+                        case "Laser":
+                              this.#totalLaserPerimeter += this.#outputSizeTableData[i][6];
+                              this.#totalLaserNumberOfShapes += this.#outputSizeTableData[i][0];
                               this.#outputSizeTable.getCell(i + 1, 7).style.backgroundColor = COLOUR.LightBlue;
                               break;
                         case "Guillotine":
@@ -582,8 +597,21 @@ class Sheet extends Material {
                   this.#router.required = true;
                   this.#router.Maximize();
             }
+
+            if(this.#totalLaserPerimeter + this.#totalLaserNumberOfShapes === 0) {
+                  this.#laser.required = false;
+                  this.#laser.Minimize();
+            } else {
+                  this.#laser.required = true;
+                  this.#laser.Maximize();
+            }
+
             this.#router.deleteAllRunRows();
             this.#router.addRunRow(this.#totalRouterPerimeter, this.#totalRouterNumberOfShapes);
+
+            this.#laser.deleteAllRunRows();
+            this.#laser.addRunRow(this.#totalLaserPerimeter, this.#totalLaserNumberOfShapes);
+
             if(this.#isFolded[1].checked) {
                   let totalPerimeter = 0;
                   let numberShapes = 0;
@@ -602,8 +630,8 @@ class Sheet extends Material {
                   }
 
                   for(let i = 0; i < this.matrixSizes.length; i++) {
-                        let numberRows = this.matrixSizes[i].length; console.log(numberRows);
-                        let numberColumns = this.matrixSizes[i][0].length; console.log(numberColumns);
+                        let numberRows = this.matrixSizes[i].length;
+                        let numberColumns = this.matrixSizes[i][0].length;
                         numberShapes += foldedTop ? numberColumns : 0;
                         numberShapes += foldedLeft ? numberRows : 0;
                         numberShapes += foldedRight ? numberRows : 0;
@@ -611,6 +639,7 @@ class Sheet extends Material {
                   }
 
                   this.#router.addRunRow(totalPerimeter, numberShapes, {material: "ACM", profile: "Groove", quality: "Good Quality", speed: null});
+                  TODO("Laser folding");
             }
             if(this.#totalRouterNumberOfShapes > 1) {
                   this.#router.setupMultiple = true;
@@ -626,6 +655,22 @@ class Sheet extends Material {
 
                   this.#router.cleanOnceOff = true;
                   this.#router.cleanTime = 10;
+            }
+
+            if(this.#totalLaserNumberOfShapes > 1) {
+                  this.#laser.setupMultiple = true;
+                  this.#laser.setupNumberOfSheets = this.#totalLaserNumberOfShapes;
+                  this.#laser.setupPerSheet = 10;
+
+                  this.#laser.cleanMultiple = true;
+                  this.#laser.cleanNumberOfSheets = this.#totalLaserNumberOfShapes;
+                  this.#laser.cleanPerSheet = 10;
+            } else {
+                  this.#laser.setupOnceOff = true;
+                  this.#laser.setupTime = 10;
+
+                  this.#laser.cleanOnceOff = true;
+                  this.#laser.cleanTime = 10;
             }
 
             if(this.#totalNumberSupplierCuts === 0) {
@@ -824,7 +869,6 @@ class Sheet extends Material {
        * @Router
        */
       static canRouterSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
-            console.log(cutWidth, cutHeight, sheetWidth, sheetHeight, material);
             if(!Sheet.routerMaterialsCanCut.includes(material)) {
                   return false;
             }
@@ -840,7 +884,6 @@ class Sheet extends Material {
        * @Laser
        */
       static canLaserSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
-            console.log(cutWidth, cutHeight, sheetWidth, sheetHeight, material);
             if(!Sheet.laserMaterialsCanCut.includes(material)) {
                   return false;
             }
@@ -895,7 +938,6 @@ class Sheet extends Material {
                         let itemIsStocked = foundParts[j].Weight.includes("Stocked:true");
                         optionsArray.push([foundParts[j].Name, itemIsStocked ? "blue" : "white"]);
                   }
-                  console.log(foundParts);
             }
 
             return optionsArray;
@@ -972,148 +1014,6 @@ class Sheet extends Material {
                   this.#finish[1].value).change();
 
             this.#sheetMaterial[5]();
-            //$(this.#sheetMaterial[1]).change();
-            /**this.#filterContainersOrdered[0] = this.#material[0];
-
-            for(let i = this.#filterOrder.length - 1; i >= 0; i--) {
-                  var firstNode = this.#material[0];
-                  var nodeToMove;
-                  if(this.#filterOrder[i] == 'Sheet Size') nodeToMove = this.#sheetSize[0];
-                  if(this.#filterOrder[i] == 'Thickness') nodeToMove = this.#thickness[0];
-                  if(this.#filterOrder[i] == 'Finish') nodeToMove = this.#finish[0];
-
-                  nodeToMove.parentNode.insertBefore(nodeToMove, firstNode.nextSibling);
-            }
-
-            let c = 1;
-            switch(updateFromFilter) {
-                  case 'Material':
-                        c = 1;
-                        break;
-                  case 'Thickness':
-                        c = this.#filterOrder.indexOf("Thickness") + 1;
-                        break;
-                  case 'Finish':
-                        c = this.#filterOrder.indexOf("Finish") + 1;
-                        break;
-                  case 'Sheet Size':
-                        c = this.#filterOrder.indexOf("Sheet Size") + 1;
-                        break;
-                  default:
-                        c = 1;
-                        break;
-            }
-
-            this.#searchTerms[0] = this.#material[1].value + " - (sqm)";
-            this.#searchTerms = this.#searchTerms.slice(0, c);
-            this.#parts = getPredefinedParts_RefinedSearch(this.#searchTerms[0], null, null);
-
-            for(let i = c; i < this.#filterOrder.length; i++) {
-                  if(i == 1) {
-                        if(this.#filterOrder[i] == 'Sheet Size') {
-                              this.#parts = getPredefinedParts_RefinedSearch(this.#searchTerms[0], null, null);
-                              let arr = [];
-                              for(let j = 0; j < this.#parts.length; j++) {
-                                    let sheetSize = this.#parts[j].ParentSize.replace(/<[^>]+>/g, "");
-                                    if(!arr.includes(sheetSize)) arr.push(sheetSize);
-
-                              }
-                              this.setSheetSizeOptions(...arr);
-                              this.#searchTerms.push(this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", ""));
-                              this.#filterContainersOrdered[i] = this.#sheetSize[0];
-                        }
-                        if(this.#filterOrder[i] == 'Thickness') {
-                              this.#parts = getPredefinedParts_RefinedSearch(this.#searchTerms[0], null, null);
-                              let arr = [];
-                              for(let j = 0; j < this.#parts.length; j++) {
-                                    let thickness = this.#parts[j].Thickness;
-                                    if(!arr.includes(thickness)) arr.push(thickness);
-
-                              }
-                              this.setThicknessOptions(...arr);
-                              this.#searchTerms.push(this.#thickness[1].value.replaceAll("mm", "").replaceAll(" ", ""));
-                              this.#filterContainersOrdered[i] = this.#thickness[0];
-                        }
-                        if(this.#filterOrder[i] == 'Finish') {
-                              this.#parts = getPredefinedParts_RefinedSearch(this.#searchTerms[0], null, null);
-                              let arr = [];
-                              for(let j = 0; j < this.#parts.length; j++) {
-                                    let finish = this.#parts[j].Finish;
-                                    if(!arr.includes(finish)) arr.push(finish);
-                              }
-                              this.setFinishOptions(...arr);
-                              this.#searchTerms.push(this.#finish[1].value);
-                              this.#filterContainersOrdered[i] = this.#finish[0];
-                        }
-                  } else {
-                        var tempThis = this;
-                        if(this.#filterOrder[i - 1] == 'Sheet Size') {
-                              this.#searchTerms[i - 1] = this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", "");
-                        }
-                        if(this.#filterOrder[i - 1] == 'Thickness') {
-                              this.#searchTerms[i - 1] = this.#thickness[1].value.replaceAll("mm", "").replaceAll(" ", "");
-                        }
-                        if(this.#filterOrder[i - 1] == 'Finish') {
-                              this.#searchTerms[i - 1] = this.#finish[1].value;
-                        }
-
-
-                        if(this.#filterOrder[i] == 'Sheet Size') {
-                              var innerPart = $.grep(this.#parts, function(obj) {
-                                    var containsAll = true;
-                                    for(let x = 0; x < tempThis.#searchTerms.length; x++) {
-                                          if(!obj.Name.includes(tempThis.#searchTerms[x])) containsAll = false;
-                                    }
-                                    return containsAll;
-                              });
-                              let arr = [];
-                              for(let j = 0; j < innerPart.length; j++) {
-                                    let sheetSize = innerPart[j].ParentSize.replace(/<[^>]+>/g, "");
-                                    if(!arr.includes(sheetSize)) arr.push(sheetSize);
-
-                              }
-                              this.setSheetSizeOptions(...arr);
-                              this.#searchTerms.push(this.#sheetSize[1].value.replaceAll("mm", "").replaceAll(" ", ""));
-                              this.#filterContainersOrdered[i] = this.#sheetSize[0];
-                        }
-                        if(this.#filterOrder[i] == 'Thickness') {
-                              var innerPart = $.grep(this.#parts, function(obj) {
-                                    var containsAll = true;
-                                    for(let x = 0; x < tempThis.#searchTerms.length; x++) {
-                                          if(!obj.Name.includes(tempThis.#searchTerms[x])) containsAll = false;
-                                    }
-                                    return containsAll;
-                              });
-                              let arr = [];
-                              for(let j = 0; j < innerPart.length; j++) {
-                                    let thickness = innerPart[j].Thickness;
-                                    if(!arr.includes(thickness)) arr.push(thickness);
-
-                              }
-                              this.setThicknessOptions(...arr);
-                              this.#searchTerms.push(this.#thickness[1].value.replaceAll("mm", "").replaceAll(" ", ""));
-                              this.#filterContainersOrdered[i] = this.#thickness[0];
-                        }
-                        if(this.#filterOrder[i] == 'Finish') {
-                              var innerPart = $.grep(this.#parts, function(obj) {
-                                    var containsAll = true;
-                                    for(let x = 0; x < tempThis.#searchTerms.length; x++) {
-                                          if(!obj.Name.includes(tempThis.#searchTerms[x])) containsAll = false;
-                                    }
-                                    return containsAll;
-                              });
-                              let arr = [];
-                              for(let j = 0; j < innerPart.length; j++) {
-                                    let finish = innerPart[j].Finish;
-                                    if(!arr.includes(finish)) arr.push(finish);
-                              }
-                              this.setFinishOptions(...arr);
-                              this.#searchTerms.push(this.#finish[1].value);
-                              this.#filterContainersOrdered[i] = this.#finish[0];
-                        }
-                  }
-            }
-            this.UpdateFromChange();*/
       }
 
       setSheetSizeOptions(...options) {
@@ -1149,19 +1049,7 @@ class Sheet extends Material {
       }
 
       setFinishOptions(...options) {
-            /**this.#finishOptions = [];
 
-            for(let x = 0; x < options.length; x++) {
-                  this.#finishOptions[x] = createDropdownOption(options[x], options[x]);
-            }
-
-            while(this.#finish[1].firstChild) {
-                  this.#finish[1].removeChild(this.#finish[1].firstChild);
-            }
-
-            for(var l = 0; l < options.length; l++) {
-                  this.#finish[1].add(this.#finishOptions[l]);
-            }*/
       }
 
       /**
@@ -1180,6 +1068,7 @@ class Sheet extends Material {
 
             partIndex = await this.#guillotineProduction.Create(productNo, partIndex);
             partIndex = await this.#router.Create(productNo, partIndex);
+            partIndex = await this.#laser.Create(productNo, partIndex);
             partIndex = await this.#supplierCuts.Create(productNo, partIndex);
             partIndex = await this.#cutByHandProduction.Create(productNo, partIndex);
 

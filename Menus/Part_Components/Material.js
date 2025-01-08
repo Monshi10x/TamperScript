@@ -10,10 +10,12 @@ class Material extends SubscriptionManager {
       #backgroundColor = COLOUR.Black;
       #textColor = COLOUR.White;
       #isLocked;
+      static DISPLAY_NAME = "MATERIAL";
+
       /*
                         
       FIELDS            */
-      #inheritedSizeHeader;
+      #f_overallQtyContainer;
       #f_qty;
       #f_width;
       #f_height;
@@ -30,21 +32,24 @@ class Material extends SubscriptionManager {
       #f_lhsMenuWindow;
       #f_popOutModal;
       #f_popOutBtn;
+      #f_debugInheritedData;
       /*
                         
       GETTER            */
       get qty() {return zeroIfNaNNullBlank(this.#f_qty[1].value);}
+      get qtyField() {return this.#f_qty[1];}
       get width() {return zeroIfNaNNullBlank(this.#f_width[1].value);}
       get height() {return zeroIfNaNNullBlank(this.#f_height[1].value);}
       get depth() {return zeroIfNaNNullBlank(this.#f_depth[1].value);}
       get container() {return this.#f_container;}
-      get Type() {return this.#Type;}
+      get Type() {return this.TYPE;}
       get ID() {return this.#Type + "-" + this.#UNIQUEID;}
       get typeLabel() {return this.#f_typeLabel;}
       get productNumber() {return this.#productNumber;}
       get inheritedRowSizeLabel() {return this.#f_subscribedToLabel;}
       get backgroundColor() {return this.#backgroundColor;}
       get textColor() {return this.#textColor;}
+      get DEBUG_SHOW() {return false;}
 
       /*
                         
@@ -53,6 +58,7 @@ class Material extends SubscriptionManager {
       set productNumber(value) {this.#productNumber = value; this.#f_productNumberLabel.innerText = value;}
       set backgroundColor(color) {this.#backgroundColor = color;}
       set textColor(color) {this.#textColor = color;}
+      set qty(value) {this.#f_qty[1].value = value;}
       /*
                         
       START             */
@@ -112,29 +118,15 @@ class Material extends SubscriptionManager {
 
             if(this.#showIDInContainer) createLabel(this.ID, "width:100%", this.#f_container);
 
-            this.#inheritedSizeHeader = createDivStyle5(null, "Overall Size", this.#f_container)[1];
+            this.#f_overallQtyContainer = createDivStyle5(null, "Overall Qty", this.#f_container)[1];
 
-            this.#f_qty = createInput_Infield("Qty", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 1);
-            setFieldDisabled(true, this.#f_qty[1], this.#f_qty[0]);
 
-            this.#f_width = createInput_Infield("Width", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100, {postfix: "mm"});
-            setFieldDisabled(true, this.#f_width[1], this.#f_width[0]);
+            this.#f_debugInheritedData = createTextarea("DEBUG", "", "width:90%;", () => { }, this.#f_overallQtyContainer);
+            if(!this.DEBUG_SHOW) $(this.#f_debugInheritedData).hide();
 
-            this.#f_height = createInput_Infield("Height", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100, {postfix: "mm"});
-            setFieldDisabled(true, this.#f_height[1], this.#f_height[0]);
+            this.#f_qty = createInput_Infield("Qty", 1, "width:20%", () => {this.UpdateFromChange();}, this.#f_overallQtyContainer, true, 1);
+            setFieldDisabled(false, this.#f_qty[1], this.#f_qty[0]);
 
-            this.#f_depth = createInput_Infield("Depth", 0, "width:20%", () => {this.UpdateFromChange();}, this.#inheritedSizeHeader, true, 100, {postfix: "mm"});
-            setFieldDisabled(true, this.#f_depth[1], this.#f_depth[0]);
-
-            /*this.#f_lockBtn = createButton("", "font-size: 18px;display: block; float: left; width:10%; min-width:20px;max-width:30px;border:none;padding:2px; color:white;min-height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
-                  this.#isLocked = toggleLock(this.#f_lockBtn);
-                  this.UpdateFromChange();
-            }, this.#inheritedSizeHeader);
-            this.#f_lockBtn.innerHTML = "🔒";
-            */
-            this.#isLocked = true;
-
-            this.UpdateQWH();
             this.Minimize();
       }
 
@@ -142,15 +134,26 @@ class Material extends SubscriptionManager {
       Override */
       UpdateFromChange() {
             super.UpdateFromChange();
-            this.UpdateQWH();
+
             this.UpdateSubscribedLabel();
+            this.UpdateDebug();
+      }
+
+      UpdateDebug() {
+            let debugData = "";
+
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  debugData += JSON.stringify(subscription.data, null, 4);
+            });
+
+            this.#f_debugInheritedData.value = debugData;
       }
 
       OpenSubscriptionsModal() {
             new ModalManageSubscriptions2("Manage Subscriptions", () => {
                   this.UpdateFromChange();
             }, this, this.#f_lhsMenuWindow);
-            this.UpdateQWH();
       }
 
       UpdateSubscribedLabel() {
@@ -169,24 +172,8 @@ class Material extends SubscriptionManager {
 
       }
 
-      UpdateQWH() {
-            let setDisabled = true;
-            if(this.#isLocked) {
-                  $(this.#f_qty[1]).val(roundNumber(this.getQWH().qty, 0));
-                  $(this.#f_width[1]).val(roundNumber(this.getQWH().width, 2));
-                  $(this.#f_height[1]).val(roundNumber(this.getQWH().height, 2));
-                  $(this.#f_depth[1]).val(roundNumber(this.getQWH().depth, 2));
-            } else {
-                  setDisabled = false;
-            }
-            setFieldDisabled(setDisabled, this.#f_width[1], this.#f_width[0]);
-            setFieldDisabled(setDisabled, this.#f_height[1], this.#f_height[0]);
-            setFieldDisabled(setDisabled, this.#f_depth[1], this.#f_depth[0]);
-            setFieldDisabled(setDisabled, this.#f_qty[1], this.#f_qty[0]);
-      }
-
       getQWH() {
-            if(!this.#isLocked) return new QWHD(this.qty, this.width, this.height, this.depth);
+            if(!this.#isLocked) return new QWHD(this.qty, 0, 0, 0);
 
             for(let i = 0; i < this.subscriptions.length; i++) {
                   if(this.subscriptions[i].qty && this.subscriptions[i].width && this.subscriptions[i].height) {
