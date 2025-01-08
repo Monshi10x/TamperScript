@@ -21,6 +21,8 @@ class SVGCutfile extends SubscriptionManager {
        */
       #dataForSubscribers = [];
       #totalBoundingRectAreas = 0;
+      #totalShapeQty = 0;
+      #totalNumberPaths = 0;
       /*
                         
       Fields            */
@@ -168,7 +170,7 @@ class SVGCutfile extends SubscriptionManager {
 
             }, f_container_fileChooser);
 
-            this.#f_visualiserBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "", "width:calc(100% - 10px);display:none;height:40px;margin:5px;background-color:" + COLOUR.Orange + ";", () => {
+            this.#f_visualiserBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 10px);display:none;height:40px;margin:5px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#f_visualiser = new ModalSVG("SVG", 100, () => {
                         this.UpdateFromChange();
                   }, this.#f_svgFile);
@@ -190,16 +192,19 @@ class SVGCutfile extends SubscriptionManager {
 
             let icon_boundingArea = document.createElement('img');
             icon_boundingArea.src = GM_getResourceURL("Icon_BoundingArea");
-
-            icon_boundingArea.style = "display:block;float:left;width:45px;height:50px;;background-size:cover;";
+            icon_boundingArea.style = "display:block;float:left;width:calc(100% - 20px);padding:10px;";
             this.#f_sizeMethod1[0].appendChild(icon_boundingArea);
-
 
             this.#f_sizeMethod2 = createCheckbox_Infield("Method 2 - Use Shape Areas", false, "width:300px;", () => {
                   setFieldDisabled(false, this.#f_pathArea[1], this.#f_pathArea[0]);
                   setFieldDisabled(true, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
                   this.UpdateFromChange();
             }, f_container_outputSizes);
+
+            let icon_shapeArea = document.createElement('img');
+            icon_shapeArea.src = GM_getResourceURL("Icon_ShapeArea");
+            icon_shapeArea.style = "display:block;float:left;width:calc(100% - 20px);padding:10px;";
+            this.#f_sizeMethod2[0].appendChild(icon_shapeArea);
 
             checkboxesAddToSelectionGroup(true, this.#f_sizeMethod1, this.#f_sizeMethod2);
 
@@ -241,7 +246,8 @@ class SVGCutfile extends SubscriptionManager {
                   pathLength: zeroIfNaNNullBlank(this.pathLength),
                   shapeAreas: zeroIfNaNNullBlank(this.#f_shapeAreas),
                   boundingRectAreas: zeroIfNaNNullBlank(this.#totalBoundingRectAreas),
-                  paintedArea: this.#f_sizeMethod1[1].checked ? zeroIfNaNNullBlank(this.#totalBoundingRectAreas) : zeroIfNaNNullBlank(this.#f_shapeAreas),
+                  paintedArea: zeroIfNaNNullBlank(this.#f_shapeAreas),
+                  pathQty: this.getNumberOfShapes(),
                   QWHD: this.getQWH()
             });
 
@@ -249,6 +255,11 @@ class SVGCutfile extends SubscriptionManager {
                   parent: this,
                   data: this.#dataForSubscribers
             };
+      }
+
+      getNumberOfShapes() {
+            if(!this.#f_svgFile) return 0;
+            return svg_getPathQty(this.#f_svgFile);
       }
 
       getQWH() {

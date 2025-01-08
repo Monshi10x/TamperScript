@@ -758,6 +758,43 @@ function svg_getTotalBoundingRectAreas_m2(svgStringOrObject, useShallowCopy = tr
       return totalArea;
 }
 
+function svg_getPathQty(svgStringOrObject) {
+      let newSvg;
+      let useShallowCopy = true;
+      if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
+            newSvg = svg_makeFromString(svgStringOrObject);
+
+            svg_convertShapesToPaths(newSvg);
+            svg_formatCompoundPaths(newSvg);
+
+            document.body.appendChild(newSvg);
+            newSvg.style = "display:block;visibility:hidden";
+
+            svgStringOrObject = newSvg.querySelector("#pathGroup").getElementsByTagNameNS("http://www.w3.org/2000/svg", "path");
+      }
+
+      let returnObject = {
+            totalQty: 0,
+            innerPaths: 0,
+            outerPaths: 0
+      };
+
+      for(let i = 0; i < svgStringOrObject.length; i++) {
+            if(svgStringOrObject[i].nodeName == "g") continue;
+
+            let element = svgStringOrObject[i];
+
+            if(element.className.baseVal.includes("outerPath")) returnObject.outerPaths++;
+            if(element.className.baseVal.includes("innerPath")) returnObject.innerPaths++;
+
+            returnObject.totalQty++;
+      }
+
+      if(newSvg) deleteElement(newSvg);
+
+      return returnObject;
+}
+
 function svg_convertShapesToPaths(svgObject) {
       let svgElements = svgObject.getElementsByTagName("*");
 

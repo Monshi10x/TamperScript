@@ -191,6 +191,7 @@ class Sheet extends Material {
       #foldedRight;
 
       #flipSheet = false;
+      #preferredCuttingMachine = null;
       #flip;
 
       #hasGrain;
@@ -199,6 +200,183 @@ class Sheet extends Material {
       get backgroundColor() {return COLOUR.Orange;}
       get textColor() {return COLOUR.White;}
       get DEBUG_SHOW() {return true;}
+
+
+      static getCutVsSheetType = (width, height, sheetWidth, sheetHeight) => {
+            let [w, h] = convertDimensionsToLandscape(width, height);
+            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
+
+            if(w == sw && h == sh) return "Standard Sheet";
+            if(w > sw || h > sh) return "Bigger Than Standard Sheet";
+            if(w == sw || h == sh || w == sh || h == sw) return "One Side Sheet Size";
+
+            return "Smaller Than Standard Sheet";
+      };
+
+      /**
+       * @returns array [[w,h], [w,h]...]
+       */
+      static cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet = false) {
+            let returnArray = [];
+
+            if(flipSheet) {
+                  let tempW = sheetWidth, tempH = sheetHeight;
+                  sheetWidth = tempH;
+                  sheetHeight = tempW;
+            }
+
+            if(method == Sheet.joinMethod["Full Sheet + Offcut"]) {
+                  let numbersheetsW, numbersheetsH, eachSheetWidth, eachSheetHeight;
+
+                  numbersheetsW = Math.ceil(width / sheetWidth);
+                  numbersheetsH = Math.ceil(height / sheetHeight);
+
+                  for(let w = 0; w < numbersheetsW; w++) {
+                        if(w == numbersheetsW - 1) {
+                              eachSheetWidth = width - (sheetWidth * (w));
+                        } else {
+                              eachSheetWidth = sheetWidth;
+                        }
+
+                        for(let h = 0; h < numbersheetsH; h++) {
+                              if(h == numbersheetsH - 1) {
+                                    eachSheetHeight = height - (sheetHeight * (h));
+                              } else {
+                                    eachSheetHeight = sheetHeight;
+                              }
+                              returnArray.push([eachSheetWidth, eachSheetHeight]);
+                        }
+                  }
+            }
+
+            if(method == Sheet.joinMethod["Even Joins"]) {
+                  let numbersheetsW, numbersheetsH, eachSheetWidth, eachSheetHeight;
+
+                  numbersheetsW = Math.ceil(width / sheetWidth);
+                  numbersheetsH = Math.ceil(height / sheetHeight);
+                  eachSheetWidth = width / numbersheetsW;
+                  eachSheetHeight = height / numbersheetsH;
+
+                  for(let w = 0; w < numbersheetsW; w++) {
+                        for(let h = 0; h < numbersheetsH; h++) {
+                              returnArray.push([eachSheetWidth, eachSheetHeight]);
+                        }
+                  }
+            }
+
+            return returnArray;
+      }
+
+
+      /** 
+       * @Returns matrix array of sheets
+       * @Results are left to right, then top to bottom
+       * @example [
+                  [[2440, 1220], [2440, 1220], [2440, 1220], [2440, 1220], [240, 1220]],//row 1
+                  [[2440, 1220], [2440, 1220], [2440, 1220], [2440, 1220], [240, 1220]],//row 2
+                  [[2440, 110], [2440, 110], [2440, 110], [2440, 110], [240, 110]]//row 3
+                  ];
+      */
+      static getMatrixSizes(method, width, height, sheetWidth, sheetHeight, flipSheet = false) {
+            let matrixSizes = [];
+
+            let returnArray = Sheet.cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet);
+
+            if(flipSheet) {
+                  let tempW = sheetWidth, tempH = sheetHeight;
+                  sheetWidth = tempH;
+                  sheetHeight = tempW;
+            }
+
+            let numbersheetsW = Math.ceil(width / sheetWidth);
+            let numbersheetsH = Math.ceil(height / sheetHeight);
+
+            /** @MatrixSizes */
+            for(let y = 0; y < numbersheetsH; y++) {
+                  matrixSizes.push([]);
+                  for(let x = 0; x < numbersheetsW * numbersheetsH; x++) {
+                        if(x % numbersheetsH == y) {
+                              matrixSizes[y].push(returnArray[x]);
+                        }
+                  }
+
+            }
+
+            return matrixSizes;
+      }
+
+      /**
+       * @returns [] i.e. [QWHD(), QWHD(), ...]
+       */
+      static cutResultsByMethodWithOccurenceCount(method, width, height, sheetWidth, sheetHeight, flipSheet) {
+            return uniqueSizeArrayWithOccurenceCount(Sheet.cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet));
+      }
+
+      /**
+       * @Guillotine
+       */
+
+      static canGuillotineSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
+            let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
+            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
+
+            if(!Sheet.guillotineMaterialsCanCut.includes(material)) {
+                  return false;
+            }
+
+            if(sw > Sheet.guillotineMaxRunLength ||
+                  sh > Sheet.guillotineMaxRunLength ||
+                  w > Sheet.guillotineMaxRunLength ||
+                  h > Sheet.guillotineMaxRunLength) return false;
+            if(sw > Sheet.guillotineMaxCutWidth && sh > Sheet.guillotineMaxCutWidth) return false;
+            if(w > Sheet.guillotineMaxCutWidth && h > Sheet.guillotineMaxCutWidth) return false;
+            if(w > Sheet.guillotineMaxCutWidth && h != sh) return false;
+            return true;
+      };
+
+      static getNumberOfGuillotineCuts = (width, height, sheetWidth, sheetHeight) => {
+            return Sheet.guillotineCutsPerType[Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight)];
+      };
+
+      /**
+       * @Router
+       */
+      static canRouterSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
+            if(!Sheet.routerMaterialsCanCut.includes(material)) {
+                  return false;
+            }
+            let [maxCutW, maxCutH] = convertDimensionsToLandscape(Router.maxCutSize.width, Router.maxCutSize.height);
+            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
+            let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
+
+            if(sw > maxCutW || sh > maxCutH || w > maxCutW || h > maxCutH) return false;
+            return true;
+      };
+
+      /**
+       * @Laser
+       */
+      static canLaserSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
+            if(!Sheet.laserMaterialsCanCut.includes(material)) {
+                  return false;
+            }
+            let [maxCutW, maxCutH] = convertDimensionsToLandscape(Laser.maxCutSize.width, Laser.maxCutSize.height);
+            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
+            let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
+
+            if(sw > maxCutW || sh > maxCutH || w > maxCutW || h > maxCutH) return false;
+            return true;
+      };
+
+      /**
+       * @HandCutting
+       */
+      static canHandCutSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
+            if(!Sheet.handMaterialsCanCut.includes(material)) {
+                  return false;
+            }
+            return true;
+      };
 
       constructor(parentContainer, LHSMenuWindow, type) {
             super(parentContainer, LHSMenuWindow, type);
@@ -470,9 +648,7 @@ class Sheet extends Material {
       UpdateOutput = () => {
             this.#outputSizeTable.deleteAllRows();
             this.#outputSizeTableData = [];
-
             this.#dataForSubscribers = [];
-
             this.#matrixSizes = [];
 
             this.#totalNumberGuillotineCuts = 0;
@@ -481,6 +657,20 @@ class Sheet extends Material {
             this.#totalRouterNumberOfShapes = 0;
 
             let [sheetSizeWidth, sheetSizeHeight] = this.getSheetSizeWH();
+
+            let mustBeRouterCut = false;
+            let _this = this;
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{pathQty: {}}*/) => {
+
+                        if(subscription.parent instanceof LED) {
+                              console.log("IS IN HERE");
+                              mustBeRouterCut = true;
+                              _this.#preferredCuttingMachine = "router";
+                        }
+                  });
+            });
 
             for(let i = 0; i < this.#inheritedSizes.length; i++) {
 
@@ -534,7 +724,15 @@ class Sheet extends Material {
 
                         this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[0], cutsTotal, totalPerimeter);
                         this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[1], cutsTotal, totalPerimeter]);
-                        dropdownSetSelectedIndexToNextAvailable(cuttingTypeDropDown[1], yes);
+
+                        console.log(this.#preferredCuttingMachine);
+                        if(this.#preferredCuttingMachine == null) dropdownSetSelectedIndexToNextAvailable(cuttingTypeDropDown[1], yes);
+                        if(this.#preferredCuttingMachine == "router") {
+                              console.log("MUST BE HERE");
+                              dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Router.value);
+                        }
+                        if(this.#preferredCuttingMachine == "guillotine") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Guillotine.value);
+                        console.log(this.#cuttingOptions.Router.value);
                   }
             }
       };
@@ -547,6 +745,22 @@ class Sheet extends Material {
             this.#totalRouterNumberOfShapes = 0;
             this.#totalLaserPerimeter = 0;
             this.#totalLaserNumberOfShapes = 0;
+
+            let numberOfPaths = 0;
+            let penMarkingQty = 0;
+            let penMarkingLength = 0;
+
+            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{pathQty: {}}*/) => {
+
+                        if(dataEntry.pathQty) numberOfPaths += dataEntry.pathQty.totalQty;
+                        if(subscription.parent instanceof LED) {
+                              penMarkingQty += dataEntry.qty;
+                              penMarkingLength += dataEntry.qty * 100;
+                        }
+                  });
+            });
 
             for(let i = 0; i < this.#outputSizeTableData.length; i++) {
                   this.#outputSizeTable.getCell(i + 1, 6).style.backgroundColor = "white";
@@ -607,10 +821,11 @@ class Sheet extends Material {
             }
 
             this.#router.deleteAllRunRows();
-            this.#router.addRunRow(this.#totalRouterPerimeter, this.#totalRouterNumberOfShapes);
+            this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths);
+            if(penMarkingQty > 0) this.#router.addRunRow(penMarkingLength, penMarkingQty);
 
             this.#laser.deleteAllRunRows();
-            this.#laser.addRunRow(this.#totalLaserPerimeter, this.#totalLaserNumberOfShapes);
+            this.#laser.addRunRow(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths);
 
             if(this.#isFolded[1].checked) {
                   let totalPerimeter = 0;
@@ -638,7 +853,7 @@ class Sheet extends Material {
                         numberShapes += foldedBottom ? numberColumns : 0;
                   }
 
-                  this.#router.addRunRow(totalPerimeter, numberShapes, {material: "ACM", profile: "Groove", quality: "Good Quality", speed: null});
+                  this.#router.addRunRow(totalPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", profile: "Groove", quality: "Good Quality", speed: null});
                   TODO("Laser folding");
             }
             if(this.#totalRouterNumberOfShapes > 1) {
@@ -729,182 +944,23 @@ class Sheet extends Material {
             return returnArray;
       };
 
-      static getCutVsSheetType = (width, height, sheetWidth, sheetHeight) => {
-            let [w, h] = convertDimensionsToLandscape(width, height);
-            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
-
-            if(w == sw && h == sh) return "Standard Sheet";
-            if(w > sw || h > sh) return "Bigger Than Standard Sheet";
-            if(w == sw || h == sh || w == sh || h == sw) return "One Side Sheet Size";
-
-            return "Smaller Than Standard Sheet";
-      };
-
       /**
-       * @returns array [[w,h], [w,h]...]
+       * 
+       * @param {*} machine = "router" || "guillotine"
        */
-      static cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet = false) {
-            let returnArray = [];
-
-            if(flipSheet) {
-                  let tempW = sheetWidth, tempH = sheetHeight;
-                  sheetWidth = tempH;
-                  sheetHeight = tempW;
+      setCuttingMachine(machine = "router") {
+            switch(machine) {
+                  case "router":
+                        this.#preferredCuttingMachine = "router";
+                        this.UpdateFromChange();
+                        break;
+                  case "guillotine":
+                        this.#preferredCuttingMachine = "guillotine";
+                        this.UpdateFromChange();
+                        break;
+                  default: break;
             }
-
-            if(method == Sheet.joinMethod["Full Sheet + Offcut"]) {
-                  let numbersheetsW, numbersheetsH, eachSheetWidth, eachSheetHeight;
-
-                  numbersheetsW = Math.ceil(width / sheetWidth);
-                  numbersheetsH = Math.ceil(height / sheetHeight);
-
-                  for(let w = 0; w < numbersheetsW; w++) {
-                        if(w == numbersheetsW - 1) {
-                              eachSheetWidth = width - (sheetWidth * (w));
-                        } else {
-                              eachSheetWidth = sheetWidth;
-                        }
-
-                        for(let h = 0; h < numbersheetsH; h++) {
-                              if(h == numbersheetsH - 1) {
-                                    eachSheetHeight = height - (sheetHeight * (h));
-                              } else {
-                                    eachSheetHeight = sheetHeight;
-                              }
-                              returnArray.push([eachSheetWidth, eachSheetHeight]);
-                        }
-                  }
-            }
-
-            if(method == Sheet.joinMethod["Even Joins"]) {
-                  let numbersheetsW, numbersheetsH, eachSheetWidth, eachSheetHeight;
-
-                  numbersheetsW = Math.ceil(width / sheetWidth);
-                  numbersheetsH = Math.ceil(height / sheetHeight);
-                  eachSheetWidth = width / numbersheetsW;
-                  eachSheetHeight = height / numbersheetsH;
-
-                  for(let w = 0; w < numbersheetsW; w++) {
-                        for(let h = 0; h < numbersheetsH; h++) {
-                              returnArray.push([eachSheetWidth, eachSheetHeight]);
-                        }
-                  }
-            }
-
-            return returnArray;
       }
-
-
-      /** 
-       * @Returns matrix array of sheets
-       * @Results are left to right, then top to bottom
-       * @example [
-                  [[2440, 1220], [2440, 1220], [2440, 1220], [2440, 1220], [240, 1220]],//row 1
-                  [[2440, 1220], [2440, 1220], [2440, 1220], [2440, 1220], [240, 1220]],//row 2
-                  [[2440, 110], [2440, 110], [2440, 110], [2440, 110], [240, 110]]//row 3
-                  ];
-      */
-      static getMatrixSizes(method, width, height, sheetWidth, sheetHeight, flipSheet = false) {
-            let matrixSizes = [];
-
-            let returnArray = Sheet.cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet);
-
-            if(flipSheet) {
-                  let tempW = sheetWidth, tempH = sheetHeight;
-                  sheetWidth = tempH;
-                  sheetHeight = tempW;
-            }
-
-            let numbersheetsW = Math.ceil(width / sheetWidth);
-            let numbersheetsH = Math.ceil(height / sheetHeight);
-
-            /** @MatrixSizes */
-            for(let y = 0; y < numbersheetsH; y++) {
-                  matrixSizes.push([]);
-                  for(let x = 0; x < numbersheetsW * numbersheetsH; x++) {
-                        if(x % numbersheetsH == y) {
-                              matrixSizes[y].push(returnArray[x]);
-                        }
-                  }
-
-            }
-
-            return matrixSizes;
-      }
-
-      /**
-       * @returns [] i.e. [QWHD(), QWHD(), ...]
-       */
-      static cutResultsByMethodWithOccurenceCount(method, width, height, sheetWidth, sheetHeight, flipSheet) {
-            return uniqueSizeArrayWithOccurenceCount(Sheet.cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet));
-      }
-
-      /**
-       * @Guillotine
-       */
-
-      static canGuillotineSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
-            let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
-            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
-
-            if(!Sheet.guillotineMaterialsCanCut.includes(material)) {
-                  return false;
-            }
-
-            if(sw > Sheet.guillotineMaxRunLength ||
-                  sh > Sheet.guillotineMaxRunLength ||
-                  w > Sheet.guillotineMaxRunLength ||
-                  h > Sheet.guillotineMaxRunLength) return false;
-            if(sw > Sheet.guillotineMaxCutWidth && sh > Sheet.guillotineMaxCutWidth) return false;
-            if(w > Sheet.guillotineMaxCutWidth && h > Sheet.guillotineMaxCutWidth) return false;
-            if(w > Sheet.guillotineMaxCutWidth && h != sh) return false;
-            return true;
-      };
-
-      static getNumberOfGuillotineCuts = (width, height, sheetWidth, sheetHeight) => {
-            return Sheet.guillotineCutsPerType[Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight)];
-      };
-
-      /**
-       * @Router
-       */
-      static canRouterSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
-            if(!Sheet.routerMaterialsCanCut.includes(material)) {
-                  return false;
-            }
-            let [maxCutW, maxCutH] = convertDimensionsToLandscape(Router.maxCutSize.width, Router.maxCutSize.height);
-            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
-            let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
-
-            if(sw > maxCutW || sh > maxCutH || w > maxCutW || h > maxCutH) return false;
-            return true;
-      };
-
-      /**
-       * @Laser
-       */
-      static canLaserSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
-            if(!Sheet.laserMaterialsCanCut.includes(material)) {
-                  return false;
-            }
-            let [maxCutW, maxCutH] = convertDimensionsToLandscape(Laser.maxCutSize.width, Laser.maxCutSize.height);
-            let [sw, sh] = convertDimensionsToLandscape(sheetWidth, sheetHeight);
-            let [w, h] = convertDimensionsToLandscape(cutWidth, cutHeight);
-
-            if(sw > maxCutW || sh > maxCutH || w > maxCutW || h > maxCutH) return false;
-            return true;
-      };
-
-      /**
-       * @HandCutting
-       */
-      static canHandCutSheet = (cutWidth, cutHeight, sheetWidth, sheetHeight, material) => {
-            if(!Sheet.handMaterialsCanCut.includes(material)) {
-                  return false;
-            }
-            return true;
-      };
-
       /**
        * @Sheets
        */

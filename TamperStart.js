@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.49
+// @version      10.5
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -25,6 +25,8 @@
 // @grant        window.onurlchange
 // @updateURL    https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
 // @downloadURL  https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
+// @resource     Icon_BoundingArea https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-BoundingArea.svg
+// @resource     Icon_ShapeArea https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-ShapeArea.svg
 // @resource     Icon_Download https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Download.svg
 // @resource     Icon_M2 https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-M2.svg
 // @resource     Icon_Lnm https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Lnm.svg
@@ -43,7 +45,8 @@
 // @resource     Icon_POS https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-POS.svg
 // @resource     Icon_Admin https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Admin.svg
 // @resource     Icon_Bin https://github.com/Monshi10x/TamperScript/raw/main/Images/BinIcon.svg
-// @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/tree/main/Styles/Styles_Sales.css
+// @resource     Icon_Select https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Select.svg
+// @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_Sales.css
 // @resource     JSONTransformers https://github.com/Monshi10x/TamperScript/raw/main/External Files/Transformers.json
 // @resource     JSONPredefinedVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/PredefinedVehicleTemplates.json
 // @resource     JSONBlankVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/BlankVehicleTemplates.json
@@ -52,19 +55,21 @@
 // @resource     JSONPartItems https://github.com/Monshi10x/TamperScript/raw/main/External Files/PartItems.json
 // @resource     JSONInstallTimes https://github.com/Monshi10x/TamperScript/raw/main/External Files/InstallTimes.json
 // @resource     Image_Corflute https://github.com/Monshi10x/TamperScript/raw/main/Images/Corflute-Resized.jpg
+// @resource     SVGWebWorker https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_WebWorker.js
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
-// @require      https://cdn.jsdelivr.net/npm/svg-path-commander/dist/svg-path-commander.js
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
-// @require      https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js
+// @require      https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js
+// @require      https://cdn.jsdelivr.net/npm/svg-path-commander/dist/svg-path-commander.js
+// @require      https://cdn.jsdelivr.net/npm/path-data-polyfill@1.0.6/path-data-polyfill.min.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Charts/Chart.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Loaders/Loader.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/DragAndDrop/DragAndDrop.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/QWHD.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UI.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UIContainerType3.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Async_Functions/Async_Functions.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Toggle.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Common.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Subscription/SubscriptionManager.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/ObjectArray.js
@@ -72,7 +77,10 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Console/Console.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/FileIO/FileIO.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Tables/Table.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_PathFunctions.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVGPathFunctions.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_Common.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_ShapeArea.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/DragZoomCanvas.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/DragZoomSVG.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/LHSMenu.js
@@ -92,7 +100,6 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/PanelSigns.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/ChartMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/MenuPOS.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/TogglePartsMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/Modal.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalManageSubscriptions.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInput.js
@@ -108,15 +115,21 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalStandoffHelper.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSheetJoins.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalVinylJoins.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSVG.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Mouse/ContextMenu.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/ProductComponents.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/TogglePartsMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/SummaryHelper.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/CostAnalysisSummary.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/InstallSummary.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/ProductComponents.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Images.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Colour.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/QWHD.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/SubMenu.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Material.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Size.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/SVGCutfile.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Artwork.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Baseplate.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Footing.js
@@ -124,21 +137,19 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Install.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/LED.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Leg.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/SVGCutfile.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Production.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Router.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Laser.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Material.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/ProductDetails.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Size.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Size2.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/InstallSubscribable.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/ArtworkSubscribable.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/ProductionSubscribable.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Sheet.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Vinyl.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Coil.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Laminate.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Finishing.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Painting.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Sign.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Supplier.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/TotalQuantity.js
@@ -146,7 +157,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/HandTrimming.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/AppTaping.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/PrintMounting.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Part_Specific/Transformer.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Transformer.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Polygon/Polygon.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Main.js
 // ==/UserScript==
