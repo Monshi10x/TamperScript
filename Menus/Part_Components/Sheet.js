@@ -3,9 +3,15 @@ class Sheet extends Material {
       static DISPLAY_NAME = "SHEET";
       /*override*/get Type() {return "SHEET";}
 
-      cutProfile = {material: "ACM", profile: "Cut Through", quality: "Good Quality"};
-      setCutProfile(material, profile, quality) {
-            this.cutProfile = {material: material, profile: profile, quality: quality};
+      routerCutProfile = {material: "ACM", profile: "Cut Through", quality: "Good Quality"};
+      setRouterCutProfile(material, profile, quality) {
+            this.routerCutProfile = {material: material, profile: profile, quality: quality};
+            this.UpdateFromChange();
+      }
+
+      laserCutProfile = {material: "Stainless", profile: "Cut Through", quality: "Good Quality"};
+      setLaserCutProfile(material, profile, quality) {
+            this.laserCutProfile = {material: material, profile: profile, quality: quality};
             this.UpdateFromChange();
       }
 
@@ -827,11 +833,12 @@ class Sheet extends Material {
             }
 
             this.#router.deleteAllRunRows();
-            this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, this.cutProfile);
+            this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, this.routerCutProfile);
             if(penMarkingQty > 0) this.#router.addRunRow(penMarkingLength, penMarkingQty, {material: "Any", profile: "LED Marking", quality: "SecondsPerCut"});
 
             this.#laser.deleteAllRunRows();
-            this.#laser.addRunRow(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths);
+            console.log(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths, this.laserCutProfile);
+            this.#laser.addRunRow(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths, this.laserCutProfile);
 
             if(this.#isFolded[1].checked) {
                   let totalPerimeter = 0;

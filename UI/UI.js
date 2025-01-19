@@ -1370,7 +1370,7 @@ function dropdownSetSelectedValue(field, value) {
         }
     }
     console.trace("here shouldnt");
-    alert("no value selected for dropdown (no match)");
+    //alert("no value selected for dropdown (no match)");
 }
 function dropdownSetSelectedText(field, value) {
     let allOptions = field.options;
@@ -1381,7 +1381,8 @@ function dropdownSetSelectedText(field, value) {
             return;
         }
     }
-    alert("no value selected for dropdown text (no match)");
+    console.trace("here shouldnt");
+    // alert("no value selected for dropdown text (no match)");
 }
 
 function dropdownInfieldIconsSearchSetSelected(dropdownField, value, setSearchToo = true, withCallback = true) {

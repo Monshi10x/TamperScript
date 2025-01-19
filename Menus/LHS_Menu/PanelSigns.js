@@ -105,7 +105,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
 			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
-				[["3D Front-lit Letters", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
+				[["3D Front-lit Letters", "https://cdn.gorilladash.com/images/media/12562260/signarama-australia-homeco-cafe-63-lightbox-thumbnail-663186cf397a7.jpg"],
 				["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
 				["Lightbox Face - Opal Acrylic", "https://cdn.gorilladash.com/images/media/5077257/signarama-australia-img-6911-2-small-thumbnail-61611e9ab2f0f.jpg"],
 				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
@@ -167,7 +167,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.material = "Acrylic";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
-				sheet.setCutProfile("Acrylic", "Opal Cut Through And Rebate", "Good Quality");
+				sheet.setRouterCutProfile("Acrylic", "Opal Cut Through And Rebate", "Good Quality");
 
 
 				led = this.#add(LED, this.page1, [SVGCutfile]);
