@@ -1,20 +1,27 @@
 {
-      "RouterToolpathTimes":{
-            "ACM":{
-                  "Cut Through":{
-                        "Good Quality":2000,
-                        "Fast":5000
+      "RouterToolpathTimes": {
+            "ACM": {
+                  "Cut Through": {
+                        "Good Quality": 3000,
+                        "Fast": 5000
                   },
-                  "Groove":{
-                        "Good Quality":3000
+                  "Groove": {
+                        "Good Quality": 3000
                   }
-            },"Aluminium":{
-                  "Cut Through":{
-                        "Good Quality":2000,
-                        "Fast":5000
+            },
+            "Aluminium": {
+                  "Cut Through": {
+                        "Good Quality": 2000,
+                        "Fast": 5000
                   },
-                  "Groove":{
-                        "Good Quality":3000
+                  "Groove": {
+                        "Good Quality": 3000
+                  }
+            },
+            "Any": {
+                  "LED Marking": {
+                        "Standard": 1050,
+                        "SecondsPerCut": 5.54
                   }
             }
       }

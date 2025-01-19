@@ -68,9 +68,9 @@ class Coil extends Material {
 
             var coilParts = getPredefinedParts("Coil - ");
             var coilDropdownElements = [];
-            coilParts.forEach(element => coilDropdownElements.push([element.Name, "white"]));
+            coilParts.forEach(element => coilDropdownElements.push([element.Name, GM_getResourceURL("Image_Coil")]));
 
-            this.#f_material = createDropdown_Infield_Icons_Search("Coil", 0, "width:60%;", 10, true, coilDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
+            this.#f_material = createDropdown_Infield_Icons_Search("Coil", 0, "width:60%;", 50, false, coilDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
 
             /*
             Machine*/

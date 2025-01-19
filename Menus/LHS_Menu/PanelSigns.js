@@ -168,16 +168,18 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
 
-				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+				led = this.#add(LED, this.page1, [SVGCutfile]);
+
+				sheet = this.#add2(Sheet, this.page1, [svgCutfile, led]);
 				sheet.material = "ACM";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
 
-				led = this.#add(LED, this.page1, [SVGCutfile]);
+
 				transformer = this.#add(Transformer, this.page1, [LED]);
 
 				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
-
+				painting.formula = "Fabricated Front-lit Letters";
 
 				artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
 				artwork.artworkItem.artworkTime = 60;
@@ -393,7 +395,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 		newItem.productNumber = this.#getproductNumber();
 
 		for(let x = 0; x < subscribeTo.length; x++) {
-			newItem.SubscribeTo(subscribeTo[i]);//subscribe to last of kind
+			newItem.SubscribeTo(subscribeTo[x]);//subscribe to last of kind
 		}
 
 		this.#allMaterials.push(newItem);

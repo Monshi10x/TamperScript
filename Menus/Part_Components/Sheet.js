@@ -821,8 +821,8 @@ class Sheet extends Material {
             }
 
             this.#router.deleteAllRunRows();
-            this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths);
-            if(penMarkingQty > 0) this.#router.addRunRow(penMarkingLength, penMarkingQty);
+            this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, {material: "ACM", profile: "Cut Through", quality: "Good Quality"});
+            if(penMarkingQty > 0) this.#router.addRunRow(penMarkingLength, penMarkingQty, {material: "Any", profile: "LED Marking", quality: "SecondsPerCut"});
 
             this.#laser.deleteAllRunRows();
             this.#laser.addRunRow(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths);

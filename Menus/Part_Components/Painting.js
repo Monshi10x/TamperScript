@@ -39,6 +39,9 @@ class Painting extends Material {
       /*
                         
       Setter            */
+      set formula(value) {
+            $(this.#f_litresFormulas[1]).val(value).change();
+      }
       /*
                         
       Start             */

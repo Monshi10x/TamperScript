@@ -9,7 +9,7 @@ class ModalPopOut extends Modal {
             super(headerText, callback);
             this.#containersToBorrow = containersToBorrow;
 
-            this.setContainerSize(900, 900);
+            this.setContainerSize(1100, 1000);
             this.borrowFieldsContainer = this.getBodyElement();
             this.borrowFields(...containersToBorrow);
 

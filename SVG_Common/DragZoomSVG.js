@@ -234,19 +234,19 @@ class DragZoomSVG {
       initSVGStyles() {
             let svgElements = this.#f_svg.getElementsByTagName("path");
 
-            for(let i = 0; i < svgElements.length; i++) {
-                  svgElements[i].setAttribute('stroke-miterlimit', `0`);
+            [...svgElements].forEach((element) => {
+                  element.setAttribute('stroke-miterlimit', `0`);
 
-                  svgElements[i].addEventListener("mouseover", (e) => {
-                        svgElements[i].classList.add("SVGHover");
+                  element.addEventListener("mouseover", (e) => {
+                        element.classList.add("SVGHover");
                   });
-                  svgElements[i].addEventListener("mouseout", (e) => {
-                        svgElements[i].classList.remove("SVGHover");
+                  element.addEventListener("mouseout", (e) => {
+                        element.classList.remove("SVGHover");
                   });
-                  svgElements[i].addEventListener("click", (e) => {
-                        svgElements[i].classList.toggle("SVGSelected");
+                  element.addEventListener("mousedown", (e) => {
+                        element.classList.toggle("SVGSelected");
                   });
-            }
+            });
       }
       /**
        * @summary separates path elements with inner paths into separate outer/inner path elements
@@ -324,7 +324,24 @@ class DragZoomSVG {
             };
       }
 
-      updateFromFields() { }
+      updateFromFields() {
+            this.#outerPathElements = [];
+            this.#innerPathElements = [];
+            this.#allPathElements = [];
+
+            [...this.#f_svgG.getElementsByTagName("path")].forEach(element => {
+
+                  if(element.classList.contains("outerPath")) this.#outerPathElements.push(element);
+                  if(element.classList.contains("innerPath")) this.#innerPathElements.push(element);
+                  this.#allPathElements.push(element);
+            });
+      }
+
+      deleteElement(element) {
+            deleteElement(element);
+
+            this.updateFromFields();
+      }
 
       /*overrideable*/onMouseUpdate(updateFrom) { }
 

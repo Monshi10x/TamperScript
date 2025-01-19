@@ -443,7 +443,7 @@ function svg_convertShapesToPaths(svgElement) {
       let svgElements = svgElement.getElementsByTagName("*");
 
       for(let i = 0; i < svgElements.length; i++) {
-            if(svgElements[i].nodeName != "g" && svgElements[i].nodeName != "path") {
+            if(svgElements[i].nodeName != "g" && svgElements[i].nodeName != "path" || svgElements[i].nodeName != "defs") {
                   let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
             }
       }
@@ -456,7 +456,7 @@ function svg_getTotalPathLengths(svgElement) {
       let svgElements = svgElement.getElementsByTagName("*");
 
       for(let i = 0; i < svgElements.length; i++) {
-            if(svgElements[i].nodeName == "g") continue;
+            if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "defs") continue;
 
             totalPathLength += svg_getPathLength_mm(svgElements[i]);
       }
@@ -739,7 +739,7 @@ function svg_getTotalBoundingRectAreas_m2(svgStringOrObject, useShallowCopy = tr
       let totalArea = 0;
 
       for(let i = 0; i < svgStringOrObject.length; i++) {
-            if(svgStringOrObject[i].nodeName == "g") continue;
+            if(svgStringOrObject[i].nodeName == "g" || svgStringOrObject[i].nodeName == "defs") continue;
 
             let element = svgStringOrObject[i];
 
@@ -780,7 +780,7 @@ function svg_getPathQty(svgStringOrObject) {
       };
 
       for(let i = 0; i < svgStringOrObject.length; i++) {
-            if(svgStringOrObject[i].nodeName == "g") continue;
+            if(svgStringOrObject[i].nodeName == "g" || svgStringOrObject[i].nodeName == "defs") continue;
 
             let element = svgStringOrObject[i];
 
@@ -799,7 +799,7 @@ function svg_convertShapesToPaths(svgObject) {
       let svgElements = svgObject.getElementsByTagName("*");
 
       for(let i = 0; i < svgElements.length; i++) {
-            if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "path") continue;
+            if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "path" || svgElements[i].nodeName == "defs") continue;
 
             let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
 
