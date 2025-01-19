@@ -18,6 +18,11 @@
                         "Good Quality": 3000
                   }
             },
+            "Acrylic": {
+                  "Opal Cut Through And Rebate": {
+                        "Good Quality": 1000
+                  }
+            },
             "Any": {
                   "LED Marking": {
                         "Standard": 1050,

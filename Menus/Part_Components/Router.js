@@ -2,7 +2,7 @@ class Router extends SubMenu {
 
 	static maxCutSize = {width: 4100, height: 2100};
 
-	perShapeTime = secondsToMinutes(30);
+	perShapeTime = secondsToMinutes(5);
 	runRows = [];
 	#showIDInContainer = true;
 
@@ -284,6 +284,17 @@ class Router extends SubMenu {
 	requiredToggle = () => {
 		this.Update();
 	};
+
+	updateRunRow(rowID, totalPathLength, numberOfShapes, material, profile, quality, speed) {
+		let row = this.runRows[rowID].items;
+
+		if(totalPathLength) $(row[5][1]).val(totalPathLength).change();
+		if(numberOfShapes) $(row[5][1]).val(numberOfShapes).change();
+		if(material) dropdownSetSelectedText(row[2][1], material);
+		if(profile) dropdownSetSelectedText(row[3][1], profile);
+		if(quality) dropdownSetSelectedText(row[4][1], quality);
+		if(speed) $(row[5][1]).val(speed).change();
+	}
 
 	updateCutProfile = (requestFrom, materialField, profileField, qualityField, speedField) => {
 		if(requestFrom == "Material") {

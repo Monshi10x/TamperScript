@@ -3,6 +3,12 @@ class Sheet extends Material {
       static DISPLAY_NAME = "SHEET";
       /*override*/get Type() {return "SHEET";}
 
+      cutProfile = {material: "ACM", profile: "Cut Through", quality: "Good Quality"};
+      setCutProfile(material, profile, quality) {
+            this.cutProfile = {material: material, profile: profile, quality: quality};
+            this.UpdateFromChange();
+      }
+
       #materialOptions = [
             createDropdownOption("ACM", "ACM"),
             createDropdownOption("Acrylic", "Acrylic"),
@@ -31,7 +37,7 @@ class Sheet extends Material {
             "Smaller Than Standard Sheet": 2,
             "Bigger Than Standard Sheet": 0
       };
-      static guillotineMaxCutWidth = 2500;
+      static guillotineMaxCutWidth = 2480;
       static guillotineMaxRunLength = 20000;
       static guillotinePerCutTime = 5;
       static guillotineMaterialsCanCut = [
@@ -200,6 +206,7 @@ class Sheet extends Material {
       get backgroundColor() {return COLOUR.Orange;}
       get textColor() {return COLOUR.White;}
       get DEBUG_SHOW() {return true;}
+      get router() {return this.#router;}
 
 
       static getCutVsSheetType = (width, height, sheetWidth, sheetHeight) => {
@@ -562,7 +569,6 @@ class Sheet extends Material {
       UpdateFromChange() {
             super.UpdateFromChange();
 
-
             this.UpdateFromInheritedData();
             this.UpdateGrainDirection();
             this.UpdateOutput();
@@ -821,7 +827,7 @@ class Sheet extends Material {
             }
 
             this.#router.deleteAllRunRows();
-            this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, {material: "ACM", profile: "Cut Through", quality: "Good Quality"});
+            this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, this.cutProfile);
             if(penMarkingQty > 0) this.#router.addRunRow(penMarkingLength, penMarkingQty, {material: "Any", profile: "LED Marking", quality: "SecondsPerCut"});
 
             this.#laser.deleteAllRunRows();

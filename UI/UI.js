@@ -1369,7 +1369,26 @@ function dropdownSetSelectedValue(field, value) {
             return;
         }
     }
+    console.trace("here shouldnt");
     alert("no value selected for dropdown (no match)");
+}
+function dropdownSetSelectedText(field, value) {
+    let allOptions = field.options;
+    for(let i = 0; i < allOptions.length; i++) {
+        if(allOptions[i].innerText === value) {
+            field.selectedIndex = i;
+            $(field).change();
+            return;
+        }
+    }
+    alert("no value selected for dropdown text (no match)");
+}
+
+function dropdownInfieldIconsSearchSetSelected(dropdownField, value, setSearchToo = true, withCallback = true) {
+    if(!withCallback) dropdownField[6]();//pause callback
+    if(setSearchToo) $(dropdownField[4]).val(value).change();
+    $(dropdownField[1]).val(value).change();
+    if(!withCallback) dropdownField[7]();//resume callback
 }
 //helper functions
 function checkboxesAddToSelectionGroup(oneMustBeChecked, ...checkboxElements) {

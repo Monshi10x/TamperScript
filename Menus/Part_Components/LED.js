@@ -61,6 +61,14 @@ class LED extends Material {
                         
       Setter            */
       set material(value) {$(this.#f_material[1]).val(value).change();}
+      set formula(value) {
+            console.log(value);
+            dropdownSetSelectedText(this.#f_formula[1], value);
+      }
+      set material(value) {
+            console.log(value);
+            dropdownInfieldIconsSearchSetSelected(this.#f_material, value, false, true);
+      }
       /*
                         
       Start             */

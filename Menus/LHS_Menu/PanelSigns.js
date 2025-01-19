@@ -167,19 +167,23 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.material = "Acrylic";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
+				sheet.setCutProfile("Acrylic", "Opal Cut Through And Rebate", "Good Quality");
+
 
 				led = this.#add(LED, this.page1, [SVGCutfile]);
+				led.formula = "3D Letters 100D - 80 per m2";
+				led.material = "LED Module - 6500K 1.08W 5yr 175deg 12V";
 
 				sheet = this.#add2(Sheet, this.page1, [svgCutfile, led]);
 				sheet.material = "ACM";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
 
-
 				transformer = this.#add(Transformer, this.page1, [LED]);
 
 				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
 				painting.formula = "Fabricated Front-lit Letters";
+				painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
 
 				artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
 				artwork.artworkItem.artworkTime = 60;

@@ -76,17 +76,18 @@ class Coil extends Material {
             Machine*/
             let f_container_machine = createDivStyle5(null, "Machine", this.container)[1];
 
-            createText("Setup", "width:100%;height:20px", f_container_machine);
-            this.#f_machineSetupTime = createInput_Infield("Setup Time Average", 3, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "min"});
+            let f_setupContainer = createDivStyle5(null, "Setup", f_container_machine)[1];
+            this.#f_machineSetupTime = createInput_Infield("Setup Time Average", 3, "width:30%;", () => {this.UpdateFromChange();}, f_setupContainer, false, 0.1, {postfix: "min"});
 
-            createText("Run", "width:100%;height:20px", f_container_machine);
-            this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "m"});
+            let f_runContainer = createDivStyle5(null, "Run", f_container_machine)[1];
+            this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "m"});
             setFieldDisabled(true, this.#f_machineLengthToRun[1], this.#f_machineLengthToRun[0]);
-            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 2, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "m/min"});
-            this.#f_machineRunTime = createInput_Infield("Run Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
+            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 2, "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 0.1, {postfix: "m/min"});
+            this.#f_machineRunTime = createInput_Infield("Run Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineRunTime[1], this.#f_machineRunTime[0]);
-            createText("Total", "width:100%;height:20px", f_container_machine);
-            this.#f_machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
+
+            let f_totalContainer = createDivStyle5(null, "Total", f_container_machine)[1];
+            this.#f_machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineTotalTime[1], this.#f_machineTotalTime[0]);
 
             /*

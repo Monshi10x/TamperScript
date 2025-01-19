@@ -90,14 +90,24 @@ class ModalSVG extends Modal {
 
             this.#controlsContainer = createDivStyle5(null, "Controls", this.getBodyElement())[1];
 
-            let selectionTool = createIconButton(GM_getResourceURL("Icon_Select"), null, "width:50px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
-                  IFELSEF(this.currentTool != "Selection Tool", () => {this.setCurrentTool("Selection Tool");}, () => {this.setCurrentTool("null");});
+            let deleteTool;
+            let selectionTool;
+
+            selectionTool = createIconButton(GM_getResourceURL("Icon_Select"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
+                  IFELSEF(this.currentTool != "Selection Tool", () => {
+                        if(deleteTool.style.borderColor == "red") $(deleteTool).click();
+                        this.setCurrentTool("Selection Tool");
+
+                  }, () => {this.setCurrentTool("null");});
                   IFELSEF(selectionTool.style.borderColor != "red", () => {selectionTool.style.borderColor = "red";}, () => {selectionTool.style.borderColor = COLOUR.DarkGrey;});
             }, this.#controlsContainer, true);
 
-            console.log(GM_getResourceURL("Icon_Bin2"));
-            let deleteTool = createIconButton(GM_getResourceURL("Icon_Bin2"), null, "width:50px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
-                  IFELSEF(this.currentTool != "Delete Tool", () => {this.setCurrentTool("Delete Tool");}, () => {this.setCurrentTool("null");});
+            deleteTool = createIconButton(GM_getResourceURL("Icon_Bin2"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
+                  IFELSEF(this.currentTool != "Delete Tool", () => {
+                        if(selectionTool.style.borderColor == "red") $(selectionTool).click();
+                        this.setCurrentTool("Delete Tool");
+
+                  }, () => {this.setCurrentTool("null");});
                   IFELSEF(deleteTool.style.borderColor != "red", () => {deleteTool.style.borderColor = "red";}, () => {deleteTool.style.borderColor = COLOUR.DarkGrey;});
             }, this.#controlsContainer, true);
 
@@ -586,6 +596,7 @@ class ModalSVG extends Modal {
                                     }
                               }
                         } else if(state == "Mouse Up") {
+                              if(!this.selectionRect) break;
                               let _x = (this.selectionRect.x),
                                     _y = (this.selectionRect.y),
                                     _width = (this.selectionRect.width),

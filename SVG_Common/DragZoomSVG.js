@@ -215,7 +215,7 @@ class DragZoomSVG {
             let svgElements = this.#f_svg.getElementsByTagName("*");
 
             for(let i = 0; i < svgElements.length; i++) {
-                  if(svgElements[i].nodeName != "g" && svgElements[i].nodeName != "path") {
+                  if(svgElements[i].nodeName != "g" && svgElements[i].nodeName != "path" && svgElements[i].nodeName != "defs" && svgElements[i].nodeName != "style") {
                         let element = SVGPathCommander.shapeToPath(svgElements[i], true);
                   }
             }
