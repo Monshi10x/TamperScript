@@ -770,15 +770,19 @@ class Sheet extends Material {
             let numberOfPaths = 0;
             let penMarkingQty = 0;
             let penMarkingLength = 0;
+            let pathLength = 0;
 
             this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
-                  subscription.data.forEach((dataEntry/**{pathQty: {}}*/) => {
+                  subscription.data.forEach((dataEntry/**{pathLength:{},pathQty: {}}*/) => {
 
                         if(dataEntry.pathQty) numberOfPaths += dataEntry.pathQty.totalQty;
                         if(subscription.parent instanceof LED) {
                               penMarkingQty += dataEntry.qty;
                               penMarkingLength += dataEntry.qty * 100;
+                        }
+                        if(subscription.parent instanceof SVGCutfile) {
+                              pathLength += dataEntry.pathLength;
                         }
                   });
             });
@@ -854,7 +858,7 @@ class Sheet extends Material {
             this.staticLaserRows.forEach((element) => {
                   this.#laser.addRunRow(eval(element.pathLength), eval(element.numberOfPaths), eval(element.profileSettings));
             });
-            this.#laser.addRunRow(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths, this.laserCutProfile);
+            this.#laser.addRunRow(this.#totalLaserPerimeter, this.#totalLaserNumberOfShapes == 0 ? numberOfPaths : this.#totalLaserNumberOfShapes, this.laserCutProfile);
 
             ///FOLDED
             if(this.#isFolded[1].checked) {
