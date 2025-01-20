@@ -8,6 +8,11 @@
             },
             "Stainless": {
                   "Cut Through": {
+                        "Good Quality": 20000
+                  }
+            },
+            "Corflute": {
+                  "Cut Through": {
                         "Good Quality": 10000
                   }
             }

@@ -181,6 +181,12 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 				transformer = this.#add(Transformer, this.page1, [LED]);
 
+				sheet = this.#add2(Sheet, this.page1, [svgCutfile]);
+				sheet.material = "Corflute";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
+				sheet.addStaticLaserRow("this.#totalPerimeter", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
+
 				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
 				painting.formula = "Fabricated Front-lit Letters";
 				painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";

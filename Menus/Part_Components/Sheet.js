@@ -9,10 +9,22 @@ class Sheet extends Material {
             this.UpdateFromChange();
       }
 
+      staticRouterRows = [];
+      addStaticRouterRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", profile: "Cut Through", quality: "Good Quality"}) {
+            this.staticRouterRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
+            console.log(this.staticRouterRows);
+      }
+
       laserCutProfile = {material: "Stainless", profile: "Cut Through", quality: "Good Quality"};
       setLaserCutProfile(material, profile, quality) {
             this.laserCutProfile = {material: material, profile: profile, quality: quality};
             this.UpdateFromChange();
+      }
+
+      staticLaserRows = [];
+      addStaticLaserRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", profile: "Cut Through", quality: "Good Quality"}) {
+            this.staticLaserRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
+            console.log(this.staticLaserRows);
       }
 
       #materialOptions = [
@@ -64,7 +76,6 @@ class Sheet extends Material {
       static laserMaterialsCanCut = [
             "Acrylic",
             "Aluminium",
-            "Foamed PVC",
             "Polycarb",
             "HDPE",
             "Corflute",
@@ -204,6 +215,7 @@ class Sheet extends Material {
 
       #flipSheet = false;
       #preferredCuttingMachine = null;
+      #totalPerimeter = 0;
       #flip;
 
       #hasGrain;
@@ -725,7 +737,7 @@ class Sheet extends Material {
                         let cutsEach = Sheet.getNumberOfGuillotineCuts(w, h, sheetSizeWidth, sheetSizeHeight);
                         let cutsTotal = cutsEach * qty;
 
-                        let totalPerimeter = roundNumber((w * 2 + h * 2) * qty, 2);
+                        this.#totalPerimeter = roundNumber((w * 2 + h * 2) * qty, 2);
                         let options = this.createCuttingOptions(w, h, sheetSizeWidth, sheetSizeHeight, currentMaterial);
 
                         let cuttingTypeDropDown = createDropdown_Infield("Panel Cutting Type", 0, ";width:-webkit-fill-available;", options, () => {
@@ -734,17 +746,14 @@ class Sheet extends Material {
 
                         this.#dataForSubscribers.push({QWHD: new QWHD(qty, w, h), matrixSizes: this.#matrixSizes, paintedArea: mmToM(width) * mmToM(height) * qty});
 
-                        this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[0], cutsTotal, totalPerimeter);
-                        this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[1], cutsTotal, totalPerimeter]);
+                        this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[0], cutsTotal, this.#totalPerimeter);
+                        this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[1], cutsTotal, this.#totalPerimeter]);
 
-                        console.log(this.#preferredCuttingMachine);
                         if(this.#preferredCuttingMachine == null) dropdownSetSelectedIndexToNextAvailable(cuttingTypeDropDown[1], yes);
                         if(this.#preferredCuttingMachine == "router") {
-                              console.log("MUST BE HERE");
                               dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Router.value);
                         }
                         if(this.#preferredCuttingMachine == "guillotine") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Guillotine.value);
-                        console.log(this.#cuttingOptions.Router.value);
                   }
             }
       };
@@ -832,29 +841,37 @@ class Sheet extends Material {
                   this.#laser.Maximize();
             }
 
+            ///ROUTER
             this.#router.deleteAllRunRows();
+            this.staticRouterRows.forEach((element) => {
+                  this.#router.addRunRow(eval(element.pathLength), eval(element.numberOfPaths), eval(element.profileSettings));
+            });
             this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, this.routerCutProfile);
             if(penMarkingQty > 0) this.#router.addRunRow(penMarkingLength, penMarkingQty, {material: "Any", profile: "LED Marking", quality: "SecondsPerCut"});
 
+            ///LASER
             this.#laser.deleteAllRunRows();
-            console.log(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths, this.laserCutProfile);
+            this.staticLaserRows.forEach((element) => {
+                  this.#laser.addRunRow(eval(element.pathLength), eval(element.numberOfPaths), eval(element.profileSettings));
+            });
             this.#laser.addRunRow(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths, this.laserCutProfile);
 
+            ///FOLDED
             if(this.#isFolded[1].checked) {
-                  let totalPerimeter = 0;
+                  let foldPerimeter = 0;
                   let numberShapes = 0;
                   let foldedTop = this.#foldedTop[1].checked;
                   let foldedLeft = this.#foldedLeft[1].checked;
                   let foldedRight = this.#foldedRight[1].checked;
                   let foldedBottom = this.#foldedBottom[1].checked;
                   if(foldedTop) {
-                        totalPerimeter += this.width;
+                        foldPerimeter += this.width;
                   } if(foldedLeft) {
-                        totalPerimeter += this.height;
+                        foldPerimeter += this.height;
                   } if(foldedRight) {
-                        totalPerimeter += this.height;
+                        foldPerimeter += this.height;
                   } if(foldedBottom) {
-                        totalPerimeter += this.width;
+                        foldPerimeter += this.width;
                   }
 
                   for(let i = 0; i < this.matrixSizes.length; i++) {
@@ -866,7 +883,7 @@ class Sheet extends Material {
                         numberShapes += foldedBottom ? numberColumns : 0;
                   }
 
-                  this.#router.addRunRow(totalPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", profile: "Groove", quality: "Good Quality", speed: null});
+                  this.#router.addRunRow(foldPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", profile: "Groove", quality: "Good Quality", speed: null});
                   TODO("Laser folding");
             }
             if(this.#totalRouterNumberOfShapes > 1) {
