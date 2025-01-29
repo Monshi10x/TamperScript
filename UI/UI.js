@@ -383,9 +383,9 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(containerDiv);
     }
-
+    let prefixField = 0;
     if(options.prefix) {
-        let prefixField = document.createElement("p");
+        prefixField = document.createElement("p");
         prefixField.style = "float:left; field-sizing: content;user-select: none;color:#555;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-family:Arial;font-size: 14px;line-height: 18px;";
         prefixField.innerText = options.prefix;
         prefixField.onclick = function() {
@@ -408,8 +408,9 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
             }
         });
     }
+    let postfixField = 0;
     if(options.postfix) {
-        let postfixField = document.createElement("p");
+        postfixField = document.createElement("p");
         postfixField.style = "float:left; field-sizing: content;user-select: none;color:#555;height:18px;margin: 0px;padding:2px;border:0px solid;box-sizing:content-box;outline: none;background:none;text-align:left;position:relative;font-family:Arial;font-size: 14px;line-height: 18px;";
         postfixField.innerText = options.postfix;
         postfixField.onclick = function() {
@@ -441,7 +442,7 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         _pauseCallback = false;
     }
 
-    return [containerDiv, input, textDescription, pauseCallback, resumeCallback];
+    return [containerDiv, input, textDescription, pauseCallback, resumeCallback, prefixField, postfixField];
 }
 function createFileChooserButton(text, overrideCssStyles, optionalCallback, parentObjectToAppendTo) {
     var itemChooseBtn = document.createElement('input');
@@ -1368,7 +1369,27 @@ function dropdownSetSelectedValue(field, value) {
             return;
         }
     }
-    alert("no value selected for dropdown (no match)");
+    console.trace("here shouldnt");
+    //alert("no value selected for dropdown (no match)");
+}
+function dropdownSetSelectedText(field, value) {
+    let allOptions = field.options;
+    for(let i = 0; i < allOptions.length; i++) {
+        if(allOptions[i].innerText === value) {
+            field.selectedIndex = i;
+            $(field).change();
+            return;
+        }
+    }
+    console.trace("here shouldnt");
+    // alert("no value selected for dropdown text (no match)");
+}
+
+function dropdownInfieldIconsSearchSetSelected(dropdownField, value, setSearchToo = true, withCallback = true) {
+    if(!withCallback) dropdownField[6]();//pause callback
+    if(setSearchToo) $(dropdownField[4]).val(value).change();
+    $(dropdownField[1]).val(value).change();
+    if(!withCallback) dropdownField[7]();//resume callback
 }
 //helper functions
 function checkboxesAddToSelectionGroup(oneMustBeChecked, ...checkboxElements) {

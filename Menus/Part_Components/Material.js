@@ -144,7 +144,8 @@ class Material extends SubscriptionManager {
 
             this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
-                  debugData += JSON.stringify(subscription.data, null, 4);
+                  debugData += subscription.parent.constructor.name + "\n";
+                  debugData += JSON.stringify(subscription.data, null, 4) + "\n\n";
             });
 
             this.#f_debugInheritedData.value = debugData;

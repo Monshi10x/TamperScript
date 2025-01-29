@@ -90,9 +90,25 @@ class ModalSVG extends Modal {
 
             this.#controlsContainer = createDivStyle5(null, "Controls", this.getBodyElement())[1];
 
-            let selectionTool = createIconButton(GM_getResourceURL("Icon_Select"), null, "width:50px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
-                  IFELSEF(this.currentTool != "Selection Tool", () => {this.setCurrentTool("Selection Tool");}, () => {this.setCurrentTool("null");});
+            let deleteTool;
+            let selectionTool;
+
+            selectionTool = createIconButton(GM_getResourceURL("Icon_Select"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
+                  IFELSEF(this.currentTool != "Selection Tool", () => {
+                        if(deleteTool.style.borderColor == "red") $(deleteTool).click();
+                        this.setCurrentTool("Selection Tool");
+
+                  }, () => {this.setCurrentTool("null");});
                   IFELSEF(selectionTool.style.borderColor != "red", () => {selectionTool.style.borderColor = "red";}, () => {selectionTool.style.borderColor = COLOUR.DarkGrey;});
+            }, this.#controlsContainer, true);
+
+            deleteTool = createIconButton(GM_getResourceURL("Icon_Bin2"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
+                  IFELSEF(this.currentTool != "Delete Tool", () => {
+                        if(selectionTool.style.borderColor == "red") $(selectionTool).click();
+                        this.setCurrentTool("Delete Tool");
+
+                  }, () => {this.setCurrentTool("null");});
+                  IFELSEF(deleteTool.style.borderColor != "red", () => {deleteTool.style.borderColor = "red";}, () => {deleteTool.style.borderColor = COLOUR.DarkGrey;});
             }, this.#controlsContainer, true);
 
             this.loadPathArea();
@@ -484,7 +500,6 @@ class ModalSVG extends Modal {
 
       addElementPoints() {
 
-
             let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
             let svgScale = this.#dragZoomSVG.scale;
 
@@ -508,12 +523,10 @@ class ModalSVG extends Modal {
 
                   const points = SVGPoints.toPoints(path2);
 
-                  console.log();
                   console.log(points);
 
                   points.forEach((entry) => {
                         if(!entry.x || !entry.y) return;
-
 
                         let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                         circle.setAttribute('fill', `rgb(0,0,255)`);
@@ -525,10 +538,6 @@ class ModalSVG extends Modal {
                   });
 
             });
-
-
-
-
       }
 
       showElementPoints() {
@@ -587,6 +596,7 @@ class ModalSVG extends Modal {
                                     }
                               }
                         } else if(state == "Mouse Up") {
+                              if(!this.selectionRect) break;
                               let _x = (this.selectionRect.x),
                                     _y = (this.selectionRect.y),
                                     _width = (this.selectionRect.width),
@@ -602,6 +612,7 @@ class ModalSVG extends Modal {
                               let pathElements = this.#dragZoomSVG.allPathElements;
                               for(let i = 0; i < pathElements.length; i++) {
                                     let element = pathElements[i];
+
                                     let elementFirstPoint = element.getPointAtLength(0);
                                     let isWithinSelection = pointInPolygon(elementFirstPoint, selectionPolygon);
                                     if(isWithinSelection) {
@@ -611,6 +622,18 @@ class ModalSVG extends Modal {
                               if(this.selectionRect) this.selectionRect.Delete();
                         }
                         break;
+                  case "Delete Tool":
+                        let elementsToDelete = [];
+                        this.#dragZoomSVG.allPathElements.forEach((element) => {
+                              if(element.classList.contains("SVGSelected")) elementsToDelete.push(element);
+                        });
+
+                        let countToDelete = elementsToDelete.length;
+                        for(let i = 0; i < countToDelete; i++) {
+                              this.#dragZoomSVG.deleteElement(elementsToDelete[i]);
+                        }
+                        break;
+
                   default:
                         this.#dragZoomSVG.allowPanning = true;
                         break;

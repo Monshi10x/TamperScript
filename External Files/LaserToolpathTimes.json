@@ -5,6 +5,16 @@
                         "Glossy Edge": 600,
                         "Painted Edge (faster)": 1000
                   }
+            },
+            "Stainless": {
+                  "Cut Through": {
+                        "Good Quality": 20000
+                  }
+            },
+            "Corflute": {
+                  "Cut Through": {
+                        "Good Quality": 10000
+                  }
             }
       }
 }

@@ -105,7 +105,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
 			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
-				[["3D Front-lit Letters", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
+				[["3D Front-lit Letters", "https://cdn.gorilladash.com/images/media/12562260/signarama-australia-homeco-cafe-63-lightbox-thumbnail-663186cf397a7.jpg"],
 				["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
 				["Lightbox Face - Opal Acrylic", "https://cdn.gorilladash.com/images/media/5077257/signarama-australia-img-6911-2-small-thumbnail-61611e9ab2f0f.jpg"],
 				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
@@ -167,17 +167,30 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.material = "Acrylic";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
+				sheet.setRouterCutProfile("Acrylic", "Opal Cut Through And Rebate", "Good Quality");
 
-				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+
+				led = this.#add(LED, this.page1, [SVGCutfile]);
+				led.formula = "3D Letters 100D - 80 per m2";
+				led.material = "LED Module - 6500K 1.08W 5yr 175deg 12V";
+
+				sheet = this.#add2(Sheet, this.page1, [svgCutfile, led]);
 				sheet.material = "ACM";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
 
-				led = this.#add(LED, this.page1, [SVGCutfile]);
 				transformer = this.#add(Transformer, this.page1, [LED]);
 
-				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
+				sheet = this.#add2(Sheet, this.page1, [svgCutfile]);
+				sheet.material = "Corflute";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
+				sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
+				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
 
+				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
+				painting.formula = "Fabricated Front-lit Letters";
+				painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
 
 				artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
 				artwork.artworkItem.artworkTime = 60;
@@ -393,7 +406,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 		newItem.productNumber = this.#getproductNumber();
 
 		for(let x = 0; x < subscribeTo.length; x++) {
-			newItem.SubscribeTo(subscribeTo[i]);//subscribe to last of kind
+			newItem.SubscribeTo(subscribeTo[x]);//subscribe to last of kind
 		}
 
 		this.#allMaterials.push(newItem);

@@ -113,8 +113,6 @@ class SVGCutfile extends SubscriptionManager {
 
             this.#f_deleteBtn = createIconButton(GM_getResourceURL("Icon_Bin"), "", "display: block; float: right; width: 35px;height:40px; border:none;padding:0px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Red + ";", () => {this.Delete();}, this.#f_container);
 
-
-
             let f_container_fileChooser = createDivStyle5(null, "File", this.#f_container)[1];
 
             createText("Use SVG Text or Select File...", "width:100%;", f_container_fileChooser);
@@ -177,18 +175,18 @@ class SVGCutfile extends SubscriptionManager {
             }, f_container_fileChooser, true);
 
 
-
             this.#f_setting_IncludeSizeInDescription = createCheckbox_Infield("Include Size(s) In Description", false, "width: 450px;", () => {
                   this.#includeSizeInDescription = this.#f_setting_IncludeSizeInDescription[1].checked;
             });
 
-            let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.#f_container)[1];
+            let f_container_materialUsage = createDivStyle5(null, "Material Usage", this.#f_container)[1];
+
 
             this.#f_sizeMethod1 = createCheckbox_Infield("Method 1 - Use Bounding Rect Areas", true, "width:300px;", () => {
                   setFieldDisabled(true, this.#f_pathArea[1], this.#f_pathArea[0]);
                   setFieldDisabled(false, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
                   this.UpdateFromChange();
-            }, f_container_outputSizes);
+            }, f_container_materialUsage);
 
             let icon_boundingArea = document.createElement('img');
             icon_boundingArea.src = GM_getResourceURL("Icon_BoundingArea");
@@ -199,7 +197,7 @@ class SVGCutfile extends SubscriptionManager {
                   setFieldDisabled(false, this.#f_pathArea[1], this.#f_pathArea[0]);
                   setFieldDisabled(true, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
                   this.UpdateFromChange();
-            }, f_container_outputSizes);
+            }, f_container_materialUsage);
 
             let icon_shapeArea = document.createElement('img');
             icon_shapeArea.src = GM_getResourceURL("Icon_ShapeArea");
@@ -208,9 +206,14 @@ class SVGCutfile extends SubscriptionManager {
 
             checkboxesAddToSelectionGroup(true, this.#f_sizeMethod1, this.#f_sizeMethod2);
 
+            let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.#f_container)[1];
+
+
             this.#f_width = createInput_Infield("Width", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, f_container_outputSizes, true, 100, {postfix: "mm"});
+            setFieldDisabled(true, this.#f_width[1], this.#f_width[0]);
 
             this.#f_height = createInput_Infield("Height", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, f_container_outputSizes, true, 100, {postfix: "mm"});
+            setFieldDisabled(true, this.#f_height[1], this.#f_height[0]);
 
             this.UpdateFromChange();
       }

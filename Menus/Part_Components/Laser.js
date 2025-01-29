@@ -1,8 +1,8 @@
 class Laser extends SubMenu {
 
-      static maxCutSize = {width: 4100, height: 2100};
+      static maxCutSize = {width: 1350, height: 2500};
 
-      perShapeTime = secondsToMinutes(30);
+      perShapeTime = secondsToMinutes(5);
       runRows = [];
       #showIDInContainer = true;
 
@@ -38,7 +38,7 @@ class Laser extends SubMenu {
             f_container_run[1].style.cssText = "width:calc(100% - 50px)";
             this.l_usePaths = createCheckbox_Infield("Use Path Specs for Times", true, "width:60%;margin-right:30%;", () => {this.updateRun();}, f_container_run[1]);
             this.l_cuttingTable = new Table(f_container_run[1], "100%", 20, 250);
-            this.l_cuttingTable.setHeading("Total Path Length", "Number Shapes", "Material", "Profile", "Quality", "Speed", "Delete");
+            this.l_cuttingTable.setHeading("Total Path Length", "Number Shapes", "Material", "Profile", "Quality", "Speed", "Total Time", "Delete");
             this.l_addRowBtn = createButton("+ Row", "width:15%;margin:0px;margin-right:70%;min-width:80px;", () => {this.addRunRow();}, f_container_run[1]);
             this.l_runTime = createInput_Infield("Total Run Minutes", 20, "width:30%", null, f_container_run[1], false, 10, {postfix: "mins"});
 
@@ -184,18 +184,19 @@ class Laser extends SubMenu {
             let internalIndex = this.runRowIndex;
             let l_pathLength = createInput_Infield("Length", pathLength, "width:90%;min-width:90px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 10, {postfix: " mm"});
             let l_numberShapes = createInput_Infield("# Shapes", numberShapes, "width:90%;min-width:70px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 1);
-            let l_material, l_profile, l_quality, l_speed;
+            let l_material, l_profile, l_quality, l_speed, l_totalTime;
             l_material = createDropdown_Infield("Material", 0, "width:80px;margin:0px;", this.getProfileOptions("Material"), () => {this.updateCutProfile("Material", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer);
             l_profile = createDropdown_Infield("Profile", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Profile", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer);
             l_quality = createDropdown_Infield("Quality", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Quality", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer);
             l_speed = createInput_Infield("Speed", 1000, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer, false, 10, {postfix: " mm/min"});
-            if(options.material != null) {
-                  dropdownSetSelectedValue(l_material[1], options.material);
-                  dropdownSetSelectedValue(l_profile[1], options.profile);
-                  dropdownSetSelectedValue(l_quality[1], options.quality);
-            } else {
-                  this.updateCutProfile("Material", l_material[1], l_profile[1], l_quality[1], l_speed[1]);
-            }
+            l_totalTime = createInput_Infield("Total Time", 0, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.updateRun();}, this.contentContainer, false, 10, {postfix: " min"});
+
+            if(options.material != null) dropdownSetSelectedValue(l_material[1], options.material);
+            if(options.profile != null) dropdownSetSelectedValue(l_profile[1], options.profile);
+            if(options.quality != null) dropdownSetSelectedValue(l_quality[1], options.quality);
+            if(options.speed != null) $(l_speed[1]).val(options.speed);
+            if(options.material == null && options.profile != null && options.quality != null && options.speed != null) this.updateCutProfile("Material", l_material[1], l_profile[1], l_quality[1], l_speed[1]);
+
             let l_deleteRowBtn = createButton("X", "Background-color:red;width:30px;margin:0px;", () => {
                   for(let i = 0; i < this.runRows.length; i++) {
                         if(this.runRows[i].index === internalIndex) {
@@ -209,10 +210,10 @@ class Laser extends SubMenu {
             this.runRows.push(
                   {
                         index: this.runRowIndex,
-                        items: [l_pathLength, l_numberShapes, l_material, l_profile, l_quality, l_speed, l_deleteRowBtn]
+                        items: [l_pathLength, l_numberShapes, l_material, l_profile, l_quality, l_speed, l_totalTime, l_deleteRowBtn]
                   }
             );
-            this.l_cuttingTable.addRow(l_pathLength[0], l_numberShapes[0], l_material[0], l_profile[0], l_quality[0], l_speed[0], l_deleteRowBtn);
+            this.l_cuttingTable.addRow(l_pathLength[0], l_numberShapes[0], l_material[0], l_profile[0], l_quality[0], l_speed[0], l_totalTime[0], l_deleteRowBtn);
 
             this.Update();
       }
@@ -247,15 +248,28 @@ class Laser extends SubMenu {
 
       updateRun() {
             if(this.l_usePaths[1].checked) {
-                  let runTime = 0;
+                  this.runTime = 0;
                   for(let i = 0; i < this.runRows.length; i++) {
                         let pathLength = mmToM(parseFloat(this.runRows[i].items[0][1].value));
                         let numberShapes = parseFloat(this.runRows[i].items[1][1].value);
                         let cutSpeed = mmToM(parseFloat(this.runRows[i].items[5][1].value));
+                        let usePerCutTime = this.runRows[i].items[4][1].value == "SecondsPerCut";
 
-                        runTime += pathLength / cutSpeed + numberShapes * this.perShapeTime;
+                        let timeMin = 0;
+
+                        if(usePerCutTime) {
+                              this.runRows[i].items[5][6].innerHTML = "sec/cut";
+                              timeMin = (cutSpeed * 1000 * numberShapes) / 60;
+                        } else {
+                              this.runRows[i].items[5][6].innerHTML = "mm/min";
+                              timeMin = pathLength / cutSpeed + numberShapes * this.perShapeTime;
+                        }
+
+                        $(this.runRows[i].items[6][1]).val(roundNumber(timeMin, 2));
+
+                        this.runTime += timeMin;
                   }
-                  this.runTime = roundNumber(runTime, 2);
+                  this.runTime = roundNumber(this.runTime, 2);
             }
       }
 
@@ -270,6 +284,17 @@ class Laser extends SubMenu {
       requiredToggle = () => {
             this.Update();
       };
+
+      updateRunRow(rowID, totalPathLength, numberOfShapes, material, profile, quality, speed) {
+            let row = this.runRows[rowID].items;
+
+            if(totalPathLength) $(row[5][1]).val(totalPathLength).change();
+            if(numberOfShapes) $(row[5][1]).val(numberOfShapes).change();
+            if(material) dropdownSetSelectedText(row[2][1], material);
+            if(profile) dropdownSetSelectedText(row[3][1], profile);
+            if(quality) dropdownSetSelectedText(row[4][1], quality);
+            if(speed) $(row[5][1]).val(speed).change();
+      }
 
       updateCutProfile = (requestFrom, materialField, profileField, qualityField, speedField) => {
             if(requestFrom == "Material") {
@@ -288,7 +313,7 @@ class Laser extends SubMenu {
       getProfileOptions = (requestFrom, materialField, profileField, qualityField, speedField) => {
             let returnOptions = [];
             if(requestFrom == "Material") {
-                  let keys = Object.keys(RouterToolpathTimeLookup);
+                  let keys = Object.keys(LaserToolpathTimeLookup);
                   let keysLength = keys.length;
                   for(let i = 0; i < keysLength; i++) {
                         returnOptions.push(createDropdownOption(keys[i], keys[i]));
@@ -296,7 +321,7 @@ class Laser extends SubMenu {
             }
             else if(requestFrom == "Profile") {
                   let materialChosen = materialField.value;
-                  let keys = Object.keys(RouterToolpathTimeLookup[materialChosen]);
+                  let keys = Object.keys(LaserToolpathTimeLookup[materialChosen]);
                   let keysLength = keys.length;
                   for(let i = 0; i < keysLength; i++) {
                         returnOptions.push(createDropdownOption(keys[i], keys[i]));
@@ -304,7 +329,7 @@ class Laser extends SubMenu {
             } else if(requestFrom == "Quality") {
                   let materialChosen = materialField.value;
                   let profileChosen = profileField.value;
-                  let keys = Object.keys(RouterToolpathTimeLookup[materialChosen][profileChosen]);
+                  let keys = Object.keys(LaserToolpathTimeLookup[materialChosen][profileChosen]);
                   let keysLength = keys.length;
                   for(let i = 0; i < keysLength; i++) {
                         returnOptions.push(createDropdownOption(keys[i], keys[i]));
@@ -313,7 +338,7 @@ class Laser extends SubMenu {
                   let materialChosen = materialField.value;
                   let profileChosen = profileField.value;
                   let qualityChosen = qualityField.value;
-                  return parseFloat(RouterToolpathTimeLookup[materialChosen][profileChosen][qualityChosen]);
+                  return parseFloat(LaserToolpathTimeLookup[materialChosen][profileChosen][qualityChosen]);
             }
             return returnOptions;
       };
@@ -329,7 +354,7 @@ class Laser extends SubMenu {
                               await setRouterRunTimeEach(productNo, partIndex, this.runTime);
                               await setRouterPostJobTimeEach(productNo, partIndex, this.cleanTime);
                               await setRouterSetupOnceOff(productNo, partIndex, this.setupOnceOff);
-                              await setPartDescription(productNo, partIndex, "[LASER] Laser Cutting per ea");
+                              await setPartDescription(productNo, partIndex, "[ROUTERING] Router Cutting per ea");
                               await savePart(productNo, partIndex);
                         } else {
                               await AddPart("Router Cutting (total)", productNo);
@@ -338,7 +363,7 @@ class Laser extends SubMenu {
                               await setRouterSetupTimeTotal(productNo, partIndex, this.setupTime);
                               await setRouterRunTimeTotal(productNo, partIndex, this.runTime);
                               await setRouterPostJobTimeTotal(productNo, partIndex, this.cleanTime);
-                              await setPartDescription(productNo, partIndex, "[LASER] Laser Cutting per total");
+                              await setPartDescription(productNo, partIndex, "[ROUTERING] Router Cutting per total");
                               await savePart(productNo, partIndex);
                         }
                   }
