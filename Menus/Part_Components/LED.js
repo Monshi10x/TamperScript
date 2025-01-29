@@ -95,8 +95,8 @@ class LED extends Material {
                   createDropdownOption("Lightbox 150D - 50 per m2", "50"/**per square meter*/),
                   createDropdownOption("Lightbox 100D - 100 per m2", "100"/**per square meter*/),
                   createDropdownOption("Lightbox 50D - 380 per m2", "380"/**per square meter*/),
-                  createDropdownOption("3D Letters 100D - 80 per m2", "80"/**per square meter*/),
-                  createDropdownOption("3D Letters 80D - 156 per m2", "156"/**per square meter*/),
+                  createDropdownOption("3D Letters 100D - 200 per m2", "200"/**per square meter*/),
+                  createDropdownOption("3D Letters 80D - 250 per m2", "250"/**per square meter*/),
                   createDropdownOption("3D Letters 50D - 380 per m2", "380"/**per square meter*/)
             ], () => {this.UpdateFromChange();}, f_formula);
 
