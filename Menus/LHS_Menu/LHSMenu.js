@@ -316,6 +316,7 @@ var menu_3D;
 var menu_PanelSigns;
 var menu_Charts;
 var menu_POS;
+var menu_Travel;
 async function initLHSMenu() {
     var container = document.createElement('div');
     container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + "rgb(36 36 36)" + ";box-shadow: rgb(0, 0, 0) 6px 1px 20px -2px,rgb(0, 0, 0) 6px 1px 60px -2px;";
@@ -347,6 +348,7 @@ async function initLHSMenu() {
     menu_PanelSigns = new MenuPanelSigns(900, 700, "PanelSignsMenu", "Panel Signs");
     menu_Charts = new ChartMenu(900, 700, "ChartsMenu", "Charts");
     menu_POS = new MenuPOS(900, 700, "MenuPOS", "POS");
+    menu_Travel = new MenuMap(900, 900, "MenuMap", "Map");
 
     addItem(GM_getResourceURL("Icon_Find"), "Find", "finder");
     addItem(GM_getResourceURL("Icon_M2"), "Area", "m2");
@@ -364,6 +366,7 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_3D"), "3D Letters", "3D", null, "loadedPredefinedParts");
     addItem(GM_getResourceURL("Icon_Chart"), "Charts", "Charts", null, "loadedPredefinedParts");
     addItem(GM_getResourceURL("Icon_POS"), "POS", "POS", null);
+    addItem(GM_getResourceURL("Icon_Map"), "Travel", "Travel", null);
 
     function addItem(imageSrc, text, openMenuName, overrideCss, unlockListenEvent) {
         var itemContainer = document.createElement('div');
@@ -431,6 +434,7 @@ function hideAllMenu() {
     menu_PanelSigns.hide();
     menu_Charts.hide();
     menu_POS.hide();
+    menu_Travel.hide();
 }
 
 function openMenu(menu) {
@@ -483,6 +487,9 @@ function openMenu(menu) {
         }
         if(menu == "POS") {
             menu_POS.show();
+        }
+        if(menu == "Travel") {
+            menu_Travel.show();
         }
     }
 }

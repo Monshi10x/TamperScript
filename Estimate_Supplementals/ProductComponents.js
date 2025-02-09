@@ -1,3 +1,26 @@
+var GLOBAL_KO_ORDER = null;
+
+function getKOStorageVariable() {
+	let product = document.querySelector('div[class^="ord-prod-model-item"]');
+	let db = ko.contextFor(product).$parent.AvalaraDocCodeStatus;
+
+	if(!db) return {};
+
+	if(typeof db == "string") return JSON.parse(db.replaceAll("~", " ").replaceAll("^", '"'));
+
+}
+
+function setKOStorageVariable(newObject) {
+	console.log("setting ko obj to ", newObject);
+
+	let product = document.querySelector('div[class^="ord-prod-model-item"]');
+	ko.contextFor(product).$parent.AvalaraDocCodeStatus = JSON.stringify(newObject).replaceAll(" ", "~").replaceAll('"', "^");
+}
+
+function parseKOStorageVariable(koString) {
+	return koString.replaceAll(" ", "~").replaceAll('"', "^");
+}
+
 function partInfoTick() {
 	products = document.querySelectorAll('div[class^="ord-prod-model-item"]');
 
@@ -16,12 +39,18 @@ function partInfoTick() {
 	//******************************//
 	//           PRODUCT            //
 	//******************************//
+
+	//console.log(ko.contextFor(products[0]).$parent.AvalaraDocCode);
+	GLOBAL_KO_ORDER = ko.contextFor(products[0]).$parent;
+	//ko.contextFor(products[0]).$parent.TaxJarDocCode = "{quoteSeconds_Stored: 0}";
 	for(var product = 0; product < products.length; product++) {
 		var koProduct = ko.contextFor(products[product]).$data;
 		var koParts = koProduct.Parts();
 		let koProductNumber = koProduct.LineItemOrder();
 		let koProductPricePreDiscount = koProduct.PartTotals();
 		let koProductPricePostDiscount = koProduct.TotalPrice();
+
+		//AVALARA
 		if(product == 0) {
 			if(quoteSeconds_Total == 0) {
 				quoteSeconds_Stored = zeroIfNull(ko.contextFor(products[product]).$parent.AvalaraDocCode);
@@ -31,6 +60,32 @@ function partInfoTick() {
 				ko.contextFor(products[product]).$parent.AvalaraDocCode = quoteSeconds_Total;
 			}
 		}
+
+		/*
+		if(product == 0) {
+			let currentAvalara = ko.contextFor(products[product]).$parent.AvalaraDocCode;
+			let databaseVar = ko.contextFor(products[product]).$parent.PhoneValidation;
+			if(quoteSeconds_Total == 0) {
+				//console.log(typeof JSON.parse(ko.contextFor(products[product]).$parent.AvalaraDocCode), ko.contextFor(products[product]).$parent.AvalaraDocCode);
+
+				if(currentAvalara == null || currentAvalara == "")
+					ko.contextFor(products[product]).$parent.AvalaraDocCode =0;
+				//if(typeof JSON.parse(currentAvalara) == "number")
+				//	ko.contextFor(products[product]).$parent.AvalaraDocCode = {"quoteSeconds_Stored": currentAvalara};
+
+				//console.log(currentAvalara);
+				let avalaraObject = currentAvalara;//JSON.parse(currentAvalara.replace("[", '"').replace("]", '"'));
+				console.log(avalaraObject);
+				quoteSeconds_Stored = zeroIfNull(avalaraObject.quoteSeconds_Stored);
+				quoteSeconds_Total = quoteSeconds_Stored + quoteSeconds_CurrentSession;
+			} else {
+				quoteSeconds_Total = quoteSeconds_Stored + quoteSeconds_CurrentSession;
+
+				let avalaraObject = currentAvalara;//JSON.parse(currentAvalara.replace("[", '"').replace("]", '"'));
+				avalaraObject.quoteSeconds_Stored = quoteSeconds_Total;
+				ko.contextFor(products[product]).$parent.AvalaraDocCode = avalaraObject;//JSON.stringify(avalaraObject);
+			}
+		}*/
 		SqmPriceGroup = 0;
 		PriceGroup = 0;
 		totalNumberOfProducts = products.length;

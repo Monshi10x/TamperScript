@@ -96,7 +96,6 @@ function convertClipboardToMeasure() {
 async function saveToClipboard(string) {
     await navigator.clipboard.writeText(string);
     console.log("string copied to clipboard");
-    Ordui.Alert("copied to clipboard");
 }
 
 function StringCombine(...args) {
@@ -447,4 +446,13 @@ function IFELSEF(expression, functionIf, functionElse) {
 function isVisible(element) {
     if(element.style.display != "none") return true;
     return false;
+}
+
+function getDate() {
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0'); //janvier = 0
+    let yyyy = today.getFullYear();
+
+    return dd + '/' + mm + '/' + yyyy;
 }

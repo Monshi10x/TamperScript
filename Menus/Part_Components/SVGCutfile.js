@@ -23,6 +23,8 @@ class SVGCutfile extends SubscriptionManager {
       #totalBoundingRectAreas = 0;
       #totalShapeQty = 0;
       #totalNumberPaths = 0;
+      #shapeAreas;
+      #overallSize;
       /*
                         
       Fields            */
@@ -36,8 +38,8 @@ class SVGCutfile extends SubscriptionManager {
       #f_deleteBtn;
       #f_fileChooser;
       #f_setting_IncludeSizeInDescription;
+
       #f_shapeAreas;
-      #f_pathArea;
       #f_sizeMethod1;
       #f_sizeMethod2;
       #f_totalBoundingRectAreas;
@@ -67,6 +69,9 @@ class SVGCutfile extends SubscriptionManager {
       set productNumber(value) {this.#productNumber = value; this.#f_productNumberLabel.innerText = value;}
       set qty(value) {$(this.#f_qty[1]).val(value).change();};
       set pathLength(value) {$(this.#f_pathLength[1]).val(value).change();};
+      set svgFile(value) {
+            this.#f_svgFile = value;
+      }
       /*
                         
       Start             */
@@ -102,7 +107,7 @@ class SVGCutfile extends SubscriptionManager {
 
             this.#f_pathLength = createInput_Infield("Path Length", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#f_container, true, 100, {postfix: "mm"});
 
-            this.#f_pathArea = createInput_Infield("Shape Areas", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#f_container, true, 100, {postfix: "m2"});
+            this.#f_shapeAreas = createInput_Infield("Shape Areas", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#f_container, true, 100, {postfix: "m2"});
 
             this.#f_totalBoundingRectAreas = createInput_Infield("Bounding Rect Areas", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#f_container, true, 100, {postfix: "m2"});
 
@@ -119,59 +124,24 @@ class SVGCutfile extends SubscriptionManager {
 
             this.#f_svgStringChooser = createTextarea("SVG Text", "", "width:calc(50% - 10px);box-sizing:border-box;", async () => {
                   if(this.#f_svgStringChooser.value == "") return;
+
                   this.#f_svgFile = this.#f_svgStringChooser.value;
-                  console.log("svg file set to");
-                  console.log(this.#f_svgFile);
-                  if(this.#f_svgFile) $(this.#f_visualiserBtn).show();
-                  else $(this.#f_visualiserBtn).hide();
 
-                  $(this.#f_pathLength[1]).val(roundNumber(svg_getTotalPathLengths(svg_makeFromString(this.#f_svgFile)), 2)).change();
-
-                  //path Area
-                  let loader = new Loader(this.#f_pathArea[0]);
-                  this.#f_shapeAreas = await svg_getTotalPathArea_m2(this.#f_svgFile);
-                  $(this.#f_pathArea[1]).val(roundNumber(this.#f_shapeAreas, 4)).change();
-                  loader.Delete();
-
-                  //Bounding Rects
-                  let loader2 = new Loader(this.#f_totalBoundingRectAreas[0]);
-                  this.#totalBoundingRectAreas = svg_getTotalBoundingRectAreas_m2(this.#f_svgFile, yes);
-                  $(this.#f_totalBoundingRectAreas[1]).val(roundNumber(this.#totalBoundingRectAreas, 4)).change();
-                  loader2.Delete();
-
-                  this.UpdateFromChange();
+                  await this.onFileChange();
             }, f_container_fileChooser);
 
             this.#f_fileChooser = createFileChooserButton("", "margin:5px;min-height:40px;width:calc(50% - 10px);box-sizing:border-box;", async (fileContent) => {
-                  if(fileContent)
-                        this.#f_svgFile = fileContent;
-                  console.log("svg file set to");
-                  console.log(this.#f_svgFile);
-                  if(this.#f_svgFile) $(this.#f_visualiserBtn).show();
-                  else $(this.#f_visualiserBtn).hide();
+                  if(!fileContent) return;
 
-                  $(this.#f_pathLength[1]).val(roundNumber(svg_getTotalPathLengths(svg_makeFromString(this.#f_svgFile)), 2)).change();
+                  this.#f_svgFile = fileContent;
 
-                  //path Area
-                  let loader = new Loader(this.#f_pathArea[0]);
-                  this.#f_shapeAreas = await svg_getTotalPathArea_m2(this.#f_svgFile);
-                  $(this.#f_pathArea[1]).val(roundNumber(this.#f_shapeAreas, 4)).change();
-                  loader.Delete();
-
-                  //Bounding Rects
-                  let loader2 = new Loader(this.#f_totalBoundingRectAreas[0]);
-                  this.#totalBoundingRectAreas = svg_getTotalBoundingRectAreas_m2(this.#f_svgFile, yes);
-                  $(this.#f_totalBoundingRectAreas[1]).val(roundNumber(this.#totalBoundingRectAreas, 4)).change();
-                  loader2.Delete();
-
-                  this.UpdateFromChange();
-
+                  await this.onFileChange();
             }, f_container_fileChooser);
 
             this.#f_visualiserBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 10px);display:none;height:40px;margin:5px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#f_visualiser = new ModalSVG("SVG", 100, () => {
                         this.UpdateFromChange();
-                  }, this.#f_svgFile);
+                  }, this.#f_svgFile, this);
             }, f_container_fileChooser, true);
 
 
@@ -183,7 +153,7 @@ class SVGCutfile extends SubscriptionManager {
 
 
             this.#f_sizeMethod1 = createCheckbox_Infield("Method 1 - Use Bounding Rect Areas", true, "width:300px;", () => {
-                  setFieldDisabled(true, this.#f_pathArea[1], this.#f_pathArea[0]);
+                  setFieldDisabled(true, this.#f_shapeAreas[1], this.#f_shapeAreas[0]);
                   setFieldDisabled(false, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
                   this.UpdateFromChange();
             }, f_container_materialUsage);
@@ -194,7 +164,7 @@ class SVGCutfile extends SubscriptionManager {
             this.#f_sizeMethod1[0].appendChild(icon_boundingArea);
 
             this.#f_sizeMethod2 = createCheckbox_Infield("Method 2 - Use Shape Areas", false, "width:300px;", () => {
-                  setFieldDisabled(false, this.#f_pathArea[1], this.#f_pathArea[0]);
+                  setFieldDisabled(false, this.#f_shapeAreas[1], this.#f_shapeAreas[0]);
                   setFieldDisabled(true, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
                   this.UpdateFromChange();
             }, f_container_materialUsage);
@@ -218,6 +188,33 @@ class SVGCutfile extends SubscriptionManager {
             this.UpdateFromChange();
       }
 
+      async onFileChange() {
+            console.log("svg file set to");
+            console.log(this.#f_svgFile);
+            if(this.#f_svgFile) $(this.#f_visualiserBtn).show();
+            else $(this.#f_visualiserBtn).hide();
+
+            $(this.#f_pathLength[1]).val(roundNumber(svg_getTotalPathLengths(svg_makeFromString(this.#f_svgFile)), 2)).change();
+
+            //Overall Size
+            this.#overallSize = svg_getTotalSize(this.#f_svgFile, true);
+            console.log(this.#overallSize);
+
+            //path Area
+            let loader = new Loader(this.#f_shapeAreas[0]);
+            this.#shapeAreas = await svg_getTotalPathArea_m2(this.#f_svgFile);
+            $(this.#f_shapeAreas[1]).val(roundNumber(this.#shapeAreas, 4)).change();
+            loader.Delete();
+
+            //Bounding Rects
+            let loader2 = new Loader(this.#f_totalBoundingRectAreas[0]);
+            this.#totalBoundingRectAreas = svg_getTotalBoundingRectAreas_m2(this.#f_svgFile, yes);
+            $(this.#f_totalBoundingRectAreas[1]).val(roundNumber(this.#totalBoundingRectAreas, 4)).change();
+            loader2.Delete();
+
+            this.UpdateFromChange();
+      }
+
       UpdateFromChange() {
             this.UpdateWH();
             this.UpdateDataForSubscribers();
@@ -230,7 +227,7 @@ class SVGCutfile extends SubscriptionManager {
             let sqrtWidth, sqrtHeight;
             IFELSEF(useBoundingRectArea == true,
                   () => {sqrtWidth = sqrtHeight = Math.sqrt(this.#totalBoundingRectAreas * 1000000);},
-                  () => {sqrtWidth = sqrtHeight = Math.sqrt(this.#f_shapeAreas * 1000000);});
+                  () => {sqrtWidth = sqrtHeight = Math.sqrt(this.#shapeAreas * 1000000);});
 
             this.#f_width[3]();//pause Callback
             this.#f_height[3]();//pause Callback
@@ -246,10 +243,11 @@ class SVGCutfile extends SubscriptionManager {
             this.#dataForSubscribers = [];
 
             this.#dataForSubscribers.push({
+                  overallSize: this.#overallSize,
                   pathLength: zeroIfNaNNullBlank(this.pathLength),
-                  shapeAreas: zeroIfNaNNullBlank(this.#f_shapeAreas),
+                  shapeAreas: zeroIfNaNNullBlank(this.#shapeAreas),
                   boundingRectAreas: zeroIfNaNNullBlank(this.#totalBoundingRectAreas),
-                  paintedArea: zeroIfNaNNullBlank(this.#f_shapeAreas),
+                  paintedArea: zeroIfNaNNullBlank(this.#shapeAreas),
                   pathQty: this.getNumberOfShapes(),
                   QWHD: this.getQWH()
             });

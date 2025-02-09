@@ -60,6 +60,8 @@ class Table {
             this.table.appendChild(row);
             var tempThis = this;
 
+            row.style = STYLE.TableRow;
+
             function updateHeadingSizes() {
                   for(var c = 0; c < columns; c++) {
                         tempThis.headingRow.querySelectorAll("th")[c].style.width = row.querySelectorAll("td")[c].offsetWidth + "px";

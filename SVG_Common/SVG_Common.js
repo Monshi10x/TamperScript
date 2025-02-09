@@ -457,7 +457,7 @@ function svg_getTotalPathLengths(svgElement) {
       let svgElements = svgElement.getElementsByTagName("*");
 
       for(let i = 0; i < svgElements.length; i++) {
-            if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "defs" || svgElements[i].nodeName == "style") continue;
+            if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "defs" || svgElements[i].nodeName == "style" || svgElements[i].nodeName == "text") continue;
 
             totalPathLength += svg_getPathLength_mm(svgElements[i]);
       }
@@ -723,6 +723,32 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
       }
 }
 
+function svg_getTotalSize(svgStringOrObject, useShallowCopy = true) {
+      let newSvg;
+      if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
+            newSvg = svg_makeFromString(svgStringOrObject);
+
+            svg_convertShapesToPaths(newSvg);
+            svg_formatCompoundPaths(newSvg);
+
+            document.body.appendChild(newSvg);
+            newSvg.style = "display:block;visibility:hidden";
+
+            svgStringOrObject = newSvg.querySelector("#pathGroup").querySelectorAll(".outerPath");
+      } else {
+            newSvg = svgStringOrObject;
+      }
+
+      let pathGroup = newSvg.querySelector("#pathGroup");
+
+      let totalSize = {width: 0, height: 0};
+      if(pathGroup) totalSize = {width: svg_pixelToMM(pathGroup.getBBox().width), height: svg_pixelToMM(pathGroup.getBBox().height)};
+
+      if(newSvg) deleteElement(newSvg);
+
+      return totalSize;
+}
+
 function svg_getTotalBoundingRectAreas_m2(svgStringOrObject, useShallowCopy = true) {
       let newSvg;
       if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
@@ -735,12 +761,14 @@ function svg_getTotalBoundingRectAreas_m2(svgStringOrObject, useShallowCopy = tr
             newSvg.style = "display:block;visibility:hidden";
 
             svgStringOrObject = newSvg.querySelector("#pathGroup").querySelectorAll(".outerPath");
+      } else {
+            newSvg = svgStringOrObject;
       }
 
       let totalArea = 0;
 
       for(let i = 0; i < svgStringOrObject.length; i++) {
-            if(svgStringOrObject[i].nodeName == "g" || svgStringOrObject[i].nodeName == "defs" || svgStringOrObject[i].nodeName == "style") continue;
+            if(svgStringOrObject[i].nodeName == "g" || svgStringOrObject[i].nodeName == "defs" || svgStringOrObject[i].nodeName == "style" || svgStringOrObject[i].nodeName == "text") continue;
 
             let element = svgStringOrObject[i];
 
@@ -772,6 +800,8 @@ function svg_getPathQty(svgStringOrObject) {
             newSvg.style = "display:block;visibility:hidden";
 
             svgStringOrObject = newSvg.querySelector("#pathGroup").getElementsByTagNameNS("http://www.w3.org/2000/svg", "path");
+      } else {
+            newSvg = svgStringOrObject;
       }
 
       let returnObject = {
@@ -781,7 +811,7 @@ function svg_getPathQty(svgStringOrObject) {
       };
 
       for(let i = 0; i < svgStringOrObject.length; i++) {
-            if(svgStringOrObject[i].nodeName == "g" || svgStringOrObject[i].nodeName == "defs" || svgStringOrObject[i].nodeName == "style") continue;
+            if(svgStringOrObject[i].nodeName == "g" || svgStringOrObject[i].nodeName == "defs" || svgStringOrObject[i].nodeName == "style" || svgStringOrObject[i].nodeName == "text") continue;
 
             let element = svgStringOrObject[i];
 
@@ -800,7 +830,7 @@ function svg_convertShapesToPaths(svgObject) {
       let svgElements = svgObject.getElementsByTagName("*");
 
       for(let i = 0; i < svgElements.length; i++) {
-            if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "path" || svgElements[i].nodeName == "defs" || svgElements[i].nodeName == "style") continue;
+            if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "path" || svgElements[i].nodeName == "defs" || svgElements[i].nodeName == "style" || svgElements[i].nodeName == "text") continue;
 
             let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
 
@@ -810,11 +840,11 @@ function svg_convertShapesToPaths(svgObject) {
 }
 
 function svg_formatCompoundPaths(svgObject) {
-      console.log(svgObject);
+
       let mainGroup = svgObject.querySelector("#mainGcreatedByT");
-      console.log(mainGroup);
+
       let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      console.log(newGroup);
+
       newGroup.id = "pathGroup";
       mainGroup.appendChild(newGroup);
 

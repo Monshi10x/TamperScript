@@ -1,7 +1,28 @@
 (function() {
       'use strict';
+
+      let mapDiv = document.createElement("div");
+      mapDiv.id = "map";
+      document.getElementById("MainContent").appendChild(mapDiv);
+
+      let head = document.head || document.documentElement;
+
+      var script2 = document.createElement("script");
+      script2.textContent = GM_getResourceText("GoogleScript");
+      script2.async = true;
+      script2.defer = true;
+      head.appendChild(script2);
+
+
+      var script = document.createElement("script");
+      script.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAP_API_KEY + "&loading=async&libraries=maps,places,marker&v=beta&callback=initMap";
+      script.async = true;
+      script.defer = true;
+      head.appendChild(script);
+
       const myCss = GM_getResourceText("IMPORTED_CSS");
       GM_addStyle(myCss);
+
 })();
 
 window.addEventListener("load", async (event) => {
@@ -341,7 +362,7 @@ class DesignBoard2 extends JobBoard {
                   $(this.#jobObjects[j].containerObject.container).show();
 
                   let filterValue;
-                  
+
                   //Payments
                   if(this.#usersWithSalesPermissions.includes(this.currentUser)) {
                         filterValue = this.#f_showPaymentsFilter[1].checked;

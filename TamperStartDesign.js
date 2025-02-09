@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Design Board v2
 // @namespace    http://tampermonkey.net/
-// @version      2.85
+// @version      2.5
 // @description  try to take over the world!
 // @author       You
 // @match        https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx
@@ -11,23 +11,24 @@
 // @grant        GM_addStyle
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @grant        GM_addElement
 // @grant        GM_setClipboard
 // @grant        GM_info
+// @grant        GM_xmlhttpRequest
+// @grant        GM_getResourceText
+// @grant        GM_getResourceURL
+// @grant        GM_addElement
 // @grant        unsafeWindow
 // @grant        window.close
 // @grant        window.focus
 // @grant        window.onurlchange
-// @grant        GM_getResourceText
-// @grant        GM_getResourceURL
-// @updateURL    https://github.com/Monshi10x/TamperScript/raw/main/TamperStartDesign.js
-// @downloadURL  https://github.com/Monshi10x/TamperScript/raw/main/TamperStartDesign.js
 // @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_DesignBoard.css
+// @resource     GoogleScript https://github.com/Monshi10x/TamperScript/raw/main/GoogleMap/GoogleMap.js
 // @resource     Icon_AdobeIllustrator https://github.com/Monshi10x/TamperScript/raw/main/Images/IllustratorIcon.png
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      https://raw.githack.com/SortableJS/Sortable/master/Sortable.js
+// @require      https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Charts/Chart.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Async_Functions/Async_Functions_Design.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Async_Functions/WebWorker_load.js

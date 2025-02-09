@@ -162,13 +162,16 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.material = "Stainless";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
+				sheet.sheetPerimeterIsCut = false;
+				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", profile: "Cut Through", quality: "Good Quality"});
+
 
 				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
 				sheet.material = "Acrylic";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
-				sheet.setRouterCutProfile("Acrylic", "Opal Cut Through And Rebate", "Good Quality");
-
+				sheet.sheetPerimeterIsCut = false;
+				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
 
 				led = this.#add(LED, this.page1, [SVGCutfile]);
 				led.formula = "3D Letters 100D - 80 per m2";
@@ -178,6 +181,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.material = "ACM";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
+				sheet.sheetPerimeterIsCut = false;
+				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", profile: "Cut Through", quality: "Fast"});
 
 				transformer = this.#add(Transformer, this.page1, [LED]);
 
@@ -185,8 +190,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.material = "Corflute";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
+				sheet.useOverallSVGSize = true;
 				sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
 				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
+
 
 				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
 				painting.formula = "Fabricated Front-lit Letters";

@@ -7,6 +7,8 @@ var newPanelContent_CostContainer_TotalCosts;
 var newPanelContent_PriceContainer_TotalPrices;
 var newPanelContent_ProfitContainer_TotalProfit;
 var newPanelContent_MarkupContainer_TotalMarkup;
+var newPanelContent_TimeClock_Time;
+var newPanelContent_Install_Address;
 function createCostAnalysisSummaryContainer() {
     sidePanel = document.getElementById('divLeftColumn');
     var newPanel = document.createElement('div');
@@ -82,6 +84,18 @@ function createCostAnalysisSummaryContainer() {
     newPanelContent_TimeClock_Time.style = "text-align: right; float:right;width:100px;";
     newPanelContent_TimeClock_Time.innerHTML = "0% / 0x";
 
+    //Install Address
+    var newPanelContent_Install = document.createElement('div');
+    newPanelContent_Install.className = "row";
+
+    var newPanelContent_Install_Header = document.createElement('div');
+    newPanelContent_Install_Header.style = "float:left;";
+    newPanelContent_Install_Header.innerHTML = "Install Address: ";
+
+    newPanelContent_Install_Address = document.createElement('div');
+    newPanelContent_Install_Address.style = "text-align: right; float:right;width:200px;";
+    newPanelContent_Install_Address.innerHTML = "";
+
     //adds
     newPanel.appendChild(newPanelHeader);
     newPanelContent_CostContainer.appendChild(newPanelContent_CostContainer_Header);
@@ -100,6 +114,10 @@ function createCostAnalysisSummaryContainer() {
     newPanelContent_TimeClock.appendChild(newPanelContent_TimeClock_Header);
     newPanelContent_TimeClock.appendChild(newPanelContent_TimeClock_Time);
     newPanelContent.appendChild(newPanelContent_TimeClock);
+
+    newPanelContent_Install.appendChild(newPanelContent_Install_Header);
+    newPanelContent_Install.appendChild(newPanelContent_Install_Address);
+    newPanelContent.appendChild(newPanelContent_Install);
 
     newPanel.appendChild(newPanelContent);
     sidePanel.appendChild(newPanel);
@@ -124,7 +142,6 @@ function costAnalysisSummaryTick() {
     let secondsToUse = quoteSeconds_Total == 0 ? quoteSeconds_CurrentSession : quoteSeconds_Total;
     let smhd = getSMHD(secondsToUse);
     newPanelContent_TimeClock_Time.innerHTML = smhd[0] + "d " + smhd[1] + "h " + smhd[2] + "m " + smhd[3] + "s";
-    //totalOrderCost = 0;
-    // totalOrderPricePreGst = 0;
-    //totalOrderProfit = 0;
+
+    newPanelContent_Install_Address.innerHTML = getKOStorageVariable().installAddress || "";
 }

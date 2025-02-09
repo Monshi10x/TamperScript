@@ -479,6 +479,7 @@ class UIContainer_Design2 {
       ];
       #productNotes;
       #noteQtyCircles = [];
+      #installAddress = "";
 
       /*Field*/
       #f_jobNameTextField;
@@ -510,6 +511,7 @@ class UIContainer_Design2 {
       #f_partsLoader;
       #f_addNoteInput;
       #f_illustratorDiv;
+      #f_address;
 
       /*Getter*/
       get container() {return this.#f_container;}
@@ -800,7 +802,13 @@ class UIContainer_Design2 {
 
             /*
             Address*/
-            let addressContainer = createDivStyle5("width:calc(100%);", "ADDRESS", this.#f_contentContainer)[1];
+            this.addressContainer = createDivStyle5("width:calc(100%);", "ADDRESS", this.#f_contentContainer)[1];
+            this.#f_address = createInput_Infield("Address", "", "width:calc(100% - 16px);", () => { }, this.addressContainer, false, null);
+
+            /*
+            Address QR Code*/
+            this.addressQRContainer = createDivStyle5("width:calc(100%);", "ADDRESS QR CODE", this.#f_contentContainer)[1];
+
             /*
             Parts Container*/
             let partsContainer = createDivStyle5("width:calc(100%);", "PARTS", this.#f_contentContainer)[1];
@@ -1007,6 +1015,9 @@ class UIContainer_Design2 {
       }
 
       async loadSecondaryFields() {
+            if(this.#hasLoadedSecondaryData && this.#installAddress != null) {
+                  await this.borrowGoogleMap();
+            }
             if(this.#hasLoadedSecondaryData) return;
 
             //Load Email
@@ -1059,6 +1070,37 @@ class UIContainer_Design2 {
                   }
             }
             /*
+            Address*/
+            this.#installAddress = "";
+            if(data.OrderInformation.OrderInformation.M1) {
+                  let koStorageString = data.OrderInformation.OrderInformation.M1;
+                  let koStorageObject = JSON.parse(this.parseKOStorageVariable(koStorageString));
+                  this.#installAddress = koStorageObject.installAddress;
+
+                  $(this.#f_address[1]).val(this.#installAddress);
+
+                  GoogleMap.borrowGoogleMap(this.addressContainer);
+
+                  googleMapContainer.style.cssText += "width:calc(100%);height:500px;";
+
+                  console.log(GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress));
+
+                  await GoogleMap.showDirections(this.#installAddress);
+
+                  let qrCodeDiv = document.createElement("div");
+                  qrCodeDiv.style = "padding:20px;background-color:white;";
+                  this.addressQRContainer.appendChild(qrCodeDiv);
+
+                  const qrcode = new QRCode(qrCodeDiv, {
+                        text: GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress),
+                        width: 200,
+                        height: 200,
+                        colorDark: '#000',
+                        colorLight: '#fff',
+                        correctLevel: QRCode.CorrectLevel.L
+                  });
+            }
+            /*
             Illustrator*/
             let button = createIconButton(GM_getResourceURL("Icon_AdobeIllustrator"), "Copy For Illustrator", "width:200px;height:35px;", async () => {
                   let x = '<?xml version="1.0" encoding="UTF-8"?>' +
@@ -1075,14 +1117,58 @@ class UIContainer_Design2 {
                         '<text x="0" y="135" fill="black">' + 'Contact Phone 2: ' + this.#jobObject.OrderContactCellPhone + '</text>' +
                         '<text x="0" y="150" fill="black">' + 'Sales Person: ' + this.#jobObject.SalesPersonName + '</text>' +
                         '<text x="0" y="165" fill="black">' + 'Item Description: ' + this.#jobObject.Description.replace("&", "and") + '</text>' +
-                        '<text x="0" y="180" fill="black">' + 'Parts: ' + partsString.replace("&", "and") + '</text>' +
-                        '<rect x="0" y="180" width = "595.28" height = "841.89" fill = "none" stroke = "#969696" stroke-miterlimit="10"/>' +
+                        '<text x="0" y="180" fill="black">' + 'Address: ' + this.#installAddress + '</text>' +
+                        '<text x="0" y="195" fill="black">' + 'Parts: ' + partsString.replace("&", "and") + '</text>' +
+                        '<rect x="0" y="210" width = "595.28" height = "841.89" fill = "none" stroke = "#969696" stroke-miterlimit="10"/>' +
                         '</g>' +
                         '</svg>';
-                  saveToClipboard(x);
+
+                  let x2 = '<? xml version = "1.0" encoding = "UTF-8" ?> <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="297.35mm" height="210.35mm" viewBox="0 0 842.89 596.28">' +
+                        '<text transform="translate(68.44 91.19)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.CompanyName.replace("&", "and") + '</tspan></text>' +
+                        '<text transform="translate(68.44 113.97)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderDescription.replace("&", "and") + '</tspan></text>' +
+                        '<text transform="translate(68.44 136.92)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderInvoiceNumber.replace("INV-", "") + '</tspan></text>' +
+                        '<text transform="translate(68.44 149.58)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + lineItemOrder + '</tspan></text>' +
+                        '<text transform="translate(68.44 160.45)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + getDate() + '</tspan></text>' +
+                        '<text transform="translate(68.44 172.70)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 'x' + productQty + '</tspan></text>' +
+                        '<text transform="translate(68.44 184.49)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
+                        '<text transform="translate(68.44 196.73)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
+                        '<text transform="translate(68.44 208.48)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
+                        '<text transform="translate(68.44 220.36)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
+                        '<text transform="translate(68.44 233.96)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
+                        '<text transform="translate(68.44 244.66)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
+                        '<text transform="translate(68.44 255.59)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#installAddress + '</tspan></text>' +
+                        '<text transform="translate(68.62 270.75)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.SalesPersonName + '</tspan></text>' +
+                        '<text transform="translate(68.44 281.78)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderContactName.replace("&", "and") + '</tspan></text>' +
+                        '<text transform="translate(68.44 293.89)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderContactWorkPhone + " | " + this.#jobObject.OrderContactCellPhone + '</tspan></text>' +
+                        '<text transform="translate(68.44 313.01)" style="font-family:ArialMT, Arial; font-size:6px; isolation:isolate;"><tspan x="0" y="0">' + 'tbc file path' + '</tspan></text>' +
+                        '<rect x=".5" y=".5" width="841.908" height="595.288" style="fill:none; stroke:#000; stroke-miterlimit:10;" />' +
+                        '</svg>';
+
+
+                  /*<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="297.35mm" height="210.35mm" viewBox="0 0 842.89 596.28">
+      <text transform="translate(68.44 91.19)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 313.01)" style="font-family:ArialMT, Arial; font-size:6px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.62 270.75)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 281.78)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 293.89)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 255.59)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 244.66)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 160.45)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 149.58)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 172.70)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 184.49)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 196.73)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 208.48)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 220.36)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 136.92)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <text transform="translate(68.44 113.97)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">W</tspan></text>
+      <text transform="translate(68.44 233.96)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
+      <rect x=".5" y=".5" width="841.908" height="595.288" style="fill:none; stroke:#000; stroke-miterlimit:10;"/>
+      </svg>*/
+                  saveToClipboard(x2);
 
                   var parser = new DOMParser();
-                  var doc = parser.parseFromString(x, "image/svg+xml");
+                  var doc = parser.parseFromString(x2, "image/svg+xml");
 
             }, this.#f_illustratorDiv, true);
 
@@ -1093,10 +1179,26 @@ class UIContainer_Design2 {
             this.#hasLoadedSecondaryData = true;
       }
 
+      async borrowGoogleMap() {
+            if(!this.#installAddress) return;
+            GoogleMap.borrowGoogleMap(this.addressContainer);
+
+            googleMapContainer.style.cssText += "width:calc(100%);height:500px;";
+
+            console.log(GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress));
+
+            await GoogleMap.showDirections(this.#installAddress);
+      }
+
       addHeadingButtons(...itemContainers) {
             for(let i = 0; i < itemContainers.length; i++) {
                   this.#f_headingContainer.appendChild(itemContainers[i]);
                   this.#addedHeadingItems_combinedWidth += itemContainers[i].offsetWidth;
             }
       }
+
+      parseKOStorageVariable(koString) {
+            return koString.replaceAll("~", " ").replaceAll("^", '"');
+      }
+
 }

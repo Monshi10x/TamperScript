@@ -12,7 +12,7 @@ class Sheet extends Material {
       staticRouterRows = [];
       addStaticRouterRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", profile: "Cut Through", quality: "Good Quality"}) {
             this.staticRouterRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
-            console.log(this.staticRouterRows);
+            this.UpdateFromChange();
       }
 
       laserCutProfile = {material: "Stainless", profile: "Cut Through", quality: "Good Quality"};
@@ -24,7 +24,7 @@ class Sheet extends Material {
       staticLaserRows = [];
       addStaticLaserRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", profile: "Cut Through", quality: "Good Quality"}) {
             this.staticLaserRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
-            console.log(this.staticLaserRows);
+            this.UpdateFromChange();
       }
 
       #materialOptions = [
@@ -146,6 +146,18 @@ class Sheet extends Material {
 
       #sheetMaterial;
       set sheetMaterial(value) {$(this.#sheetMaterial[1]).val(value).change();}
+
+      #sheetPerimeterIsCut = true;
+      set sheetPerimeterIsCut(value) {
+            this.#sheetPerimeterIsCut = value;
+            this.UpdateOutputTable();
+      }
+
+      #useOverallSVGSize = false;
+      set useOverallSVGSize(value) {
+            this.#useOverallSVGSize = value;
+            this.UpdateFromChange();
+      }
 
       #updateOrderBtn;
 
@@ -649,12 +661,16 @@ class Sheet extends Material {
 
             this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
-                  subscription.data.forEach((dataEntry/**{QWHD: QWHD}*/) => {
-
-                        if(!dataEntry.QWHD) return/**Only this iteration*/;
-
-                        this.#inheritedSizes.push(dataEntry.QWHD);
-                        this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height, dataEntry.QWHD.depth);
+                  subscription.data.forEach((dataEntry/**{overallSize: {width, height}, QWHD: QWHD}*/) => {
+                        if(this.#useOverallSVGSize && dataEntry.overallSize) {
+                              this.#inheritedSizes.push(new QWHD(1, dataEntry.overallSize.width, dataEntry.overallSize.height, 0));
+                              this.#inheritedSizeTable.addRow(1, dataEntry.overallSize.width, dataEntry.overallSize.height, 0);
+                              return;
+                        }
+                        else if(dataEntry.QWHD) {
+                              this.#inheritedSizes.push(dataEntry.QWHD);
+                              this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height, dataEntry.QWHD.depth);
+                        }
                   });
             });
 
@@ -689,7 +705,6 @@ class Sheet extends Material {
                   subscription.data.forEach((dataEntry/**{pathQty: {}}*/) => {
 
                         if(subscription.parent instanceof LED) {
-                              console.log("IS IN HERE");
                               mustBeRouterCut = true;
                               _this.#preferredCuttingMachine = "router";
                         }
@@ -750,9 +765,7 @@ class Sheet extends Material {
                         this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[1], cutsTotal, this.#totalPerimeter]);
 
                         if(this.#preferredCuttingMachine == null) dropdownSetSelectedIndexToNextAvailable(cuttingTypeDropDown[1], yes);
-                        if(this.#preferredCuttingMachine == "router") {
-                              dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Router.value);
-                        }
+                        if(this.#preferredCuttingMachine == "router") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Router.value);
                         if(this.#preferredCuttingMachine == "guillotine") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Guillotine.value);
                   }
             }
@@ -772,6 +785,8 @@ class Sheet extends Material {
             let penMarkingLength = 0;
             let pathLength = 0;
 
+            let overallSVGSizes = [];
+
             this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{pathLength:{},pathQty: {}}*/) => {
@@ -783,6 +798,7 @@ class Sheet extends Material {
                         }
                         if(subscription.parent instanceof SVGCutfile) {
                               pathLength += dataEntry.pathLength;
+                              overallSVGSizes.push(dataEntry.overallSize);
                         }
                   });
             });
@@ -850,7 +866,7 @@ class Sheet extends Material {
             this.staticRouterRows.forEach((element) => {
                   this.#router.addRunRow(eval(element.pathLength), eval(element.numberOfPaths), eval(element.profileSettings));
             });
-            this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, this.routerCutProfile);
+            if(this.#sheetPerimeterIsCut) this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, this.routerCutProfile);
             if(penMarkingQty > 0) this.#router.addRunRow(penMarkingLength, penMarkingQty, {material: "Any", profile: "LED Marking", quality: "SecondsPerCut"});
 
             ///LASER
@@ -858,7 +874,7 @@ class Sheet extends Material {
             this.staticLaserRows.forEach((element) => {
                   this.#laser.addRunRow(eval(element.pathLength), eval(element.numberOfPaths), eval(element.profileSettings));
             });
-            this.#laser.addRunRow(this.#totalLaserPerimeter, this.#totalLaserNumberOfShapes == 0 ? numberOfPaths : this.#totalLaserNumberOfShapes, this.laserCutProfile);
+            if(this.#sheetPerimeterIsCut) this.#laser.addRunRow(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths, this.laserCutProfile);
 
             ///FOLDED
             if(this.#isFolded[1].checked) {

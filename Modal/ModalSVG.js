@@ -36,11 +36,13 @@ class ModalSVG extends Modal {
       #totalBoundingRectAreas;
       #svgText;
       #showPoints;
+      #f_saveSVG;
+      #f_cancelSave;
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
 
-      constructor(headerText, incrementAmount, callback, svgText) {
+      constructor(headerText, incrementAmount, callback, svgText, callerObject) {
             super(headerText, incrementAmount, callback);
             this.#svgText = svgText;
 
@@ -113,6 +115,33 @@ class ModalSVG extends Modal {
 
             this.loadPathArea();
             this.loadBoundingRectAreas();
+
+            this.#f_saveSVG = createButton("Save Changes", "", () => {
+                  if(callerObject instanceof SVGCutfile) {
+                        let groups = this.#dragZoomSVG.svg.getElementsByTagName("g");
+
+                        let pathGroup;
+
+                        for(let i = 0; i < groups.length; i++) {
+                              if(groups[i].id == "mainGcreatedByT") continue;
+                              if(groups[i].id == "pathGroup") {
+                                    pathGroup = groups[i].innerHTML;
+                              }
+                        }
+
+                        for(let i = 0; i < groups.length; i++) {
+                              deleteElement(groups[i]);
+                        }
+
+                        callerObject.svgFile = this.#dragZoomSVG.svg.outerHTML.replaceAll("</svg>", pathGroup + "</svg>").replaceAll("\n", "").replaceAll("  ", "");
+                        callerObject.onFileChange();
+                  }
+                  this.hide();
+            }, null);
+            this.#f_cancelSave = createButton("Cancel Changes", "", () => { }, null);
+
+            this.addFooterElement(this.#f_saveSVG);
+            this.addFooterElement(this.#f_cancelSave);
       }
 
       async loadPathArea() {

@@ -60,14 +60,28 @@ class Laminate extends Material {
             this.#f_materialTotalArea = createInput_Infield("Total Area", 0, null, () => { }, f_container_material, false, 1, {postfix: "m2"});
             setFieldDisabled(true, this.#f_materialTotalArea[1], this.#f_materialTotalArea[0]);
 
-            var laminateParts = getPredefinedParts("Laminate - ");
-            let vinylParts = getPredefinedParts(VinylLookup["Whiteback"]);
             var laminateDropdownElements = [];
-            laminateParts.forEach(element => laminateDropdownElements.push([element.Name, "white"]));
-            vinylParts.forEach(element => laminateDropdownElements.push([element.Name, "white"]));
+            var laminateParts = getPredefinedParts("Laminate - ");
+            laminateParts.forEach((element) => {
+                  let isStocked = false;
+                  if(element.Weight) {
+                        let parsedWeight = JSON.parse(element.Weight);
+                        if(parsedWeight.isStocked) isStocked = parsedWeight.isStocked;
+                  }
+                  laminateDropdownElements.push([element.Name, isStocked ? "blue" : "white"]);
+            });
+            let vinylParts = getPredefinedParts(VinylLookup["Whiteback"]);
+            vinylParts.forEach((element) => {
+                  let isStocked = false;
+                  if(element.Weight) {
+                        let parsedWeight = JSON.parse(element.Weight);
+                        if(parsedWeight.isStocked) isStocked = parsedWeight.isStocked;
+                  }
+                  laminateDropdownElements.push([element.Name, isStocked ? "blue" : "white"]);
+            });
 
             this.#f_material = createDropdown_Infield_Icons_Search("Laminate", 0, "width:60%;", 10, true, laminateDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
-            $(this.#f_material).val(LaminateLookup["Gloss"]).change();
+            dropdownInfieldIconsSearchSetSelected(this.#f_material, LaminateLookup["Gloss"], false, false);
 
             /*
             Machine*/

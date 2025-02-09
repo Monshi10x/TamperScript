@@ -41,8 +41,24 @@ var quoteSeconds_CurrentSession = 0;
 var quoteSeconds_Stored = 0;
 var quoteSeconds_Total = 0;
 
+
 (function() {
   "use strict";
+
+  let head = document.head || document.documentElement;
+
+  var script2 = document.createElement("script");
+  script2.textContent = GM_getResourceText("GoogleScript");
+  script2.async = true;
+  script2.defer = true;
+  head.appendChild(script2);
+
+
+  var script = document.createElement("script");
+  script.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAP_API_KEY + "&loading=async&libraries=maps,places,marker&v=beta&callback=initMap";
+  script.async = true;
+  script.defer = true;
+  head.appendChild(script);
 
   const myCss = GM_getResourceText("IMPORTED_CSS");
   GM_addStyle(myCss);
@@ -75,6 +91,10 @@ async function init() {
   orderStep1Btn = document.getElementById("orderStep1Btn");
   orderStep2Btn = document.getElementById("orderStep2Btn");
   orderStep3Btn = document.getElementById("orderStep3Btn");
+
+  let mapDiv = document.createElement("div");
+  mapDiv.id = "map";
+  document.getElementById("MainContent").appendChild(mapDiv);
 
   createPartCombinedPrice();
   addQuickFindProducts();
@@ -120,4 +140,3 @@ function keyboardTick() {
     }
   });
 }
-

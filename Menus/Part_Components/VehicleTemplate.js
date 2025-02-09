@@ -129,13 +129,13 @@ class VehicleTemplate extends SubMenu {
             rowContainer.id = "rowContainer";
             rowContainer.className = this.rowID;
 
-            var description = createInput_Infield("Description", null, "width:100px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false);
+            var description = createInput_Infield("Description", null, "width:100px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false);
             description[1].id = "description";
-            var quantity = createInput_Infield("Qty", 1, "width:50px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 1);
+            var quantity = createInput_Infield("Qty", 1, "width:50px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 1);
             quantity[1].id = "quantity";
-            var width = createInput_Infield("Width", 0, "width:120px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 50, {postfix: "mm"});
+            var width = createInput_Infield("Width", 0, "width:120px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 50, {postfix: "mm"});
             width[1].id = "width";
-            var height = createInput_Infield("Height", 0, "width:120px;height:40px;margin:5px;", this.fieldChangeFunction, rowContainer, false, 50, {postfix: "mm"});
+            var height = createInput_Infield("Height", 0, "width:120px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 50, {postfix: "mm"});
             height[1].id = "height";
 
             var tempThis = this;
@@ -154,46 +154,67 @@ class VehicleTemplate extends SubMenu {
             var vinylParts = getPredefinedParts("Vinyl - ");
             var vinylDropdownElements = [];
             vinylDropdownElements.push(["None", "white"]);
-            vinylParts.forEach(element => vinylDropdownElements.push([element.Name, "white"]));
-            var vinyl = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:200px;margin:5px;", 0, true, vinylDropdownElements, function() { }, rowContainer);
+            vinylParts.forEach((element) => {
+                  let weightField = element.Weight;
+                  if(weightField == "") vinylDropdownElements.push([element.Name, "white"]);
+                  else {
+                        let weightField_asJSON = JSON.parse(weightField);
+                        if(weightField_asJSON.isStocked == true) vinylDropdownElements.push([element.Name, "blue"]);
+                  }
+            });
 
+            //console.log(vinylParts);
+            //vinylParts.forEach(element => vinylDropdownElements.push([element.Name, "white"]));
+            var vinyl = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:200px;margin:5px;", 10, true, vinylDropdownElements, () => {this.fieldChangeFunction(); console.log("in vinyl change");}, rowContainer);
             vinyl[1].id = "vinyl";
+            vinyl[6]();//pauseCallback
             $(vinyl[1]).val(item ? item.vinyl : VinylLookup["Air Release"]).change();
+            vinyl[7]();//resumeCallback
 
             var laminateParts = getPredefinedParts("Laminate - ");
             var laminateDropdownElements = [];
             laminateDropdownElements.push(["None", "white"]);
-            laminateParts.forEach(element => laminateDropdownElements.push([element.Name, "white"]));
-            var laminate = createDropdown_Infield_Icons_Search("Laminate", 0, "width:200px;margin:5px;", 0, true, laminateDropdownElements, function() { }, rowContainer);
+            laminateParts.forEach((element) => {
+                  let weightField = element.Weight;
+                  if(weightField == "") laminateDropdownElements.push([element.Name, "white"]);
+                  else {
+                        let weightField_asJSON = JSON.parse(weightField);
+                        if(weightField_asJSON.isStocked == true) laminateDropdownElements.push([element.Name, "blue"]);
+                  }
+            });
+            //laminateParts.forEach(element => laminateDropdownElements.push([element.Name, "white"]));
+            var laminate = createDropdown_Infield_Icons_Search("Laminate", 0, "width:200px;margin:5px;", 10, true, laminateDropdownElements, () => {this.fieldChangeFunction();}, rowContainer);
             laminate[1].id = "laminate";
+            laminate[6]();//pauseCallback
             $(laminate[1]).val(item ? item.laminate : LaminateLookup["Gloss"]).change();
+            laminate[7]();//resumeCallback
 
             if(item) {
                   if(item.isPanel == true) {
-                        var panel = createCheckbox_Infield("Panel", true, "width:100px", function() { }, rowContainer);
+                        var panel = createCheckbox_Infield("Panel", true, "width:100px", () => {this.fieldChangeFunction();}, rowContainer);
                         panel[1].id = "panel";
                   }
                   if(item.description != "Oneway") {
-                        var combo_3M = createButton("3M", "width:40px;height:45px;margin:5px;", function() {
-                              $(vinyl[1]).val(VinylLookup["3M Vehicle"]).change();
-                              $(laminate[1]).val(LaminateLookup["3m Gloss (Standard)"]).change();
+                        var combo_3M = createButton("3M", "width:40px;height:45px;margin:5px;", () => {
+                              dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
+                              dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
                         });
                         rowContainer.appendChild(combo_3M);
-                        var combo_Poly = createButton("Py", "width:40px;height:45px;margin:5px;", function() {
-                              $(vinyl[1]).val(VinylLookup["Air Release"]).change();
-                              $(laminate[1]).val(LaminateLookup["Gloss"]).change();
+                        var combo_Poly = createButton("Py", "width:40px;height:45px;margin:5px;", () => {
+                              dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
+                              dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
                         });
                         rowContainer.appendChild(combo_Poly);
                   }
             } else {
-                  var combo_3M_2 = createButton("3M", "width:30px;height:45px;margin:5px;", function() {
-                        $(vinyl[1]).val(VinylLookup["3M Vehicle"]).change();
-                        $(laminate[1]).val(LaminateLookup["3m Gloss (Standard)"]).change();
+                  var combo_3M_2 = createButton("3M", "width:30px;height:45px;margin:5px;", () => {
+                        dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
+                        dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
                   });
                   rowContainer.appendChild(combo_3M_2);
-                  var combo_Poly_2 = createButton("Py", "width:30px;height:45px;margin:5px;", function() {
-                        $(vinyl[1]).val(VinylLookup["Air Release"]).change();
-                        $(laminate[1]).val(LaminateLookup["Gloss"]).change();
+                  var combo_Poly_2 = createButton("Py", "width:30px;height:45px;margin:5px;", () => {
+                        dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
+                        dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
                   });
                   rowContainer.appendChild(combo_Poly_2);
             }
@@ -202,9 +223,11 @@ class VehicleTemplate extends SubMenu {
             var tapeDropdownElements = [];
             tapeDropdownElements.push(["None", "white"]);
             tapeParts.forEach(element => tapeDropdownElements.push([element.Name, "white"]));
-            var tape = createDropdown_Infield_Icons_Search("App Tape", 0, "width:200px;margin:5px;", 0, true, tapeDropdownElements, function() { }, rowContainer);
+            var tape = createDropdown_Infield_Icons_Search("App Tape", 0, "width:200px;margin:5px;", 0, true, tapeDropdownElements, () => {this.fieldChangeFunction();}, rowContainer);
             tape[1].id = "tape";
+            tape[6]();//pauseCallback
             $(tape[1]).val(item ? item.appTape : AppTapeLookup["Medium Tack"]).change();
+            tape[7]();//resumeCallback
 
             this.l_itemsContainer.appendChild(rowContainer);
       };
@@ -242,16 +265,16 @@ class VehicleTemplate extends SubMenu {
             if(this.required) {
                   var rows = this.l_itemsContainer.querySelectorAll("#rowContainer");
                   for(let i = 0; i < rows.length; i++) {
-                        var includesPanelYN = VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelectorAll("#panel").length > 0;
+                        var includesPanelYN = VehicleMenu_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelectorAll("#panel").length > 0;
                         this.rowObjects.push({
-                              description: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#description").value,
-                              width: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#width").value,
-                              height: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#height").value,
-                              quantity: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#quantity").value,
-                              vinyl: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#vinyl").value,
-                              laminate: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#laminate").value,
-                              appTape: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#tape").value,
-                              includesPanel: VehicleBuilder_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelectorAll("#panel").length > 0,
+                              description: VehicleMenu_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#description").value,
+                              width: VehicleMenu_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#width").value,
+                              height: VehicleMenu_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#height").value,
+                              quantity: VehicleMenu_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#quantity").value,
+                              vinyl: VehicleMenu_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#vinyl").value,
+                              laminate: VehicleMenu_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#laminate").value,
+                              appTape: VehicleMenu_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelector("#tape").value,
+                              includesPanel: VehicleMenu_Template.container.contentContainer.querySelectorAll("#rowContainer")[i].querySelectorAll("#panel").length > 0,
                               panel: (includesPanelYN ? ACMLookup["Standard Primer"] : false)
                         });
                         var uniqueItem = {};

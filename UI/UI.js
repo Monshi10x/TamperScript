@@ -894,7 +894,7 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
                     optionIcon.style.background = dropdownOptions[o][1];
                 } else {
                     optionIcon = document.createElement('img');
-                    optionIcon.src = dropdownOptions[o][1];
+                    if(dropdownOptions[o][1] != null) optionIcon.src = dropdownOptions[o][1];
                 }
                 optionIcon.style.cssText += "display: block; float: left; width: " + widthOfIcon + "px; height: " + widthOfIcon + "px; margin: 10px 10px; background-size: cover;";
                 optionDiv.appendChild(optionIcon);
@@ -943,6 +943,10 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
     dummyInput.onchange = function() {
         console.log("dummyInput.onchange");
         dropdownText.innerText = dummyInput.value;
+        if(optionalCallback && !_pauseCallback) {
+            optionalCallback();
+            console.log("callback called");
+        }
     };
 
     return [containerDiv, dummyInput, textDescription, dropdownBody, searchBar, clickFirstVisibleItem, pauseCallback, resumeCallback];

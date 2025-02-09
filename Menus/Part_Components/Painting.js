@@ -80,7 +80,13 @@ class Painting extends Material {
                   if(!this.#f_useLitresFormula[1].checked) $(this.#f_litres[0]).show();
                   this.UpdateFromChange();
             }, f_formulaContainer);
-            this.#f_litresFormulas = createDropdown_Infield_Icons_Search("Use Formula", 0, "width:30%;margin-right:30%;", 10, true, [["Flat Panels", "blue"], ["10-20mmD Letters", "green"], ["Fabricated Front-lit Letters", "yellow"], ["Fabricated Back-lit Letters", "yellow"], ["Fabricated Non-lit Letters", "yellow"]], () => {this.UpdateFromChange();}, f_formulaContainer, false);
+            this.#f_litresFormulas = createDropdown_Infield_Icons_Search("Use Formula", 0, "width:30%;margin-right:30%;", 150, false, [
+                  ["Flat Panels", GM_getResourceURL("Image_PaintedPanel")],
+                  ["10-20mmD Letters", GM_getResourceURL("Image_PaintedPanelWithLetters")],
+                  ["Fabricated FRONT-LIT Letters", GM_getResourceURL("Image_FrontLitLettersPainted")],
+                  ["Fabricated BACK-LIT Letters", GM_getResourceURL("Image_FabLettersPainted")],
+                  ["Fabricated NON-LIT Letters", GM_getResourceURL("Image_FabLettersPainted")]
+            ], () => {this.UpdateFromChange();}, f_formulaContainer, false);
 
             let f_totalContainer = createDivStyle5(null, "Total", f_litresContainer)[1];
             this.#f_areaToPaint = createInput_Infield("Area To Paint", 0, "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "m2"});

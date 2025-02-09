@@ -82,7 +82,7 @@ class Coil extends Material {
             let f_runContainer = createDivStyle5(null, "Run", f_container_machine)[1];
             this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "m"});
             setFieldDisabled(true, this.#f_machineLengthToRun[1], this.#f_machineLengthToRun[0]);
-            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 2, "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 0.1, {postfix: "m/min"});
+            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 1, "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 0.1, {postfix: "m/min"});
             this.#f_machineRunTime = createInput_Infield("Run Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineRunTime[1], this.#f_machineRunTime[0]);
 

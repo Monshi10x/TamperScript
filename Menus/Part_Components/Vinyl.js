@@ -165,10 +165,16 @@ class Vinyl extends Material {      /*
 
             let vinylParts = getPredefinedParts("Vinyl - ");
             let vinylDropdownElements = [];
-            vinylParts.forEach(element => vinylDropdownElements.push([element.Name, "white"]));
+            vinylParts.forEach((element) => {
+                  let isStocked = false;
+                  if(element.Weight) {
+                        let parsedWeight = JSON.parse(element.Weight);
+                        if(parsedWeight.isStocked) isStocked = parsedWeight.isStocked;
+                  }
+                  vinylDropdownElements.push([element.Name, isStocked ? "blue" : "white"]);
+            });
             this.#f_material = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:60%;", 10, true, vinylDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
-            $(this.#f_material).val(VinylLookup["Air Release"]).change();
-
+            dropdownInfieldIconsSearchSetSelected(this.#f_material, VinylLookup["Air Release"], false, false);
 
             /*
             Machine*/
@@ -299,6 +305,9 @@ class Vinyl extends Material {      /*
             }
 
             this.#finalRollSize = new QWHD(1, this.rollWidth, mToMM(rollLengthUsed));
+
+
+            console.trace(this.#f_outputSizeTable2);
 
             this.#f_outputSizeTable2.deleteAllRows();
             this.#f_outputSizeTable2.addRow(this.#finalRollSize.qty, roundNumber(this.#finalRollSize.width, 2), roundNumber(this.#finalRollSize.height, 2));

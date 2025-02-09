@@ -39,7 +39,7 @@ class Router extends SubMenu {
 		this.l_usePaths = createCheckbox_Infield("Use Path Specs for Times", true, "width:60%;margin-right:30%;", () => {this.updateRun();}, f_container_run[1]);
 		this.l_cuttingTable = new Table(f_container_run[1], "100%", 20, 250);
 		this.l_cuttingTable.setHeading("Total Path Length", "Number Shapes", "Material", "Profile", "Quality", "Speed", "Total Time", "Delete");
-		this.l_addRowBtn = createButton("+ Row", "width:15%;margin:0px;margin-right:70%;min-width:80px;", () => {this.addRunRow();}, f_container_run[1]);
+		this.l_addRowBtn = createButton("+ Row", "width:15%;margin:0px;margin-right:70%;min-width:80px;", () => {this.addRunRow(0, 0, {isCustom: true});}, f_container_run[1]);
 		this.l_runTime = createInput_Infield("Total Run Minutes", 20, "width:30%", null, f_container_run[1], false, 10, {postfix: "mins"});
 
 		/*Clean Time*/
@@ -179,7 +179,7 @@ class Router extends SubMenu {
 	}
 
 	runRowIndex = 0;
-	addRunRow(pathLength = 0, numberShapes = 0, options = {material: null, profile: null, quality: null, speed: null}) {
+	addRunRow(pathLength = 0, numberShapes = 0, options = {material: null, profile: null, quality: null, speed: null, isCustom: false}) {
 		this.runRowIndex++;
 		let internalIndex = this.runRowIndex;
 		let l_pathLength = createInput_Infield("Length", pathLength, "width:90%;min-width:90px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 10, {postfix: " mm"});
@@ -213,7 +213,12 @@ class Router extends SubMenu {
 				items: [l_pathLength, l_numberShapes, l_material, l_profile, l_quality, l_speed, l_totalTime, l_deleteRowBtn]
 			}
 		);
-		this.l_cuttingTable.addRow(l_pathLength[0], l_numberShapes[0], l_material[0], l_profile[0], l_quality[0], l_speed[0], l_totalTime[0], l_deleteRowBtn);
+		let addedRow = this.l_cuttingTable.addRow(l_pathLength[0], l_numberShapes[0], l_material[0], l_profile[0], l_quality[0], l_speed[0], l_totalTime[0], l_deleteRowBtn);
+
+		if(options.isCustom === true) {
+			addedRow.id = "customRow";
+			addedRow.style.backgroundColor = "yellow";
+		}
 
 		this.Update();
 	}
@@ -224,9 +229,21 @@ class Router extends SubMenu {
 		this.Update();
 	}
 
-	deleteAllRunRows() {
+	deleteAllRunRows(includingCustomRows = false) {
 		this.runRows = [];
-		this.l_cuttingTable.deleteAllRows();
+		if(includingCustomRows == true) this.l_cuttingTable.deleteAllRows();
+		else {
+			let rowsToDelete = [];
+			let allRows = this.l_cuttingTable.getRowsAll();
+
+			allRows.forEach((element, index) => {
+				if(element.id != "customRow") rowsToDelete.push(index + 1);
+			});
+
+			rowsToDelete.forEach((element) => {
+				this.l_cuttingTable.deleteRow(element);
+			});
+		}
 		this.Update();
 	}
 
