@@ -39,7 +39,7 @@ class Laser extends SubMenu {
             this.l_usePaths = createCheckbox_Infield("Use Path Specs for Times", true, "width:60%;margin-right:30%;", () => {this.updateRun();}, f_container_run[1]);
             this.l_cuttingTable = new Table(f_container_run[1], "100%", 20, 250);
             this.l_cuttingTable.setHeading("Total Path Length", "Number Shapes", "Material", "Profile", "Quality", "Speed", "Total Time", "Delete");
-            this.l_addRowBtn = createButton("+ Row", "width:15%;margin:0px;margin-right:70%;min-width:80px;", () => {this.addRunRow();}, f_container_run[1]);
+            this.l_addRowBtn = createButton("+ Row", "width:15%;margin:0px;margin-right:70%;min-width:80px;", () => {this.addRunRow(0, 0, {isCustom: true});}, f_container_run[1]);
             this.l_runTime = createInput_Infield("Total Run Minutes", 20, "width:30%", null, f_container_run[1], false, 10, {postfix: "mins"});
 
             /*Clean Time*/
