@@ -167,13 +167,13 @@ class Painting extends Material {
                               case "10-20mmD Letters":
                                     if(subscription.parent.constructor.name != "Coil") calculatedArea += dataEntry.paintedArea; /**exclude backs from painting, only Coil returns */
                                     break;
-                              case "Fabricated Front-lit Letters":
-                                    if(!["Sheet", "SVGCutfile"].includes(subscription.parent.constructor.name)) calculatedArea += dataEntry.paintedArea; /**exclude backs from painting, only Coil returns */
+                              case "Fabricated FRONT-LIT Letters":
+                                    if(!["Sheet", "SVGCutfile"].includes(subscription.parent.constructor.name)) calculatedArea += dataEntry.paintedArea; /**exclude backs from painting, only use Coil returns */
                                     break;
-                              case "Fabricated Back-lit Letters":
+                              case "Fabricated BACK-LIT Letters":
                                     calculatedArea += dataEntry.paintedArea;
                                     break;
-                              case "Fabricated Non-lit Letters":
+                              case "Fabricated NON-LIT Letters":
                                     calculatedArea += dataEntry.paintedArea;
                                     break;
                               default: break;
