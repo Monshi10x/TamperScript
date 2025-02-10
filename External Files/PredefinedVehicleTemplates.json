@@ -705,6 +705,46 @@
                   }
             ],
             [
+                  "Van - LDV G10",
+                  "https://github.com/Monshi10x/TamperScript/raw/main/Images/LDV-G10.svg",
+                  14722.9,
+                  10477.075,
+                  {
+                        "name": "Single Door",
+                        "production_time": 120,
+                        "production_TE": "Each",
+                        "install_TE": "Each",
+                        "install_time": 120,
+                        "install_rate": "Install 1 Person (Min) $135/h",
+                        "template_rects": [
+                              {
+                                    "x": 6689.287339225901,
+                                    "y": 2098.777456845445,
+                                    "w": 700,
+                                    "h": 400,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Driver Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 4771.538373500958,
+                                    "y": 5193.869365263114,
+                                    "w": 700,
+                                    "h": 400,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Pass Door",
+                                    "colour": "#FF5A5A"
+                              }
+                        ]
+                  }
+            ],
+            [
                   "Hatch - Toyota Carola 2022",
                   "https://cdn.gorilladash.com/images/media/5418205/Carola-01.svg",
                   9204.8,
