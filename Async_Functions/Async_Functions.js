@@ -80,6 +80,17 @@ async function loadPredefinedParts() {
             value: predefinedParts_obj[l].Id
         });
     }
+    for(let i = 0; i < predefinedParts_obj.length; i++) {
+        let arr = predefinedParts_obj[i].ParentSize.replaceAll("mm", "").replaceAll(" ", "").split("x");
+        let wxhString = "" + zeroIfNaNNullBlank(parseFloat(arr[0])) + "x" + zeroIfNaNNullBlank(parseFloat(arr[1]));
+
+        if(predefinedParts_obj[i].Name.includes(" - (sqm) -")) predefinedParts_obj[i].Material = predefinedParts_obj[i].Name.split(" - (sqm) -")[0];
+        predefinedParts_obj[i].SheetSize = wxhString;
+        predefinedParts_obj[i].SheetWidth = parseFloat(arr[0]);
+        predefinedParts_obj[i].SheetHeight = parseFloat(arr[1]);
+        predefinedParts_obj[i].IsStocked = predefinedParts_obj[i].Weight.includes("Stocked:true");
+
+    }
     //console.log(predefinedParts_Name_Id);
     console.log("%cPREDEFINED PARTS", 'background: blue; color: white');
     console.log(predefinedParts_obj);
@@ -284,28 +295,39 @@ function getPredefinedParts_AllFinishes(searchName) {
     return finishes;
 }
 
-function getPredefinedParts_RefinedSearch(searchName, thickness, finish, sheetW, sheetH) {
+function getPredefinedParts_RefinedSearch(searchName, thickness, finish, sheetSize, material) {
     var searchedPart = $.grep(predefinedParts_obj, function(obj) {return obj.Name.includes(searchName);});
     var result = [];
     for(var i = 0; i < searchedPart.length; i++) {
-        var c1, c2;//, c3;
-        if(thickness != null) {
-            c1 = searchedPart[i].Thickness == thickness;
-        } else {
-            c1 = true;
-        }
-        if(finish != null) {
-            c2 = searchedPart[i].Finish == finish;
-        } else {
-            c2 = true;
-        }
-        /*       if(sheetW!=null){
-            c3=searchedPart[i].ParentSize==sheetW+"<span style = 'font-size:60%;' >mm</span> x "+sheetH+"<span style = 'font-size:60%;' >mm</span>";
-        }else{
-            c3=true;
-        }*/
+        let _material = searchedPart[i].Name.split(" - (sqm) -")[0];
+        let wh = searchedPart[i].ParentSize.replaceAll("mm", "").replaceAll(" ", "").split("x");
+        let _sheetSize = "" + zeroIfNaNNullBlank(parseFloat(wh[0])) + "x" + zeroIfNaNNullBlank(parseFloat(wh[1]));
 
-        if(c1 && c2) result.push(searchedPart[i]);
+        var c1 = false,
+            c2 = false,
+            c3 = false,
+            c4 = false;
+
+        if(thickness) {
+            c1 = searchedPart[i].Thickness == thickness;
+        } else c1 = true; //skip case if null, same as is true
+        if(finish) {
+            c2 = searchedPart[i].Finish == finish;
+        } else c2 = true;
+        if(material) {
+            c3 = _material == material;
+        } else c3 = true;
+        if(sheetSize) {
+            c4 = _sheetSize == sheetSize;
+        } else c4 = true;
+
+        if(c1 && c2 && c3 && c4) {
+            result.push(searchedPart[i]);
+            continue;
+        }
+
+        if(!thickness && !finish && !sheetSize && !material) result.push(searchedPart[i]); // case where all are null
+
     }
     return result;
 }

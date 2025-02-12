@@ -1376,12 +1376,15 @@ function dropdownSetSelectedValue(field, value) {
     console.trace("here shouldnt");
     //alert("no value selected for dropdown (no match)");
 }
-function dropdownSetSelectedText(field, value) {
+function dropdownSetSelectedText(field, value, triggerChange = true) {
+    console.table("dropdownSetSelectedText", field, value, triggerChange);
     let allOptions = field.options;
+    console.log(allOptions.length);
     for(let i = 0; i < allOptions.length; i++) {
+
         if(allOptions[i].innerText === value) {
             field.selectedIndex = i;
-            $(field).change();
+            if(triggerChange) $(field).change();
             return;
         }
     }
@@ -1394,6 +1397,16 @@ function dropdownInfieldIconsSearchSetSelected(dropdownField, value, setSearchTo
     if(setSearchToo) $(dropdownField[4]).val(value).change();
     $(dropdownField[1]).val(value).change();
     if(!withCallback) dropdownField[7]();//resume callback
+}
+
+function dropdownSetOptions(dropdownField, ...stringArray) {
+    while(dropdownField.firstChild) {
+        dropdownField.removeChild(dropdownField.firstChild);
+    }
+
+    for(var l = 0; l < stringArray.length; l++) {
+        dropdownField.add(createDropdownOption(stringArray[l], stringArray[l]));
+    }
 }
 //helper functions
 function checkboxesAddToSelectionGroup(oneMustBeChecked, ...checkboxElements) {

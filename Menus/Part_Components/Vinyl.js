@@ -306,9 +306,6 @@ class Vinyl extends Material {      /*
 
             this.#finalRollSize = new QWHD(1, this.rollWidth, mToMM(rollLengthUsed));
 
-
-            console.trace(this.#f_outputSizeTable2);
-
             this.#f_outputSizeTable2.deleteAllRows();
             this.#f_outputSizeTable2.addRow(this.#finalRollSize.qty, roundNumber(this.#finalRollSize.width, 2), roundNumber(this.#finalRollSize.height, 2));
 

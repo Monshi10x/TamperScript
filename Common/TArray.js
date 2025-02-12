@@ -11,7 +11,7 @@ class TArray extends Array {
 
       /**
        * 
-       * @returns [... , ... , ...] with each element being the first unique element found, evaluated against some comparison property
+       * @returns [... , ... , ...] with each element being the first unique element found
        */
       uniqueArrayElements() {
             let uniqueElements = [];
