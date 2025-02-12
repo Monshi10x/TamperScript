@@ -80,7 +80,7 @@ class Painting extends Material {
                   if(!this.#f_useLitresFormula[1].checked) $(this.#f_litres[0]).show();
                   this.UpdateFromChange();
             }, f_formulaContainer);
-            this.#f_litresFormulas = createDropdown_Infield_Icons_Search("Use Formula", 0, "width:30%;margin-right:30%;", 150, false, [
+            this.#f_litresFormulas = createDropdown_Infield_Icons_Search("Use Formula", 2, "width:30%;margin-right:30%;", 200, false, [
                   ["Flat Panels", GM_getResourceURL("Image_PaintedPanel")],
                   ["10-20mmD Letters", GM_getResourceURL("Image_PaintedPanelWithLetters")],
                   ["Fabricated FRONT-LIT Letters", GM_getResourceURL("Image_FrontLitLettersPainted")],

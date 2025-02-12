@@ -450,16 +450,14 @@ class Sheet extends Material {
 
             let sheetFilterContainer = createDivStyle5(null, "Filters", f_container_sheetSize)[1];
 
-            this.#material = createDropdown_Infield("Material", 0, "width:80px", [createDropdownOption("", "")].concat(this.#materialOptions), () => {this.UpdateFilters2();/* this.UpdateFilters("Material");*/}, sheetFilterContainer);
-            //this.#searchTerms.push(this.#material[1].value + " - (sqm)");
+            this.#material = createDropdown_Infield("Material", 0, "width:80px", [createDropdownOption("", "")].concat(this.#materialOptions), () => {this.UpdateFilters2();}, sheetFilterContainer);
 
-            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters2(); /*this.UpdateFilters('Sheet Size');*/}, sheetFilterContainer);
+            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer);
             this.#sheetSize[1].id = "Sheet Size";
 
-            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters2(); /*this.UpdateFilters("Thickness");*/}, sheetFilterContainer);
+            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters2();}, sheetFilterContainer);
 
-            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters2(); /*this.UpdateFilters("Finish");*/}, sheetFilterContainer);
-
+            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer);
 
             this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 10, true, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize, false);
 
@@ -604,10 +602,10 @@ class Sheet extends Material {
 
             /*
             Updates*/
-            this.setSheetMaterial("ACM", false);
-            this.setSheetSize("2440x1220", false);
-            this.setSheetThickness("3x0.21", false);
-            this.setSheetFinish("Primer", false);
+            // this.setSheetMaterial("ACM", false);
+            //this.setSheetSize("2440x1220", false);
+            // this.setSheetThickness("3x0.21", false);
+            //this.setSheetFinish("Primer", false);
 
             this.UpdateFromChange();
       }
