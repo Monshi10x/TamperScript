@@ -147,28 +147,22 @@ class Sheet extends Material {
       #sheetMaterial;
       set sheetMaterial(value) {$(this.#sheetMaterial[1]).val(value).change();}
 
+
+      setSheetMaterial(value, triggerChange = true) {
+            dropdownSetSelectedText(this.#material[1], value, triggerChange);
+            this.UpdateFilters2(triggerChange);
+      }
       setSheetSize(value, triggerChange = true) {
-            //this.UpdateFilters("Material", triggerChange);
-
-            //if(triggerChange) $(this.#material[1]).val(value).change();
-            //else $(this.#material[1]).val(value);
-
             dropdownSetSelectedText(this.#sheetSize[1], value, triggerChange);
+            this.UpdateFilters2(triggerChange);
       }
       setSheetThickness(value, triggerChange = true) {
-            //this.UpdateFilters("Sheet Size", triggerChange);
-            //if(triggerChange) $(this.#thickness[1]).val(value).change();
-            //else $(this.#thickness[1]).val(value);
-
-            //alert(this.#thickness[1].value);
             dropdownSetSelectedText(this.#thickness[1], value, triggerChange);
+            this.UpdateFilters2(triggerChange);
       }
       setSheetFinish(value, triggerChange = true) {
-            //this.UpdateFilters("Thickness", triggerChange);
-            //if(triggerChange) $(this.#finish[1]).val(value).change();
-            // else $(this.#finish[1]).val(value);
-
             dropdownSetSelectedText(this.#finish[1], value, triggerChange);
+            this.UpdateFilters2(triggerChange);
       }
 
       #sheetPerimeterIsCut = true;
@@ -610,13 +604,10 @@ class Sheet extends Material {
 
             /*
             Updates*/
-            //this.UpdateFilters();
+            this.setSheetMaterial("ACM", false);
             this.setSheetSize("2440x1220", false);
             this.setSheetThickness("3x0.21", false);
             this.setSheetFinish("Primer", false);
-            //this.sheetSize = "2440mm x 1220mm";
-            //this.thickness = "3x0.21";
-            //this.finish = "Primer";
 
             this.UpdateFromChange();
       }
@@ -1064,7 +1055,7 @@ class Sheet extends Material {
             for(let i = 0; i < materialsToUse.length; i++) {
                   let foundParts = getPredefinedParts_RefinedSearch(materialsToUse[i] + " - ");
                   for(let j = 0; j < foundParts.length; j++) {
-                        optionsArray.push([foundParts[j].IsStocked, foundParts[j].IsStocked ? "blue" : "white"]);
+                        optionsArray.push([foundParts[j].Name, foundParts[j].IsStocked ? "blue" : "white"]);
                   }
             }
 
