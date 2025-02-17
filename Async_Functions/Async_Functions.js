@@ -127,15 +127,81 @@ async function loadPredefinedModifiers() {
     resultObj_num = predefinedModifiers_obj.length;
     for(var l = 0; l < predefinedModifiers_obj.length; l++) {
         predefinedModifiers_Name_Id.push({
-            key: predefinedModifiers_obj[l].Name,
-            value: predefinedModifiers_obj[l].Id
+            Name: predefinedModifiers_obj[l].Name,
+            Id: predefinedModifiers_obj[l].Id
         });
     }
     //console.log(predefinedModifiers_Name_Id);
     console.log("%cPREDEFINED MODIFIERS", 'background: blue; color: white');
     console.log(predefinedModifiers_obj);
+
+}
+
+var modifiersData = [];
+async function loadModifiersData() {
+    console.log(predefinedModifiers_Name_Id);
+    let promises = [];
+    for(let i = 0; i < predefinedModifiers_Name_Id.length; i++) {
+        promises.push(getModifierData(predefinedModifiers_Name_Id[i].Id));
+        //const data = await response.json(); console.log(data)
+    }
+
+    let data = await Promise.all(promises);
+    console.log(data);
+    for(let i = 0; i < data.length; i++) {
+        modifiersData.push(data[i].Modifier);
+    }
+
+    console.log("%cPREDEFINED MODIFIERS -> DATA", 'background: blue; color: white');
+    console.log(modifiersData);
     document.dispatchEvent(event_loadedPredefinedModifiers);
 }
+
+async function getModifierData(modifierID) {
+    const response = await fetch("https://sar10686.corebridge.net/Api/OrderEntryProducts/GetModifier?modifierId=" + modifierID, {
+        "headers": {
+            "accept": "*/*",
+            "accept-language": "en-US,en;q=0.9",
+            "content-type": "application/json; charset=utf-8",
+            "priority": "u=1, i",
+            "sec-ch-ua": "\"Not A(Brand\";v=\"8\", \"Chromium\";v=\"132\", \"Google Chrome\";v=\"132\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "x-requested-with": "XMLHttpRequest"
+        },
+        //"referrer": "https://sar10686.corebridge.net/SalesModule/Orders/EditOrder.aspx?Edit=1&OrderId=16882&acctid=11079&acctname=TEST",
+        "referrerPolicy": "strict-origin-when-cross-origin",
+        "body": null,
+        "method": "GET",
+        "mode": "cors",
+        "credentials": "include"
+    });
+    const data = await response.json();
+    return data;
+}
+
+function getModifierDropdown_Name_Price_Cost(modifierName) {
+    let listItemsObject = [];
+
+    for(let i = 0; i < modifiersData.length; i++) {
+        if(modifiersData[i].Name != modifierName) continue;
+        if(!modifiersData[i].VariableRateListItems) continue;
+
+        let listItems = modifiersData[i].VariableRateListItems.replaceAll("~0", "").split(":");
+        listItems.shift();
+        for(let j = 0; j < listItems.length; j += 4) {
+            listItemsObject.push({Name: listItems[j], Price: listItems[j + 1], Cost: listItems[j + 2], Rate: listItems[j + 3]});
+        }
+
+        return listItemsObject;
+    }
+
+    return null;
+}
+
 
 var RHSList = [];
 async function loadRHSList() {
@@ -749,6 +815,14 @@ async function setPartDescription(productNo, partNo, value) {
     console.log("set part description " + partNo);
     await sleep(sleepMS);
     return partNo;
+}
+function setPartDescriptionDisabled(productNo, partNo, tf) {
+    let product = document.querySelector(Field.Product(productNo));
+    let partDescription = product.querySelectorAll(".txtPartDescription")[partNo - 1];
+
+    partDescription.style.color = COLOUR.Blue;
+    partDescription.disabled = tf;
+
 }
 async function setPartText(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
@@ -1399,6 +1473,28 @@ function getProductsWithName(name) {
 function getNumProducts() {
     var products = ko.contextFor(document.querySelector(".ord-prod-body")).$parent.OrderProducts();
     return products.length;
+}
+function getPartNamesInProduct(productNo) {
+    let partNames = [];
+    let domProduct = document.querySelector(Field.Product(productNo));
+
+
+    let parts = domProduct.querySelectorAll(".txtPartDescription");
+    console.log(parts);
+
+    for(let i = 0; i < parts.length; i++) {
+        partNames.push(parts[i].value);
+    }
+
+    return partNames;
+}
+
+function getKoPartsInProduct(productNo) {
+    let parts = [];
+    var productContext = ko.contextFor(document.querySelector(Field.Product(productNo))).$data;
+
+    parts.push(productContext.Parts());
+    return parts;
 }
 
 

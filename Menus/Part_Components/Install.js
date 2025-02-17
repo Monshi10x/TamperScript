@@ -36,26 +36,40 @@ class Install extends SubMenu {
 		this.#outsourceMarkup = createInput_Infield("Markup", null, "width:30%;display:block;", () => { }, this.contentContainer, true, 1, {postfix: "x"});
 		$(this.#outsourceMarkup[0]).hide();
 
-		this.#install_InstallRate = createDropdown_Infield("Install Rate", 3, "display:block;width:63%;margin-right:20%;", [
-			createDropdownOption(InstallLookup["1P $95"], InstallLookup["1P $95"]),
-			createDropdownOption(InstallLookup["1P $135"], InstallLookup["1P $135"]),
-			createDropdownOption(InstallLookup["1P $120 SAR"], InstallLookup["1P $120 SAR"]),
-			createDropdownOption(InstallLookup["1P $135 Vehicles"], InstallLookup["1P $135 Vehicles"]),
-			createDropdownOption(InstallLookup["2P $180"], InstallLookup["2P $180"]),
-			createDropdownOption(InstallLookup["2P $270"], InstallLookup["2P $270"]),
-			createDropdownOption(InstallLookup["2P $200 SAR"], InstallLookup["2P $200 SAR"]),
-		], () => {this.Update();}, this.contentContainer);
+		///Install Rate
+		this.#install_InstallRate = createDropdown_Infield("Install Rate", 1, "display:block;width:63%;margin-right:20%;", [], () => {this.Update();}, this.contentContainer);
+
+		let dropdownOptions = [];
+		let modifierOptions = getModifierDropdown_Name_Price_Cost("Install IH (ea)");
+		modifierOptions.forEach((element) => {
+			dropdownOptions.push(createDropdownOption(element.Name, element.Name));
+		});
+		if(dropdownOptions != null) {
+			dropdownOptions.forEach((item) => {
+				this.#install_InstallRate[1].add(item);
+			});
+		}
+
+		///Install Times
 		this.#install_InstallMinutes = createInput_Infield("Install Minutes", null, "width:25%;display:block;margin-left:40px;", () => {this.Update();}, this.contentContainer, false, 10);
 		this.#install_InstallHours = createInput_Infield("Install Hours", null, "width:25%;display:block", () => {this.Update();}, this.contentContainer, false, 1);
 		this.#install_InstallDays = createInput_Infield("Install Days (8h)", null, "width:25%;display:block", () => {this.Update();}, this.contentContainer, false, 1);
-		this.#install_TravelRate = createDropdown_Infield("Travel Rate", 1, "display:block;width:63%;margin-right:20%", [
-			createDropdownOption(TravelLookup["1P $95"], TravelLookup["1P $95"]),
-			createDropdownOption(TravelLookup["1P $135"], TravelLookup["1P $135"]),
-			createDropdownOption(TravelLookup["1P $120 SAR"], TravelLookup["1P $120 SAR"]),
-			createDropdownOption(TravelLookup["2P $135"], TravelLookup["2P $135"]),
-			createDropdownOption(TravelLookup["2P $270"], TravelLookup["2P $270"]),
-			createDropdownOption(TravelLookup["2P $240 SAR"], TravelLookup["2P $240 SAR"])
-		], () => {this.Update();}, this.contentContainer);
+
+		///Travel Rate
+		this.#install_TravelRate = createDropdown_Infield("Travel Rate", 1, "display:block;width:63%;margin-right:20%;", [], () => {this.Update();}, this.contentContainer);
+
+		dropdownOptions = [];
+		modifierOptions = getModifierDropdown_Name_Price_Cost("Travel IH (ea)");
+		modifierOptions.forEach((element) => {
+			dropdownOptions.push(createDropdownOption(element.Name, element.Name));
+		});
+		if(dropdownOptions != null) {
+			dropdownOptions.forEach((item) => {
+				this.#install_TravelRate[1].add(item);
+			});
+		}
+
+		///Travel Times
 		this.#install_TravelMinutes = createInput_Infield("Travel Minutes", null, "width:25%;display:block;margin-left:40px", () => {this.Update();}, this.contentContainer, false, 10);
 		this.#install_TravelHours = createInput_Infield("Travel Hours", null, "width:25%;display:block;", () => {this.Update();}, this.contentContainer, false, 1);
 		this.#install_TravelDays = createInput_Infield("Travel Days (8h)", null, "width:25%;display:block;", () => {this.Update();}, this.contentContainer, false, 1);

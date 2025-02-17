@@ -85,10 +85,19 @@ class WindowMenu extends LHSMenuWindow {
             setup[1].id = "windowField_Setup";
             var travelMinutes = createInput_Infield('Travel Minutes', null, "margin-left:50px;width:100px;display:none", null, row, false, 10);
             travelMinutes[1].id = "windowField_TravelMinutes";
-            var travelRate = createDropdown_Infield('Travel Rate', 0, "display:none",
-                [createDropdownOption("Travel 1 Person (Min) $135/h", "Travel 1 Person (Min) $95/h"),
-                createDropdownOption("Travel 2 Person (Min) $240/h", "Travel 2 Person (Min) $135/h")], null, row);
-            travelRate[1].id = "windowField_TravelRate";
+
+            var travelRate = createDropdown_Infield("Travel Rate", 1, null, [], () => { }, row);
+            travelRate[1].id;
+            let dropdownOptions = [];
+            let modifierOptions = getModifierDropdown_Name_Price_Cost("Travel IH (ea)");
+            modifierOptions.forEach((element) => {
+                dropdownOptions.push(createDropdownOption(element.Name, element.Name));
+            });
+            if(dropdownOptions != null) {
+                dropdownOptions.forEach((item) => {
+                    travelRate[1].add(item);
+                });
+            }
 
             let artwork = new Artwork(row, null, function() { });
 

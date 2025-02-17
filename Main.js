@@ -101,6 +101,7 @@ async function init() {
   await loadPredefinedQuickProducts();
   await loadPredefinedParts();
   await loadPredefinedModifiers();
+  await loadModifiersData();
   await loadRHSList();
   await loadBaseplateList();
 }

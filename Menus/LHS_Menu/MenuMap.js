@@ -19,6 +19,13 @@ class MenuMap extends LHSMenuWindow {
       #f_travelTimeMins;
       #f_createParts_DivideEqually;
       #f_createParts_DivideBy$Percentage;
+      #f_numberOfMobilisations;
+      #f_travelRate;
+      #f_mobilisationContainer;
+
+      get travelRate() {
+            return this.#f_travelRate[1].value;
+      }
 
       constructor(width, height, ID, windowTitle) {
             super(width, height, ID, windowTitle);
@@ -49,15 +56,27 @@ class MenuMap extends LHSMenuWindow {
             ///TIMES
             this.#f_timeContainer = createDivStyle5(null, "Times", this.#f_page1)[1];
 
-            this.#f_truckPackingAndSetupTime = createInput_Infield("Truck Packing And Setup Time", 30, "width:200px;", () => { }, this.#f_timeContainer, false, 5, {postfix: "mins"});
-
             this.#f_travelDistanceMeters = createInput_Infield("Distance To", 0, "width:200px;", () => { }, this.#f_timeContainer, false, 1, {postfix: "km"});
             setFieldDisabled(true, this.#f_travelDistanceMeters[1], this.#f_travelDistanceMeters[0]);
 
             this.#f_travelTimeMins = createInput_Infield("Travel Time To", 0, "width:200px;", () => { }, this.#f_timeContainer, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_travelTimeMins[1], this.#f_travelTimeMins[0]);
 
-            ///
+            ///MOBILISATION
+            this.#f_mobilisationContainer = createDivStyle5(null, "Mobilisation", this.#f_page1)[1];
+
+            this.#f_truckPackingAndSetupTime = createInput_Infield("Truck Packing And Setup Time", 30, "width:200px;", () => { }, this.#f_mobilisationContainer, false, 5, {postfix: "mins"});
+
+            this.#f_numberOfMobilisations = createInput_Infield("Number of Mobilisations", 1, "width:200px;", () => { }, this.#f_mobilisationContainer, false, 1, {postfix: ""});
+
+            document.addEventListener("loadedPredefinedModifiers", (e) => {
+                  let dropdownOptions = [];
+                  let modifierOptions = getModifierDropdown_Name_Price_Cost("Travel IH");
+                  modifierOptions.forEach((element) => {
+                        dropdownOptions.push(createDropdownOption(element.Name, element.Name));
+                  });
+                  this.#f_travelRate = createDropdown_Infield("Travel Rate", 5, null, dropdownOptions, () => { }, this.#f_mobilisationContainer);
+            });
 
             ///CREATE
             this.#f_createParts_DivideEqually = createButton('Create -> Split Equally', "margin:0px;width:50%", async () => {
@@ -97,10 +116,12 @@ class MenuMap extends LHSMenuWindow {
 
             if(ko.travelDistance) $(this.#f_travelDistanceMeters[1]).val(ko.travelDistance);
             if(ko.travelTime) $(this.#f_travelTimeMins[1]).val(ko.travelTime);
+            if(ko.numberOfMobilisations) $(this.#f_numberOfMobilisations[1]).val(ko.numberOfMobilisations);
+            if(ko.truckPackingAndSetupTime) $(this.#f_truckPackingAndSetupTime[1]).val(ko.truckPackingAndSetupTime);
 
             if(!ko.installAddress) return;
 
-            console.log(ko.installAddress);
+            if(this.SHOW_DEBUG) console.log("Install Address: " + ko.installAddress);
 
             $(this.#f_searchField[1]).val(ko.installAddress);
       }
@@ -158,8 +179,10 @@ class MenuMap extends LHSMenuWindow {
             koStorageObject.installAddress = this.#f_searchField[1].value;
             koStorageObject.travelDistance = this.#f_travelDistanceMeters[1].value || 0;
             koStorageObject.travelTime = this.#f_travelTimeMins[1].value || 0;
+            koStorageObject.numberOfMobilisations = this.#f_numberOfMobilisations[1].value || 0;
+            koStorageObject.truckPackingAndSetupTime = this.#f_truckPackingAndSetupTime[1].value || 0;
 
-            console.log(JSON.stringify(koStorageObject));
+            if(this.SHOW_DEBUG) console.log(JSON.stringify(koStorageObject));
 
             setKOStorageVariable(koStorageObject);
       }
@@ -180,58 +203,66 @@ class MenuMap extends LHSMenuWindow {
       async Create(method) {
             this.minimize();
 
-            let totalTravelMins = this.#f_travelTimeMins[1].value * 2 + this.#f_truckPackingAndSetupTime[1].value;
-            let totalTravelDistance = this.#f_travelDistanceMeters[1].value * 2;
-
             let totalOrderPrice = 0;
             let numProducts = getNumProducts();
             let numProductsToDivideAgainst = numProducts;
+            let numberOfMobilisations = this.#f_numberOfMobilisations[1].value;
 
-            switch(method) {
-                  case "Split Equally":
-                        for(let i = 0; i < numProducts; i++) {
-                              let productPrice = getProductPrice(i + 1);
-                              if(productPrice == 0) numProductsToDivideAgainst--;
-                              totalOrderPrice += productPrice;
-                        }
+            let totalTravelMins = zeroIfNaNNullBlank(this.#f_travelTimeMins[1].value * 2 + this.#f_truckPackingAndSetupTime[1].value) * numberOfMobilisations;
+            let totalTravelDistance = zeroIfNaNNullBlank(this.#f_travelDistanceMeters[1].value * 2) * numberOfMobilisations;
 
-                        for(let i = 0; i < numProducts; i++) {
-                              let productPrice = getProductPrice(i + 1);
-                              if(productPrice == 0) continue;
-                        }
-                        console.log(totalTravelMins / numProductsToDivideAgainst, totalTravelMins, numProductsToDivideAgainst);
-                  case "Divide By $ Percentage":
-                        for(let i = 0; i < numProducts; i++) {
-                              let productPrice = getProductPrice(i + 1);
-                              if(productPrice == 0) numProductsToDivideAgainst--;
-                              totalOrderPrice += productPrice;
-                        }
-
-                        for(let i = 0; i < numProducts; i++) {
-                              let productPrice = getProductPrice(i + 1);
-                              if(productPrice == 0) continue;
-
-                              let productMultiplier = productPrice / totalOrderPrice;
-
-                              let productTravelMins = totalTravelMins * productMultiplier;
-
-                              console.log(productTravelMins);
-                        }
-                        break;
-                  default: break;
+            for(let i = 0; i < numProducts; i++) {
+                  let productPrice = getProductPrice(i + 1);
+                  if(productPrice == 0) numProductsToDivideAgainst--;
+                  totalOrderPrice += productPrice;
             }
-            /* await AddBlankProduct();
-             let productNo = getNumProducts();
-             var newPartIndex = 1;
- 
-             //await q_AddPart_CostMarkup(productNo, 0, true, false, 1, parseFloat(this.#f_costForQty[1].value) / parseFloat(this.#f_qty[1].value), this.#f_markup[1].value, "");
-             await setProductQty(productNo, this.#f_qty[1].value);
-             await setProductSummary(productNo, this.Description());
-             // await setProductName(productNo, this.#f_typeDropdown[1].value);
- */
+
+            for(let i = 0; i < numProducts; i++) {
+                  let productPrice = getProductPrice(i + 1);
+                  if(productPrice == 0) continue;
+
+                  let productNo = i + 1;
+                  let partIndex = getNumPartsInProduct(productNo); //last index by default
+
+                  let productIncludesTravelAlready = {value: false, index: null};
+                  let partNamesInProduct = getPartNamesInProduct(productNo);
+
+                  for(let j = 0; j < partNamesInProduct.length; j++) {
+                        if(partNamesInProduct[j] != "TRAVEL [Automatic]") continue;
+
+                        productIncludesTravelAlready.value = true;
+                        productIncludesTravelAlready.index = j + 1;
+                        partIndex = j + 1;
+                  }
+
+                  let productTravelTime = 0;
+
+                  if(method == "Split Equally") {
+                        productTravelTime = totalTravelMins / numProductsToDivideAgainst;
+                  } else if(method == "Divide By $ Percentage") {
+                        productTravelTime = totalTravelMins * (productPrice / totalOrderPrice);
+                  }
+
+                  if(productIncludesTravelAlready.value == false) {
+                        await AddPart("Install - IH", productNo);
+                        partIndex++;
+                        await setPartDescription(productNo, partIndex, "TRAVEL [Automatic]");
+                        setPartDescriptionDisabled(productNo, partIndex, true);
+                        await setTravelTimeMHD(productNo, partIndex, productTravelTime, 0, 0);
+                        await setTravelType(productNo, partIndex, this.travelRate);
+                        await savePart(productNo, partIndex);
+                  } else if(productIncludesTravelAlready.value == true) {
+                        await openPart(productNo, partIndex);
+                        console.log(productNo, partIndex, productTravelTime);
+                        await setTravelTimeMHD(productNo, partIndex, productTravelTime, 0, 0);
+                        await setTravelType(productNo, partIndex, this.travelRate);
+                        await savePart(productNo, partIndex);
+                  }
+            }
+
             Ordui.Alert("Done");
       }
-      //catchNull(value, valueIfNull)
+
       Description() {
             return "";
       }
