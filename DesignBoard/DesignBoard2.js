@@ -122,6 +122,7 @@ class DesignBoard2 extends JobBoard {
       #f_designerFilter;
       #f_companyFilter;
       #f_showPaymentsFilter;
+      #f_jobNoFilter;
 
       constructor(parentToAppendTo) {
             super(parentToAppendTo);
@@ -345,6 +346,10 @@ class DesignBoard2 extends JobBoard {
             this.#f_companyFilter = createInput_Infield("Company Name", "", "box-shadow:none;", () => {this.FilterJobs();}, null, false, null);
             this.AddToHeader(this.#f_companyFilter[0]);
 
+            //Job No
+            this.#f_jobNoFilter = createInput_Infield("Job Number", "", "box-shadow:none;", () => {this.FilterJobs();}, null, false, null);
+            this.AddToHeader(this.#f_jobNoFilter[0]);
+
             //Payments
             if(this.#usersWithSalesPermissions.includes(this.currentUser)) {
                   this.#f_showPaymentsFilter = createCheckbox_Infield("Load Payments", false, "width:200px;box-shadow:none;", () => {this.FilterJobs();}, null);
@@ -383,6 +388,13 @@ class DesignBoard2 extends JobBoard {
                   filterValue = this.#f_companyFilter[1].value;
                   let companyName = this.#jobObjects[j].CompanyName;
                   if(!companyName.toLowerCase().includes(filterValue.toLowerCase())) {
+                        $(this.#jobObjects[j].containerObject.container).hide();
+                  }
+
+                  //Job No
+                  filterValue = this.#f_jobNoFilter[1].value;
+                  let jobNo = this.#jobObjects[j].OrderInvoiceNumber.replaceAll("INV-", "");
+                  if(!jobNo.toLowerCase().includes(filterValue.toLowerCase())) {
                         $(this.#jobObjects[j].containerObject.container).hide();
                   }
             }
