@@ -153,7 +153,7 @@ function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo)
     f_arrow.style = "display:table-cell;vertical-align: middle;word-break: break-all;";
     f_arrow.innerHTML = "&#11208";
 
-    f_contentContainer.style = "width:calc(100% - 120px);height:100%;float:left;position: relative;";
+    f_contentContainer.style = "width:calc(100% - 120px);float:left;position: relative;";
 
     f_headingTextWrapper.addEventListener("click", function() {
         $(f_contentContainer).toggle();

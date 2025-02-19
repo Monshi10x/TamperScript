@@ -446,7 +446,8 @@ class Sheet extends Material {
 
             /*
             Sheet Size*/
-            let f_container_sheetSize = createDivStyle5(null, "Sheet To Use", this.container)[1];
+            let f_container_sheetSize = createDivStyle5("", "Sheet To Use", this.container)[1];
+            f_container_sheetSize.id = "iojsdnbgkjasngjknas";
 
             let sheetFilterContainer = createDivStyle5(null, "Filters", f_container_sheetSize)[1];
 
@@ -459,7 +460,7 @@ class Sheet extends Material {
 
             this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer);
 
-            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 30, false, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize, false);
+            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 40, false, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize, false);
 
             /*
             Folded*/
