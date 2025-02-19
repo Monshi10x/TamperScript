@@ -459,7 +459,7 @@ class Sheet extends Material {
 
             this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer);
 
-            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 10, true, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize, false);
+            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 30, false, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize, false);
 
             /*
             Folded*/
@@ -1053,7 +1053,7 @@ class Sheet extends Material {
             for(let i = 0; i < materialsToUse.length; i++) {
                   let foundParts = getPredefinedParts_RefinedSearch(materialsToUse[i] + " - ");
                   for(let j = 0; j < foundParts.length; j++) {
-                        optionsArray.push([foundParts[j].Name, foundParts[j].IsStocked ? "blue" : "white"]);
+                        optionsArray.push([foundParts[j].Name, foundParts[j].IsStocked ? GM_getResourceURL("Image_IsStocked") : null]);
                   }
             }
 

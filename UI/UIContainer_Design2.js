@@ -1144,27 +1144,6 @@ class UIContainer_Design2 {
                         '<rect x=".5" y=".5" width="841.908" height="595.288" style="fill:none; stroke:#000; stroke-miterlimit:10;" />' +
                         '</svg>';
 
-
-                  /*<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="297.35mm" height="210.35mm" viewBox="0 0 842.89 596.28">
-      <text transform="translate(68.44 91.19)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 313.01)" style="font-family:ArialMT, Arial; font-size:6px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.62 270.75)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 281.78)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 293.89)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 255.59)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 244.66)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 160.45)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 149.58)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 172.70)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 184.49)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 196.73)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 208.48)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 220.36)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 136.92)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <text transform="translate(68.44 113.97)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">W</tspan></text>
-      <text transform="translate(68.44 233.96)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">A</tspan></text>
-      <rect x=".5" y=".5" width="841.908" height="595.288" style="fill:none; stroke:#000; stroke-miterlimit:10;"/>
-      </svg>*/
                   saveToClipboard(x2);
 
                   var parser = new DOMParser();
