@@ -726,7 +726,6 @@ async function setPartQty(productNo, partNo, value) {
 async function setPartBorderColour(productNo, partNo, value) {
     var partBorder = document.querySelector(Field.PartBorderField(productNo, partNo));
     partBorder.style.border = "5px solid " + value;
-    console.log("set border colour " + partNo);
     await sleep(sleepMS);
 }
 async function setProductQty(productNo, value) {
@@ -1397,9 +1396,32 @@ async function copyPart(currentProductNo, currentPartNo, newProductNo) {
 
     console.log(currentProductContext, currentPartContext, currentPartContext_ParentObject, newProductContext);
 
+    $(Field.Product_ProvidesRealNo(currentProductNo) + ' .partExpander').not('.partExpander.collapse').click();
+    $(Field.Product_ProvidesRealNo(currentProductNo) + ' .partExpander.collapse').show();
+    //$(Field.Product_ProvidesRealNo(currentProductNo) + ' .partExpander.collapse').click();
+    //$(Field.Product_ProvidesRealNo(currentProductNo) + ' .partExpander').not('.partExpander').show();
+    await sleep(sleepMS);
+
+    await new Promise(resolve => {
+        var resolvedStatus = 'reject';
+        var pragmaOnce = true;
+        var timer = setInterval(() => {
+            if(isLoading() == false && isSaveInProgress() == false) {
+                resetExecuted();
+                resolvedStatus = 'fulfilled';
+                resolve();
+                clearInterval(timer);
+                timer = undefined;
+            } else {
+                resolvedStatus = 'reject';
+            }
+        }, sleepMS);
+    });
+
     currentPartContext.SetParentObject(newProductContext);//is fix
     OrderStep2.ProductPart_ClonePartProcess(currentPartContext, newProductContext);
     currentPartContext.SetParentObject(currentPartContext_ParentObject);//is fix
+
 
     await new Promise(resolve => {
         var resolvedStatus = 'reject';
@@ -1480,7 +1502,6 @@ function getPartNamesInProduct(productNo) {
 
 
     let parts = domProduct.querySelectorAll(".txtPartDescription");
-    console.log(parts);
 
     for(let i = 0; i < parts.length; i++) {
         partNames.push(parts[i].value);
@@ -1671,20 +1692,49 @@ var Field = {
     },
     //--------TRAVEL-------//
     TravelTimeEach: function(productNo, partNo) {
-        var realProductNo = getRealProductNo(productNo);
-        var realPartNo = getRealPartNo(productNo, partNo);
-        var min = document.querySelector("#ord_prod_part_" + realProductNo + "_" + realPartNo + " #data_id_509");
-        var hour = document.querySelector("#ord_prod_part_" + realProductNo + "_" + realPartNo + " #data_id_510");
-        var day = document.querySelector("#ord_prod_part_" + realProductNo + "_" + realPartNo + " #data_id_511");
-        return [min, hour, day];
+        /* var realProductNo = getRealProductNo(productNo);
+         var realPartNo = getRealPartNo(productNo, partNo);
+         var min = document.querySelector("#ord_prod_part_" + realProductNo + "_" + realPartNo + " #data_id_509");
+         var hour = document.querySelector("#ord_prod_part_" + realProductNo + "_" + realPartNo + " #data_id_510");
+         var day = document.querySelector("#ord_prod_part_" + realProductNo + "_" + realPartNo + " #data_id_511");
+         return [min, hour, day];*/
+
+        let part = document.querySelector("#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo));
+        let modifierName = "Travel IH (ea)";
+        let modifierHeading = part.querySelectorAll(".divModifierHeaderWrapper");
+        let foundModifierContainer = null;
+
+        modifierHeading.forEach((element) => {
+            if(element.children[0].innerText == modifierName) {
+                return foundModifierContainer = element.nextElementSibling.nextElementSibling;
+            }
+        });
+
+        if(foundModifierContainer != null) {
+            let [min, hour, day] = foundModifierContainer.querySelectorAll("input[id^='data_id_']");
+            return [min, hour, day];
+        }
+
+        return null;
     },
     TravelTimeTotal: function(productNo, partNo) {
-        var realProductNo = getRealProductNo(productNo);
-        var realPartNo = getRealPartNo(productNo, partNo);
-        var min = document.querySelector("#ord_prod_part_" + realProductNo + "_" + realPartNo + " #data_id_506");
-        var hour = document.querySelector("#ord_prod_part_" + realProductNo + "_" + realPartNo + " #data_id_507");
-        var day = document.querySelector("#ord_prod_part_" + realProductNo + "_" + realPartNo + " #data_id_508");
-        return [min, hour, day];
+        let part = document.querySelector("#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo));
+        let modifierName = "Travel IH";
+        let modifierHeading = part.querySelectorAll(".divModifierHeaderWrapper");
+        let foundModifierContainer = null;
+
+        modifierHeading.forEach((element) => {
+            if(element.children[0].innerText == modifierName) {
+                return foundModifierContainer = element.nextElementSibling.nextElementSibling;
+            }
+        });
+
+        if(foundModifierContainer != null) {
+            let [min, hour, day] = foundModifierContainer.querySelectorAll("input[id^='data_id_']");
+            return [min, hour, day];
+        }
+
+        return null;
     },
     TravelTypeEach: function(productNo, partNo) {
         return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #modifierDynamicDataView_" + getRealPartNo(productNo, partNo) + "_" + 2 + " #pnlInputPanel_List0 > select";//Find better solution rather than using first index.

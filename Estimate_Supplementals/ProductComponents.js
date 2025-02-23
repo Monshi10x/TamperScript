@@ -215,6 +215,13 @@ function partInfoTick() {
 				parts[part].querySelector(".ord-prod-part-header").style.backgroundColor = "#eee";
 			}
 
+			if(koPartDescription.includes("TRAVEL [Automatic]")) {
+				let relevantPart = parts[part].querySelector(".txtPartDescription");
+				relevantPart.disabled = true;
+				relevantPart.style.color = COLOUR.Blue;
+				relevantPart.style.border = "0px";
+			}
+
 
 
 			if(part == 0) prevPartNameNumber = partNameNumber;

@@ -221,6 +221,8 @@ class Router extends SubMenu {
 		}
 
 		this.Update();
+
+		return addedRow;
 	}
 
 	deleteRunRow(index) {

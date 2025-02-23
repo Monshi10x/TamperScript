@@ -96,6 +96,7 @@ class MenuMap extends LHSMenuWindow {
             GoogleMap.borrowGoogleMap(this.#f_mapContainer);
 
             googleMapContainer.style.cssText += "width:calc(100%);height:600px;";
+
       }
 
       show() {
@@ -208,8 +209,8 @@ class MenuMap extends LHSMenuWindow {
             let numProductsToDivideAgainst = numProducts;
             let numberOfMobilisations = this.#f_numberOfMobilisations[1].value;
 
-            let totalTravelMins = zeroIfNaNNullBlank(this.#f_travelTimeMins[1].value * 2 + this.#f_truckPackingAndSetupTime[1].value) * numberOfMobilisations;
-            let totalTravelDistance = zeroIfNaNNullBlank(this.#f_travelDistanceMeters[1].value * 2) * numberOfMobilisations;
+            let totalTravelMins = zeroIfNaNNullBlank(this.#f_travelTimeMins[1].value) * 2 * numberOfMobilisations + zeroIfNaNNullBlank(this.#f_truckPackingAndSetupTime[1].value);
+            let totalTravelDistance = zeroIfNaNNullBlank(this.#f_travelDistanceMeters[1].value) * 2 * numberOfMobilisations;
 
             for(let i = 0; i < numProducts; i++) {
                   let productPrice = getProductPrice(i + 1);
@@ -253,7 +254,6 @@ class MenuMap extends LHSMenuWindow {
                         await savePart(productNo, partIndex);
                   } else if(productIncludesTravelAlready.value == true) {
                         await openPart(productNo, partIndex);
-                        console.log(productNo, partIndex, productTravelTime);
                         await setTravelTimeMHD(productNo, partIndex, productTravelTime, 0, 0);
                         await setTravelType(productNo, partIndex, this.travelRate);
                         await savePart(productNo, partIndex);

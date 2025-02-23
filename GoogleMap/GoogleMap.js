@@ -21,6 +21,9 @@ window.initMap = function() {
             center: new google.maps.LatLng(-27.6115076, 153.1144851),
             zoom: 20,
             mapId: "DEMO_MAP_ID",
+            options: {
+                  gestureHandling: 'greedy'
+            }
       };
       googleMap = new google.maps.Map(googleMapContainer, googleMapProp);
 
@@ -32,6 +35,7 @@ window.initMap = function() {
       GoogleMap.setHomeMarker();
 
       document.dispatchEvent(new Event("googleMapLoaded"));
+
 };
 
 /**

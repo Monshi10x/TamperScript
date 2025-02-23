@@ -174,7 +174,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
 
 				led = this.#add(LED, this.page1, [SVGCutfile]);
-				led.formula = "3D Letters 100D - 80 per m2";
+				led.formula = "3D Letters 100D - 200 per m2";
 				led.material = "LED Module - 6500K 1.08W 5yr 175deg 12V";
 
 				sheet = this.#add2(Sheet, this.page1, [svgCutfile, led]);

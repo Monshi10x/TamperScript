@@ -168,7 +168,7 @@ class Sheet extends Material {
       #sheetPerimeterIsCut = true;
       set sheetPerimeterIsCut(value) {
             this.#sheetPerimeterIsCut = value;
-            this.UpdateOutputTable();
+            this.UpdateFromChange();
       }
 
       #useOverallSVGSize = false;
@@ -880,7 +880,9 @@ class Sheet extends Material {
 
             ///ROUTER
             this.#router.deleteAllRunRows();
+            console.log(this.staticRouterRows);
             this.staticRouterRows.forEach((element) => {
+                  console.log("tiomes");
                   this.#router.addRunRow(eval(element.pathLength), eval(element.numberOfPaths), eval(element.profileSettings));
             });
             if(this.#sheetPerimeterIsCut) this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, this.routerCutProfile);
