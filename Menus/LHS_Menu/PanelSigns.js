@@ -154,50 +154,62 @@ class MenuPanelSigns extends LHSMenuWindow {
 				productDetails.productName = "3D Front-lit Letters";
 
 				svgCutfile = this.#add(SVGCutfile, this.page1, []);
+
 				coil = this.#add(Coil, this.page1, [SVGCutfile]);
 
 				production = this.#add(ProductionSubscribable, this.page1, [Coil]);
 
 				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+				sheet.UPDATES_PAUSED = true;
 				sheet.material = "Stainless";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
 				sheet.sheetPerimeterIsCut = false;
 				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", profile: "Cut Through", quality: "Good Quality"});
-
+				sheet.UPDATES_PAUSED = false;
 
 				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+				sheet.UPDATES_PAUSED = true;
 				sheet.material = "Acrylic";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
 				sheet.sheetPerimeterIsCut = false;
 				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
+				sheet.UPDATES_PAUSED = false;
 
 				led = this.#add(LED, this.page1, [SVGCutfile]);
+				led.UPDATES_PAUSED = true;
 				led.formula = "3D Letters 100D - 200 per m2";
 				led.material = "LED Module - 6500K 1.08W 5yr 175deg 12V";
+				led.UPDATES_PAUSED = false;
 
 				sheet = this.#add2(Sheet, this.page1, [svgCutfile, led]);
+				sheet.UPDATES_PAUSED = true;
 				sheet.material = "ACM";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
 				sheet.sheetPerimeterIsCut = false;
 				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", profile: "Cut Through", quality: "Fast"});
+				sheet.UPDATES_PAUSED = false;
 
 				transformer = this.#add(Transformer, this.page1, [LED]);
 
 				sheet = this.#add2(Sheet, this.page1, [svgCutfile]);
+				sheet.UPDATES_PAUSED = true;
 				sheet.material = "Corflute";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
 				sheet.useOverallSVGSize = true;
 				sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
 				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
+				sheet.UPDATES_PAUSED = false;
 
 
 				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
+				painting.UPDATES_PAUSED = true;
 				painting.formula = "Fabricated Front-lit Letters";
 				painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
+				painting.UPDATES_PAUSED = false;
 
 				artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
 				artwork.artworkItem.artworkTime = 60;

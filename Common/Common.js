@@ -179,6 +179,12 @@ function deleteElement(element) {
     element.remove();
 }
 
+function removeElementsFromArrayByIndex(array, arrayOfIndexesToRemove) {
+    for(let i = arrayOfIndexesToRemove.length - 1; i >= 0; i--) {
+        array.splice(arrayOfIndexesToRemove[i], 1);
+    }
+}
+
 /**
  * @param {*} array 
  * @returns new array with only unique elements 
@@ -455,4 +461,33 @@ function getDate() {
     let yyyy = today.getFullYear();
 
     return dd + '/' + mm + '/' + yyyy;
+}
+
+
+class UOM {
+    //TIME
+    _timeMins = 0;
+
+    //SPEED
+    _speedMetresPerMin = 0;
+
+    constructor(value, unit) {
+        if(unit == "seconds") this._timeMins = value / 60;
+        if(unit == "mins" || unit == "min") this._timeMins = value;
+        if(unit == "hours") this._timeMins = value * 60;
+
+        if(unit == "mm/min") this._speedMetresPerMin = value / 1000;
+        if(unit == "m/min") this._speedMetresPerMin = value;
+    }
+
+    as(newUnitConversion) {
+        if(newUnitConversion == "seconds") return this._timeMins * 60;
+        if(newUnitConversion == "mins" || newUnitConversion == "min") return this._timeMins;
+        if(newUnitConversion == "hours") return this._timeMins / 60;
+
+        if(newUnitConversion == "mm/min") return this._speedMetresPerMin * 1000;
+        if(newUnitConversion == "m/min") return this._speedMetresPerMin;
+
+        return console.error("no conversion found");
+    }
 }

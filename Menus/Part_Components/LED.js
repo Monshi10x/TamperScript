@@ -9,6 +9,8 @@ class LED extends Material {
       #dataForSubscribers = [{qty: 0, totalWattage: 0, voltage: 12}];
       #defaultUseFormula = true;
       #defaultLEDPerHour = 50;
+
+      UPDATES_PAUSED = false;
       /*
                         
       Fields            */
@@ -62,11 +64,9 @@ class LED extends Material {
       Setter            */
       set material(value) {$(this.#f_material[1]).val(value).change();}
       set formula(value) {
-            console.log(value);
             dropdownSetSelectedText(this.#f_formula[1], value);
       }
       set material(value) {
-            console.log(value);
             dropdownInfieldIconsSearchSetSelected(this.#f_material, value, false, true);
       }
       /*
@@ -149,6 +149,8 @@ class LED extends Material {
       /*
       Inherited*/
       UpdateFromChange() {
+            if(this.UPDATES_PAUSED) return;
+
             super.UpdateFromChange();
 
             this.UpdateFromInheritedData();

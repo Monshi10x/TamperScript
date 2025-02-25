@@ -87,10 +87,10 @@ class Table {
             return cell;
       }
 
-      deleteRow(...rowNumbers) {
+      deleteRows(...rowIndex) {
             let allRows = this.table.querySelectorAll("tr");
             for(let r = 0; r < allRows.length; r++) {
-                  if(rowNumbers.includes(r + 1)) {
+                  if(rowIndex.includes(r)) {
                         $(allRows[r]).remove();
                   }
             }

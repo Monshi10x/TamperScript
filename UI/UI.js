@@ -157,7 +157,6 @@ function createDivStyle5(overrideCssStyles, headingText, parentObjectToAppendTo)
 
     f_headingTextWrapper.addEventListener("click", function() {
         $(f_contentContainer).toggle();
-        console.log(f_arrow.innerHTML);
         toggle(f_arrow.innerHTML == "⯈", () => {
             f_arrow.innerHTML = "&#11207";
         }, () => {
@@ -214,7 +213,6 @@ function createIconButton(src, text, overrideCssStyles, optionalCallback, parent
     btn.style = STYLE.Button + ";line-height:30px";
     btn.style.cssText += overrideCssStyles;
     height = btn.style.height ? "" + btn.style.height : "30px";
-    console.log(height);
     btn.dataset.backgroundColor = btn.style.backgroundColor;
     btn.style.borderColor = btn.style.backgroundColor;
     btn.dataset.backgroundColorDisabled = COLOUR.White;
@@ -288,12 +286,6 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         containerDiv.style.borderColor = "red";
     }
     if(increments != null) {
-        /*var accuracyDigits = 12;
-        if(increments<Math.pow(0.1,accuracyDigits)){
-            alert("Accuracy of createInput_Infield function not desirable at this increment");
-            console.log(increments);
-            console.log(Math.pow(0.1,accuracyDigits));
-        }*/
         var upArrow = document.createElement('button');
         upArrow.innerHTML = "&#9650";
         upArrow.style = "width:15px;height:20px;float:right;background-color:" + COLOUR.DarkGrey + ";position:absolute;top:0;right:0;color:white; border:0px solid " + COLOUR.DarkGrey + ";cursor: pointer;padding:0px;";
@@ -921,7 +913,6 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
         for(let i = 0; i < internalOptionDivs.length; i++) {
             if(internalOptionDivs[i].style.display != "none") {
                 $(internalOptionDivs[i]).click();
-                console.log("clicked");
                 break topLoop;
             }
         }
@@ -941,11 +932,9 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
     }
 
     dummyInput.onchange = function() {
-        console.log("dummyInput.onchange");
         dropdownText.innerText = dummyInput.value;
         if(optionalCallback && !_pauseCallback) {
             optionalCallback();
-            console.log("callback called");
         }
     };
 
@@ -1373,23 +1362,19 @@ function dropdownSetSelectedValue(field, value) {
             return;
         }
     }
-    console.trace("here shouldnt");
-    //alert("no value selected for dropdown (no match)");
+    console.warn("No Dropdown Value Match");
 }
 function dropdownSetSelectedText(field, value, triggerChange = true) {
-    console.table("dropdownSetSelectedText", field, value, triggerChange);
     let allOptions = field.options;
-    console.log(allOptions.length);
     for(let i = 0; i < allOptions.length; i++) {
-
         if(allOptions[i].innerText === value) {
             field.selectedIndex = i;
             if(triggerChange) $(field).change();
             return;
         }
     }
-    console.trace("here shouldnt");
-    // alert("no value selected for dropdown text (no match)");
+
+    console.warn("No Dropdown Text Match");
 }
 
 function dropdownInfieldIconsSearchSetSelected(dropdownField, value, setSearchToo = true, withCallback = true) {

@@ -20,7 +20,7 @@ class SubscriptionManager {
       ///Subscriptions
 
       SubscribeTo(parent) {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " issues Subscription request to ", parent.ID);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " issues Subscription request to ", parent.constructor.name + "(" + parent.ID + ")");
 
             if(!this.isSubscribedTo(parent)) this.#subscriptions.push(parent);
 
@@ -39,7 +39,7 @@ class SubscriptionManager {
       ReceiveSubscriptionData(data) {
             if(data.parent == null) return;
 
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, "has recieved data", data);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " has recieved data", data);
 
             //:Only update subscriptions for relevant parent so that others are not erased
 
@@ -74,7 +74,7 @@ class SubscriptionManager {
       }
 
       UnSubscribeFrom(parent) {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " issues UnSubscribe request to ", parent.ID);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " issues UnSubscribe request to ", parent.constructor.name + "(" + parent.ID + ")");
 
             //:Remove Parent data from my subscriptions
             for(let i = 0; i < this.INHERITED_DATA.length; i++) {
@@ -99,19 +99,20 @@ class SubscriptionManager {
       ///Subscribers
 
       AddSubscriber(subscriber) {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " adds Subscriber ", subscriber.ID);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " adds Subscriber ", subscriber.constructor.name + "(" + subscriber.ID + ")");
             this.#subscribers.push(subscriber);
       }
 
       PushToSubscribers() {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " sends data to x" + this.#subscribers.length + " Subscribers, data: ", this.DATA_FOR_SUBSCRIBERS);
+            if(this.DATA_FOR_SUBSCRIBERS.parent == null & this.DATA_FOR_SUBSCRIBERS.data == null) return console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " attempts sends blank data, aborted");
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " sends data to x" + this.#subscribers.length + " Subscribers, data: ", this.DATA_FOR_SUBSCRIBERS);
             for(let i = 0; i < this.#subscribers.length; i++) {
                   this.#subscribers[i].ReceiveSubscriptionData(this.DATA_FOR_SUBSCRIBERS);
             }
       }
 
       RemoveSubscriber(subscriber) {
-            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.Type, " removes Subscriber ", subscriber.ID);
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " removes Subscriber ", subscriber.constructor.name + "(" + subscriber.ID + ")");
             for(let i = 0; i < this.#subscribers.length; i++) {
                   if(this.#subscribers[i] == subscriber) {
                         this.#subscribers.splice(i, 1);//I remove subscriber

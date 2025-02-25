@@ -251,6 +251,8 @@ class Sheet extends Material {
       #hasGrain;
       #grainDirection;
 
+      UPDATES_PAUSED = false;
+
       get backgroundColor() {return COLOUR.Orange;}
       get textColor() {return COLOUR.White;}
       get DEBUG_SHOW() {return true;}
@@ -614,6 +616,8 @@ class Sheet extends Material {
       /*
       Override*/
       UpdateFromChange() {
+            if(this.UPDATES_PAUSED) return;
+
             super.UpdateFromChange();
 
             this.UpdateFromInheritedData();
@@ -880,9 +884,7 @@ class Sheet extends Material {
 
             ///ROUTER
             this.#router.deleteAllRunRows();
-            console.log(this.staticRouterRows);
             this.staticRouterRows.forEach((element) => {
-                  console.log("tiomes");
                   this.#router.addRunRow(eval(element.pathLength), eval(element.numberOfPaths), eval(element.profileSettings));
             });
             if(this.#sheetPerimeterIsCut) this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, this.routerCutProfile);
@@ -1062,62 +1064,7 @@ class Sheet extends Material {
 
             return optionsArray;
       }
-      /*
-            getSheetSizeOptions() {
-                  let optionsArray = new TArray();
-                  optionsArray.push("");
-      
-                  let selectedMaterial = this.#material[1].value;
-                  let selectedThickness = this.#thickness[1].value;
-                  let selectedFinish = this.#finish[1].value;
-      
-      
-                  let foundParts = getPredefinedParts_RefinedSearch(selectedMaterial + " - (sqm) - ");
-      
-                  for(let i = 0; i < foundParts.length; i++) {
-                        var arr = foundParts[i].ParentSize.replaceAll("mm", "").replaceAll(" ", "").split("x");
-                        let wh = "" + zeroIfNaNNullBlank(parseFloat(arr[0])) + "x" + zeroIfNaNNullBlank(parseFloat(arr[1]));
-      
-                        optionsArray.push(wh);
-                  }
-      
-                  return optionsArray.uniqueArrayElements().sort();
-            }
-      
-            getThicknessOptions() {
-                  let optionsArray = new TArray();
-                  optionsArray.push("");
-      
-                  let selectedMaterial = this.#material[1].value;
-                  let selectedSize = this.#sheetSize[1].value;
-      
-      
-      
-                  let foundParts = getPredefinedParts_RefinedSearch(selectedMaterial + " - (sqm) - " + selectedSize);
-      
-                  for(let i = 0; i < foundParts.length; i++) {
-                        optionsArray.push(foundParts[i].Thickness);
-                  }
-      
-                  return optionsArray.uniqueArrayElements().sort();
-            }
-      
-            getFinishOptions() {
-                  let optionsArray = new TArray();
-                  optionsArray.push("");
-      
-                  let selectedMaterial = this.#material[1].value;
-                  let selectedSize = this.#sheetSize[1].value;
-                  let selectedThickness = this.#thickness[1].value;
-                  let foundParts = getPredefinedParts_RefinedSearch(selectedMaterial + " - (sqm) - " + selectedSize + "x" + selectedThickness);
-      
-                  for(let i = 0; i < foundParts.length; i++) {
-                        optionsArray.push(foundParts[i].Finish);
-                  }
-      
-                  return optionsArray.uniqueArrayElements().sort();
-            }
-      */
+
       UpdateFilters2(triggerChange = true) {
             let chosenMaterial = this.#material[1].value || null;
             let chosenSheetSize = this.#sheetSize[1].value || null;
@@ -1200,56 +1147,6 @@ class Sheet extends Material {
 
             this.#sheetMaterial[5]();
       }
-
-      /*
-      setSheetSizeOptions(...optionsArray) {
-            this.#sheetSizeOptions = [];
-
-            for(let x = 0; x < optionsArray.length; x++) {
-                  this.#sheetSizeOptions[x] = createDropdownOption(optionsArray[x], optionsArray[x]);
-            }
-
-            while(this.#sheetSize[1].firstChild) {
-                  this.#sheetSize[1].removeChild(this.#sheetSize[1].firstChild);
-            }
-
-            for(var l = 0; l < optionsArray.length; l++) {
-                  this.#sheetSize[1].add(this.#sheetSizeOptions[l]);
-            }
-      }
-
-      setThicknessOptions(...options) {
-            this.#thicknessOptions = [];
-
-            for(let x = 0; x < options.length; x++) {
-                  this.#thicknessOptions[x] = createDropdownOption(options[x], options[x]);
-            }
-
-            while(this.#thickness[1].firstChild) {
-                  this.#thickness[1].removeChild(this.#thickness[1].firstChild);
-            }
-
-            for(var l = 0; l < options.length; l++) {
-                  this.#thickness[1].add(this.#thicknessOptions[l]);
-            }
-      }
-
-      setFinishOptions(...options) {
-            this.#finishOptions = [];
-
-            for(let x = 0; x < options.length; x++) {
-                  this.#finishOptions[x] = createDropdownOption(options[x], options[x]);
-            }
-
-            while(this.#finish[1].firstChild) {
-                  this.#finish[1].removeChild(this.#finish[1].firstChild);
-            }
-
-            for(var l = 0; l < options.length; l++) {
-                  this.#finish[1].add(this.#finishOptions[l]);
-            }
-      }
-*/
       /**
        * @CorebridgeCreate
        */
