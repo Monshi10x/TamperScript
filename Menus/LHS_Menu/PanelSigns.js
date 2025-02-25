@@ -207,7 +207,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
 				painting.UPDATES_PAUSED = true;
-				painting.formula = "Fabricated Front-lit Letters";
+				painting.formula = "Fabricated FRONT-LIT Letters";
 				painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
 				painting.UPDATES_PAUSED = false;
 
