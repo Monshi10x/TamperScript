@@ -151,7 +151,7 @@ class SVGCutfile extends SubscriptionManager {
 
             let f_container_materialUsage = createDivStyle5(null, "Material Usage", this.#f_container)[1];
 
-
+            ///method 1
             this.#f_sizeMethod1 = createCheckbox_Infield("Method 1 - Use Bounding Rect Areas", true, "width:300px;", () => {
                   setFieldDisabled(true, this.#f_shapeAreas[1], this.#f_shapeAreas[0]);
                   setFieldDisabled(false, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
@@ -163,6 +163,7 @@ class SVGCutfile extends SubscriptionManager {
             icon_boundingArea.style = "display:block;float:left;width:calc(100% - 20px);padding:10px;";
             this.#f_sizeMethod1[0].appendChild(icon_boundingArea);
 
+            ///method 2
             this.#f_sizeMethod2 = createCheckbox_Infield("Method 2 - Use Shape Areas", false, "width:300px;", () => {
                   setFieldDisabled(false, this.#f_shapeAreas[1], this.#f_shapeAreas[0]);
                   setFieldDisabled(true, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);

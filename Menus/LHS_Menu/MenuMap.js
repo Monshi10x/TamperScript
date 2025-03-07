@@ -22,6 +22,9 @@ class MenuMap extends LHSMenuWindow {
       #f_numberOfMobilisations;
       #f_travelRate;
       #f_mobilisationContainer;
+      #f_settingsContainer;
+      #f_setting_excludeEWPs;
+      #f_setting_excludeArtwork;
 
       get travelRate() {
             return this.#f_travelRate[1].value;
@@ -77,6 +80,12 @@ class MenuMap extends LHSMenuWindow {
                   });
                   this.#f_travelRate = createDropdown_Infield("Travel Rate", 5, null, dropdownOptions, () => { }, this.#f_mobilisationContainer);
             });
+
+            ///SETTINGS
+            this.#f_settingsContainer = createDivStyle5(null, "Settings", this.#f_page1)[1];
+
+            this.#f_setting_excludeEWPs = createCheckbox_Infield("Exclude EWPs", true, "width:20%;", () => { }, this.#f_settingsContainer);
+            this.#f_setting_excludeArtwork = createCheckbox_Infield("Exclude Artwork", true, "width:20%;", () => { }, this.#f_settingsContainer);
 
             ///CREATE
             this.#f_createParts_DivideEqually = createButton('Create -> Split Equally', "margin:0px;width:50%", async () => {

@@ -99,10 +99,11 @@ class ModalSheetJoins extends ModalWidthHeight {
             setFieldDisabled(true, this.widthField[1], this.widthField[0]);
             setFieldDisabled(true, this.heightField[1], this.heightField[0]);
 
-            this.#containerBeforeCanvas = createDivStyle5("width: " + (this.container.getBoundingClientRect().width / 2 - 4) + "px;height:500px;", "Borrowed Fields", this.getBodyElement())[1];
-            this.borrowFieldsContainer = this.#containerBeforeCanvas;
+            this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 500, () => this.draw(), this.getBodyElement());
 
-            this.#dragZoomCanvas = new DragZoomCanvas((this.container.getBoundingClientRect().width / 2) - 4, 500, () => this.draw(), this.getBodyElement());
+            this.#containerBeforeCanvas = createDivStyle5("width: calc(100%);height:300px;", "Borrowed Fields", this.getBodyElement())[1];
+            AddCssStyle("overflow-y:auto;", this.#containerBeforeCanvas);
+            this.borrowFieldsContainer = this.#containerBeforeCanvas;
 
             this.#containerAfterCanvas = createDivStyle5(null, "View Settings", this.getBodyElement())[1];
 

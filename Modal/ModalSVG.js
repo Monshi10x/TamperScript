@@ -464,7 +464,17 @@ class ModalSVG extends Modal {
                         mainGroup.appendChild(newGroup);
                   }
 
-                  let boundingRect = new TSVGRect(newGroup, "stroke-width:" + 1 / svgScale + ";stroke:black;fill:#ddd;opacity:0.4", scaledBox.x, scaledBox.y, scaledBox.width, scaledBox.height);
+                  // new TSVGRect(newGroup, "stroke-width:" + 1 / svgScale + ";stroke:black;fill:#ddd;opacity:0.4", );
+                  let boundingRect = new TSVGRectangle(newGroup, {
+                        x: scaledBox.x,
+                        y: scaledBox.y,
+                        width: scaledBox.width,
+                        height: scaledBox.height,
+                        strokeWidth: 1 / svgScale,
+                        stroke: "black",
+                        fill: "#ddd",
+                        opacity: 0.8
+                  });
             }
       }
 
@@ -598,7 +608,18 @@ class ModalSVG extends Modal {
 
                         if(state == "Mouse Down") {
                               this.selectionRect_mouseDownPos = this.#dragZoomSVG.relativeMouseXY;
-                              this.selectionRect = new TSVGRect(this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT"), "stroke-width:" + (1 / this.#dragZoomSVG.scale), this.selectionRect_mouseDownPos.x, this.selectionRect_mouseDownPos.y, 0, 0);
+                              // this.selectionRect = new TSVGRect(this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT"), "stroke-width:" + (1 / this.#dragZoomSVG.scale), this.selectionRect_mouseDownPos.x, this.selectionRect_mouseDownPos.y, 0, 0);
+
+                              this.selectionRect = new TSVGRectangle(this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT"), {
+                                    x: this.selectionRect_mouseDownPos.x,
+                                    y: this.selectionRect_mouseDownPos.y,
+                                    width: 0,
+                                    height: 0,
+                                    strokeWidth: (1 / this.#dragZoomSVG.scale),
+                                    stroke: "black",
+                                    fill: "#ddd",
+                                    opacity: 0.8
+                              });
 
                         } else if(state == "Mouse Move") {
                               let mousePos = this.#dragZoomSVG.relativeMouseXY;
@@ -607,29 +628,29 @@ class ModalSVG extends Modal {
                                     let distY = mousePos.y - this.selectionRect_mouseDownPos.y;
 
                                     if(distX >= 0) {
-                                          this.selectionRect.width = distX;
-                                          this.selectionRect.x = this.selectionRect_mouseDownPos.x;
+                                          this.selectionRect.setAttribute("width", distX);
+                                          this.selectionRect.setAttribute("x", this.selectionRect_mouseDownPos.x);
                                     }
                                     else {
-                                          this.selectionRect.width = Math.abs(this.selectionRect_mouseDownPos.x - mousePos.x);
-                                          this.selectionRect.x = mousePos.x;
+                                          this.selectionRect.setAttribute("width", Math.abs(this.selectionRect_mouseDownPos.x - mousePos.x));
+                                          this.selectionRect.setAttribute("x", mousePos.x);
                                     }
 
                                     if(distY >= 0) {
-                                          this.selectionRect.height = distY;
-                                          this.selectionRect.y = this.selectionRect_mouseDownPos.y;
+                                          this.selectionRect.setAttribute("height", distY);
+                                          this.selectionRect.setAttribute("y", this.selectionRect_mouseDownPos.y);
                                     }
                                     else {
-                                          this.selectionRect.height = Math.abs(this.selectionRect_mouseDownPos.y - mousePos.y);
-                                          this.selectionRect.y = mousePos.y;
+                                          this.selectionRect.setAttribute("height", Math.abs(this.selectionRect_mouseDownPos.y - mousePos.y));
+                                          this.selectionRect.setAttribute("y", mousePos.y);
                                     }
                               }
                         } else if(state == "Mouse Up") {
                               if(!this.selectionRect) break;
-                              let _x = (this.selectionRect.x),
-                                    _y = (this.selectionRect.y),
-                                    _width = (this.selectionRect.width),
-                                    _height = (this.selectionRect.height);
+                              let _x = parseFloat(this.selectionRect.getAttribute("x")),
+                                    _y = parseFloat(this.selectionRect.getAttribute("y")),
+                                    _width = parseFloat(this.selectionRect.getAttribute("width")),
+                                    _height = parseFloat(this.selectionRect.getAttribute("height"));
 
                               let selectionPolygon = [
                                     {x: _x, y: _y},

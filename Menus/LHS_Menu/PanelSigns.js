@@ -105,7 +105,9 @@ class MenuPanelSigns extends LHSMenuWindow {
 			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
 			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
-				[["3D Front-lit Letters", "https://cdn.gorilladash.com/images/media/12562260/signarama-australia-homeco-cafe-63-lightbox-thumbnail-663186cf397a7.jpg"],
+				[["3D Non-lit Letters", "https://cdn.gorilladash.com/images/media/3752855/signarama-australia-atco-small-fascia-resized-thumbnail-5f38fe9719f20.jpg"],
+				["3D Front-lit Letters", "https://cdn.gorilladash.com/images/media/12562260/signarama-australia-homeco-cafe-63-lightbox-thumbnail-663186cf397a7.jpg"],
+				["3D 10mm Acrylic Letters", "https://cdn.gorilladash.com/images/media/5077109/signarama-australia-img-1060-2-small-square-61611e488aba9.jpg?auto=webp&width=1600"],
 				["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
 				["Lightbox Face - Opal Acrylic", "https://cdn.gorilladash.com/images/media/5077257/signarama-australia-img-6911-2-small-thumbnail-61611e9ab2f0f.jpg"],
 				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
@@ -148,10 +150,60 @@ class MenuPanelSigns extends LHSMenuWindow {
 		let install = null;
 
 		switch(this.#addQuickTemplateBtn[1].value) {
+			case "3D Non-lit Letters":
+				productDetails = this.#add(ProductDetails, this.page1, []);
+				productDetails.productLocation = "";
+				productDetails.productName = "3D Fabricated Non-lit Letters";
+
+				svgCutfile = this.#add(SVGCutfile, this.page1, []);
+
+				coil = this.#add(Coil, this.page1, [SVGCutfile]);
+
+				production = this.#add(ProductionSubscribable, this.page1, [Coil]);
+
+				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+				sheet.UPDATES_PAUSED = true;
+				sheet.material = "Stainless";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
+				sheet.sheetPerimeterIsCut = false;
+				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", profile: "Cut Through", quality: "Good Quality"});
+				sheet.UPDATES_PAUSED = false;
+
+				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+				sheet.UPDATES_PAUSED = true;
+				sheet.material = "Foamed PVC";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "Foamed PVC - (sqm) - 2440x1220x10.0 Matte White (Signex Mulfords)";
+				sheet.sheetPerimeterIsCut = false;
+				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Foamed PVC", profile: "Cut Through", quality: "Good Quality"});
+				sheet.UPDATES_PAUSED = false;
+
+				sheet = this.#add2(Sheet, this.page1, [svgCutfile]);
+				sheet.UPDATES_PAUSED = true;
+				sheet.material = "Corflute";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
+				sheet.useOverallSVGSize = true;
+				sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
+				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
+				sheet.UPDATES_PAUSED = false;
+
+
+				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
+				painting.UPDATES_PAUSED = true;
+				painting.formula = "Fabricated NON-LIT Letters";
+				painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
+				painting.UPDATES_PAUSED = false;
+
+				artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+				artwork.artworkItem.artworkTime = 60;
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+				break;
 			case "3D Front-lit Letters":
 				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
-				productDetails.productName = "3D Front-lit Letters";
+				productDetails.productName = "3D Fabricated Front-lit Letters";
 
 				svgCutfile = this.#add(SVGCutfile, this.page1, []);
 
@@ -209,6 +261,44 @@ class MenuPanelSigns extends LHSMenuWindow {
 				painting.UPDATES_PAUSED = true;
 				painting.formula = "Fabricated FRONT-LIT Letters";
 				painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
+				painting.UPDATES_PAUSED = false;
+
+				artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+				artwork.artworkItem.artworkTime = 60;
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+				break;
+			case "3D 10mm Acrylic Letters":
+				productDetails = this.#add(ProductDetails, this.page1, []);
+				productDetails.productLocation = "";
+				productDetails.productName = "3D 10mm Acrylic Letters";
+
+				svgCutfile = this.#add(SVGCutfile, this.page1, []);
+
+				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+				sheet.UPDATES_PAUSED = true;
+				sheet.material = "Acrylic";
+				sheet.sheetSize = "2440x1220";
+				sheet.thickness = "10";
+				sheet.sheetMaterial = "Acrylic - (sqm) - White/Black 2440x1220x10 (Mulfords)";
+				sheet.setCuttingMachine("laser");
+				sheet.sheetPerimeterIsCut = false;
+				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", profile: "Cut Through", quality: "Glossy Edge"});
+				sheet.UPDATES_PAUSED = false;
+
+				sheet = this.#add2(Sheet, this.page1, [svgCutfile]);
+				sheet.UPDATES_PAUSED = true;
+				sheet.material = "Corflute";
+				sheet.sheetSize = "2440x1220";
+				sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
+				sheet.useOverallSVGSize = true;
+				sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
+				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
+				sheet.UPDATES_PAUSED = false;
+
+				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
+				painting.UPDATES_PAUSED = true;
+				painting.formula = "10-20mmD Letters";
+				painting.numberOfCoats = "x2 (2K for Acrylic/ACM)";
 				painting.UPDATES_PAUSED = false;
 
 				artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);

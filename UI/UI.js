@@ -272,6 +272,8 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
     var input = document.createElement('input');
     var containerDiv = document.createElement('div');
     var textDescription = document.createElement('p');
+    var svgIcon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.65 6.35A8.97 8.97 0 0 0 12 4a9 9 0 1 0 8.94 10H19a7 7 0 1 1-2.05-5L14 11h7V4l-3.35 2.35z" fill="blue"/></svg>';
+
     textDescription.style = "width:calc(100% - 15px);box-sizing:border-box;user-select: none;height:16px;margin: 0px;padding:2px;color:#666;font-size:11px;";
     textDescription.innerText = text;
     input.autocomplete = 'off';
@@ -280,6 +282,31 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
     containerDiv.style = STYLE.InputInfield;
     containerDiv.appendChild(textDescription);
     containerDiv.appendChild(input);
+
+    let resetValueToDefault = () => {
+        $(input).val(defaultValue).change();
+    };
+
+    //Value Change Icon
+    const icon = document.createElement("div");
+    icon.innerHTML = svgIcon;
+    let svgIconObject = icon.children[0];
+    icon.style = "margin:0px;float:right;margin-right:20px;";
+    icon.style.display = "none";
+    icon.onclick = resetValueToDefault;
+    svgIconObject.addEventListener("mouseover", function() {
+        svgIconObject.children[0].style.fill = "blue"; // Change background on hover
+    });
+
+    svgIconObject.addEventListener("mouseout", function() {
+        svgIconObject.children[0].style.fill = "#000"; // Revert to default
+    });
+
+    containerDiv.appendChild(icon);
+
+
+
+
     if(defaultValue != null) input.value = defaultValue; else input.value = '';
     if(overrideCssStyles) containerDiv.style.cssText += overrideCssStyles;
     if(fieldRequired && input.value == "") {
@@ -323,7 +350,8 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         containerDiv.appendChild(upArrow);
         containerDiv.appendChild(downArrow);
     }
-    input.onkeyup = function() {
+
+    let onChange = () => {
         if(optionalCallback && !_pauseCallback) {
             optionalCallback();
         }
@@ -332,17 +360,18 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         } else {
             containerDiv.style.borderColor = "red";
         }
-    };
-    input.onchange = function() {
-        if(optionalCallback && !_pauseCallback) {
-            optionalCallback();
-        }
-        if(input.value != "" || !fieldRequired) {
-            containerDiv.style.borderColor = "rgb(177, 177, 177)";
+        if(parseFloat(input.value) !== defaultValue && defaultValue != null) {
+            icon.style.display = "block";
         } else {
-            containerDiv.style.borderColor = "red";
+            icon.style.display = "none";
         }
     };
+
+    input.onkeyup = onChange;
+    input.onchange = onChange;
+
+
+
 
     textDescription.addEventListener("click", (event) => {
         if(event.target == textDescription) {
@@ -806,14 +835,17 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
         }
     }
 
-    var isScrollInside = false;
+    var isMouseOver = false;
 
     document.addEventListener("wheel", (event) => {
-        if(!isScrollInside) {
+        if(!isMouseOver) {
             $(dropdownContainer).hide();
-            //$(dropdownBody).hide();
-            //$(searchBar[0]).hide();
-            //searchBar.value = "";
+        }
+    });
+
+    document.addEventListener("click", (event) => {
+        if(!isMouseOver) {
+            //$(dropdownContainer).hide();
         }
     });
 
@@ -839,11 +871,11 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
     dropdownBody.style.left = containerDiv.getBoundingClientRect().left;
 
     dropdownBody.addEventListener("mouseout", (event) => {
-        isScrollInside = false;
+        isMouseOver = false;
     });
 
     dropdownBody.addEventListener("mouseover", (event) => {
-        isScrollInside = true;
+        isMouseOver = true;
     });
 
     if(overrideCssStyles) containerDiv.style.cssText += overrideCssStyles;

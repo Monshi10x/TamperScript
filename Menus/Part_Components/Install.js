@@ -2,42 +2,52 @@ class Install extends SubMenu {
 
 	#isOutsourced;
 	#quickLookup;
+	#quickLookupContainer;
 	#quickItem;
 	#quickInstall_sub;
+	#qtyContainer;
 	#qty;
 	#installTimeTotalEach;
+	#timeContainer;
 	#install_InstallRate;
 	#install_InstallMinutes;
 	#install_InstallHours;
 	#install_InstallDays;
+	#travelContainer;
 	#install_TravelRate;
 	#install_TravelMinutes;
 	#install_TravelHours;
 	#install_TravelDays;
 	#outsourceCost;
 	#outsourceMarkup;
+	#outsourcedContainer;
 
 	constructor(parentObject, canvasCtx, updateFunction, sizeClass) {
 		super(parentObject, canvasCtx, updateFunction, "INSTALL");
 
-		this.#qty = createInput_Infield("Qty", 1, "width:30%;display:block;", () => { }, this.contentContainer, true, 1);
+		this.#qtyContainer = createDivStyle5(null, "Quantity", this.contentContainer);
+
+		this.#qty = createInput_Infield("Qty", 1, "width:30%;display:block;", () => { }, this.#qtyContainer[1], true, 1);
 
 		this.#installTimeTotalEach = createDropdown_Infield("Total or Each", 1, "width:30%;display:block;margin-right:20%;", [
 			createDropdownOption("Total", "Total"),
 			createDropdownOption("Each", "Each"),
-		], () => {this.Update();}, this.contentContainer);
+		], () => {this.Update();}, this.#qtyContainer[1]);
 
+		///Outsourced
+		this.#outsourcedContainer = createDivStyle5(null, "Outsourced", this.contentContainer);
 		this.#isOutsourced = createCheckbox_Infield("Is Outsourced", false, null, () => {
 			$(this.#outsourceMarkup[0]).toggle();
 			$(this.#outsourceCost[0]).toggle();
-		}, this.contentContainer);
-		this.#outsourceCost = createInput_Infield("Outsource Cost", null, "width:30%;display:block;margin-left:40px;", () => { }, this.contentContainer, true, 1, {prefix: "$"});
+		}, this.#outsourcedContainer[1]);
+		this.#outsourceCost = createInput_Infield("Outsource Cost", null, "width:30%;display:block;margin-left:40px;", () => { }, this.#outsourcedContainer[1], true, 1, {prefix: "$"});
 		$(this.#outsourceCost[0]).hide();
-		this.#outsourceMarkup = createInput_Infield("Markup", null, "width:30%;display:block;", () => { }, this.contentContainer, true, 1, {postfix: "x"});
+		this.#outsourceMarkup = createInput_Infield("Markup", null, "width:30%;display:block;", () => { }, this.#outsourcedContainer[1], true, 1, {postfix: "x"});
 		$(this.#outsourceMarkup[0]).hide();
 
 		///Install Rate
-		this.#install_InstallRate = createDropdown_Infield("Install Rate", 1, "display:block;width:63%;margin-right:20%;", [], () => {this.Update();}, this.contentContainer);
+		this.#timeContainer = createDivStyle5(null, "Time", this.contentContainer);
+		this.#install_InstallRate = createDropdown_Infield("Install Rate", 1, "display:block;width:63%;margin-right:20%;", [], () => {this.Update();}, this.#timeContainer[1]);
 
 		let dropdownOptions = [];
 		let modifierOptions = getModifierDropdown_Name_Price_Cost("Install IH (ea)");
@@ -51,12 +61,39 @@ class Install extends SubMenu {
 		}
 
 		///Install Times
-		this.#install_InstallMinutes = createInput_Infield("Install Minutes", null, "width:25%;display:block;margin-left:40px;", () => {this.Update();}, this.contentContainer, false, 10);
-		this.#install_InstallHours = createInput_Infield("Install Hours", null, "width:25%;display:block", () => {this.Update();}, this.contentContainer, false, 1);
-		this.#install_InstallDays = createInput_Infield("Install Days (8h)", null, "width:25%;display:block", () => {this.Update();}, this.contentContainer, false, 1);
+		this.#install_InstallMinutes = createInput_Infield("Install Minutes", null, "width:25%;display:block;margin-left:40px;", () => {this.Update();}, this.#timeContainer[1], false, 10);
+		this.#install_InstallHours = createInput_Infield("Install Hours", null, "width:25%;display:block", () => {this.Update();}, this.#timeContainer[1], false, 1);
+		this.#install_InstallDays = createInput_Infield("Install Days (8h)", null, "width:25%;display:block", () => {this.Update();}, this.#timeContainer[1], false, 1);
+
+
+		///Quick Lookup
+
+		this.#quickLookupContainer = createDivStyle5(null, "Quick Lookup", this.#timeContainer[1]);
+		this.#quickLookup = createCheckbox_Infield("Quick Lookup", false, null, () => {
+			$(this.#quickItem[0]).toggle();
+			$(this.#quickInstall_sub[0]).toggle();
+		}, this.#quickLookupContainer[1]);
+
+		let installTypes = [];
+		let types = Object.getOwnPropertyNames(InstallTimesLookup);
+		for(let i = 0; i < types.length; i++) {
+			installTypes.push(createDropdownOption(types[i], types[i]));
+		}
+		this.#quickItem = createDropdown_Infield("Type", 0, "margin-left:40px", installTypes, () => {
+			this.UpdateInstallLookup();
+		}, this.#quickLookupContainer[1]);
+		$(this.#quickItem[0]).hide();
+
+		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Sub", 0, null, 150, false, [], () => {
+			this.UpdateInstallTimes();
+		}, this.#quickLookupContainer[1], false);
+		this.UpdateInstallLookup();
+		$(this.#quickInstall_sub[0]).hide();
 
 		///Travel Rate
-		this.#install_TravelRate = createDropdown_Infield("Travel Rate", 1, "display:block;width:63%;margin-right:20%;", [], () => {this.Update();}, this.contentContainer);
+		this.#travelContainer = createDivStyle5(null, "Travel", this.contentContainer);
+
+		this.#install_TravelRate = createDropdown_Infield("Travel Rate", 1, "display:block;width:63%;margin-right:20%;", [], () => {this.Update();}, this.#travelContainer[1]);
 
 		dropdownOptions = [];
 		modifierOptions = getModifierDropdown_Name_Price_Cost("Travel IH (ea)");
@@ -70,73 +107,53 @@ class Install extends SubMenu {
 		}
 
 		///Travel Times
-		this.#install_TravelMinutes = createInput_Infield("Travel Minutes", null, "width:25%;display:block;margin-left:40px", () => {this.Update();}, this.contentContainer, false, 10);
-		this.#install_TravelHours = createInput_Infield("Travel Hours", null, "width:25%;display:block;", () => {this.Update();}, this.contentContainer, false, 1);
-		this.#install_TravelDays = createInput_Infield("Travel Days (8h)", null, "width:25%;display:block;", () => {this.Update();}, this.contentContainer, false, 1);
-
-		this.#quickLookup = createCheckbox_Infield("Quick Lookup", false, null, () => {
-			$(this.#quickItem[0]).toggle();
-			$(this.#quickInstall_sub[0]).toggle();
-		}, this.contentContainer);
-
-		let installTypes = [];
-		let types = Object.getOwnPropertyNames(InstallTimesLookup);
-		for(let i = 0; i < types.length; i++) {
-			installTypes.push(createDropdownOption(types[i], types[i]));
-		}
-		this.#quickItem = createDropdown_Infield("Type", 0, "margin-left:40px", installTypes, () => {
-			this.UpdateInstallLookup();
-		}, this.contentContainer);
-		$(this.#quickItem[0]).hide();
-
-		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Sub", 0, null, 150, false, [], () => {
-			this.UpdateInstallTimes();
-		}, this.contentContainer, false);
-		this.UpdateInstallLookup();
-		$(this.#quickInstall_sub[0]).hide();
+		this.#install_TravelMinutes = createInput_Infield("Travel Minutes", null, "width:25%;display:block;margin-left:40px", () => {this.Update();}, this.#travelContainer[1], false, 10);
+		this.#install_TravelHours = createInput_Infield("Travel Hours", null, "width:25%;display:block;", () => {this.Update();}, this.#travelContainer[1], false, 1);
+		this.#install_TravelDays = createInput_Infield("Travel Days (8h)", null, "width:25%;display:block;", () => {this.Update();}, this.#travelContainer[1], false, 1);
 
 
 
-		makeFieldGroup2("Checkbox", this.requiredField[1],
-			this.#qty[0],
-			this.#installTimeTotalEach[0],
-			this.#install_InstallRate[0],
-			this.#install_InstallMinutes[0],
-			this.#install_InstallHours[0],
-			this.#install_InstallDays[0],
-			this.#install_TravelRate[0],
-			this.#install_TravelMinutes[0],
-			this.#install_TravelHours[0],
-			this.#install_TravelDays[0],
-			this.#quickLookup[0],
-			this.#quickItem[0],
-			this.#quickInstall_sub[0],
-			this.#isOutsourced[0]
-		);
-
-		makeFieldGroup2Reversed("Checkbox", this.#isOutsourced[1],
-			this.#install_InstallRate[0],
-			this.#install_InstallMinutes[0],
-			this.#install_InstallHours[0],
-			this.#install_InstallDays[0],
-			this.#install_TravelRate[0],
-			this.#install_TravelMinutes[0],
-			this.#install_TravelHours[0],
-			this.#install_TravelDays[0],
-			this.#quickLookup[0],
-			this.#quickItem[0],
-			this.#quickInstall_sub[0],
-		);
-
-		makeFieldGroup2("Checkbox", this.#isOutsourced[1],
-			this.#outsourceCost[0],
-			this.#outsourceMarkup[0]
-		);
-		makeFieldGroup2("Checkbox", this.#quickLookup[1],
-			this.#quickItem[0],
-			this.#quickInstall_sub[0]
-		);
-
+		/*
+				makeFieldGroup2("Checkbox", this.requiredField[1],
+					this.#qty[0],
+					this.#installTimeTotalEach[0],
+					this.#install_InstallRate[0],
+					this.#install_InstallMinutes[0],
+					this.#install_InstallHours[0],
+					this.#install_InstallDays[0],
+					this.#install_TravelRate[0],
+					this.#install_TravelMinutes[0],
+					this.#install_TravelHours[0],
+					this.#install_TravelDays[0],
+					this.#quickLookup[0],
+					this.#quickItem[0],
+					this.#quickInstall_sub[0],
+					this.#isOutsourced[0]
+				);
+		
+				makeFieldGroup2Reversed("Checkbox", this.#isOutsourced[1],
+					this.#install_InstallRate[0],
+					this.#install_InstallMinutes[0],
+					this.#install_InstallHours[0],
+					this.#install_InstallDays[0],
+					this.#install_TravelRate[0],
+					this.#install_TravelMinutes[0],
+					this.#install_TravelHours[0],
+					this.#install_TravelDays[0],
+					this.#quickLookup[0],
+					this.#quickItem[0],
+					this.#quickInstall_sub[0],
+				);
+		
+				makeFieldGroup2("Checkbox", this.#isOutsourced[1],
+					this.#outsourceCost[0],
+					this.#outsourceMarkup[0]
+				);
+				makeFieldGroup2("Checkbox", this.#quickLookup[1],
+					this.#quickItem[0],
+					this.#quickInstall_sub[0]
+				);
+		*/
 
 	}
 
@@ -181,7 +198,7 @@ class Install extends SubMenu {
 		deleteElement(this.#quickInstall_sub[0]);
 		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Sub", 0, null, 150, false, array, () => {
 			this.UpdateInstallTimes();
-		}, this.contentContainer, false);
+		}, this.#quickLookupContainer[1], false);
 	}
 
 	UpdateInstallTimes() {

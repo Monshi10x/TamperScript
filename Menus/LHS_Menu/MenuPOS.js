@@ -68,13 +68,15 @@ class MenuPOS extends LHSMenuWindow {
             let container3 = createDivStyle5(null, "Specs", this.#page1)[1];
 
             this.#f_dimensions = createDropdown_Infield_Icons_Search("Dimensions", 0, null, 10, true, [
-                  ["A7 (105x75)", "#ffffff"],
-                  ["A6 (148x105)", "#ffffff"],
                   ["DL (210x99)", "#ffffff"],
-                  ["A5 (210x148)", "#ffffff"],
-                  ["A4 (297x210)", "#ffffff"],
-                  ["A3 (297x420)", "#ffffff"],
+                  ["A0 (1189x841)", "#ffffff"],
+                  ["A1 (841x594)", "#ffffff"],
                   ["A2 (594x420)", "#ffffff"],
+                  ["A3 (297x420)", "#ffffff"],
+                  ["A4 (297x210)", "#ffffff"],
+                  ["A5 (210x148)", "#ffffff"],
+                  ["A6 (148x105)", "#ffffff"],
+                  ["A7 (105x75)", "#ffffff"],
                   ["90x55", "#ffffff"],
                   ["600x900", "#ffffff"],
                   ["Custom Size", "#0000ff"]], () => {

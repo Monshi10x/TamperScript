@@ -6,11 +6,11 @@ class Painting extends Material {
 
       #dataForSubscribers = [{qty: 0, totalLength: 0}];
 
-      #defaultSetupTime = 30;
-      #defaultFlashTime = 20;
-      #defaultCoatTime = 10;
-      #defaultColourMatchTime = 0;
-      #defaultLitres = 0.5;
+      #defaultSetupTime = new UOM(60, "minutes");
+      #defaultFlashTime = new UOM(20, "minutes");
+      #defaultCoatTime = new UOM(10, "minutes");
+      #defaultColourMatchTime = new UOM(0, "minutes");
+      #defaultLitres = new UOM(0.5, "litres");
       #defaultUseLitresFormula = true;
       #defaultLitresPerSquareMetrePerCoat = 0.3;
       /*
@@ -43,7 +43,7 @@ class Painting extends Material {
             $(this.#f_litresFormulas[1]).val(value).change();
       }
       set numberOfCoats(value) {
-            dropdownSetSelectedText(this.#f_numberCoats[1], "x3 (2K for Raw Metals Alum/Steel/Stainless...)");
+            dropdownSetSelectedText(this.#f_numberCoats[1], value);
       }
       /*
                         
@@ -64,15 +64,15 @@ class Painting extends Material {
             let f_timeContainer = createDivStyle5(null, "Time", this.container)[1];
 
             let f_setupContainer = createDivStyle5(null, "Setup", f_timeContainer)[1];
-            this.#f_setupTime = createInput_Infield("Setup Time", this.#defaultSetupTime, "width:30%;", () => {this.UpdateFromChange();}, f_setupContainer, false, 0.1, {postfix: "min"});
+            this.#f_setupTime = createInput_Infield("Setup Time", this.#defaultSetupTime.as("minutes"), "width:30%;", () => {this.UpdateFromChange();}, f_setupContainer, false, 0.1, {postfix: "min"});
 
             let f_colourMatchContainer = createDivStyle5(null, "Colour Match", f_timeContainer)[1];
-            this.#f_colourMatchTime = createInput_Infield("Colour Match Time", this.#defaultColourMatchTime, "width:30%;margin-right:60%;", () => {this.UpdateFromChange();}, f_colourMatchContainer, false, 5, {postfix: "min"});
+            this.#f_colourMatchTime = createInput_Infield("Colour Match Time", this.#defaultColourMatchTime.as("minutes"), "width:30%;margin-right:60%;", () => {this.UpdateFromChange();}, f_colourMatchContainer, false, 5, {postfix: "min"});
 
             let f_runContainer = createDivStyle5(null, "Run", f_timeContainer)[1];
             this.#f_numberCoats = createDropdown_Infield("Number of Coats", 0, "width:50%;", [createDropdownOption("x2 (2K for Acrylic/ACM)", 2), createDropdownOption("x3 (2K for Raw Metals Alum/Steel/Stainless...)", 3)], () => {this.UpdateFromChange();}, f_runContainer);
-            this.#f_perCoatTime = createInput_Infield("Per Coat Time", this.#defaultCoatTime, "width:20%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "min"});
-            this.#f_flashTime = createInput_Infield("Flash Time", this.#defaultFlashTime, "width:20%;", () => {this.UpdateFromChange();}, f_runContainer, false, 5, {postfix: "min"});
+            this.#f_perCoatTime = createInput_Infield("Per Coat Time", this.#defaultCoatTime.as("minutes"), "width:20%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "min"});
+            this.#f_flashTime = createInput_Infield("Flash Time", this.#defaultFlashTime.as("minutes"), "width:20%;", () => {this.UpdateFromChange();}, f_runContainer, false, 5, {postfix: "min"});
 
             let f_litresContainer = createDivStyle5(null, "Litres", this.container)[1];
             let f_formulaContainer = createDivStyle5(null, "Formula", f_litresContainer)[1];
@@ -96,7 +96,7 @@ class Painting extends Material {
             createText("=", "width:30px;height:50px;font-size:32px;color:blue;", f_totalContainer);
             setFieldDisabled(true, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
 
-            this.#f_litres = createInput_Infield("Litres", this.#defaultLitres, "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "L"});
+            this.#f_litres = createInput_Infield("Litres", this.#defaultLitres.as("litres"), "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "L"});
 
             makeFieldGroup("Checkbox", this.#f_useLitresFormula[1], true, this.#f_litresFormulas[0]);
             /*

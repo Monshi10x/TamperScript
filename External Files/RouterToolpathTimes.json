@@ -23,6 +23,11 @@
                         "Good Quality": 1000
                   }
             },
+            "Foamed PVC": {
+                  "Cut Through": {
+                        "Good Quality": 4000
+                  }
+            },
             "Any": {
                   "LED Marking": {
                         "Standard": 1050,

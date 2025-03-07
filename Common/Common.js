@@ -471,22 +471,35 @@ class UOM {
     //SPEED
     _speedMetresPerMin = 0;
 
+    //LITRES
+    _litres = 0;
+
     constructor(value, unit) {
-        if(unit == "seconds") this._timeMins = value / 60;
-        if(unit == "mins" || unit == "min") this._timeMins = value;
-        if(unit == "hours") this._timeMins = value * 60;
+        unit = unit.toLowerCase();
+
+        if(unit == "seconds" || unit == "secs" || unit == "second") this._timeMins = value / 60;
+        if(unit == "mins" || unit == "min" || unit == "minute" || unit == "minutes") this._timeMins = value;
+        if(unit == "hours" || unit == "hour") this._timeMins = value * 60;
 
         if(unit == "mm/min") this._speedMetresPerMin = value / 1000;
         if(unit == "m/min") this._speedMetresPerMin = value;
+
+        if(unit == "litres" || unit == "l") this._litres = value;
+        if(unit == "ml" || unit == "millilitres" || unit == "millilitre") this._litres = value / 1000;
     }
 
-    as(newUnitConversion) {
-        if(newUnitConversion == "seconds") return this._timeMins * 60;
-        if(newUnitConversion == "mins" || newUnitConversion == "min") return this._timeMins;
-        if(newUnitConversion == "hours") return this._timeMins / 60;
+    as(unit) {
+        unit = unit.toLowerCase();
 
-        if(newUnitConversion == "mm/min") return this._speedMetresPerMin * 1000;
-        if(newUnitConversion == "m/min") return this._speedMetresPerMin;
+        if(unit == "seconds" || unit == "secs" || unit == "second") return this._timeMins * 60;
+        if(unit == "mins" || unit == "min" || unit == "minute" || unit == "minutes") return this._timeMins;
+        if(unit == "hours" || unit == "hour") return this._timeMins / 60;
+
+        if(unit == "mm/min") return this._speedMetresPerMin * 1000;
+        if(unit == "m/min") return this._speedMetresPerMin;
+
+        if(unit == "litres" || unit == "l") return this._litres;
+        if(unit == "ml" || unit == "millilitres" || unit == "millilitre") return this._litres * 1000;
 
         return console.error("no conversion found");
     }

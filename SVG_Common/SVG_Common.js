@@ -927,71 +927,365 @@ const SummarizePathString = (function() {
       };
 })();
 
-class TSVGRect {
-      #x;
-      set x(value) {
-            this.#x = value;
-            this.#element.setAttribute('x', value);
-      }
-      get x() {return this.#x;}
 
-      #y;
-      set y(value) {
-            this.#y = value;
-            this.#element.setAttribute('y', value);
-      }
-      get y() {return this.#y;}
-
-      #width;
-      set width(value) {
-            this.#width = value;
-            this.#element.setAttribute('width', value);
-      }
-      get width() {return this.#width;}
-
-      #height;
-      set height(value) {
-            this.#height = value;
-            this.#element.setAttribute('height', value);
-      }
-      get height() {return this.#height;}
-
-      #rx;
-      #ry;
-      #parentToAppendTo;
-      #overrideCssStyles;
-
-      #element;
-      get element() {return this.#element;}
-
-      constructor(parentToAppendTo, overrideCssStyles, x = 0, y = 0, width = 0, height = 0, rx = 0, ry = 0) {
-            this.#parentToAppendTo = parentToAppendTo;
-            this.#overrideCssStyles = overrideCssStyles;
-            this.#x = x;
-            this.#y = y;
-            this.#width = width;
-            this.#height = height;
-            this.#rx = rx;
-            this.#ry = ry;
-
-            this.createElement();
+class TSVGRectangle {
+      constructor(parentToAppendTo, options = {}) {
+            this.parentToAppendTo = parentToAppendTo;
+            this.options = {
+                  x: 0,
+                  y: 0,
+                  width: 100,
+                  height: 50,
+                  rx: 0,
+                  ry: 0,
+                  fill: 'blue',
+                  stroke: 'black',
+                  strokeWidth: 2,
+                  ...options // Override defaults with user options
+            };
+            this.rect = this.createRectangle();
       }
 
-      createElement() {
-            this.#element = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            this.#element.setAttribute('x', this.#x);
-            this.#element.setAttribute('y', this.#y);
-            this.#element.setAttribute('width', this.#width);
-            this.#element.setAttribute('height', this.#height);
-            this.#element.setAttribute('rx', this.#rx);
-            this.#element.setAttribute('ry', this.#ry);
-            this.#element.style = STYLE.SVGRect;
+      createRectangle() {
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
 
-            if(this.#overrideCssStyles) this.#element.style.cssText += this.#overrideCssStyles;
-            if(this.#parentToAppendTo) this.#parentToAppendTo.appendChild(this.#element);
+            for(const key in this.options) {
+                  rect.setAttribute(key, this.options[key]);
+            }
+
+            this.parentToAppendTo.appendChild(rect);
+            return rect;
+      }
+
+      updateAttributes(newOptions = {}) {
+            Object.assign(this.options, newOptions);
+            for(const key in newOptions) {
+                  this.rect.setAttribute(key, newOptions[key]);
+            }
+      }
+
+      getAttribute(attr) {
+            return this.rect.getAttribute(attr);
+      }
+
+      setAttribute(attr, value) {
+            this.options[attr] = value;
+            this.rect.setAttribute(attr, value);
       }
 
       Delete() {
-            deleteElement(this.element);
+            deleteElement(this.rect);
+      }
+}
+
+class TSVGRectangle {
+      constructor(parentToAppendTo, options = {}) {
+            this.parentToAppendTo = parentToAppendTo;
+            this.options = {
+                  x: 0,
+                  y: 0,
+                  x2: 100,
+                  y2: 100,
+                  stroke: 'black',
+                  strokeWidth: 2,
+                  ...options // Override defaults with user options
+            };
+            if(this.options.width) this.options.x2 += this.options.width;
+            if(this.options.height) this.options.y2 += this.options.height;
+
+            this.line = this.createLine();
+      }
+
+      createLine() {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+
+            for(const key in this.options) {
+                  line.setAttribute(key, this.options[key]);
+            }
+
+            this.parentToAppendTo.appendChild(line);
+            return line;
+      }
+
+      updateAttributes(newOptions = {}) {
+            Object.assign(this.options, newOptions);
+            for(const key in newOptions) {
+                  this.line.setAttribute(key, newOptions[key]);
+            }
+      }
+
+      getAttribute(attr) {
+            return this.line.getAttribute(attr);
+      }
+
+      setAttribute(attr, value) {
+            this.options[attr] = value;
+            this.line.setAttribute(attr, value);
+      }
+
+      Delete() {
+            deleteElement(this.line);
+      }
+}
+
+class TSVGCircle {
+      constructor(parentToAppendTo, options = {}) {
+            this.parentToAppendTo = parentToAppendTo;
+            this.options = {
+                  cx: 50,
+                  cy: 50,
+                  r: 25,
+                  stroke: 'black',
+                  strokeWidth: 2,
+                  ...options // Override defaults with user options
+            };
+
+            this.circle = this.createCircle();
+      }
+
+      createCircle() {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+
+            for(const key in this.options) {
+                  circle.setAttribute(key, this.options[key]);
+            }
+
+            this.parentToAppendTo.appendChild(circle);
+            return circle;
+      }
+
+      updateAttributes(newOptions = {}) {
+            Object.assign(this.options, newOptions);
+            for(const key in newOptions) {
+                  this.circle.setAttribute(key, newOptions[key]);
+            }
+      }
+
+      getAttribute(attr) {
+            return this.circle.getAttribute(attr);
+      }
+
+      setAttribute(attr, value) {
+            this.options[attr] = value;
+            this.circle.setAttribute(attr, value);
+      }
+
+      Delete() {
+            deleteElement(this.circle);
+      }
+}
+
+class TSVGEllipse {
+      constructor(parentToAppendTo, options = {}) {
+            this.parentToAppendTo = parentToAppendTo;
+            this.options = {
+                  cx: 50,
+                  cy: 50,
+                  rx: 40,
+                  ry: 20,
+                  fill: 'blue',
+                  stroke: 'black',
+                  strokeWidth: 2,
+                  ...options // Override defaults with user options
+            };
+
+            this.ellipse = this.createEllipse();
+      }
+
+      createEllipse() {
+            const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+
+            for(const key in this.options) {
+                  ellipse.setAttribute(key, this.options[key]);
+            }
+
+            this.parentToAppendTo.appendChild(ellipse);
+            return ellipse;
+      }
+
+      updateAttributes(newOptions = {}) {
+            Object.assign(this.options, newOptions);
+            for(const key in newOptions) {
+                  this.ellipse.setAttribute(key, newOptions[key]);
+            }
+      }
+
+      getAttribute(attr) {
+            return this.ellipse.getAttribute(attr);
+      }
+
+      setAttribute(attr, value) {
+            this.options[attr] = value;
+            this.ellipse.setAttribute(attr, value);
+      }
+
+      Delete() {
+            deleteElement(this.ellipse);
+      }
+}
+
+class TSVGPolygon {
+      constructor(parentToAppendTo, options = {}) {
+            this.parentToAppendTo = parentToAppendTo;
+            this.options = {
+                  points: [], // Array of {x, y} objects
+                  fill: 'blue',
+                  stroke: 'black',
+                  strokeWidth: 2,
+                  ...options // Override defaults with user options
+            };
+            this.polygon = this.createPolygon();
+      }
+
+      createPolygon() {
+            const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            this.updateAttributes(this.options);
+            this.parentToAppendTo.appendChild(polygon);
+            return polygon;
+      }
+
+      updateAttributes(newOptions = {}) {
+            if(newOptions.points) {
+                  newOptions.points = newOptions.points.map(point => `${point.x},${point.y}`).join(" ");
+            }
+            Object.assign(this.options, newOptions);
+            for(const key in newOptions) {
+                  this.polygon.setAttribute(key, newOptions[key]);
+            }
+      }
+
+      getAttribute(attr) {
+            if(attr === 'points') {
+                  return this.options.points.split(" ").map(point => {
+                        const [x, y] = point.split(",").map(Number);
+                        return {x, y};
+                  });
+            }
+            return this.polygon.getAttribute(attr);
+      }
+
+      setAttribute(attr, value) {
+            if(attr === 'points') {
+                  value = value.map(point => `${point.x},${point.y}`).join(" ");
+            }
+            this.options[attr] = value;
+            this.polygon.setAttribute(attr, value);
+      }
+
+      Delete() {
+            deleteElement(this.polygon);
+      }
+}
+
+class TSVGText {
+      constructor(parentToAppendTo, options = {}) {
+            this.parentToAppendTo = parentToAppendTo;
+            // Updated default options. The "anchor" option now drives both horizontal and vertical alignment.
+            this.options = {
+                  x: 0,
+                  y: 0,
+                  text: '',
+                  fontSize: '16px',
+                  fill: 'black',
+                  anchor: "middle", // Default anchor set to center middle
+                  ...options // Override defaults with user options
+            };
+            this.textElement = this.createText();
+            // If an anchor is provided, update the text element accordingly.
+            if(this.options.anchor) {
+                  this.setAnchor(this.options.anchor);
+            }
+      }
+
+      createText() {
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            // Set basic attributes first.
+            this.updateAttributes(this.options);
+            text.textContent = this.options.text;
+            this.parentToAppendTo.appendChild(text);
+            return text;
+      }
+
+      updateAttributes(newOptions = {}) {
+            Object.assign(this.options, newOptions);
+            for(const key in newOptions) {
+                  this.textElement.setAttribute(key, newOptions[key]);
+            }
+      }
+
+      getAttribute(attr) {
+            return this.textElement.getAttribute(attr);
+      }
+
+      setAttribute(attr, value) {
+            this.options[attr] = value;
+            this.textElement.setAttribute(attr, value);
+      }
+
+      /**
+       * setAnchor(anchor)
+       * Allows the user to set the text anchor using strings such as "top", "left", "bottom", "right",
+       * or compound strings like "top left", "bottom right", etc.
+       */
+      setAnchor(anchor) {
+            this.options.anchor = anchor;
+            // Split the input into words and standardize to lowercase.
+            const words = anchor.toLowerCase().split(" ");
+            let horizontal = null;
+            let vertical = null;
+
+            if(words.length === 1) {
+                  // If only one word is provided, decide based on the word:
+                  if(["left", "right", "center"].includes(words[0])) {
+                        horizontal = words[0];
+                        vertical = "middle"; // default vertical alignment
+                  } else if(["top", "bottom"].includes(words[0])) {
+                        vertical = words[0];
+                        horizontal = "center"; // default horizontal alignment
+                  } else {
+                        // Fallback to center if unrecognized.
+                        horizontal = "center";
+                        vertical = "middle";
+                  }
+            } else {
+                  // If two words are provided, check for a vertical word.
+                  if(["top", "bottom"].includes(words[0])) {
+                        vertical = words[0];
+                        horizontal = words[1];
+                  } else {
+                        horizontal = words[0];
+                        vertical = words[1];
+                  }
+            }
+
+            // Map horizontal alignment to SVG text-anchor values.
+            let textAnchorValue;
+            switch(horizontal) {
+                  case "left":
+                        textAnchorValue = "start";
+                        break;
+                  case "right":
+                        textAnchorValue = "end";
+                        break;
+                  default:
+                        textAnchorValue = "middle";
+            }
+
+            // Map vertical alignment to SVG dominant-baseline values.
+            let dominantBaselineValue;
+            switch(vertical) {
+                  case "top":
+                        dominantBaselineValue = "hanging";
+                        break;
+                  case "bottom":
+                        dominantBaselineValue = "baseline";
+                        break;
+                  default:
+                        dominantBaselineValue = "middle";
+            }
+
+            // Update the text element with the computed anchor values.
+            this.setAttribute("text-anchor", textAnchorValue);
+            this.setAttribute("dominant-baseline", dominantBaselineValue);
       }
 }

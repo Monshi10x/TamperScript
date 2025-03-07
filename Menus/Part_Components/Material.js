@@ -74,7 +74,7 @@ class Material extends SubscriptionManager {
                   ";border:2px solid;border-color: black;margin:8px;box-shadow: rgb(0 0 0 / 80%) 3px 4px 10px 0px;padding:0px;overflow:hidden;box-sizing: border-box";
             parentContainer.appendChild(this.#f_container);
             this.#f_container.addEventListener("click", (e) => {
-                  if(e.target == this.#f_container) this.onPopOut();
+                  if(e.target == this.#f_container && this.#isMinimized == true) this.onPopOut();
             });
 
             this.#f_productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
@@ -87,7 +87,7 @@ class Material extends SubscriptionManager {
 
             this.#f_typeLabel = createText(this.Type, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:150px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", this.#f_container);
             this.#f_typeLabel.addEventListener("click", () => {
-                  this.onPopOut();
+                  if(this.#isMinimized == true) this.onPopOut();
             });
             /*
             Subscriptions */
@@ -97,7 +97,7 @@ class Material extends SubscriptionManager {
             this.#f_subscriptionsContainer = document.createElement("div");
             this.#f_subscriptionsContainer.style = "height:40px;width:20%;background-color:white;box-sizing:border-box;float:left;margin:0px;";
             this.#f_subscriptionsContainer.addEventListener("click", (e) => {
-                  if(e.target == this.#f_subscriptionsContainer) this.onPopOut();
+                  if(e.target == this.#f_subscriptionsContainer && this.#isMinimized == true) this.onPopOut();
             });
             this.#f_container.appendChild(this.#f_subscriptionsContainer);
             $(this.#f_container).hover(function() {

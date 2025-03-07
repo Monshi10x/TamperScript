@@ -448,21 +448,21 @@ class Sheet extends Material {
 
             /*
             Sheet Size*/
-            let f_container_sheetSize = createDivStyle5("", "Sheet To Use", this.container)[1];
-            f_container_sheetSize.id = "iojsdnbgkjasngjknas";
+            let f_container_sheetSize = createDivStyle5("width:calc(100%)", "Sheet To Use", this.container);
+            f_container_sheetSize[1].id = "iojsdnbgkjasngjknas";
 
-            let sheetFilterContainer = createDivStyle5(null, "Filters", f_container_sheetSize)[1];
+            let sheetFilterContainer = createDivStyle5("width:calc(100%)", "Filters", f_container_sheetSize[1]);
 
-            this.#material = createDropdown_Infield("Material", 0, "width:80px", [createDropdownOption("", "")].concat(this.#materialOptions), () => {this.UpdateFilters2();}, sheetFilterContainer);
+            this.#material = createDropdown_Infield("Material", 0, "width:80px", [createDropdownOption("", "")].concat(this.#materialOptions), () => {this.UpdateFilters2();}, sheetFilterContainer[1]);
 
-            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer);
+            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer[1]);
             this.#sheetSize[1].id = "Sheet Size";
 
-            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters2();}, sheetFilterContainer);
+            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters2();}, sheetFilterContainer[1]);
 
-            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer);
+            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer[1]);
 
-            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 40, false, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize, false);
+            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 40, false, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize[1], false);
 
             /*
             Folded*/
@@ -509,7 +509,7 @@ class Sheet extends Material {
                         this.UpdateFromChange();
                   }, this);
 
-                  this.#visualiser.borrowFields(f_container_sheetSize, this.#flip[0], this.#hasGrain[0], methodContainer, this.#f_foldSideContainer);
+                  this.#visualiser.borrowFields(sheetFilterContainer[0], this.#sheetMaterial[0], this.#flip[0], this.#hasGrain[0], methodContainer, this.#f_foldSideContainer);
                   this.#visualiser.setFlippedField(this.#flip[1]);
                   this.#visualiser.setSheetSizeField(this.#sheetSize[1]);
                   this.#visualiser.setHasGrainField(this.#hasGrain[1]);
@@ -787,6 +787,7 @@ class Sheet extends Material {
 
                         if(this.#preferredCuttingMachine == null) dropdownSetSelectedIndexToNextAvailable(cuttingTypeDropDown[1], yes);
                         if(this.#preferredCuttingMachine == "router") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Router.value);
+                        if(this.#preferredCuttingMachine == "laser") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Laser.value);
                         if(this.#preferredCuttingMachine == "guillotine") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Guillotine.value);
                   }
             }
@@ -1023,6 +1024,10 @@ class Sheet extends Material {
             switch(machine) {
                   case "router":
                         this.#preferredCuttingMachine = "router";
+                        this.UpdateFromChange();
+                        break;
+                  case "laser":
+                        this.#preferredCuttingMachine = "laser";
                         this.UpdateFromChange();
                         break;
                   case "guillotine":
