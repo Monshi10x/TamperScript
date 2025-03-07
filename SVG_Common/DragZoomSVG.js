@@ -54,6 +54,7 @@ class DragZoomSVG {
       Getter            */
       get scale() {return this.#scale;}
       get svg() {return this.#f_svg;}
+      get svgG() {return this.#f_svgG;}
       set svgWidth(width) {this.#f_svg.width.baseVal.value = width;}
       get svgWidth() {return this.#f_svg.width.baseVal.value;}
       set svgHeight(height) {this.#f_svg.height.baseVal.value = height;}

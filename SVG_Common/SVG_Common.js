@@ -978,7 +978,7 @@ class TSVGRectangle {
       }
 }
 
-class TSVGRectangle {
+class TSVGLine {
       constructor(parentToAppendTo, options = {}) {
             this.parentToAppendTo = parentToAppendTo;
             this.options = {

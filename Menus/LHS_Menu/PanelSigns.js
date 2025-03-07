@@ -647,8 +647,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 				let currentProductNumber = uniqueProductNumbers[i];
 				//create product container
 				let newProductContainer = new UIContainerType3("max-height:450px;", "PRODUCT " + uniqueProductNumbers[i], this.page1);
-				newProductContainer.contentContainer.style.cssText += "max-height:800px;";
-				newProductContainer.container.style.cssText += "max-height:800px;";
+				newProductContainer.contentContainer.style.cssText += "max-height:10000px;";
+				newProductContainer.container.style.cssText += "max-height:10000px;";
 
 				newProductContainer.addHeadingButtons(createButton("x", "width:30px;height:30px;margin:0px;border:none;padding:2px;min-height:30px;float:right;background-color:" + COLOUR.Red + ";", () => {
 					this.DeleteProduct(currentProductNumber);

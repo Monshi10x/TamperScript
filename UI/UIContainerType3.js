@@ -103,16 +103,16 @@ class UIContainerType3 {
       onPopOut() {
             this.prePopOutState = this.#isMinimized;//true
             this.Maximize();
-            this.#contentContainer.style.maxHeight = "100%";
-            this.#container.style.maxHeight = "10000px";
+            //this.#contentContainer.style.maxHeight = "100%";
+            // this.#container.style.maxHeight = "10000px";
       }
 
       onPopOutLeave() {
             //if was minimized before, restore to minimized
             if(this.prePopOutState == true) this.Minimize();
             else this.Maximize();
-            this.#contentContainer.style.maxHeight = "400px";
-            this.#container.style = STYLE.Div3;
+            //this.#contentContainer.style.maxHeight = "400px";
+            //this.#container.style = STYLE.Div3;
       }
 
       /**@Overridable */

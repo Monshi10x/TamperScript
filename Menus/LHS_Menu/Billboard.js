@@ -28,6 +28,7 @@ var measurementTextOffset = -150;
 class BillboardMenu extends LHSMenuWindow {
 
       #dragZoomCanvas;
+      #dragZoomSVG;
       #canvasCtx;
 
       #totalQuantity;
@@ -63,6 +64,9 @@ class BillboardMenu extends LHSMenuWindow {
 
             this.#dragZoomCanvas = new DragZoomCanvas(page.getBoundingClientRect().width / 2 + 50, this.height, () => {this.draw();}, page);
             this.#dragZoomCanvas.canvas.style.cssText += "float:right;";
+            //this.#dragZoomCanvas.canvas.style.cssText += ";display:none;";//TEMPORARY
+
+
 
             this.#canvasCtx = this.#dragZoomCanvas.canvasCtx;
 
@@ -126,7 +130,21 @@ class BillboardMenu extends LHSMenuWindow {
                   infoContainer.appendChild(container);
             }
 
+
+
             createAttachmentTypeContainer();
+
+            page.appendChild(infoContainer);
+
+            /* this.#dragZoomSVG = new DragZoomSVG(page.getBoundingClientRect().width / 2 + 50, this.height, '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"></svg>', page);
+             let testRect = new TSVGRectangle(this.#dragZoomSVG.svgG, {
+                   x: 0,
+                   y: 0,
+                   width: 1000,
+                   height: 1000
+             });*/
+
+
             this.#totalQuantity = new TotalQuantity(infoContainer, this.#canvasCtx, () => {this.updateFromFields();});
             this.#sign = new Sign(infoContainer, this.#canvasCtx, () => {this.updateFromFields();});
             this.#frame = new Frame(infoContainer, this.#canvasCtx, () => {this.updateFromFields();});
@@ -139,7 +157,9 @@ class BillboardMenu extends LHSMenuWindow {
 
             this.#dragZoomCanvas.scale = 0.15;
 
-            page.appendChild(infoContainer);
+
+
+
 
             var fieldCreateBillboardProduct = createButton('Create Billboard Product', 'width:100%;margin:0px;', () => {this.createBillboardProduct(this);});
             this.footer.appendChild(fieldCreateBillboardProduct);
