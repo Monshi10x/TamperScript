@@ -810,6 +810,8 @@ async function setPartDescription(productNo, partNo, value) {
     var partList = productContext.$data.Parts();
     var part = partList[partNo - 1];
 
+    await sleep(sleepMS);
+    console.log(productNo, partNo, value, partList);
     part.PartDescription(value);
     console.log("set part description " + partNo);
     await sleep(sleepMS);
