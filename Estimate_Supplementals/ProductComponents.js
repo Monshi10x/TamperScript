@@ -1071,5 +1071,5 @@ function addQuickFindProducts() {
 			await AddQuickProduct(addInstall.value);
 		});
 
-	let addSpiderBoom = createIconButton(GM_getResourceURL("Image_SpiderBoom"), null, "width:100px;height:100px;", () => { }, footer);
+	let addSpiderBoom = createIconButton(GM_getResourceURL("Image_SpiderBoom"), null, "width:100px;height:100px;filter:none;", () => { }, footer);
 }
