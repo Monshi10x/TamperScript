@@ -65,6 +65,7 @@
 // @resource     Image_PaintedPanel https://github.com/Monshi10x/TamperScript/raw/main/Images/PaintedPanel.png
 // @resource     Image_PaintedPanelWithLetters https://github.com/Monshi10x/TamperScript/raw/main/Images/PaintedPanelWithLetters.png
 // @resource     Image_IsStocked https://github.com/Monshi10x/TamperScript/raw/main/Images/IsStockedImage.png
+// @resource     Image_SpiderBoom https://github.com/Monshi10x/TamperScript/raw/main/Images/SpiderBoomImage.png
 // @resource     SVGWebWorker https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_WebWorker.js
 // @resource     GoogleScript https://github.com/Monshi10x/TamperScript/raw/main/GoogleMap/GoogleMap.js
 // @require      https://cdn.plot.ly/plotly-latest.min.js
