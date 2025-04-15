@@ -215,7 +215,7 @@ function partInfoTick() {
 				parts[part].querySelector(".ord-prod-part-header").style.backgroundColor = "#eee";
 			}
 
-			if(koPartDescription.includes("TRAVEL [Automatic]")) {
+			if(koPartDescription.includes("TRAVEL [Automatic]") || koPartDescription.includes("CODE [Automatic]")) {
 				let relevantPart = parts[part].querySelector(".txtPartDescription");
 				relevantPart.disabled = true;
 				relevantPart.style.color = COLOUR.Blue;
@@ -1071,5 +1071,61 @@ function addQuickFindProducts() {
 			await AddQuickProduct(addInstall.value);
 		});
 
-	let addSpiderBoom = createIconButton(GM_getResourceURL("Image_SpiderBoom"), null, "width:100px;height:100px;filter:none;", () => { }, footer);
+	createHr("", footer);
+
+	let addSpiderBoom = createIconButton(GM_getResourceURL("Image_SpiderBoom"), "Add Spidey", "width:200px;height:80px;filter:none;float:left;", () => {
+		let modal = new ModalSingleInput("Days of Use", async () => {
+			if(modal.value < 0) return alert("Value cannot be < 1");
+
+			await AddBlankProduct();
+			let productNo = getNumProducts();
+
+			//EWP
+			await setProductName(productNo, "EWP - CTE Traccess Diesel Boom (" + modal.value + " Days)");
+			await setProductSummary(productNo, "Boom lift for elevated access.&nbsp;<div>Delivered to site&nbsp;</div><div><div><br></div><div>Allowance made for " + modal.value + " days hire.&nbsp;</div><div><br></div><div><i><b>Best estimate at the time of quoting is that we will require this EWP. Should a larger EWP be required there will be additional costs for a larger machine including Transport to site.</b></i></div></div>");
+
+			let partNo = 0;
+			await AddPart("EWP - _CTE Traccess Diesel Boom (DAILY)", productNo);
+			partNo++;
+			await setPartQty(productNo, partNo, parseInt(modal.value));
+			await setPartDescription(productNo, partNo, "EWP - Traccess");
+			await savePart(productNo, partNo);
+
+			//Transport
+			await AddPart("EWP - _CTE Traccess Diesel Boom Transport - 10km and under", productNo);
+			partNo++;
+			await setPartDescription(productNo, partNo, "Transport");
+			await savePart(productNo, partNo);
+
+			Ordui.Alert("done");
+		});
+		modal.setContainerSize(300, 300);
+		modal.value = 1;
+	}, footer);
+
+
+
+	let addScissor = createIconButton(GM_getResourceURL("Image_Scissor"), "Add Scissor", "width:200px;height:80px;filter:none;float:left;", () => {
+		let modal = new ModalSingleInput("Days of Use", async () => {
+			if(modal.value < 0) return alert("Value cannot be < 1");
+
+			await AddBlankProduct();
+			let productNo = getNumProducts();
+
+			//EWP
+			await setProductName(productNo, "EWP - 26ft Scissor (" + modal.value + " Days)");
+			await setProductSummary(productNo, "26ft Trailer Mounted Scissor Lift for elevated access.&nbsp;<div>Delivered to site&nbsp;</div><div><div><br></div><div>Allowance made for " + modal.value + " days hire.&nbsp;</div><div><br></div><div><i><b>Best estimate at the time of quoting is that we will require this EWP. Should a larger EWP be required there will be additional costs for a larger machine including Transport to site.</b></i></div></div>");
+
+			let partNo = 0;
+			await AddPart("EWP - _Scissor Trailer Drawn 26ft (DAILY)", productNo);
+			partNo++;
+			await setPartQty(productNo, partNo, parseInt(modal.value));
+			await setPartDescription(productNo, partNo, "EWP - _Scissor Trailer Drawn 26ft");
+			await savePart(productNo, partNo);
+
+			Ordui.Alert("done");
+		});
+		modal.setContainerSize(300, 300);
+		modal.value = 1;
+	}, footer);
 }

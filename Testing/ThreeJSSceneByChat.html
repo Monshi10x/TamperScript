@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Three.js Scene in Div</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #scene-container {
+      width: 800px;
+      height: 600px;
+      border: 2px solid #444;
+      background: #111;
+      position: relative;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js",
+        "three/examples/": "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="scene-container"></div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/examples/controls/OrbitControls.js';
+    import { Sky } from 'three/examples/objects/Sky.js';
+
+    const container = document.getElementById('scene-container');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    // === Scene Setup ===
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(5, 5, 10);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(width, height);
+    renderer.shadowMap.enabled = true;
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
+    controls.zoomSpeed = 2.5;
+
+    // === Lights ===
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
+
+    const sky = new Sky();
+    sky.scale.setScalar(450000);
+    scene.add(sky);
+
+    const sun = new THREE.Vector3();
+    const phi = THREE.MathUtils.degToRad(90 - 10);
+    const theta = THREE.MathUtils.degToRad(180);
+    sun.setFromSphericalCoords(1, phi, theta);
+    sky.material.uniforms['turbidity'].value = 10;
+    sky.material.uniforms['rayleigh'].value = 2;
+    sky.material.uniforms['mieCoefficient'].value = 0.005;
+    sky.material.uniforms['mieDirectionalG'].value = 0.8;
+    sky.material.uniforms['sunPosition'].value.copy(sun);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.copy(sun.clone().multiplyScalar(100));
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.set(2048, 2048);
+    dirLight.shadow.camera.left = -50;
+    dirLight.shadow.camera.right = 50;
+    dirLight.shadow.camera.top = 50;
+    dirLight.shadow.camera.bottom = -50;
+    scene.add(dirLight);
+
+    // === Ground ===
+    const texLoader = new THREE.TextureLoader();
+    const grassMap = texLoader.load('https://threejs.org/examples/textures/terrain/grasslight-big.jpg');
+    const grassBump = texLoader.load('https://threejs.org/examples/textures/terrain/grasslight-big-nm.jpg');
+    const grassNormal = texLoader.load('https://threejs.org/examples/textures/water/Water_1_M_Normal.jpg');
+
+    [grassMap, grassBump, grassNormal].forEach(tex => {
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(40, 40);
+    });
+
+    const ground = new THREE.Mesh(
+      new THREE.PlaneGeometry(200, 200),
+      new THREE.MeshStandardMaterial({
+        map: grassMap,
+        bumpMap: grassBump,
+        bumpScale: 0.2,
+        normalMap: grassNormal,
+        normalScale: new THREE.Vector2(0.3, 0.3)
+      })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -1.1;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // === Objects ===
+    const cube = new THREE.Mesh(
+      new THREE.BoxGeometry(2, 2, 2),
+      new THREE.MeshStandardMaterial({ color: 0xff5733 })
+    );
+    cube.position.set(-2.5, 0, 0);
+    cube.castShadow = true;
+    scene.add(cube);
+
+    const cylinder = new THREE.Mesh(
+      new THREE.CylinderGeometry(1, 1, 2, 64),
+      new THREE.MeshStandardMaterial({ color: 0x3399ff })
+    );
+    cylinder.position.set(2.5, 0, 0);
+    cylinder.castShadow = true;
+    scene.add(cylinder);
+
+    // === Resize on Container Change ===
+    const resize = () => {
+      const newWidth = container.clientWidth;
+      const newHeight = container.clientHeight;
+      camera.aspect = newWidth / newHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(newWidth, newHeight);
+    };
+    window.addEventListener('resize', resize);
+
+    // === Render Loop ===
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

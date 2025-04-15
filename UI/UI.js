@@ -360,7 +360,8 @@ function createInput_Infield(text, defaultValue, overrideCssStyles, optionalCall
         } else {
             containerDiv.style.borderColor = "red";
         }
-        if(parseFloat(input.value) !== defaultValue && defaultValue != null) {
+
+        if(parseFloat(input.value) !== parseFloat(defaultValue) && defaultValue != null) {
             icon.style.display = "block";
         } else {
             icon.style.display = "none";
@@ -1847,5 +1848,250 @@ function makeFieldGroup2Reversed(parentControllerType, masterControllerField, ..
         default:
             console.error("No Case Available");
             break;
+    }
+}
+
+class TButton {
+    constructor({
+        parent = document.body,
+        text = "Click Me",
+        onClick = () => { },
+        onToggle = null,
+        extraStyles = {},
+        icon = null,
+        iconOn = null,
+        iconOff = null,
+        iconPosition = "left",
+        disabled = false,
+        toggle = false
+    }) {
+        this.toggleMode = toggle;
+        this.toggled = false;
+        this.onClick = onClick;
+        this.onToggle = onToggle;
+        this.iconOn = iconOn;
+        this.iconOff = iconOff;
+        this.iconPosition = iconPosition;
+
+        this.button = document.createElement('button');
+        Object.assign(this.button.style, {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '10px 20px',
+            border: 'none',
+            borderRadius: '6px',
+            backgroundColor: '#007BFF',
+            color: '#fff',
+            fontSize: '16px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            ...extraStyles
+        });
+
+        this.uniqueClass = `styled-btn-${Math.random().toString(36).substr(2, 9)}`;
+        this.button.classList.add(this.uniqueClass);
+        this.addHoverStyle();
+
+        // Create icon + text containers
+        this.iconElement = document.createElement('span');
+        this.labelElement = document.createElement('span');
+        this.labelElement.textContent = text;
+
+        // Set initial icon
+        if(this.toggleMode && this.iconOff && this.iconOn) {
+            this.setIcon(this.iconOff);
+        } else if(icon) {
+            this.setIcon(icon);
+        }
+
+        if(this.iconPosition === 'left') {
+            this.button.appendChild(this.iconElement);
+            this.button.appendChild(this.labelElement);
+        } else {
+            this.button.appendChild(this.labelElement);
+            this.button.appendChild(this.iconElement);
+        }
+
+        this.button.addEventListener('click', (e) => {
+            if(this.button.disabled) return;
+
+            if(this.toggleMode) {
+                this.toggled = !this.toggled;
+                this.setToggledStyle(this.toggled);
+                if(this.onToggle) this.onToggle(this.toggled);
+            } else {
+                this.onClick(e);
+            }
+        });
+
+        parent.appendChild(this.button);
+        this.setDisabled(disabled);
+    }
+
+    setIcon(icon) {
+        this.iconElement.innerHTML = "";
+
+        if(icon.startsWith("<svg")) {
+            this.iconElement.innerHTML = icon;
+        } else if(icon.match(/\.(png|jpg|svg)$/) || icon.startsWith("http")) {
+            const img = document.createElement('img');
+            img.src = icon;
+            img.style.width = "20px";
+            img.style.height = "20px";
+            this.iconElement.appendChild(img);
+        } else {
+            const i = document.createElement('i');
+            i.className = icon;
+            this.iconElement.appendChild(i);
+        }
+    }
+
+    addHoverStyle() {
+        const style = document.createElement('style');
+        style.textContent = `
+      .${this.uniqueClass}:hover:not(:disabled) {
+        background-color: #0056b3 !important;
+      }
+      .${this.uniqueClass}:disabled {
+        background-color: #ccc !important;
+        color: #666 !important;
+        cursor: not-allowed !important;
+      }
+    `;
+        document.head.appendChild(style);
+    }
+
+    setDisabled(state) {
+        this.button.disabled = state;
+    }
+
+    setToggledStyle(state) {
+        if(state) {
+            this.button.style.backgroundColor = "#28a745";
+            if(this.iconOn) this.setIcon(this.iconOn);
+        } else {
+            this.button.style.backgroundColor = "#007BFF";
+            if(this.iconOff) this.setIcon(this.iconOff);
+        }
+    }
+}
+
+class TIconDropdown {
+    constructor({
+        parent = document.body,
+        mount = null,
+        label = null,
+        labelTooltip = "",
+        items = [],
+        placeholder = "Select Option",
+        onSelect = null,
+        styles = {}
+    }) {
+        this.items = items;
+        this.onSelect = onSelect;
+        this.selected = null;
+        this.styles = styles;
+
+        this.wrapper = document.createElement("div");
+        this.wrapper.style.display = "flex";
+        this.wrapper.style.flexDirection = "column";
+
+        if(label) {
+            const labelWrapper = document.createElement("div");
+            labelWrapper.className = "T-dropdown-label-wrapper";
+
+            const labelText = document.createElement("span");
+            labelText.textContent = label;
+
+            const infoIcon = document.createElement("i");
+            infoIcon.className = "fas fa-info-circle T-info-icon";
+            infoIcon.setAttribute("data-tooltip", labelTooltip);
+
+            labelWrapper.appendChild(labelText);
+            labelWrapper.appendChild(infoIcon);
+            Object.assign(labelWrapper.style, styles.labelText || {});
+            this.wrapper.appendChild(labelWrapper);
+        }
+
+        this.container = document.createElement("div");
+        this.container.className = "T-dropdown";
+
+        this.button = document.createElement("button");
+        this.button.className = "T-dropdown-btn";
+        this.button.innerHTML = `<span>${placeholder}</span><i class="fas fa-chevron-down"></i>`;
+        Object.assign(this.button.style, styles.button || {});
+
+        this.menu = document.createElement("div");
+        this.menu.className = "T-dropdown-content";
+        Object.assign(this.menu.style, styles.menu || {});
+
+        this.renderItems();
+
+        this.container.appendChild(this.button);
+        this.container.appendChild(this.menu);
+        this.wrapper.appendChild(this.container);
+
+        if(mount) {
+            mount.appendChild(this.wrapper);
+        } else {
+            parent.appendChild(this.wrapper);
+        }
+
+        this.button.addEventListener("click", () => {
+            this.container.classList.toggle("show");
+        });
+
+        window.addEventListener("click", (e) => {
+            if(!this.container.contains(e.target)) {
+                this.container.classList.remove("show");
+            }
+        });
+    }
+
+    renderItems() {
+        this.items.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "T-dropdown-item";
+            div.dataset.value = item.value;
+            Object.assign(div.style, this.styles.item || {});
+
+            let iconElement;
+            if(item.icon.startsWith("http") || item.icon.match(/\.(png|jpg|svg)$/)) {
+                iconElement = document.createElement("img");
+                iconElement.src = item.icon;
+            } else {
+                iconElement = document.createElement("i");
+                iconElement.className = item.icon;
+            }
+            Object.assign(iconElement.style, this.styles.icon || {});
+
+            const textWrapper = document.createElement("div");
+            textWrapper.className = "T-dropdown-text";
+
+            const label = document.createElement("div");
+            label.className = "T-dropdown-label";
+            label.textContent = item.label;
+            Object.assign(label.style, this.styles.label || {});
+
+            const desc = document.createElement("div");
+            desc.className = "T-dropdown-desc";
+            desc.textContent = item.description || "";
+            Object.assign(desc.style, this.styles.description || {});
+
+            textWrapper.appendChild(label);
+            textWrapper.appendChild(desc);
+
+            div.appendChild(iconElement);
+            div.appendChild(textWrapper);
+            this.menu.appendChild(div);
+
+            div.addEventListener("click", () => {
+                this.selected = item;
+                this.button.querySelector("span").textContent = item.label;
+                this.container.classList.remove("show");
+                if(this.onSelect) this.onSelect(item);
+            });
+        });
     }
 }

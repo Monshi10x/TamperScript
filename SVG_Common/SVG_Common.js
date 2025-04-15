@@ -927,10 +927,12 @@ const SummarizePathString = (function() {
       };
 })();
 
-
 class TSVGRectangle {
+
       constructor(parentToAppendTo, options = {}) {
             this.parentToAppendTo = parentToAppendTo;
+            this.patternId = `pattern-${Math.random().toString(36).substr(2, 8)}`;
+
             this.options = {
                   x: 0,
                   y: 0,
@@ -938,19 +940,171 @@ class TSVGRectangle {
                   height: 50,
                   rx: 0,
                   ry: 0,
+                  miter: 40,
+                  miterSides: [],
                   fill: 'blue',
                   stroke: 'black',
                   strokeWidth: 2,
-                  ...options // Override defaults with user options
+                  origin: 'top-left',
+                  usePattern: false,
+                  patternType: 'hatch45', // or "soil"
+                  hatchFill: 'none',
+                  hatchLineColor: 'black',
+                  hatchLineWidth: 4,
+                  hatchSpacing: 20,
+                  ...options
             };
+
+            if(this.options.usePattern) {
+                  const fillColor = this.options.hatchFill === 'none' ? this.options.fill : this.options.hatchFill;
+                  this.ensurePattern(fillColor);
+                  this.options.fill = `url(#${this.patternId})`;
+            }
+
             this.rect = this.createRectangle();
       }
 
-      createRectangle() {
-            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      ensurePattern(hatchFill) {
+            const svgNS = 'http://www.w3.org/2000/svg';
+            this.defs = document.createElementNS(svgNS, 'defs');
 
-            for(const key in this.options) {
-                  rect.setAttribute(key, this.options[key]);
+            const patternType = this.options.patternType;
+            const pattern = (patternType === 'soil')
+                  ? this.createSoilPattern(svgNS, hatchFill)
+                  : this.createHatch45Pattern(svgNS, hatchFill);
+
+            this.defs.appendChild(pattern);
+            const svg = this.parentToAppendTo.closest('svg');
+            if(svg) svg.insertBefore(this.defs, svg.firstChild);
+      }
+
+      createHatch45Pattern(svgNS, hatchFill) {
+            const spacing = this.options.hatchSpacing || 10;
+
+            const pattern = document.createElementNS(svgNS, 'pattern');
+            pattern.setAttribute('id', this.patternId);
+            pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+            pattern.setAttribute('width', spacing);
+            pattern.setAttribute('height', spacing);
+            pattern.setAttribute('patternTransform', 'rotate(45)');
+
+            const background = document.createElementNS(svgNS, 'rect');
+            background.setAttribute('width', spacing);
+            background.setAttribute('height', spacing);
+            background.setAttribute('fill', hatchFill);
+            pattern.appendChild(background);
+
+            const line = document.createElementNS(svgNS, 'line');
+            line.setAttribute('x1', '0');
+            line.setAttribute('y1', '0');
+            line.setAttribute('x2', '0');
+            line.setAttribute('y2', spacing);
+            line.setAttribute('stroke', this.options.hatchLineColor);
+            line.setAttribute('stroke-width', this.options.hatchLineWidth);
+            pattern.appendChild(line);
+
+            return pattern;
+      }
+
+      createSoilPattern(svgNS, hatchFill) {
+            const patternSize = 240;
+
+            const pattern = document.createElementNS(svgNS, 'pattern');
+            pattern.setAttribute('id', this.patternId);
+            pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+            pattern.setAttribute('width', patternSize);
+            pattern.setAttribute('height', patternSize);
+
+            const background = document.createElementNS(svgNS, 'rect');
+            background.setAttribute('width', patternSize);
+            background.setAttribute('height', patternSize);
+            background.setAttribute('fill', hatchFill);
+            pattern.appendChild(background);
+
+            // 12× scaled specks
+            const specks = [
+                  {cx: 36, cy: 60, r: 9.6},
+                  {cx: 180, cy: 84, r: 12},
+                  {cx: 120, cy: 180, r: 7.2},
+                  {cx: 72, cy: 132, r: 8.4},
+                  {cx: 216, cy: 216, r: 6}
+            ];
+            specks.forEach(s => {
+                  const dot = document.createElementNS(svgNS, 'circle');
+                  dot.setAttribute('cx', s.cx);
+                  dot.setAttribute('cy', s.cy);
+                  dot.setAttribute('r', s.r);
+                  dot.setAttribute('fill', this.options.hatchLineColor);
+                  pattern.appendChild(dot);
+            });
+
+            return pattern;
+      }
+
+
+
+      adjustCoordinatesForOrigin(x, y, width, height, origin) {
+            switch(origin) {
+                  case "TL": case 'top-left': return {x, y};
+                  case "T": case 'top-middle': return {x: x - width / 2, y};
+                  case "TR": case 'top-right': return {x: x - width, y};
+                  case "L": case 'center-left': return {x, y: y - height / 2};
+                  case "M": case 'center': return {x: x - width / 2, y: y - height / 2};
+                  case "R": case 'center-right': return {x: x - width, y: y - height / 2};
+                  case "BL": case 'bottom-left': return {x, y: y - height};
+                  case "B": case 'bottom-middle': return {x: x - width / 2, y: y - height};
+                  case "BR": case 'bottom-right': return {x: x - width, y: y - height};
+                  default: return {x, y};
+            }
+      }
+
+      createRectangle() {
+            let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            if(this.options.miter && this.options.miterSides.length > 0)
+                  rect = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+
+            const {x, y, width, height, origin, ...attrs} = this.options;
+            const adjusted = this.adjustCoordinatesForOrigin(x, y, width, height, origin);
+            const has = side => this.options.miterSides.includes(side);
+            const miter = this.options.miter;
+            const points = [];
+
+            if(has('top-left')) {
+                  points.push([adjusted.x, adjusted.y + miter]);
+                  points.push([adjusted.x + miter, adjusted.y]);
+            } else {
+                  points.push([adjusted.x, adjusted.y]);
+            }
+            if(has('top-right')) {
+                  points.push([adjusted.x + width - miter, adjusted.y]);
+                  points.push([adjusted.x + width, adjusted.y + miter]);
+            } else {
+                  points.push([adjusted.x + width, adjusted.y]);
+            }
+            if(has('bottom-right')) {
+                  points.push([adjusted.x + width, adjusted.y + height - miter]);
+                  points.push([adjusted.x + width - miter, adjusted.y + height]);
+            } else {
+                  points.push([adjusted.x + width, adjusted.y + height]);
+            }
+            if(has('bottom-left')) {
+                  points.push([adjusted.x + miter, adjusted.y + height]);
+                  points.push([adjusted.x, adjusted.y + height - miter]);
+            } else {
+                  points.push([adjusted.x, adjusted.y + height]);
+            }
+
+            if(rect.tagName === 'polygon') {
+                  rect.setAttribute('points', points.map(p => p.join(',')).join(' '));
+            } else {
+                  rect.setAttribute('x', adjusted.x);
+                  rect.setAttribute('y', adjusted.y);
+                  rect.setAttribute('width', width);
+                  rect.setAttribute('height', height);
+            }
+
+            for(const key in attrs) {
+                  if(key !== 'origin') rect.setAttribute(key, attrs[key]);
             }
 
             this.parentToAppendTo.appendChild(rect);
@@ -959,8 +1113,54 @@ class TSVGRectangle {
 
       updateAttributes(newOptions = {}) {
             Object.assign(this.options, newOptions);
+            if(this.options.usePattern) {
+                  this.ensureHatchPattern(this.options.hatchFill === 'none' ? this.options.fill : this.options.hatchFill);
+                  this.options.fill = `url(#${this.hatchId})`;
+            }
+            const {x, y, width, height, origin} = this.options;
+            const adjusted = this.adjustCoordinatesForOrigin(x, y, width, height, origin);
+            const has = side => this.options.miterSides.includes(side);
+            const miter = this.options.miter;
+            const points = [];
+
+            if(has('top-left')) {
+                  points.push([adjusted.x, adjusted.y + miter]);
+                  points.push([adjusted.x + miter, adjusted.y]);
+            } else {
+                  points.push([adjusted.x, adjusted.y]);
+            }
+            if(has('top-right')) {
+                  points.push([adjusted.x + width - miter, adjusted.y]);
+                  points.push([adjusted.x + width, adjusted.y + miter]);
+            } else {
+                  points.push([adjusted.x + width, adjusted.y]);
+            }
+            if(has('bottom-right')) {
+                  points.push([adjusted.x + width, adjusted.y + height - miter]);
+                  points.push([adjusted.x + width - miter, adjusted.y + height]);
+            } else {
+                  points.push([adjusted.x + width, adjusted.y + height]);
+            }
+            if(has('bottom-left')) {
+                  points.push([adjusted.x + miter, adjusted.y + height]);
+                  points.push([adjusted.x, adjusted.y + height - miter]);
+            } else {
+                  points.push([adjusted.x, adjusted.y + height]);
+            }
+
+            if(this.rect.tagName === 'polygon') {
+                  this.rect.setAttribute('points', points.map(p => p.join(',')).join(' '));
+            } else {
+                  this.rect.setAttribute('x', adjusted.x);
+                  this.rect.setAttribute('y', adjusted.y);
+                  this.rect.setAttribute('width', width);
+                  this.rect.setAttribute('height', height);
+            }
+
             for(const key in newOptions) {
-                  this.rect.setAttribute(key, newOptions[key]);
+                  if(!['x', 'y', 'width', 'height', 'origin'].includes(key)) {
+                        this.rect.setAttribute(key, newOptions[key]);
+                  }
             }
       }
 
@@ -970,13 +1170,25 @@ class TSVGRectangle {
 
       setAttribute(attr, value) {
             this.options[attr] = value;
-            this.rect.setAttribute(attr, value);
+            if(['x', 'y', 'width', 'height', 'origin', 'miter', 'miterSides', 'usePattern', 'hatchFill', 'hatchLineColor', 'hatchLineWidth', 'hatchSpacing'].includes(attr)) {
+                  this.updateAttributes({});
+            } else {
+                  this.rect.setAttribute(attr, value);
+            }
       }
 
       Delete() {
-            deleteElement(this.rect);
+            if(this.rect?.parentNode) {
+                  this.rect.parentNode.removeChild(this.rect);
+            }
+            if(this.defs?.parentNode) {
+                  this.defs.parentNode.removeChild(this.defs);
+            }
       }
 }
+
+
+
 
 class TSVGLine {
       constructor(parentToAppendTo, options = {}) {
@@ -1031,23 +1243,89 @@ class TSVGLine {
 class TSVGCircle {
       constructor(parentToAppendTo, options = {}) {
             this.parentToAppendTo = parentToAppendTo;
+            this.hatchId = `hatch45-${Math.random().toString(36).substr(2, 8)}`; // Unique hatch ID
+
             this.options = {
                   cx: 50,
                   cy: 50,
                   r: 25,
                   stroke: 'black',
                   strokeWidth: 2,
-                  ...options // Override defaults with user options
+                  fill: 'blue',
+                  origin: 'center',
+                  usePattern: false,
+                  hatchFill: 'none',
+                  hatchLineColor: 'black',
+                  hatchLineWidth: 4,
+                  hatchSpacing: 20,
+                  ...options
             };
+
+            if(this.options.usePattern) {
+                  this.ensureHatchPattern(this.options.hatchFill === 'none' ? this.options.fill : this.options.hatchFill);
+                  this.options.fill = `url(#${this.hatchId})`;
+            }
 
             this.circle = this.createCircle();
       }
 
+      ensureHatchPattern(hatchFill) {
+            const spacing = this.options.hatchSpacing || 10;
+            const svgNS = 'http://www.w3.org/2000/svg';
+            this.defs = document.createElementNS(svgNS, 'defs');
+            const pattern = document.createElementNS(svgNS, 'pattern');
+            pattern.setAttribute('id', this.hatchId);
+            pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+            pattern.setAttribute('width', spacing);
+            pattern.setAttribute('height', spacing);
+            pattern.setAttribute('patternTransform', 'rotate(45)');
+
+            const background = document.createElementNS(svgNS, 'rect');
+            background.setAttribute('width', spacing);
+            background.setAttribute('height', spacing);
+            background.setAttribute('fill', hatchFill || 'none');
+
+            const line = document.createElementNS(svgNS, 'line');
+            line.setAttribute('x1', '0');
+            line.setAttribute('y1', '0');
+            line.setAttribute('x2', '0');
+            line.setAttribute('y2', spacing);
+            line.setAttribute('stroke', this.options.hatchLineColor);
+            line.setAttribute('stroke-width', this.options.hatchLineWidth);
+
+            pattern.appendChild(background);
+            pattern.appendChild(line);
+            this.defs.appendChild(pattern);
+
+            const svg = this.parentToAppendTo.closest('svg');
+            if(svg) svg.insertBefore(this.defs, svg.firstChild);
+      }
+
+      adjustCoordinatesForOrigin(cx, cy, origin) {
+            switch(origin) {
+                  case "TL": case 'top-left': return {cx, cy};
+                  case "T": case 'top-middle': return {cx, cy};
+                  case "TR": case 'top-right': return {cx, cy};
+                  case "L": case 'center-left': return {cx, cy};
+                  case "M": case 'center': return {cx, cy};
+                  case "R": case 'center-right': return {cx, cy};
+                  case "BL": case 'bottom-left': return {cx, cy};
+                  case "B": case 'bottom-middle': return {cx, cy};
+                  case "BR": case 'bottom-right': return {cx, cy};
+                  default: return {cx, cy};
+            }
+      }
+
       createCircle() {
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            const {cx, cy, origin, ...attrs} = this.options;
+            const adjusted = this.adjustCoordinatesForOrigin(cx, cy, origin);
 
-            for(const key in this.options) {
-                  circle.setAttribute(key, this.options[key]);
+            circle.setAttribute('cx', adjusted.cx);
+            circle.setAttribute('cy', adjusted.cy);
+
+            for(const key in attrs) {
+                  if(key !== 'origin') circle.setAttribute(key, attrs[key]);
             }
 
             this.parentToAppendTo.appendChild(circle);
@@ -1056,8 +1334,22 @@ class TSVGCircle {
 
       updateAttributes(newOptions = {}) {
             Object.assign(this.options, newOptions);
-            for(const key in newOptions) {
-                  this.circle.setAttribute(key, newOptions[key]);
+
+            if(this.options.usePattern) {
+                  this.ensureHatchPattern(this.options.hatchFill === 'none' ? this.options.fill : this.options.hatchFill);
+                  this.options.fill = `url(#${this.hatchId})`;
+            }
+
+            const {cx, cy, origin} = this.options;
+            const adjusted = this.adjustCoordinatesForOrigin(cx, cy, origin);
+
+            this.circle.setAttribute('cx', adjusted.cx);
+            this.circle.setAttribute('cy', adjusted.cy);
+
+            for(const key in this.options) {
+                  if(!['cx', 'cy', 'origin'].includes(key)) {
+                        this.circle.setAttribute(key, this.options[key]);
+                  }
             }
       }
 
@@ -1067,13 +1359,23 @@ class TSVGCircle {
 
       setAttribute(attr, value) {
             this.options[attr] = value;
-            this.circle.setAttribute(attr, value);
+            if(['cx', 'cy', 'origin', 'usePattern', 'hatchFill', 'hatchLineColor', 'hatchLineWidth', 'hatchSpacing'].includes(attr)) {
+                  this.updateAttributes({});
+            } else {
+                  this.circle.setAttribute(attr, value);
+            }
       }
 
       Delete() {
-            deleteElement(this.circle);
+            if(this.circle?.parentNode) {
+                  this.circle.parentNode.removeChild(this.circle);
+            }
+            if(this.defs?.parentNode) {
+                  this.defs.parentNode.removeChild(this.defs);
+            }
       }
 }
+
 
 class TSVGEllipse {
       constructor(parentToAppendTo, options = {}) {
@@ -1289,3 +1591,662 @@ class TSVGText {
             this.setAttribute("dominant-baseline", dominantBaselineValue);
       }
 }
+
+function getRandomPointsInPath(pathElement, numberOfPoints) {
+      if(!(pathElement instanceof SVGPathElement)) {
+            throw new Error("Expected an SVGPathElement");
+      }
+
+      const bbox = pathElement.getBBox();
+      const pathLength = pathElement.getTotalLength();
+      const points = [];
+
+      const canvas = document.createElement("canvas");
+      canvas.width = bbox.width;
+      canvas.height = bbox.height;
+      const ctx = canvas.getContext("2d");
+
+      // Convert SVG path to canvas path
+      const path2d = new Path2D(pathElement.getAttribute("d"));
+
+      let attempts = 0;
+      const maxAttempts = numberOfPoints * 100;
+
+      while(points.length < numberOfPoints && attempts < maxAttempts) {
+            const x = bbox.x + Math.random() * bbox.width;
+            const y = bbox.y + Math.random() * bbox.height;
+            if(ctx.isPointInPath(path2d, x, y)) {
+                  points.push({x, y});
+            }
+            attempts++;
+      }
+
+      if(points.length < numberOfPoints) {
+            console.warn(`Only found ${points.length} points after ${attempts} attempts`);
+      }
+
+      return points;
+}
+
+/*
+new TSVGMeasurement(svg, {
+  target: rect,
+  direction: "both",
+  autoLabel: true,
+  deletable: true,
+  unit: "mm",
+  scale: 10,
+  precision: 1
+});
+*/
+
+class TSVGMeasurement_1 {
+      static idCounter = 0;
+
+      constructor(svgElement, options = {}) {
+            if(!(svgElement instanceof SVGElement)) {
+                  throw new Error("First argument must be an SVG element.");
+            }
+
+            this.svgElement = svgElement;
+            this.subMeasures = [];
+
+            const {
+                  x1, y1, x2, y2,
+                  target,
+                  direction = "both",
+                  sides = [],
+                  autoLabel = false,
+                  unit = "mm",
+                  scale = 1,
+                  precision = 0,
+                  arrowSize = 5,
+                  textOffset = 20,
+                  stroke = "#000",
+                  lineWidth = 1,
+                  fontSize = "12px",
+                  tickLength = 8,
+                  handleRadius = 8,
+                  offsetX = 10,
+                  offsetY = 10,
+                  sideHint = null
+            } = options;
+
+            this.sideHint = sideHint;
+
+            if(target instanceof SVGGraphicsElement) {
+                  const bbox = target.getBBox();
+
+                  const apply = (cond, x1, y1, x2, y2, sideHint) => {
+                        if(cond) {
+                              this.subMeasures.push(new TSVGMeasurement(svgElement, {
+                                    x1, y1, x2, y2,
+                                    autoLabel, unit, scale, precision,
+                                    arrowSize, textOffset, stroke, fontSize,
+                                    tickLength, handleRadius, lineWidth,
+                                    sideHint
+                              }));
+                        }
+                  };
+
+                  const useSides = sides.length > 0;
+                  const doWidth = direction === "width" || direction === "both";
+                  const doHeight = direction === "height" || direction === "both";
+
+                  apply(useSides ? sides.includes("top") : doWidth,
+                        bbox.x, bbox.y - offsetY, bbox.x + bbox.width, bbox.y - offsetY, 'top');
+
+                  apply(useSides ? sides.includes("bottom") : doWidth,
+                        bbox.x, bbox.y + bbox.height + offsetY, bbox.x + bbox.width, bbox.y + bbox.height + offsetY, 'bottom');
+
+                  apply(useSides ? sides.includes("left") : doHeight,
+                        bbox.x - offsetX, bbox.y, bbox.x - offsetX, bbox.y + bbox.height, 'left');
+
+                  apply(useSides ? sides.includes("right") : doHeight,
+                        bbox.x + bbox.width + offsetX, bbox.y, bbox.x + bbox.width + offsetX, bbox.y + bbox.height, 'right');
+
+                  return;
+            }
+
+            this.x1 = x1;
+            this.y1 = y1;
+            this.x2 = x2;
+            this.y2 = y2;
+            this.text = options.text ?? null;
+
+            this.autoLabel = autoLabel;
+            this.unit = unit;
+            this.scale = scale;
+            this.precision = precision;
+            this.arrowSize = arrowSize;
+            this.textOffset = textOffset;
+            this.stroke = stroke;
+            this.lineWidth = lineWidth;
+            this.fontSize = fontSize;
+            this.tickLength = tickLength;
+            this.handleRadius = handleRadius;
+
+            this.markerId = `arrowhead-${TSVGMeasurement.idCounter++}`;
+            this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+            this.initDefs();
+            this.createElements();
+            this.attachDragHandlers();
+
+            this.svgElement.appendChild(this.group);
+            this.update();
+      }
+
+      initDefs() {
+            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            defs.appendChild(this.createArrowMarker(this.markerId));
+            this.group.appendChild(defs);
+      }
+
+      createArrowMarker(id) {
+            const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+            marker.setAttribute("id", id);
+            marker.setAttribute("viewBox", "0 0 10 10");
+            marker.setAttribute("refX", "5");
+            marker.setAttribute("refY", "5");
+            marker.setAttribute("markerWidth", this.arrowSize);
+            marker.setAttribute("markerHeight", this.arrowSize);
+            marker.setAttribute("orient", "auto-start-reverse");
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+            path.setAttribute("fill", this.stroke);
+
+            marker.appendChild(path);
+            return marker;
+      }
+
+      createSVGElement(type, attributes = {}) {
+            const el = document.createElementNS("http://www.w3.org/2000/svg", type);
+            for(const [key, value] of Object.entries(attributes)) {
+                  el.setAttribute(key, value);
+            }
+            return el;
+      }
+
+      createElements() {
+            this.line = this.createSVGElement("line", {
+                  stroke: this.stroke,
+                  "stroke-width": this.lineWidth,
+                  "marker-start": `url(#${this.markerId})`,
+                  "marker-end": `url(#${this.markerId})`,
+            });
+
+            this.tick1 = this.createSVGElement("line", {stroke: this.stroke, "stroke-width": this.lineWidth});
+            this.tick2 = this.createSVGElement("line", {stroke: this.stroke, "stroke-width": this.lineWidth});
+
+            this.label = this.createSVGElement("text", {
+                  fill: this.stroke,
+                  "font-size": this.fontSize,
+                  "text-anchor": this.getTextAnchor(),
+                  "alignment-baseline": this.getAlignmentBaseline(),
+            });
+
+            this.handle1 = this.createSVGElement("circle", {
+                  r: this.handleRadius,
+                  fill: "transparent",
+                  cursor: "pointer",
+            });
+
+            this.handle2 = this.createSVGElement("circle", {
+                  r: this.handleRadius,
+                  fill: "transparent",
+                  cursor: "pointer",
+            });
+
+            this.group.append(this.line, this.tick1, this.tick2, this.label, this.handle1, this.handle2);
+      }
+
+      getTextAnchor() {
+            switch(this.sideHint) {
+                  case 'left': return 'middle';
+                  case 'right': return 'middle';
+                  default: return 'middle';
+            }
+      }
+
+      getAlignmentBaseline() {
+            switch(this.sideHint) {
+                  case 'top': return 'baseline';
+                  case 'bottom': return 'hanging';
+                  case 'left': return 'baseline';
+                  case 'right': return 'baseline';
+                  default: return 'baseline';
+            }
+      }
+
+      getSmartOffset(dx, dy) {
+            const length = Math.sqrt(dx * dx + dy * dy);
+            if(length === 0) return [0, 0];
+
+            const px = -dy / length;
+            const py = dx / length;
+
+            switch(this.sideHint) {
+                  case 'top': return [-px * this.textOffset, -py * this.textOffset];
+                  case 'bottom': return [px * this.textOffset, py * this.textOffset];
+                  case 'left': return [px * this.textOffset, py * this.textOffset];
+                  case 'right': return [-px * this.textOffset, -py * this.textOffset];
+                  default: return [-px * this.textOffset, -py * this.textOffset];
+            }
+      }
+
+      update() {
+            const dx = this.x2 - this.x1;
+            const dy = this.y2 - this.y1;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const ux = dx / length;
+            const uy = dy / length;
+
+            const tickInset = this.tickLength / 2 + 1;
+            const adjX1 = this.x1 + ux * tickInset;
+            const adjY1 = this.y1 + uy * tickInset;
+            const adjX2 = this.x2 - ux * tickInset;
+            const adjY2 = this.y2 - uy * tickInset;
+
+            this.line.setAttribute("x1", adjX1);
+            this.line.setAttribute("y1", adjY1);
+            this.line.setAttribute("x2", adjX2);
+            this.line.setAttribute("y2", adjY2);
+
+            const px = -dy / length;
+            const py = dx / length;
+            const tx = px * this.tickLength / 2;
+            const ty = py * this.tickLength / 2;
+
+            this.tick1.setAttribute("x1", this.x1 - tx);
+            this.tick1.setAttribute("y1", this.y1 - ty);
+            this.tick1.setAttribute("x2", this.x1 + tx);
+            this.tick1.setAttribute("y2", this.y1 + ty);
+
+            this.tick2.setAttribute("x1", this.x2 - tx);
+            this.tick2.setAttribute("y1", this.y2 - ty);
+            this.tick2.setAttribute("x2", this.x2 + tx);
+            this.tick2.setAttribute("y2", this.y2 + ty);
+
+            const midX = (this.x1 + this.x2) / 2;
+            const midY = (this.y1 + this.y2) / 2;
+            const [offsetX, offsetY] = this.getSmartOffset(dx, dy);
+
+            const labelX = midX + offsetX;
+            const labelY = midY + offsetY;
+
+            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            if(angle > 90 || angle < -90 || this.sideHint === 'left') {
+                  angle += 180;
+            }
+
+            const scaledLength = length * this.scale;
+            const formattedLength = scaledLength.toFixed(this.precision);
+
+            this.label.setAttribute("x", labelX);
+            this.label.setAttribute("y", labelY);
+            this.label.setAttribute("transform", `rotate(${angle} ${labelX} ${labelY})`);
+            this.label.setAttribute("text-anchor", this.getTextAnchor());
+            this.label.setAttribute("alignment-baseline", this.getAlignmentBaseline());
+            this.label.textContent = this.autoLabel ? `${formattedLength} ${this.unit}` : this.text;
+
+            this.handle1.setAttribute("cx", this.x1);
+            this.handle1.setAttribute("cy", this.y1);
+            this.handle2.setAttribute("cx", this.x2);
+            this.handle2.setAttribute("cy", this.y2);
+      }
+
+      attachDragHandlers() {
+            const startDrag = (handleIndex, evt) => {
+                  evt.preventDefault();
+                  const moveHandler = (moveEvt) => {
+                        const svgPoint = this.svgElement.createSVGPoint();
+                        svgPoint.x = moveEvt.clientX;
+                        svgPoint.y = moveEvt.clientY;
+                        const pt = svgPoint.matrixTransform(this.svgElement.getScreenCTM().inverse());
+
+                        if(handleIndex === 1) {
+                              this.x1 = pt.x;
+                              this.y1 = pt.y;
+                        } else {
+                              this.x2 = pt.x;
+                              this.y2 = pt.y;
+                        }
+
+                        this.update();
+                  };
+
+                  const stopDrag = () => {
+                        window.removeEventListener("mousemove", moveHandler);
+                        window.removeEventListener("mouseup", stopDrag);
+                  };
+
+                  window.addEventListener("mousemove", moveHandler);
+                  window.addEventListener("mouseup", stopDrag);
+            };
+
+            this.handle1.addEventListener("mousedown", (e) => startDrag(1, e));
+            this.handle2.addEventListener("mousedown", (e) => startDrag(2, e));
+      }
+
+      Delete = () => {
+            if(this.group && this.group.parentNode) {
+                  this.group.parentNode.removeChild(this.group);
+            }
+
+            if(this.subMeasures.length > 0) {
+                  for(let i = 0; i < this.subMeasures.length; i++) {
+                        this.subMeasures[i].Delete();
+                  }
+            }
+      };
+}
+
+class TSVGMeasurement {
+      static idCounter = 0;
+
+      constructor(svgElement, options = {}) {
+            if(!(svgElement instanceof SVGElement)) {
+                  throw new Error("First argument must be an SVG element.");
+            }
+
+            this.svgElement = svgElement;
+            this.subMeasures = [];
+
+            const {
+                  x1, y1, x2, y2,
+                  target,
+                  direction = "both",
+                  sides = [],
+                  autoLabel = false,
+                  unit = "mm",
+                  scale = 1,
+                  precision = 0,
+                  arrowSize = 5,
+                  textOffset = 20,
+                  stroke = "#000",
+                  lineWidth = 1,
+                  fontSize = "12px",
+                  tickLength = 8,
+                  handleRadius = 8,
+                  offsetX = 0,
+                  offsetY = 0,
+                  sideHint = null
+            } = options;
+
+            this.sideHint = sideHint;
+
+            if(target instanceof SVGGraphicsElement) {
+                  const bbox = target.getBBox();
+
+                  const apply = (cond, x1, y1, x2, y2, sideHint) => {
+                        if(cond) {
+                              this.subMeasures.push(new TSVGMeasurement(svgElement, {
+                                    x1, y1, x2, y2,
+                                    autoLabel, unit, scale, precision,
+                                    arrowSize, textOffset, stroke, fontSize,
+                                    tickLength, handleRadius, lineWidth,
+                                    sideHint
+                              }));
+                        }
+                  };
+
+                  const useSides = sides.length > 0;
+                  const doWidth = direction === "width" || direction === "both";
+                  const doHeight = direction === "height" || direction === "both";
+
+                  apply(useSides ? sides.includes("top") : doWidth,
+                        bbox.x, bbox.y - offsetY, bbox.x + bbox.width, bbox.y - offsetY, 'top');
+
+                  apply(useSides ? sides.includes("bottom") : doWidth,
+                        bbox.x, bbox.y + bbox.height + offsetY, bbox.x + bbox.width, bbox.y + bbox.height + offsetY, 'bottom');
+
+                  apply(useSides ? sides.includes("left") : doHeight,
+                        bbox.x - offsetX, bbox.y, bbox.x - offsetX, bbox.y + bbox.height, 'left');
+
+                  apply(useSides ? sides.includes("right") : doHeight,
+                        bbox.x + bbox.width + offsetX, bbox.y, bbox.x + bbox.width + offsetX, bbox.y + bbox.height, 'right');
+
+                  return;
+            }
+
+            // Apply offsetX and offsetY when no target is specified
+            this.x1 = x1 + offsetX;
+            this.y1 = y1 + offsetY;
+            this.x2 = x2 + offsetX;
+            this.y2 = y2 + offsetY;
+            this.text = options.text ?? null;
+
+            this.autoLabel = autoLabel;
+            this.unit = unit;
+            this.scale = scale;
+            this.precision = precision;
+            this.arrowSize = arrowSize;
+            this.textOffset = textOffset;
+            this.stroke = stroke;
+            this.lineWidth = lineWidth;
+            this.fontSize = fontSize;
+            this.tickLength = tickLength;
+            this.handleRadius = handleRadius;
+
+            this.markerId = `arrowhead-${TSVGMeasurement.idCounter++}`;
+            this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+            this.initDefs();
+            this.createElements();
+            this.attachDragHandlers();
+
+            this.svgElement.appendChild(this.group);
+            this.update();
+      }
+
+      initDefs() {
+            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            defs.appendChild(this.createArrowMarker(this.markerId));
+            this.group.appendChild(defs);
+      }
+
+      createArrowMarker(id) {
+            const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+            marker.setAttribute("id", id);
+            marker.setAttribute("viewBox", "0 0 10 10");
+            marker.setAttribute("refX", "5");
+            marker.setAttribute("refY", "5");
+            marker.setAttribute("markerWidth", this.arrowSize);
+            marker.setAttribute("markerHeight", this.arrowSize);
+            marker.setAttribute("orient", "auto-start-reverse");
+
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+            path.setAttribute("fill", this.stroke);
+
+            marker.appendChild(path);
+            return marker;
+      }
+
+      createSVGElement(type, attributes = {}) {
+            const el = document.createElementNS("http://www.w3.org/2000/svg", type);
+            for(const [key, value] of Object.entries(attributes)) {
+                  el.setAttribute(key, value);
+            }
+            return el;
+      }
+
+      createElements() {
+            this.line = this.createSVGElement("line", {
+                  stroke: this.stroke,
+                  "stroke-width": this.lineWidth,
+                  "marker-start": `url(#${this.markerId})`,
+                  "marker-end": `url(#${this.markerId})`,
+            });
+
+            this.tick1 = this.createSVGElement("line", {stroke: this.stroke, "stroke-width": this.lineWidth});
+            this.tick2 = this.createSVGElement("line", {stroke: this.stroke, "stroke-width": this.lineWidth});
+
+            this.label = this.createSVGElement("text", {
+                  fill: this.stroke,
+                  "font-size": this.fontSize,
+                  "text-anchor": this.getTextAnchor(),
+                  "alignment-baseline": this.getAlignmentBaseline(),
+            });
+
+            this.handle1 = this.createSVGElement("circle", {
+                  r: this.handleRadius,
+                  fill: "transparent",
+                  cursor: "pointer",
+            });
+
+            this.handle2 = this.createSVGElement("circle", {
+                  r: this.handleRadius,
+                  fill: "transparent",
+                  cursor: "pointer",
+            });
+
+            this.group.append(this.line, this.tick1, this.tick2, this.label, this.handle1, this.handle2);
+      }
+
+      getTextAnchor() {
+            switch(this.sideHint) {
+                  case 'left': return 'middle';
+                  case 'right': return 'middle';
+                  default: return 'middle';
+            }
+      }
+
+      getAlignmentBaseline() {
+            switch(this.sideHint) {
+                  case 'top': return 'baseline';
+                  case 'bottom': return 'hanging';
+                  case 'left': return 'baseline';
+                  case 'right': return 'baseline';
+                  default: return 'baseline';
+            }
+      }
+
+      getSmartOffset(dx, dy) {
+            const length = Math.sqrt(dx * dx + dy * dy);
+            if(length === 0) return [0, 0];
+
+            const px = -dy / length;
+            const py = dx / length;
+
+            switch(this.sideHint) {
+                  case 'top': return [-px * this.textOffset, -py * this.textOffset];
+                  case 'bottom': return [px * this.textOffset, py * this.textOffset];
+                  case 'left': return [px * this.textOffset, py * this.textOffset];
+                  case 'right': return [-px * this.textOffset, -py * this.textOffset];
+                  default: return [-px * this.textOffset, -py * this.textOffset];
+            }
+      }
+
+      update() {
+            const dx = this.x2 - this.x1;
+            const dy = this.y2 - this.y1;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const ux = dx / length;
+            const uy = dy / length;
+
+            const tickInset = this.tickLength / 2 + 1;
+            const adjX1 = this.x1 + ux * tickInset;
+            const adjY1 = this.y1 + uy * tickInset;
+            const adjX2 = this.x2 - ux * tickInset;
+            const adjY2 = this.y2 - uy * tickInset;
+
+            this.line.setAttribute("x1", adjX1);
+            this.line.setAttribute("y1", adjY1);
+            this.line.setAttribute("x2", adjX2);
+            this.line.setAttribute("y2", adjY2);
+
+            const px = -dy / length;
+            const py = dx / length;
+            const tx = px * this.tickLength / 2;
+            const ty = py * this.tickLength / 2;
+
+            this.tick1.setAttribute("x1", this.x1 - tx);
+            this.tick1.setAttribute("y1", this.y1 - ty);
+            this.tick1.setAttribute("x2", this.x1 + tx);
+            this.tick1.setAttribute("y2", this.y1 + ty);
+
+            this.tick2.setAttribute("x1", this.x2 - tx);
+            this.tick2.setAttribute("y1", this.y2 - ty);
+            this.tick2.setAttribute("x2", this.x2 + tx);
+            this.tick2.setAttribute("y2", this.y2 + ty);
+
+            const midX = (this.x1 + this.x2) / 2;
+            const midY = (this.y1 + this.y2) / 2;
+            const [offsetX, offsetY] = this.getSmartOffset(dx, dy);
+
+            const labelX = midX + offsetX;
+            const labelY = midY + offsetY;
+
+            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            if(angle > 90 || angle < -90 || this.sideHint === 'left') {
+                  angle += 180;
+            }
+
+            const scaledLength = length * this.scale;
+            let formattedLength = scaledLength.toFixed(this.precision);
+            if(this.precision > 0 && parseFloat(formattedLength) % 1 === 0) {
+                  formattedLength = parseFloat(formattedLength).toFixed(0);
+            }
+
+            this.label.setAttribute("x", labelX);
+            this.label.setAttribute("y", labelY);
+            this.label.setAttribute("transform", `rotate(${angle} ${labelX} ${labelY})`);
+            this.label.setAttribute("text-anchor", this.getTextAnchor());
+            this.label.setAttribute("alignment-baseline", this.getAlignmentBaseline());
+            this.label.textContent = this.autoLabel ? `${formattedLength} ${this.unit}` : this.text;
+
+            this.handle1.setAttribute("cx", this.x1);
+            this.handle1.setAttribute("cy", this.y1);
+            this.handle2.setAttribute("cx", this.x2);
+            this.handle2.setAttribute("cy", this.y2);
+      }
+
+      attachDragHandlers() {
+            const startDrag = (handleIndex, evt) => {
+                  evt.preventDefault();
+                  const moveHandler = (moveEvt) => {
+                        const svgPoint = this.svgElement.createSVGPoint();
+                        svgPoint.x = moveEvt.clientX;
+                        svgPoint.y = moveEvt.clientY;
+                        const pt = svgPoint.matrixTransform(this.svgElement.getScreenCTM().inverse());
+
+                        if(handleIndex === 1) {
+                              this.x1 = pt.x;
+                              this.y1 = pt.y;
+                        } else {
+                              this.x2 = pt.x;
+                              this.y2 = pt.y;
+                        }
+
+                        this.update();
+                  };
+
+                  const stopDrag = () => {
+                        window.removeEventListener("mousemove", moveHandler);
+                        window.removeEventListener("mouseup", stopDrag);
+                  };
+
+                  window.addEventListener("mousemove", moveHandler);
+                  window.addEventListener("mouseup", stopDrag);
+            };
+
+            this.handle1.addEventListener("mousedown", (e) => startDrag(1, e));
+            this.handle2.addEventListener("mousedown", (e) => startDrag(2, e));
+      }
+
+      Delete = () => {
+            if(this.group && this.group.parentNode) {
+                  this.group.parentNode.removeChild(this.group);
+            }
+
+            if(this.subMeasures.length > 0) {
+                  for(let i = 0; i < this.subMeasures.length; i++) {
+                        this.subMeasures[i].Delete();
+                  }
+            }
+      };
+}
+

@@ -835,6 +835,17 @@ async function setPartText(productNo, partNo, value) {
     await sleep(sleepMS);
     return partNo;
 }
+async function setPartNotes(productNo, partNo, value) {
+    var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
+    var partList = productContext.$data.Parts();
+    var part = partList[partNo - 1];
+
+    document.querySelector(Field.NotesField(productNo, partNo)).maxLength = 1000000;
+    part.PartNotes(value);
+    console.log("set part notes in " + partNo);
+    await sleep(sleepMS);
+    return partNo;
+}
 async function setPartVendorCostEa(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
     var partList = productContext.$data.Parts();
@@ -1617,6 +1628,9 @@ var Field = {
     },
     NameField: function(productNo, partNo) {
         return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " > div.ord-prod-part-header > span:nth-child(6) > input";
+    },
+    NotesField: function(productNo, partNo) {
+        return "#txtPartNotes_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo);
     },
     PartBorderField: function(productNo, partNo) {
         return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo);

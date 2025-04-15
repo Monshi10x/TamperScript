@@ -2,13 +2,14 @@ class Frame {
 
       #canvasCtx;
 
-      constructor(parentObject, canvasCtx, updateFunction) {
-            this.createGUI(parentObject, canvasCtx, updateFunction);
+      constructor(parentObject, canvasCtx, updateFunction, DragZoomSVG) {
+            this.createGUI(parentObject, canvasCtx, updateFunction, DragZoomSVG);
       }
 
-      createGUI(parentObject, canvasCtx, updateFunction) {
+      createGUI(parentObject, canvasCtx, updateFunction, DragZoomSVG) {
             this.#canvasCtx = canvasCtx;
             this.callback = updateFunction;
+            this.DragZoomSVG = DragZoomSVG;
             this.l_frameThickness = 0;
             this.l_frameDepth = 0;
             this.l_frameOffsetX = 0;
@@ -41,6 +42,7 @@ class Frame {
             }
             this.l_frameDimensions = createDropdown_Infield("Dimensions", 0, "width:150px", null, this.toggleFlip, this.l_frameContainer);
             this.createFrameDimensionsOptions(0 /*initially set to Gal Steel, index 0*/);
+            dropdownSetSelectedText(this.l_frameDimensions[1], "25x25x1.6", false);
             this.l_frameFlipDimensions = createCheckbox_Infield("Flip", false, "width:100px;", this.toggleFlip, this.l_frameContainer);
             this.l_isCubelokFrame = createCheckbox_Infield("Is Cubelok", false, "width:150px;margin-right:300px;", this.toggleCubelok, this.l_frameContainer);
             this.l_hr2 = createHr("width:95%", this.l_frameContainer);
@@ -519,6 +521,259 @@ class Frame {
             }
       }
 
+      setReferences(frameClass, legClass, footingClass, baseplateClass) {
+            this.frameClass = frameClass;
+            this.legClass = legClass;
+            this.footingClass = footingClass;
+            this.baseplateClass = baseplateClass;
+
+            this.UpdateSVG();
+      }
+
+      rects = [];
+      DrawRect(ctx, xOffset, yOffset, width, height, originPoint, colour, mitreAmount, mitreSides) {
+            //drawRect(ctx, xOffset, yOffset, width, height, originPoint, colour, lineWidth);
+
+            let defaultColour = "#bbb";
+            let defaultOpacity = 1;
+
+            let rect = new TSVGRectangle(this.DragZoomSVG.svgG, {
+                  x: xOffset,
+                  y: yOffset,
+                  width: width,
+                  height: height,
+                  opacity: defaultOpacity,
+                  fill: colour || defaultColour,
+                  origin: originPoint,
+                  class: "frame",
+                  miter: mitreAmount || "null",
+                  miterSides: mitreSides || "null",
+            });
+            this.rects.push(rect);
+      }
+
+      UpdateSVG() {
+            let legClass = this.legClass;
+            let frameClass = this.frameClass;
+            let footingClass = this.footingClass;
+            let baseplateClass = this.baseplateClass;
+
+            for(let r = this.rects.length - 1; r >= 0; r--) {
+                  this.rects[r].Delete();
+            }
+            this.rects = [];
+
+
+            if(!this.frameRequired) return;
+
+
+            var sideBRequired = attachmentType == "3 Post, Centre Frame, Centre Sign" || attachmentType == "3 Post, Forward Frame, Front Sign" || attachmentType == "3 Post, Front Frame, Front Sign";
+            if(this.frameWidth_SideA > 0 && this.frameHeight_SideA > 0) {
+                  this.frameOffsetX = xOffset + (attachmentType == "1 Post, Front Frame, Front Sign" ? 0 : legClass.legWidth) + (attachmentType == "2 Post, Front Frame, Front Sign" || attachmentType == "3 Post, Front Frame, Front Sign" ? -legClass.legWidth : 0);
+                  this.frameOffsetY = yOffset;
+                  var weldedToLegs = 0;
+                  if(this.l_frameSeparateFromLegs.value == "Welded to Legs") {
+                        weldedToLegs = 1;
+                  } else {
+                        weldedToLegs = 0;
+                  }
+
+                  // this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameThickness - this.frameThickness * weldedToLegs, this.frameOffsetY + this.frameThickness, this.frameWidth_SideA - 2 * this.frameThickness + this.frameThickness * weldedToLegs * 2, this.frameHeight_SideA - 2 * this.frameThickness);
+                  //this.DrawRect(this.#canvasCtx, this.frameOffsetX, this.frameOffsetY, this.frameWidth_SideA, this.frameHeight_SideA);
+
+                  //top
+                  this.DrawRect(this.#canvasCtx, this.frameOffsetX, this.frameOffsetY, this.frameWidth_SideA, this.frameThickness, "TL", null, this.frameThickness, ["bottom-left", "bottom-right"]);
+                  //left
+                  this.DrawRect(this.#canvasCtx, this.frameOffsetX, this.frameOffsetY, this.frameThickness, this.frameHeight_SideA, "TL", null, this.frameThickness, ["top-right", "bottom-right"]);
+                  //bottom
+                  this.DrawRect(this.#canvasCtx, this.frameOffsetX, this.frameOffsetY + this.frameHeight_SideA, this.frameWidth_SideA, this.frameThickness, "BL", null, this.frameThickness, ["top-left", "top-right"]);
+                  //right
+                  this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameWidth_SideA, this.frameOffsetY, this.frameThickness, this.frameHeight_SideA, "TR", null, this.frameThickness, ['top-left', 'bottom-left']);
+
+
+                  if(attachmentType == "2 Post, Forward Frame, Front Sign") {
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView + (attachmentType == "1 Post, Front Frame, Front Sign" ? 0 : legClass.legWidth), yOffset_TopView + legClass.legDepth - this.frameDepth, this.frameWidth_SideA, this.frameDepth);
+                  } else if(attachmentType == "2 Post, Front Frame, Front Sign") {
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView, yOffset_TopView + legClass.legDepth, this.frameWidth_SideA, this.frameDepth);
+                  } else if(attachmentType == "2 Post, Centre Frame, Centre Sign") {
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView + legClass.legWidth, yOffset_TopView + legClass.legDepth / 2, this.frameWidth_SideA, this.frameDepth, "L");
+                  } else if(attachmentType == "3 Post, Centre Frame, Centre Sign") {
+                        var yOffset_TopView_Extra = this.frameWidth_SideB;
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView + (attachmentType == "1 Post, Front Frame, Front Sign" ? 0 : legClass.legWidth), yOffset_TopView + yOffset_TopView_Extra + legClass.legDepth / 2 - this.frameDepth / 2, this.frameWidth_SideA, this.frameDepth);
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView + legClass.legWidth + this.frameWidth_SideA + legClass.legWidth / 2, yOffset_TopView + yOffset_TopView_Extra, this.frameDepth, this.frameWidth_SideB, "B");
+                  } else if(attachmentType == "3 Post, Forward Frame, Front Sign") {
+                        var yOffset_TopView_Extra = this.frameWidth_SideB;
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView + legClass.legWidth, yOffset_TopView + yOffset_TopView_Extra + legClass.legDepth, this.frameWidth_SideA, this.frameDepth, "BL");
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView + legClass.legWidth + this.frameWidth_SideA + legClass.legWidth, yOffset_TopView + yOffset_TopView_Extra, this.frameDepth, this.frameWidth_SideB, "BR");
+                  } else if(attachmentType == "3 Post, Front Frame, Front Sign") {
+                        var yOffset_TopView_Extra = this.frameWidth_SideB;
+                        var xFrameOverlap = this.frameDepth;
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView, yOffset_TopView + yOffset_TopView_Extra + legClass.legDepth, this.frameWidth_SideA, this.frameDepth);
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView + this.frameWidth_SideA - xFrameOverlap, yOffset_TopView + yOffset_TopView_Extra + legClass.legDepth, this.frameDepth, this.frameWidth_SideB, "BL");
+                  } else if(attachmentType == "1 Post, Front Frame, Front Sign") {
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView + (attachmentType == "1 Post, Front Frame, Front Sign" ? 0 : legClass.legWidth), yOffset_TopView + legClass.legDepth, this.frameWidth_SideA, this.frameDepth);
+                  } else {
+                        this.DrawRect(this.#canvasCtx, xOffset_TopView + (attachmentType == "1 Post, Front Frame, Front Sign" ? 0 : legClass.legWidth), yOffset_TopView + legClass.legDepth / 2, this.frameWidth_SideA, this.frameDepth);
+                  }
+                  for(var i = 0; i < this.frameVerticalPartitions; i++) {
+                        var partitionPos = (this.frameWidth_SideA - this.frameThickness) / (this.frameVerticalPartitions + 1);
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameThickness + partitionPos * (i + 1) - this.frameThickness, this.frameOffsetY + this.frameThickness, this.frameThickness, this.frameHeight_SideA - 2 * this.frameThickness);
+                  }
+                  for(var w = 0; w < this.frameHorizontalPartitions; w++) {
+                        var partitionPosw = (this.frameHeight_SideA - this.frameThickness) / (this.frameHorizontalPartitions + 1);
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameThickness, this.frameOffsetY + this.frameThickness + partitionPosw * (w + 1) - this.frameThickness, this.frameWidth_SideA - 2 * this.frameThickness, this.frameThickness);
+                  }
+                  if(this.isQubelok) {
+                        this.numCobelokCorners = 0;
+                        this.numCobelokTs = 0;
+                        this.numCobelokCrosses = 0;
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetX, this.frameOffsetY, this.frameDepth, this.frameDepth, "TL", "black");
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameWidth_SideA - this.frameDepth, this.frameOffsetY, this.frameDepth, this.frameDepth, "TL", "black");
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetX, this.frameOffsetY + this.frameHeight_SideA - this.frameDepth, this.frameDepth, this.frameDepth, "TL", "black");
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameWidth_SideA - this.frameDepth, this.frameOffsetY + this.frameHeight_SideA - this.frameDepth, this.frameDepth, this.frameDepth, "TL", "black");
+                        this.numCobelokCorners += 4;
+                        for(var h = 0; h < this.frameVerticalPartitions; h++) {
+                              var partitionPos1 = (this.frameWidth_SideA - this.frameThickness) / (this.frameVerticalPartitions + 1);
+                              this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameThickness + partitionPos1 * (h + 1) - this.frameThickness, this.frameOffsetY, this.frameThickness, this.frameThickness, "TL", "black");
+                              this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameThickness + partitionPos1 * (h + 1) - this.frameThickness, this.frameOffsetY + this.frameHeight_SideA - this.frameThickness, this.frameThickness, this.frameThickness, "TL", "black");
+                              this.numCobelokTs += 2;
+                        }
+                        for(var j = 0; j < this.frameHorizontalPartitions; j++) {
+                              var partitionPos2 = (this.frameHeight_SideA - this.frameThickness) / (this.frameHorizontalPartitions + 1);
+                              this.DrawRect(this.#canvasCtx, this.frameOffsetX, this.frameOffsetY + this.frameThickness + partitionPos2 * (j + 1) - this.frameThickness, this.frameThickness, this.frameThickness, "TL", "black");
+                              this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameWidth_SideA - this.frameThickness, this.frameOffsetY + this.frameThickness + partitionPos2 * (j + 1) - this.frameThickness, this.frameThickness, this.frameThickness, "TL", "black");
+                              this.numCobelokTs += 2;
+                        }
+                        for(var k = 0; k < this.frameVerticalPartitions; k++) {
+                              var partitionPosV = (this.frameWidth_SideA - this.frameThickness) / (this.frameVerticalPartitions + 1);
+                              for(var l = 0; l < this.frameHorizontalPartitions; l++) {
+                                    var partitionPosH = (this.frameHeight_SideA - this.frameThickness) / (this.frameHorizontalPartitions + 1);
+                                    this.DrawRect(this.#canvasCtx, this.frameOffsetX + this.frameThickness + partitionPosV * (k + 1) - this.frameThickness, this.frameOffsetY + this.frameThickness + partitionPosH * (l + 1) - this.frameThickness, this.frameThickness, this.frameThickness, "TL", "black");
+                                    this.numCobelokCrosses++;
+                              }
+                        }
+                  }
+                  if(weldedToLegs == 0) {
+                        if(this.frameCornerFinishing == "Mitred") {
+                              this.#canvasCtx.moveTo(this.frameOffsetX, this.frameOffsetY);
+                              this.#canvasCtx.lineTo(this.frameOffsetX + this.frameThickness, this.frameOffsetY + this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetX + this.frameWidth_SideA, this.frameOffsetY);
+                              this.#canvasCtx.lineTo(this.frameOffsetX + this.frameWidth_SideA - this.frameThickness, this.frameOffsetY + this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetX, this.frameOffsetY + this.frameHeight_SideA);
+                              this.#canvasCtx.lineTo(this.frameOffsetX + this.frameThickness, this.frameOffsetY + this.frameHeight_SideA - this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetX + this.frameWidth_SideA, this.frameOffsetY + this.frameHeight_SideA);
+                              this.#canvasCtx.lineTo(this.frameOffsetX + this.frameWidth_SideA - this.frameThickness, this.frameOffsetY + this.frameHeight_SideA - this.frameThickness);
+                              this.#canvasCtx.stroke();
+                        } else if(this.frameCornerFinishing == "Open") {
+                              this.#canvasCtx.moveTo(this.frameOffsetX, this.frameOffsetY + this.frameThickness);
+                              this.#canvasCtx.lineTo(this.frameOffsetX + this.frameThickness, this.frameOffsetY + this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetX + this.frameWidth_SideA, this.frameOffsetY + this.frameThickness);
+                              this.#canvasCtx.lineTo(this.frameOffsetX + this.frameWidth_SideA - this.frameThickness, this.frameOffsetY + this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetX, this.frameOffsetY + this.frameHeight_SideA - this.frameThickness);
+                              this.#canvasCtx.lineTo(this.frameOffsetX + this.frameThickness, this.frameOffsetY + this.frameHeight_SideA - this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetX + this.frameWidth_SideA, this.frameOffsetY + this.frameHeight_SideA - this.frameThickness);
+                              this.#canvasCtx.lineTo(this.frameOffsetX + this.frameWidth_SideA - this.frameThickness, this.frameOffsetY + this.frameHeight_SideA - this.frameThickness);
+                              this.#canvasCtx.stroke();
+                        }
+                  }
+                  this.DrawMeasurements(this.frameOffsetX, this.frameOffsetY, this.frameWidth_SideA, this.frameHeight_SideA);
+            }
+
+            //SIDE B
+            if(sideBRequired && this.frameWidth_SideB > 0 && this.frameHeight_SideB > 0) {
+                  this.frameOffsetXB = sideBOffsetX + xOffset + this.frameWidth_SideA + (attachmentType == "3 Post, Centre Frame, Centre Sign" || attachmentType == "3 Post, Forward Frame, Front Sign" ? legClass.legWidth * 2 : 0) + legClass.legDepth + (attachmentType == "3 Post, Front Frame, Front Sign" ? -legClass.legDepth : 0);
+                  this.frameOffsetYB = yOffset;
+                  var weldedToLegs = 0;
+                  if(this.l_frameSeparateFromLegs.value == "Welded to Legs") {
+                        weldedToLegs = 1;
+                  } else {
+                        weldedToLegs = 0;
+                  }
+
+
+                  //top
+                  this.DrawRect(this.#canvasCtx, this.frameOffsetXB, this.frameOffsetYB, this.frameWidth_SideB, this.frameThickness, "TL", null, this.frameThickness, ["bottom-left", "bottom-right"]);
+                  //left
+                  this.DrawRect(this.#canvasCtx, this.frameOffsetXB, this.frameOffsetYB, this.frameThickness, this.frameHeight_SideB, "TL", null, this.frameThickness, ["top-right", "bottom-right"]);
+                  //bottom
+                  this.DrawRect(this.#canvasCtx, this.frameOffsetXB, this.frameOffsetYB + this.frameHeight_SideB, this.frameWidth_SideB, this.frameThickness, "BL", null, this.frameThickness, ["top-left", "top-right"]);
+                  //right
+                  this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameWidth_SideB, this.frameOffsetYB, this.frameThickness, this.frameHeight_SideB, "TR", null, this.frameThickness, ['top-left', 'bottom-left']);
+
+
+
+
+                  //this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameThickness - this.frameThickness * weldedToLegs, this.frameOffsetYB + this.frameThickness, this.frameWidth_SideB - 2 * this.frameThickness + this.frameThickness * weldedToLegs * 2, this.frameHeight_SideB - 2 * this.frameThickness);
+                  //this.DrawRect(this.#canvasCtx, this.frameOffsetXB, this.frameOffsetYB, this.frameWidth_SideB, this.frameHeight_SideB);
+                  for(var i = 0; i < this.frameVerticalPartitions; i++) {
+                        var partitionPos = (this.frameWidth_SideB - this.frameThickness) / (this.frameVerticalPartitions + 1);
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameThickness + partitionPos * (i + 1) - this.frameThickness, this.frameOffsetYB + this.frameThickness, this.frameThickness, this.frameHeight_SideB - 2 * this.frameThickness);
+                  }
+                  for(var w = 0; w < this.frameHorizontalPartitions; w++) {
+                        var partitionPosw = (this.frameHeight_SideB - this.frameThickness) / (this.frameHorizontalPartitions + 1);
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameThickness, this.frameOffsetYB + this.frameThickness + partitionPosw * (w + 1) - this.frameThickness, this.frameWidth_SideB - 2 * this.frameThickness, this.frameThickness);
+                  }
+                  if(this.isQubelok) {
+                        this.numCobelokCorners = 0;
+                        this.numCobelokTs = 0;
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetXB, this.frameOffsetYB, this.frameDepth, this.frameDepth, "TL", "black");
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameWidth_SideB - this.frameDepth, this.frameOffsetYB, this.frameDepth, this.frameDepth, "TL", "black");
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetXB, this.frameOffsetYB + this.frameHeight_SideB - this.frameDepth, this.frameDepth, this.frameDepth, "TL", "black");
+                        this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameWidth_SideB - this.frameDepth, this.frameOffsetYB + this.frameHeight_SideB - this.frameDepth, this.frameDepth, this.frameDepth, "TL", "black");
+                        this.numCobelokCorners += 4;
+                        for(var h = 0; h < this.frameVerticalPartitions; h++) {
+                              var partitionPos1 = (this.frameWidth_SideB - this.frameThickness) / (this.frameVerticalPartitions + 1);
+                              this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameThickness + partitionPos1 * (h + 1) - this.frameThickness, this.frameOffsetYB, this.frameThickness, this.frameThickness, "TL", "black");
+                              this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameThickness + partitionPos1 * (h + 1) - this.frameThickness, this.frameOffsetYB + this.frameHeight_SideB - this.frameThickness, this.frameThickness, this.frameThickness, "TL", "black");
+                              this.numCobelokTs += 2;
+                        }
+                        for(var j = 0; j < this.frameHorizontalPartitions; j++) {
+                              var partitionPos2 = (this.frameHeight_SideB - this.frameThickness) / (this.frameHorizontalPartitions + 1);
+                              this.DrawRect(this.#canvasCtx, this.frameOffsetXB, this.frameOffsetYB + this.frameThickness + partitionPos2 * (j + 1) - this.frameThickness, this.frameThickness, this.frameThickness, "TL", "black");
+                              this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameWidth_SideB - this.frameThickness, this.frameOffsetYB + this.frameThickness + partitionPos2 * (j + 1) - this.frameThickness, this.frameThickness, this.frameThickness, "TL", "black");
+                              this.numCobelokTs += 2;
+                        }
+                        for(var k = 0; k < this.frameVerticalPartitions; k++) {
+                              var partitionPosV = (this.frameWidth_SideB - this.frameThickness) / (this.frameVerticalPartitions + 1);
+                              for(var l = 0; l < this.frameHorizontalPartitions; l++) {
+                                    var partitionPosH = (this.frameHeight_SideB - this.frameThickness) / (this.frameHorizontalPartitions + 1);
+                                    this.DrawRect(this.#canvasCtx, this.frameOffsetXB + this.frameThickness + partitionPosV * (k + 1) - this.frameThickness, this.frameOffsetYB + this.frameThickness + partitionPosH * (l + 1) - this.frameThickness, this.frameThickness, this.frameThickness, "TL", "black");
+                                    this.numCobelokCrosses++;
+                              }
+                        }
+                  } else {
+                        this.numCobelokCorners = 0;
+                        this.numCobelokTs = 0;
+                        this.numCobelokCrosses = 0;
+                  }
+                  if(weldedToLegs == 0) {
+                        if(this.frameCornerFinishing == "Mitred") {
+
+                              this.#canvasCtx.moveTo(this.frameOffsetXB, this.frameOffsetYB);
+                              this.#canvasCtx.lineTo(this.frameOffsetXB + this.frameThickness, this.frameOffsetYB + this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetXB + this.frameWidth_SideB, this.frameOffsetYB);
+                              this.#canvasCtx.lineTo(this.frameOffsetXB + this.frameWidth_SideB - this.frameThickness, this.frameOffsetYB + this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetXB, this.frameOffsetYB + this.frameHeight_SideB);
+                              this.#canvasCtx.lineTo(this.frameOffsetXB + this.frameThickness, this.frameOffsetYB + this.frameHeight_SideB - this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetXB + this.frameWidth_SideB, this.frameOffsetYB + this.frameHeight_SideB);
+                              this.#canvasCtx.lineTo(this.frameOffsetXB + this.frameWidth_SideB - this.frameThickness, this.frameOffsetYB + this.frameHeight_SideB - this.frameThickness);
+                              this.#canvasCtx.stroke();
+                        } else if(this.frameCornerFinishing == "Open") {
+                              this.#canvasCtx.moveTo(this.frameOffsetXB, this.frameOffsetYB + this.frameThickness);
+                              this.#canvasCtx.lineTo(this.frameOffsetXB + this.frameThickness, this.frameOffsetYB + this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetXB + this.frameWidth_SideB, this.frameOffsetYB + this.frameThickness);
+                              this.#canvasCtx.lineTo(this.frameOffsetXB + this.frameWidth_SideB - this.frameThickness, this.frameOffsetYB + this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetXB, this.frameOffsetYB + this.frameHeight_SideB - this.frameThickness);
+                              this.#canvasCtx.lineTo(this.frameOffsetXB + this.frameThickness, this.frameOffsetYB + this.frameHeight_SideB - this.frameThickness);
+                              this.#canvasCtx.moveTo(this.frameOffsetXB + this.frameWidth_SideB, this.frameOffsetYB + this.frameHeight_SideB - this.frameThickness);
+                              this.#canvasCtx.lineTo(this.frameOffsetXB + this.frameWidth_SideB - this.frameThickness, this.frameOffsetYB + this.frameHeight_SideB - this.frameThickness);
+                              this.#canvasCtx.stroke();
+                        }
+                  }
+                  this.DrawMeasurements(this.frameOffsetXB, this.frameOffsetYB, this.frameWidth_SideB, this.frameHeight_SideB);
+            }
+      }
+
       Draw(legClass) {
             this.legClass = legClass;
             if(!this.frameRequired) return;
@@ -698,6 +953,15 @@ class Frame {
                   }
                   this.DrawMeasurements(this.frameOffsetXB, this.frameOffsetYB, this.frameWidth_SideB, this.frameHeight_SideB);
             }
+      }
+
+      setReferences(frameClass, legClass, footingClass, baseplateClass) {
+            this.frameClass = frameClass;
+            this.legClass = legClass;
+            this.footingClass = footingClass;
+            this.baseplateClass = baseplateClass;
+
+            this.UpdateSVG();
       }
 
       DrawMeasurements(xOffset, yOffset, width, height) {

@@ -10,13 +10,14 @@ class Footing {
 
       #canvasCtx;
 
-      constructor(parentObject, canvasCtx, updateFunction) {
-            this.createGUI(parentObject, canvasCtx, updateFunction);
+      constructor(parentObject, canvasCtx, updateFunction, DragZoomSVG) {
+            this.createGUI(parentObject, canvasCtx, updateFunction, DragZoomSVG);
       }
 
-      createGUI(parentObject, canvasCtx, updateFunction) {
+      createGUI(parentObject, canvasCtx, updateFunction, DragZoomSVG) {
             this.#canvasCtx = canvasCtx;
             this.callback = updateFunction;
+            this.DragZoomSVG = DragZoomSVG;
             this.l_footingContainer = document.createElement("div");
             this.l_footingContainer.style = STYLE.BillboardMenus;
             this.l_footingRequired = createCheckbox_Infield("Footing", false, "width:97%;", this.footingToggle, this.l_footingContainer);
@@ -27,7 +28,7 @@ class Footing {
             this.l_footingDepth = createInput_Infield("Depth", 600, "width:100px;", this.callback, this.l_footingContainer, true, 100);
             setFieldDisabled(true, this.l_footingDepth[1], this.l_footingDepth[0]);
             setFieldHidden(true, this.l_footingDepth[1], this.l_footingDepth[0]);
-            this.l_footingDiameter = createInput_Infield("Diameter", 300, "width:100px;;margin-right:200px;", this.callback, this.l_footingContainer, true, 50);
+            this.l_footingDiameter = createInput_Infield("Diameter", 200, "width:100px;;margin-right:200px;", this.callback, this.l_footingContainer, true, 50);
             setFieldDisabled(true, this.l_footingDiameter[1], this.l_footingDiameter[0]);
             setFieldHidden(true, this.l_footingDiameter[1], this.l_footingDiameter[0]);
             this.l_hr2 = createHr("width:95%;display:none", this.l_footingContainer);
@@ -264,6 +265,174 @@ class Footing {
                   this.#canvasCtx.moveTo(x, y + i * spaceY);
                   this.#canvasCtx.lineTo(x + w, y + (i + 1) * spaceY);
                   this.#canvasCtx.stroke();
+            }
+      }
+
+      setReferences(frameClass, legClass, baseplateClass, signClass) {
+            this.frameClass = frameClass;
+            this.legClass = legClass;
+            this.baseplateClass = baseplateClass;
+            this.signClass = signClass;
+
+            this.UpdateSVG();
+      }
+
+      rects = [];
+      measurements = [];
+      DrawRect(params) {
+            let rect = new TSVGRectangle(this.DragZoomSVG.svgG, {
+                  hatchFill: '#999',
+                  opacity: 1,
+                  ...params
+            });
+            this.rects.push(rect);
+
+            return rect.rect;
+      }
+
+      DrawCircle(params) {
+            let circle = new TSVGCircle(this.DragZoomSVG.svgG, {
+                  hatchFill: '#999',
+                  opacity: 1,
+                  ...params
+            });
+            this.rects.push(circle);
+
+            return circle.circle;
+      }
+
+
+      UpdateSVG() {
+            let legClass = this.legClass;
+            let frameClass = this.frameClass;
+            let baseplateClass = this.baseplateClass;
+
+            for(let r = this.rects.length - 1; r >= 0; r--) {
+                  this.rects[r].Delete();
+            }
+            this.rects = [];
+
+            for(let r = this.measurements.length - 1; r >= 0; r--) {
+                  this.measurements[r].Delete();
+            }
+            this.measurements = [];
+
+            if(!this.footingRequired) return;
+            var offsetArray;
+            var l_sideBOffsetX = sideBOffsetX + legClass.legWidth * 2 + frameClass.frameWidth_SideA;
+            if(attachmentType == "1 Post, Front Frame, Front Sign") {
+                  this.qty = 1;
+                  offsetArray = [[0 + frameClass.frameWidth_SideA / 2, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true]];
+            } else if(attachmentType == "2 Post, Centre Frame, Centre Sign" || attachmentType == "2 Post, Forward Frame, Front Sign") {
+                  this.qty = 2;
+                  offsetArray = [
+                        [0 + legClass.legWidth / 2, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                        [0 - legClass.legWidth / 2 + legClass.legWidth * 2 + frameClass.frameWidth_SideA, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                  ];
+            } else if(attachmentType == "2 Post, Front Frame, Front Sign") {
+                  this.qty = 2;
+                  offsetArray = [
+                        [0 + legClass.legWidth / 2, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                        [0 - legClass.legWidth / 2 + frameClass.frameWidth_SideA, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                  ];
+            } else if(attachmentType == "3 Post, Centre Frame, Centre Sign") {
+                  this.qty = 3;
+                  offsetArray = [
+                        [0 + legClass.legWidth / 2, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                        [0 - legClass.legWidth / 2 + legClass.legWidth * 2 + frameClass.frameWidth_SideA, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                        [0 - legClass.legWidth / 2 + legClass.legWidth * 2 + frameClass.frameWidth_SideA, null, 0 - frameClass.frameWidth_SideB - legClass.legWidth / 2, false, true],
+                        [0 + l_sideBOffsetX + legClass.legDepth / 2, legClass.legHeightAboveGround, null, true, false],
+                        [0 + l_sideBOffsetX + legClass.legDepth + frameClass.frameWidth_SideB + legClass.legWidth / 2, legClass.legHeightAboveGround, null, true, false],
+                  ];
+            } else if(attachmentType == "3 Post, Forward Frame, Front Sign") {
+                  this.qty = 3;
+                  offsetArray = [
+                        [0 + legClass.legWidth / 2, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                        [0 - legClass.legWidth / 2 + legClass.legWidth * 2 + frameClass.frameWidth_SideA, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                        [0 - legClass.legDepth / 2 + legClass.legWidth * 2 + frameClass.frameWidth_SideA, null, 0 - frameClass.frameWidth_SideB - legClass.legWidth / 2, false, true],
+                        [0 + l_sideBOffsetX + legClass.legDepth / 2, legClass.legHeightAboveGround, null, true, false],
+                        [0 + l_sideBOffsetX + legClass.legDepth + frameClass.frameWidth_SideB + legClass.legWidth / 2, legClass.legHeightAboveGround, null, true, false],
+                  ];
+            } else if(attachmentType == "3 Post, Front Frame, Front Sign") {
+                  this.qty = 3;
+                  offsetArray = [
+                        [0 + legClass.legWidth / 2, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                        [0 + frameClass.frameWidth_SideA - frameClass.frameDepth - legClass.legWidth / 2, legClass.legHeightAboveGround, 0 + legClass.legDepth / 2, true, true],
+                        [0 + frameClass.frameWidth_SideA - frameClass.frameDepth - legClass.legDepth / 2, null, 0 + legClass.legWidth / 2 - frameClass.frameWidth_SideB + legClass.legDepth, false, true],
+                        [0 + l_sideBOffsetX - legClass.legWidth * 2 + legClass.legDepth / 2, legClass.legHeightAboveGround, null, true, false],
+                        [0 + l_sideBOffsetX - legClass.legWidth * 2 + frameClass.frameWidth_SideB - legClass.legWidth / 2, legClass.legHeightAboveGround, null, true, false],
+                  ];
+            }
+            for(var a = 0; a < offsetArray.length; a++) {
+                  var xo = offsetArray[a][0];
+                  var yo = offsetArray[a][1];
+                  var zo = offsetArray[a][2];
+                  var sideView = offsetArray[a][3];
+                  var topView = offsetArray[a][4];
+                  if(sideView) {
+                        let sideRect = this.DrawRect({
+                              x: xOffset + xo - this.diameter / 2,
+                              y: yOffset + yo,
+                              width: this.diameter,
+                              height: this.depth,
+                              usePattern: true
+                        });
+                        if(a == 0) {
+                              this.measurements.push(new TSVGMeasurement(this.DragZoomSVG.svgG, {
+                                    target: sideRect,
+                                    direction: "both",
+                                    autoLabel: true,
+                                    deletable: true,
+                                    unit: "mm",
+                                    precision: 1,
+                                    scale: 1,
+                                    arrowSize: 10,
+                                    textOffset: 20,
+                                    stroke: "#000",
+                                    sides: ["left", "bottom"],
+                                    lineWidth: 3,
+                                    fontSize: "18px",
+                                    tickLength: 50,
+                                    handleRadius: 8,
+                                    offsetX: 100,
+                                    offsetY: 100
+                              }));
+                              this.measurements.push(new TSVGMeasurement(this.DragZoomSVG.svgG, {
+                                    direction: "height",
+                                    x1: xOffset,
+                                    y1: yOffset + legClass.legHeightAboveGround,
+                                    x2: xOffset,
+                                    y2: yOffset,
+                                    autoLabel: true,
+                                    text: legClass.legHeightAboveGround + " mm",
+                                    deletable: true,
+                                    unit: "mm",
+                                    precision: 1,
+                                    scale: 1,
+                                    arrowSize: 10,
+                                    textOffset: 20,
+                                    stroke: "#000",
+                                    sides: ["left", "bottom"],
+                                    lineWidth: 3,
+                                    fontSize: "18px",
+                                    tickLength: 50,
+                                    handleRadius: 8,
+                                    offsetX: -160,
+                                    offsetY: 0
+                              }));
+                              this.DrawMeasurements(xOffset + xo - this.diameter / 2, [yOffset + yo, yOffset], this.diameter, this.depth);
+                        }
+                  }
+                  if(topView) {
+
+                        var yOffset_TopView_Extra = attachmentType == "3 Post, Centre Frame, Centre Sign" || attachmentType == "3 Post, Forward Frame, Front Sign" || attachmentType == "3 Post, Front Frame, Front Sign" ? frameClass.frameWidth_SideB : 0;
+                        this.DrawCircle({
+                              cx: xOffset_TopView + xo,
+                              cy: yOffset_TopView + yOffset_TopView_Extra + zo,
+                              r: this.diameter / 2,
+                              usePattern: true
+                        });
+                  }
             }
       }
 

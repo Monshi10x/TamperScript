@@ -110,6 +110,7 @@ class DragZoomSVG {
             this.#f_svg = this.#f_container.querySelector("svg");
             this.#f_svg.setAttribute("width", svgWidth);
             this.#f_svg.setAttribute("height", svgHeight);
+            this.#f_svg.style.cssText += ";background-color:white;";
 
             this.#f_svgG = document.createElementNS('http://www.w3.org/2000/svg', "g");
             this.#f_svgG.id = "mainGcreatedByT";

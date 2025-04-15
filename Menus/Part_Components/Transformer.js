@@ -180,20 +180,20 @@ class Transformer extends Material {
             this.#dataForSubscribers = [];
             this.#f_outputSizeTable.deleteAllRows();
 
-            // this.#dataForSubscribers.push({qty: this.qty, wattage: this.wattage, voltage: this.voltage});
-            //this.#f_outputSizeTable.addRow(this.qty, this.wattage, this.voltage);
+            this.#dataForSubscribers.push({qty: this.qty, wattage: this.wattage, voltage: this.voltage});
+            this.#f_outputSizeTable.addRow(this.qty, this.wattage, this.voltage);
 
       };
 
       async Create(productNo, partIndex) {
+            console.log("in transformer create");
             partIndex = await super.Create(productNo, partIndex);
             var name = this.#f_material[1].value;
 
             for(let i = 0; i < this.#dataForSubscribers.length; i++) {
                   let partQty = this.#dataForSubscribers[i].qty;
-                  partIndex = await q_AddPart_Dimensionless(productNo, partIndex, true, name, partQty, "LED", "");
+                  partIndex = await q_AddPart_Dimensionless(productNo, partIndex, true, name, partQty, "Transformer", "");
             }
-            partIndex = await this.#f_production.Create(productNo, partIndex);
 
             return partIndex;
       }
