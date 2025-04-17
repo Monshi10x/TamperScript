@@ -25,6 +25,7 @@ class MenuMap extends LHSMenuWindow {
       #f_settingsContainer;
       #f_setting_excludeEWPs;
       #f_setting_excludeArtwork;
+      #f_setting_addToSpecificProductsOnly;
 
       get travelRate() {
             return this.#f_travelRate[1].value;
@@ -86,6 +87,9 @@ class MenuMap extends LHSMenuWindow {
 
             this.#f_setting_excludeEWPs = createCheckbox_Infield("Exclude EWPs", true, "width:20%;", () => { }, this.#f_settingsContainer);
             this.#f_setting_excludeArtwork = createCheckbox_Infield("Exclude Artwork", true, "width:20%;", () => { }, this.#f_settingsContainer);
+
+            this.#f_setting_addToSpecificProductsOnly = createTextarea("Add To Specific Products Only (separate by comma) i.e. 1,3,5", "", "", () => { });
+            this.#f_settingsContainer.appendChild(this.#f_setting_addToSpecificProductsOnly);
 
             ///CREATE
             this.#f_createParts_DivideEqually = createButton('Create -> Split Equally', "margin:0px;width:50%", async () => {
@@ -213,23 +217,102 @@ class MenuMap extends LHSMenuWindow {
       async Create(method) {
             this.minimize();
 
+            await this.onsetOrderInstallAddress();
+
             let totalOrderPrice = 0;
+            let totalOrderPriceLessTravel = 0;
+            let travelPrices = [];
             let numProducts = getNumProducts();
             let numProductsToDivideAgainst = numProducts;
+            let productNames = getProductNames();
             let numberOfMobilisations = this.#f_numberOfMobilisations[1].value;
 
             let totalTravelMins = zeroIfNaNNullBlank(this.#f_travelTimeMins[1].value) * 2 * numberOfMobilisations + zeroIfNaNNullBlank(this.#f_truckPackingAndSetupTime[1].value);
             let totalTravelDistance = zeroIfNaNNullBlank(this.#f_travelDistanceMeters[1].value) * 2 * numberOfMobilisations;
 
+            let productNumbersToAddTo = this.#f_setting_addToSpecificProductsOnly.value.replace(" ", "");
+            productNumbersToAddTo = productNumbersToAddTo ? productNumbersToAddTo.split(",").map(Number) : [];
+            let priceOfProductsNotIncluded = 0;
+
+            let domProducts = document.getElementsByClassName("ord-prod-model-item");
+
+            //let totalTravelPrice = 0;
+
+            //delete travel-auto parts from those that dont need it anymore
             for(let i = 0; i < numProducts; i++) {
+
+                  let partNamesInProduct = getPartNamesInProduct(i + 1);
+
+                  let travelPartNo = null;
+                  let travelPrice = 0;
                   let productPrice = getProductPrice(i + 1);
-                  if(productPrice == 0) numProductsToDivideAgainst--;
-                  totalOrderPrice += productPrice;
+
+                  for(let j = 0; j < partNamesInProduct.length; j++) {
+                        if(partNamesInProduct[j] == "TRAVEL [Automatic]") {
+                              travelPartNo = j + 1;
+
+                              travelPrice = parseFloat(domProducts[i].getElementsByClassName("ord-prod-part-header")[j].getElementsByClassName("partPrice")[0].innerText.replace("$", ""));
+                              totalOrderPriceLessTravel -= travelPrice;
+                        }
+                  }
+
+                  travelPrices.push({
+                        productNo: i + 1,
+                        travelPrice: travelPrice
+                  });
+
+                  console.log((productPrice - travelPrice) == 0);
+
+                  if(productNumbersToAddTo.includes(i + 1)) continue;
+
+                  if(!productNumbersToAddTo.includes(i + 1) && travelPartNo != null) await DeletePart(i + 1, travelPartNo);
+                  if((productPrice - travelPrice) == 0) await DeletePart(i + 1, travelPartNo);
+
             }
+
+            console.log(travelPrices);
+            console.log("totalOrderPriceLessTravel: ", totalOrderPriceLessTravel);
+
 
             for(let i = 0; i < numProducts; i++) {
                   let productPrice = getProductPrice(i + 1);
-                  if(productPrice == 0) continue;
+
+                  if(productPrice == 0) numProductsToDivideAgainst--;
+                  if(productNames[i].toLowerCase().includes("ewp") && this.#f_setting_excludeEWPs[1].checked) numProductsToDivideAgainst--;
+                  if(productNames[i].toLowerCase().includes("artwork") && this.#f_setting_excludeArtwork[1].checked) numProductsToDivideAgainst--;
+
+                  totalOrderPrice += productPrice;
+
+                  if(!productNumbersToAddTo.includes(i + 1)) priceOfProductsNotIncluded += productPrice;
+            }
+
+            totalOrderPriceLessTravel += totalOrderPrice;
+            console.log("totalOrderPriceLessTravel after add: ", totalOrderPriceLessTravel);
+
+            //if product numbers specified
+            if(productNumbersToAddTo.length != 0) {
+                  numProductsToDivideAgainst = productNumbersToAddTo.length;
+            }
+
+            //Final Creation
+            for(let i = 0; i < numProducts; i++) {
+                  let productPrice = getProductPrice(i + 1);
+                  let productPriceLessTravel = productPrice - travelPrices[i].travelPrice;
+
+                  //console.log(productNames[i].toLowerCase().includes("ewp"), productNames[i].toLowerCase().includes("artwork"), this.#f_setting_excludeEWPs[1].checked, this.#f_setting_excludeArtwork[1].checked);
+
+                  console.log(i + 1, productNumbersToAddTo.length != 0 && !productNumbersToAddTo.includes(i + 1), productPriceLessTravel == 0 && !productNumbersToAddTo.includes(i + 1));
+
+                  //if productNo not in specified textarea
+                  if(productNumbersToAddTo.length != 0 && !productNumbersToAddTo.includes(i + 1)) continue;
+                  //if productPriceLessTravel==0 and not in specified textarea
+                  if(productPriceLessTravel == 0 && !productNumbersToAddTo.includes(i + 1)) continue;
+                  //if exclude EWP checked
+                  if(productNames[i].toLowerCase().includes("ewp") && this.#f_setting_excludeEWPs[1].checked) continue;
+                  //if exclude Artwork checked
+                  if(productNames[i].toLowerCase().includes("artwork") && this.#f_setting_excludeArtwork[1].checked) continue;
+
+                  console.log("in");
 
                   let productNo = i + 1;
                   let partIndex = getNumPartsInProduct(productNo); //last index by default
@@ -247,11 +330,16 @@ class MenuMap extends LHSMenuWindow {
 
                   let productTravelTime = 0;
 
+
                   if(method == "Split Equally") {
                         productTravelTime = totalTravelMins / numProductsToDivideAgainst;
                   } else if(method == "Divide By $ Percentage") {
-                        productTravelTime = totalTravelMins * (productPrice / totalOrderPrice);
+                        if(priceOfProductsNotIncluded == totalOrderPriceLessTravel)
+                              productTravelTime = totalTravelMins * 1;
+                        else
+                              productTravelTime = totalTravelMins * (productPriceLessTravel / (totalOrderPriceLessTravel - priceOfProductsNotIncluded));
                   }
+                  console.table(i + 1, productTravelTime, productPriceLessTravel, totalOrderPriceLessTravel, priceOfProductsNotIncluded);
 
                   if(productIncludesTravelAlready.value == false) {
                         await AddPart("Install - IH", productNo);
