@@ -250,8 +250,6 @@ class Sign {
             let legClass = this.legClass;
             let frameClass = this.frameClass;
 
-
-
             for(let r = this.rects.length - 1; r >= 0; r--) {
                   this.rects[r].Delete();
             }

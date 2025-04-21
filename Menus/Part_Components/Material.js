@@ -11,7 +11,6 @@ class Material extends SubscriptionManager {
       #textColor = COLOUR.White;
       #isLocked;
       static DISPLAY_NAME = "MATERIAL";
-
       /*
                         
       FIELDS            */
@@ -33,6 +32,7 @@ class Material extends SubscriptionManager {
       #f_popOutModal;
       #f_popOutBtn;
       #f_debugInheritedData;
+      #f_requiresInputTag;
       /*
                         
       GETTER            */
@@ -59,6 +59,9 @@ class Material extends SubscriptionManager {
       set backgroundColor(color) {this.#backgroundColor = color;}
       set textColor(color) {this.#textColor = color;}
       set qty(value) {this.#f_qty[1].value = value;}
+      set typeLabel(value) {this.#f_typeLabel.innerText = value;}
+      showRequiresInputTag(value) {if(value == true) $(this.#f_requiresInputTag[0]).show(); else $(this.#f_requiresInputTag[0]).hide();}
+
       /*
                         
       START             */
@@ -100,6 +103,10 @@ class Material extends SubscriptionManager {
                   if(e.target == this.#f_subscriptionsContainer && this.#isMinimized == true) this.onPopOut();
             });
             this.#f_container.appendChild(this.#f_subscriptionsContainer);
+
+            this.#f_requiresInputTag = createToken("Requires Your Input!", false, "background-color:red;color:white;pointer-events:none", this.#f_container);
+            this.showRequiresInputTag(false);
+
             $(this.#f_container).hover(function() {
                   $(this).css("box-shadow", "rgba(0, 0, 0, 1) 3px 4px 10px 0px");
             }, function() {

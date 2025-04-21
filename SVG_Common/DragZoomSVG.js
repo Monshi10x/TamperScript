@@ -1,5 +1,5 @@
 /**
- * @see https://github.com/timmywil/panzoom/
+ * @see https://github.com/timmywil/panzoom/ - Archive
  * @see https://github.com/anvaka/panzoom/blob/main/README.md
  * @see https://github.com/thednp/svg-path-commander
  */
@@ -122,6 +122,7 @@ class DragZoomSVG {
 
             this.#allElements = this.#f_svgG.getElementsByTagName("*");
 
+
             this.#panZoomInstance = panzoom(this.#f_svgG, {
                   zoomSpeed: this.#scrollSpeed,
                   beforeMouseDown: function(e) {
@@ -135,10 +136,11 @@ class DragZoomSVG {
                   this.onZoom(e);
             });
 
-            this.#scale = this.#panZoomInstance.getTransform().scale;
 
             if(options.convertShapesToPaths) this.convertShapesToPaths();
             if(options.splitCompoundPaths) this.splitCompoundPaths();
+
+            this.#scale = this.#panZoomInstance.getTransform().scale;
 
             this.initSVGStyles();
 
@@ -151,11 +153,38 @@ class DragZoomSVG {
 
             this.#f_container.onmouseover = (e) => this.onHoverEnter(e);
             this.#f_container.onmouseout = (e) => this.onHoverExit(e);
+
+            setTimeout(() => {
+                  this.centerAndFitSVGContent(this.#f_svgG, this.svg, this.#panZoomInstance);
+            }, 1);
+      }
+
+      centerAndFitSVGContent(svg, container, panzoomInstance, margin = 20) {
+            const bbox = svg.getBBox();
+            const containerRect = container.getBoundingClientRect();
+
+            const availableWidth = containerRect.width - margin * 2;
+            const availableHeight = containerRect.height - margin * 2;
+
+            const scaleX = availableWidth / bbox.width;
+            const scaleY = availableHeight / bbox.height;
+            const scale = Math.min(scaleX, scaleY);
+
+            const scaledWidth = bbox.width * scale;
+            const scaledHeight = bbox.height * scale;
+
+            const dx = (containerRect.width - scaledWidth) / 2 - bbox.x * scale;
+            const dy = (containerRect.height - scaledHeight) / 2 - bbox.y * scale;
+
+            panzoomInstance.moveTo(0, 0);
+            panzoomInstance.zoomAbs(0, 0, scale);
+            panzoomInstance.moveTo(dx, dy);
       }
 
       Close() {
             window.removeEventListener('mousemove', this.#f_moveFunctionRef);
             window.removeEventListener('mouseup', this.#f_mouseupFunctionRef);
+            this.#panZoomInstance.dispose();
       }
 
       onHoverEnter(e) {
@@ -204,7 +233,7 @@ class DragZoomSVG {
             else return true;
       }
 
-      onZoom(e) {
+      onZoom() {
             this.scale = this.#panZoomInstance.getTransform().scale;
 
             for(let i = 0; i < this.#allElements.length; i++) {
@@ -214,13 +243,7 @@ class DragZoomSVG {
       }
 
       convertShapesToPaths() {
-            let svgElements = this.#f_svg.getElementsByTagName("*");
-
-            for(let i = 0; i < svgElements.length; i++) {
-                  if(svgElements[i].nodeName != "g" && svgElements[i].nodeName != "path" && svgElements[i].nodeName != "defs" && svgElements[i].nodeName != "style") {
-                        let element = SVGPathCommander.shapeToPath(svgElements[i], true);
-                  }
-            }
+            svg_convertShapesToPaths(this.#f_svgG);
 
             this.#allElements = this.#f_svgG.getElementsByTagName("*");
       }
@@ -257,63 +280,19 @@ class DragZoomSVG {
        */
       splitCompoundPaths() {
             this.#allPathElements = [];
+            this.#outerPathElements = [];
+            this.#innerPathElements = [];
 
-            let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            newGroup.id = "pathGroup";
-            this.#f_svgG.appendChild(newGroup);
+            svg_formatCompoundPaths(this.#f_svg);
 
-            let svgElements = this.#f_svgG.getElementsByTagName("path");
-            let svgElementsLength = svgElements.length;
+            this.#allElements = this.#f_svgG.getElementsByTagName("path");
+            for(let i = 0; i < this.#allElements.length; i++) {
+                  if(this.#allElements[i].classList.contains("outerPath")) this.#outerPathElements.push(this.#allElements[i]);
+                  if(this.#allElements[i].classList.contains("innerPath")) this.#innerPathElements.push(this.#allElements[i]);
 
-            //format outer/inner paths
-            for(let i = 0; i < svgElementsLength; i++) {
-
-                  let pathString = svgElements[i].getAttribute("d");
-                  let pathStringSplitOverZ = pathString.split("Z");
-
-                  let outerPathParent_id;
-                  for(let j = 0; j < pathStringSplitOverZ.length; j++) {
-                        if(pathStringSplitOverZ[j] == "") continue;
-
-                        //Outer Compound
-                        if(j == 0) {
-                              let outerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                              outerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                              outerPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
-                              outerPathElement.className.baseVal = "outerPath";
-                              outerPathParent_id = generateUniqueID("outerPath-");
-                              outerPathElement.id = outerPathParent_id;
-                              newGroup.appendChild(outerPathElement);
-                              this.#outerPathElements.push(outerPathElement);
-                              this.#allPathElements.push(outerPathElement);
-                        }
-
-                        //if has Inner compound paths
-                        else {
-                              let innerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                              innerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                              innerPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
-                              innerPathElement.className.baseVal = "innerPath";
-                              innerPathElement.setAttribute("data-outerPathParent", outerPathParent_id);
-                              newGroup.appendChild(innerPathElement);
-                              this.#innerPathElements.push(innerPathElement);
-                              this.#allPathElements.push(innerPathElement);
-                        }
-                  }
+                  this.#allPathElements.push(this.#allElements[i]);
             }
-
-            //remove previous unformatted elements
-            let elemsToDelete = [];
-            for(let i = 0; i < svgElementsLength; i++) {
-                  elemsToDelete.push(svgElements[i]);
-            }
-            for(let i = 0; i < elemsToDelete.length; i++) {
-                  deleteElement(elemsToDelete[i]);
-            }
-
-            this.#allElements = this.#f_svgG.getElementsByTagName("*");
       }
-
 
       updateMouseXY(e) {
             this.#mouseXY = {

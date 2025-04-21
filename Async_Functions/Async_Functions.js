@@ -644,6 +644,7 @@ async function openPart(productNo, partNo) {
     var part = partList[partNo - 1];
 
     $('#partExpander_' + productNo + '_' + (partNo)).not('.partExpander.collapse').click();
+    await sleep(100);
     $('#partExpander_' + productNo + '_' + (partNo) + ".collapse").show();
 
     await sleep(100);
@@ -664,11 +665,11 @@ async function openPart(productNo, partNo) {
         }, sleepMS);
     });
 
-    await sleep(100);
+    await sleep(200);
 
     part.ModeId(1);
 
-    await sleep(100);
+    await sleep(200);
 
     part.ModeId(1);
 
@@ -1572,16 +1573,14 @@ function getPartIntrinsicColor(productNo, partNo) {
 
 function getProductPrice(productNo) {
     var products = ko.contextFor(document.querySelector(".ord-prod-body")).$parent.OrderProducts();
-    return products[productNo - 1].ProductTotal();
+    return products[productNo - 1].TotalPrice();
 }
 
 var loadingDivs;
 function isLoading() {
     var a = false, b = false;
-    //if (executed==false) {
-    //    executed = true;
+
     loadingDivs = document.querySelectorAll("div[id^='ord_prod_model_item_']>div.loading");
-    // }
 
     if(document.querySelector("body > div.upForLinks") != null) {
         if(document.querySelector("body > div.upForLinks").style.display == "block") a = true;

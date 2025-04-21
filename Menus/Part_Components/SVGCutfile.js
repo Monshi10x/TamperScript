@@ -213,6 +213,8 @@ class SVGCutfile extends SubscriptionManager {
             $(this.#f_totalBoundingRectAreas[1]).val(roundNumber(this.#totalBoundingRectAreas, 4)).change();
             loader2.Delete();
 
+            console.log("file 2:" + this.#f_svgFile);
+
             this.UpdateFromChange();
       }
 
@@ -284,6 +286,11 @@ class SVGCutfile extends SubscriptionManager {
        * @CorebridgeCreate
        */
       async Create(productNo, partIndex) {
+            await AddPart("No Cost Part", productNo);
+            partIndex++;
+            await setPartDescription(productNo, partIndex, "CODE [Automatic]");
+            partIndex = await setPartNotes(productNo, partIndex, this.#f_svgFile);
+            await savePart(productNo, partIndex);
             return partIndex;
       }
 

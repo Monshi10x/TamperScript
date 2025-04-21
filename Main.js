@@ -114,6 +114,7 @@ function tick() {
   consoleTick();
 }
 
+
 function tickSecond() {
   quoteSeconds_CurrentSession++;
 }
@@ -124,12 +125,12 @@ function keyboardTick() {
   $(document.body).keyup(function(e) {
     if(e.keyCode == 188) {
       //var t = new ModalStandoffHelper("Standoff Helper", 100, null);
-      console.log(getProductPrice(1));
+      //console.log(getProductPrice(1));
     }
   });
   $(document).keydown(function(e) {
     if(e.which == 81) {
-      window.dispatchEvent(event_testing);
+      //window.dispatchEvent(event_testing);
     }
     if(e.which == 87) {
       //test3();

@@ -3,7 +3,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 	/** @ViewMode */
 	#viewMode;
 	#numProducts = 0;
-	#creationOrder = [ProductDetails, Size, SVGCutfile, Sheet, LED, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+	#creationOrder = [ProductDetails, Size, SVGCutfile, Coil, Sheet, LED, Transformer, Painting, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
 
 
 	/** @QuickTemplate */
@@ -77,7 +77,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 		return {
 			ProductDetails: [],
 			Size: [],
+			Coil: [],
 			Sheet: [Size],
+			LED: [],
+			Transformer: [],
+			Painting: [],
 			Vinyl: [Sheet],
 			Laminate: [Vinyl],
 			AppTaping: [Vinyl],
@@ -88,6 +92,16 @@ class MenuPanelSigns extends LHSMenuWindow {
 			InstallSubscribable: [Sheet]
 		};
 	}
+
+	quickTemplates = [
+		["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
+		["Lightbox Face - Opal Acrylic", "https://cdn.gorilladash.com/images/media/5077257/signarama-australia-img-6911-2-small-thumbnail-61611e9ab2f0f.jpg"],
+		["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
+		["Foam PVC", "https://5.imimg.com/data5/RN/UM/MY-14219350/white-pvc-foam-sheet-500x500.jpg"],
+		["Signwhite", "https://img.archiexpo.com/images_ae/photo-g/158002-12419012.jpg"],
+		["Corflute", GM_getResourceURL("Image_Corflute")],
+		["Wall Graphics", "https://cdn.gorilladash.com/images/media/6161323/signarama-australia-img-3113-thumbnail-638306a183cd0.jpg"]
+	];
 
 
 	constructor(width, height, ID, windowTitle) {
@@ -105,23 +119,12 @@ class MenuPanelSigns extends LHSMenuWindow {
 			let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
 
 			this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
-				[["3D Non-lit Letters", "https://cdn.gorilladash.com/images/media/3752855/signarama-australia-atco-small-fascia-resized-thumbnail-5f38fe9719f20.jpg"],
-				["3D Front-lit Letters", "https://cdn.gorilladash.com/images/media/12562260/signarama-australia-homeco-cafe-63-lightbox-thumbnail-663186cf397a7.jpg"],
-				["3D 10mm Acrylic Letters", "https://cdn.gorilladash.com/images/media/5077109/signarama-australia-img-1060-2-small-square-61611e488aba9.jpg?auto=webp&width=1600"],
-				["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
-				["Lightbox Face - Opal Acrylic", "https://cdn.gorilladash.com/images/media/5077257/signarama-australia-img-6911-2-small-thumbnail-61611e9ab2f0f.jpg"],
-				["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
-				["Foam PVC", "https://5.imimg.com/data5/RN/UM/MY-14219350/white-pvc-foam-sheet-500x500.jpg"],
-				["Signwhite", "https://img.archiexpo.com/images_ae/photo-g/158002-12419012.jpg"],
-				["Corflute", GM_getResourceURL("Image_Corflute")],
-				["Wall Graphics", "https://cdn.gorilladash.com/images/media/6161323/signarama-australia-img-3113-thumbnail-638306a183cd0.jpg"]],
+				this.quickTemplates,
 				() => {this.#addQuickTemplate();},
 				this.page1, false
 			);
 
 			this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.#updateViewMode();}, this.page1);
-
-			//this.#numProducts = getNumProducts() - 1;
 		});
 
 		this.#createProductBtn = createButton("Create Product   " + "\u25BA", "width:100%;margin:0px;", () => {this.CreateProduct(this);});
@@ -160,6 +163,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 				coil = this.#add(Coil, this.page1, [SVGCutfile]);
 
 				production = this.#add(ProductionSubscribable, this.page1, [Coil]);
+				production.typeLabel = "LASER WELD PRODUCTION";
+				production.showRequiresInputTag(true);
 
 				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
 				sheet.UPDATES_PAUSED = true;
@@ -169,6 +174,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.sheetPerimeterIsCut = false;
 				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", profile: "Cut Through", quality: "Good Quality"});
 				sheet.UPDATES_PAUSED = false;
+				sheet.typeLabel = "STAINLESS SHEET";
 
 				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
 				sheet.UPDATES_PAUSED = true;
@@ -176,10 +182,11 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Foamed PVC - (sqm) - 2440x1220x10.0 Matte White (Signex Mulfords)";
 				sheet.sheetPerimeterIsCut = false;
-				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Foamed PVC", profile: "Cut Through", quality: "Good Quality"});
+				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Foamed PVC", thickness: "10mm", profile: "Cut Through", quality: "Good Quality"});
 				sheet.UPDATES_PAUSED = false;
+				sheet.typeLabel = "CELUKA SHEET";
 
-				sheet = this.#add2(Sheet, this.page1, [svgCutfile]);
+				sheet = this.#add(Sheet, this.page1, [svgCutfile]);
 				sheet.UPDATES_PAUSED = true;
 				sheet.material = "Corflute";
 				sheet.sheetSize = "2440x1220";
@@ -188,6 +195,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
 				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
 				sheet.UPDATES_PAUSED = false;
+				sheet.typeLabel = "CORFLUTE POUNCE";
 
 
 				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
@@ -210,6 +218,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 				coil = this.#add(Coil, this.page1, [SVGCutfile]);
 
 				production = this.#add(ProductionSubscribable, this.page1, [Coil]);
+				production.typeLabel = "LASER WELD PRODUCTION";
+				production.showRequiresInputTag(true);
 
 				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
 				sheet.UPDATES_PAUSED = true;
@@ -219,6 +229,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.sheetPerimeterIsCut = false;
 				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", profile: "Cut Through", quality: "Good Quality"});
 				sheet.UPDATES_PAUSED = false;
+				sheet.typeLabel = "STAINLESS SHEET";
 
 				sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
 				sheet.UPDATES_PAUSED = true;
@@ -226,8 +237,9 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
 				sheet.sheetPerimeterIsCut = false;
-				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
+				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "4.5mm", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
 				sheet.UPDATES_PAUSED = false;
+				sheet.typeLabel = "OPAL FACE SHEET";
 
 				led = this.#add(LED, this.page1, [SVGCutfile]);
 				led.UPDATES_PAUSED = true;
@@ -235,18 +247,19 @@ class MenuPanelSigns extends LHSMenuWindow {
 				led.material = "LED Module - 6500K 1.08W 5yr 175deg 12V";
 				led.UPDATES_PAUSED = false;
 
-				sheet = this.#add2(Sheet, this.page1, [svgCutfile, led]);
+				sheet = this.#add(Sheet, this.page1, [svgCutfile, led]);
 				sheet.UPDATES_PAUSED = true;
 				sheet.material = "ACM";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
 				sheet.sheetPerimeterIsCut = false;
-				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", profile: "Cut Through", quality: "Fast"});
+				sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "3mm", profile: "Cut Through", quality: "Fast"});
 				sheet.UPDATES_PAUSED = false;
+				sheet.typeLabel = "ACM for LEDs";
 
 				transformer = this.#add(Transformer, this.page1, [LED]);
 
-				sheet = this.#add2(Sheet, this.page1, [svgCutfile]);
+				sheet = this.#add(Sheet, this.page1, [svgCutfile]);
 				sheet.UPDATES_PAUSED = true;
 				sheet.material = "Corflute";
 				sheet.sheetSize = "2440x1220";
@@ -255,6 +268,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
 				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
 				sheet.UPDATES_PAUSED = false;
+				sheet.typeLabel = "CORFLUTE POUNCE";
 
 
 				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
@@ -284,8 +298,9 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.sheetPerimeterIsCut = false;
 				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", profile: "Cut Through", quality: "Glossy Edge"});
 				sheet.UPDATES_PAUSED = false;
+				sheet.typeLabel = "ACRYLIC SHEET";
 
-				sheet = this.#add2(Sheet, this.page1, [svgCutfile]);
+				sheet = this.#add(Sheet, this.page1, [svgCutfile]);
 				sheet.UPDATES_PAUSED = true;
 				sheet.material = "Corflute";
 				sheet.sheetSize = "2440x1220";
@@ -294,6 +309,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
 				sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
 				sheet.UPDATES_PAUSED = false;
+				sheet.typeLabel = "CORFLUTE POUNCE";
 
 				painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
 				painting.UPDATES_PAUSED = true;
@@ -318,6 +334,8 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.material = "ACM";
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)";
+				sheet.typeLabel = "ACM SHEET";
+
 				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
 				laminate = this.#add(Laminate, this.page1, [Vinyl]);
 				appTape = null;
@@ -489,62 +507,43 @@ class MenuPanelSigns extends LHSMenuWindow {
 		this.#updateViewMode();
 	}
 
-	#add(classType, container, subscribeToClasses = []) {
+	#add(classType, container, subscribeTo = []) {
 		let newItem = new classType(container, this);
-		newItem.productNumber = this.#getproductNumber();
+		newItem.productNumber = this.#getProductNumber();
 
-		for(let x = 0; x < subscribeToClasses.length; x++) {
-			objectLoop:
-			for(let i = this.#allMaterials.length - 1; i >= 0; i--) {
-				if(this.#allMaterials[i].constructor.name == subscribeToClasses[x].name) {
-					newItem.SubscribeTo(this.#allMaterials[i]);//subscribe to last of kind
-					break objectLoop;
+		for(let sub of subscribeTo) {
+			if(typeof sub === 'function') {
+				// It’s a class (subscribe to last created of that type)
+				for(let i = this.#allMaterials.length - 1; i >= 0; i--) {
+					if(this.#allMaterials[i].constructor.name === sub.name) {
+						newItem.SubscribeTo(this.#allMaterials[i]);
+						break;
+					}
 				}
+			} else if(typeof sub === 'object' && sub !== null) {
+				// It’s an object instance (subscribe directly)
+				newItem.SubscribeTo(sub);
+			} else {
+				console.warn('Unknown subscription type:', sub);
 			}
 		}
 
 		this.#allMaterials.push(newItem);
-
 		this.#updateFromChange();
 		return newItem;
-
 	}
 
-	#add2(classType, container, subscribeTo) {
+	#addBlank(classType, container, options = {productNumber: null}) {
 		let newItem = new classType(container, this);
-		newItem.productNumber = this.#getproductNumber();
-
-		for(let x = 0; x < subscribeTo.length; x++) {
-			newItem.SubscribeTo(subscribeTo[x]);//subscribe to last of kind
-		}
-
-		this.#allMaterials.push(newItem);
-
-		this.#updateFromChange();
-		return newItem;
-
-	}
-
-	#addBlank(classType, container) {
-		let newItem = new classType(container, this);
+		if(options.productNumber != null) newItem.productNumber = options.productNumber;
 
 		this.#allMaterials.push(newItem);
 
 		this.#updateFromChange();
 	}
 
-	#getproductNumber() {
+	#getProductNumber() {
 		return this.#numProducts;
-	}
-
-	#numberOfMaterialInstancesOfClass(className) {
-		let numberOfInstances = 0;
-		for(let i = 0; i < this.#allMaterials.length; i++) {
-			if(this.#allMaterials[i] instanceof className) {
-				numberOfInstances++;
-			}
-		}
-		return numberOfInstances;
 	}
 
 	DeleteMaterial(materialObject) {
@@ -623,6 +622,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				let sameItemCount = 0;
 				for(let y = 0; y < this.#allMaterials.length; y++) {
 					let item = this.#allMaterials[y];
+					item.container.style.width = "calc(100% - 16px)";
 					if(item instanceof this.#creationOrder[x]) {
 						if(sameItemCount == 0) {
 
@@ -649,25 +649,41 @@ class MenuPanelSigns extends LHSMenuWindow {
 				let newProductContainer = new UIContainerType3("max-height:450px;", "PRODUCT " + uniqueProductNumbers[i], this.page1);
 				newProductContainer.contentContainer.style.cssText += "max-height:10000px;";
 				newProductContainer.container.style.cssText += "max-height:10000px;";
+				this.#productContainers.push(newProductContainer);
 
 				newProductContainer.addHeadingButtons(createButton("x", "width:30px;height:30px;margin:0px;border:none;padding:2px;min-height:30px;float:right;background-color:" + COLOUR.Red + ";", () => {
 					this.DeleteProduct(currentProductNumber);
 				}, null));
-				this.#productContainers.push(newProductContainer);
+
+				let dropdown = createDropdown("Add", 0, "width:200px;height:30px;margin:0px;border:none;padding:0px;min-height:30px;float:right;", this.#creationOrder.map((item) => {
+					return createDropdownOption(item.name, item.name);
+				}), () => {
+					this.#addBlank(this.#creationOrder.filter((item) => item.name == dropdown.value)[0], newProductContainer.contentContainer, {productNumber: uniqueProductNumbers[i]});
+				});
+				newProductContainer.addHeadingButtons(dropdown);
 
 				//add items to it
 				for(let j = 0; j < this.#allMaterials.length; j++) {
 					let item = this.#allMaterials[j];
 					let itemContainer = item.container;
+					item.container.style.width = "calc(100% - 16px)";
 
 					if(item.productNumber != currentProductNumber) continue;
 
 					newProductContainer.contentContainer.appendChild(itemContainer);
 				}
+
+				new Sortable(newProductContainer.contentContainer, {
+					animation: 120,
+					group: 'shared',
+					swapThreshold: 1,
+					ghostClass: 'sortable-ghost',
+					direction: 'vertical',
+				});
 			}
 		} else if(this.#viewMode[1].value == "Per Type2") {
 
-			this.#containers = [/*ProductDetails, Size, SVGCutfile, Sheet, Vinyl, Laminate, Coil, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable */];
+			this.#containers = [/*ProductDetails, Size, SVGCutfile, etc...*/];
 
 			for(let i = 0; i < this.#creationOrder.length; i++) {
 				let UIContainer = new Object();
@@ -683,6 +699,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				let sameItemCount = 0;
 				for(let y = 0; y < this.#allMaterials.length; y++) {
 					let item = this.#allMaterials[y];
+					item.container.style.width = "calc(100% - 70px)";
 					if(item instanceof this.#creationOrder[x]) {
 						if(sameItemCount == 0) {
 
@@ -699,7 +716,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 	async CreateProduct(parent) {
 		parent.minimize();
-		console.log(this.#allMaterials);
+
 		let pNo = 0;
 		let productNo = 0;
 		let partIndex = 0;

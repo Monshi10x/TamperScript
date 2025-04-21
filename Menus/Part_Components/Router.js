@@ -38,7 +38,7 @@ class Router extends SubMenu {
 		f_container_run[1].style.cssText = "width:calc(100% - 50px)";
 		this.l_usePaths = createCheckbox_Infield("Use Path Specs for Times", true, "width:60%;margin-right:30%;", () => {this.UpdateRun();}, f_container_run[1]);
 		this.l_cuttingTable = new Table(f_container_run[1], "100%", 20, 250);
-		this.l_cuttingTable.setHeading("Total Path Length", "Number Shapes", "Material", "Profile", "Quality", "Speed", "Total Time", "Delete");
+		this.l_cuttingTable.setHeading("Path Length", "Number Shapes", "Material", "Thickness", "Profile", "Quality", "Speed", "Total Time", "Delete");
 		this.l_addRowBtn = createButton("+ Row", "width:15%;margin:0px;margin-right:70%;min-width:80px;", () => {this.addRunRow(0, 0, {isCustom: true});}, f_container_run[1]);
 		this.l_runTime = createInput_Infield("Total Run Minutes", 20, "width:30%", null, f_container_run[1], false, 10, {postfix: "mins"});
 
@@ -176,22 +176,24 @@ class Router extends SubMenu {
 	}
 
 	runRowIndex = 0;
-	addRunRow(pathLength = 0, numberShapes = 0, options = {material: null, profile: null, quality: null, speed: null, isCustom: false}) {
+	addRunRow(pathLength = 0, numberShapes = 0, options = {material: null, thickness: null, profile: null, quality: null, speed: null, isCustom: false}) {
 		let internalIndex = this.runRowIndex;
 		let l_pathLength = createInput_Infield("Length", pathLength, "width:90%;min-width:90px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 10, {postfix: " mm"});
 		let l_numberShapes = createInput_Infield("# Shapes", numberShapes, "width:90%;min-width:70px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 1);
-		let l_material, l_profile, l_quality, l_speed, l_totalTime;
-		l_material = createDropdown_Infield("Material", 0, "width:80px;margin:0px;", this.getProfileOptions("Material"), () => {this.updateCutProfile("Material", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer);
-		l_profile = createDropdown_Infield("Profile", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Profile", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer);
-		l_quality = createDropdown_Infield("Quality", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Quality", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer);
-		l_speed = createInput_Infield("Speed", 1000, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " mm/min"});
-		l_totalTime = createInput_Infield("Total Time", 0, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " min"});
+		let l_material, l_thickness, l_profile, l_quality, l_speed, l_totalTime;
+		l_material = createDropdown_Infield("Material", 0, "width:80px;margin:0px;", this.getProfileOptions("Material"), () => {this.updateCutProfile("Material", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer);
+		l_thickness = createDropdown_Infield("Thickness", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Thickness", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer);
+		l_profile = createDropdown_Infield("Profile", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Profile", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer);
+		l_quality = createDropdown_Infield("Quality", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Quality", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer);
+		l_speed = createInput_Infield("Speed", 1000, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " mm/min"});
+		l_totalTime = createInput_Infield("Total Time", 0, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " min"});
 
 		if(options.material != null) dropdownSetSelectedValue(l_material[1], options.material);
+		if(options.thickness != null) dropdownSetSelectedValue(l_thickness[1], options.thickness);
 		if(options.profile != null) dropdownSetSelectedValue(l_profile[1], options.profile);
 		if(options.quality != null) dropdownSetSelectedValue(l_quality[1], options.quality);
 		if(options.speed != null) $(l_speed[1]).val(options.speed);
-		if(options.material == null && options.profile != null && options.quality != null && options.speed != null) this.updateCutProfile("Material", l_material[1], l_profile[1], l_quality[1], l_speed[1]);
+		if(options.material == null && options.profile != null && options.quality != null && options.speed != null) this.updateCutProfile("Material", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
 
 		let l_deleteRowBtn = createButton("X", "background-color:red;width:30px;margin:0px;", () => {
 			for(let i = 0; i < this.runRows.length; i++) {
@@ -205,10 +207,10 @@ class Router extends SubMenu {
 		this.runRows.push(
 			{
 				index: this.runRowIndex,
-				items: [l_pathLength, l_numberShapes, l_material, l_profile, l_quality, l_speed, l_totalTime, l_deleteRowBtn]
+				items: [l_pathLength, l_numberShapes, l_material, l_thickness, l_profile, l_quality, l_speed, l_totalTime, l_deleteRowBtn]
 			}
 		);
-		let addedRow = this.l_cuttingTable.addRow(l_pathLength[0], l_numberShapes[0], l_material[0], l_profile[0], l_quality[0], l_speed[0], l_totalTime[0], l_deleteRowBtn);
+		let addedRow = this.l_cuttingTable.addRow(l_pathLength[0], l_numberShapes[0], l_material[0], l_thickness[0], l_profile[0], l_quality[0], l_speed[0], l_totalTime[0], l_deleteRowBtn);
 
 		if(options.isCustom === true) {
 			addedRow.id = "customRow";
@@ -272,20 +274,20 @@ class Router extends SubMenu {
 			for(let i = 0; i < this.runRows.length; i++) {
 				let pathLength = mmToM(parseFloat(this.runRows[i].items[0][1].value));
 				let numberShapes = parseFloat(this.runRows[i].items[1][1].value);
-				let cutSpeed = mmToM(parseFloat(this.runRows[i].items[5][1].value));
-				let usePerCutTime = this.runRows[i].items[4][1].value == "SecondsPerCut";
+				let cutSpeed = mmToM(parseFloat(this.runRows[i].items[6][1].value));
+				let usePerCutTime = this.runRows[i].items[5][1].value == "SecondsPerCut";
 
 				let timeMin = 0;
 
 				if(usePerCutTime) {
-					this.runRows[i].items[5][6].innerHTML = "sec/cut";
+					this.runRows[i].items[6][6].innerHTML = "sec/cut";
 					timeMin = (cutSpeed * 1000 * numberShapes) / 60;
 				} else {
-					this.runRows[i].items[5][6].innerHTML = "mm/min";
+					this.runRows[i].items[6][6].innerHTML = "mm/min";
 					timeMin = pathLength / cutSpeed + numberShapes * this.perShapeTime;
 				}
 
-				$(this.runRows[i].items[6][1]).val(roundNumber(timeMin, 2));
+				$(this.runRows[i].items[7][1]).val(roundNumber(timeMin, 2));
 
 				this.runTime += timeMin;
 			}
@@ -305,32 +307,38 @@ class Router extends SubMenu {
 		this.Update();
 	};
 
-	updateRunRow(rowID, totalPathLength, numberOfShapes, material, profile, quality, speed) {
+	updateRunRow(rowID, totalPathLength, numberOfShapes, material, thickness, profile, quality, speed) {
 		let row = this.runRows[rowID].items;
 
-		if(totalPathLength) $(row[5][1]).val(totalPathLength).change();
-		if(numberOfShapes) $(row[5][1]).val(numberOfShapes).change();
+		if(totalPathLength) $(row[0][1]).val(totalPathLength).change();
+		if(numberOfShapes) $(row[1][1]).val(numberOfShapes).change();
 		if(material) dropdownSetSelectedText(row[2][1], material);
-		if(profile) dropdownSetSelectedText(row[3][1], profile);
-		if(quality) dropdownSetSelectedText(row[4][1], quality);
-		if(speed) $(row[5][1]).val(speed).change();
+		if(thickness) dropdownSetSelectedText(row[3][1], material);
+		if(profile) dropdownSetSelectedText(row[4][1], profile);
+		if(quality) dropdownSetSelectedText(row[5][1], quality);
+		if(speed) $(row[6][1]).val(speed).change();
 	}
 
-	updateCutProfile = (requestFrom, materialField, profileField, qualityField, speedField) => {
+	updateCutProfile = (requestFrom, materialField, thicknessField, profileField, qualityField, speedField) => {
 		if(requestFrom == "Material") {
-			setOptions(profileField, this.getProfileOptions("Profile", materialField, profileField, qualityField, speedField));
-			setOptions(qualityField, this.getProfileOptions("Quality", materialField, profileField, qualityField, speedField));
-			speedField.value = this.getProfileOptions("Speed", materialField, profileField, qualityField, speedField);
+			setOptions(thicknessField, this.getProfileOptions("Thickness", materialField, thicknessField, profileField, qualityField, speedField));
+			setOptions(profileField, this.getProfileOptions("Profile", materialField, thicknessField, profileField, qualityField, speedField));
+			setOptions(qualityField, this.getProfileOptions("Quality", materialField, thicknessField, profileField, qualityField, speedField));
+			speedField.value = this.getProfileOptions("Speed", materialField, thicknessField, profileField, qualityField, speedField);
+		} if(requestFrom == "Thickness") {
+			setOptions(profileField, this.getProfileOptions("Profile", materialField, thicknessField, profileField, qualityField, speedField));
+			setOptions(qualityField, this.getProfileOptions("Quality", materialField, thicknessField, profileField, qualityField, speedField));
+			speedField.value = this.getProfileOptions("Speed", materialField, thicknessField, profileField, qualityField, speedField);
 		} if(requestFrom == "Profile") {
-			setOptions(qualityField, this.getProfileOptions("Quality", materialField, profileField, qualityField, speedField));
-			speedField.value = this.getProfileOptions("Speed", materialField, profileField, qualityField, speedField);
+			setOptions(qualityField, this.getProfileOptions("Quality", materialField, thicknessField, profileField, qualityField, speedField));
+			speedField.value = this.getProfileOptions("Speed", materialField, thicknessField, profileField, qualityField, speedField);
 		} if(requestFrom == "Quality") {
-			speedField.value = this.getProfileOptions("Speed", materialField, profileField, qualityField, speedField);
+			speedField.value = this.getProfileOptions("Speed", materialField, thicknessField, profileField, qualityField, speedField);
 		} if(requestFrom == "Speed") {
 		}
 	};
 
-	getProfileOptions = (requestFrom, materialField, profileField, qualityField, speedField) => {
+	getProfileOptions = (requestFrom, materialField, thicknessField, profileField, qualityField, speedField) => {
 		let returnOptions = [];
 		if(requestFrom == "Material") {
 			let keys = Object.keys(RouterToolpathTimeLookup);
@@ -338,27 +346,37 @@ class Router extends SubMenu {
 			for(let i = 0; i < keysLength; i++) {
 				returnOptions.push(createDropdownOption(keys[i], keys[i]));
 			}
-		}
-		else if(requestFrom == "Profile") {
+		} else if(requestFrom == "Thickness") {
 			let materialChosen = materialField.value;
 			let keys = Object.keys(RouterToolpathTimeLookup[materialChosen]);
 			let keysLength = keys.length;
 			for(let i = 0; i < keysLength; i++) {
 				returnOptions.push(createDropdownOption(keys[i], keys[i]));
 			}
+		}
+		else if(requestFrom == "Profile") {
+			let materialChosen = materialField.value;
+			let thicknessChosen = thicknessField.value;
+			let keys = Object.keys(RouterToolpathTimeLookup[materialChosen][thicknessChosen]);
+			let keysLength = keys.length;
+			for(let i = 0; i < keysLength; i++) {
+				returnOptions.push(createDropdownOption(keys[i], keys[i]));
+			}
 		} else if(requestFrom == "Quality") {
 			let materialChosen = materialField.value;
+			let thicknessChosen = thicknessField.value;
 			let profileChosen = profileField.value;
-			let keys = Object.keys(RouterToolpathTimeLookup[materialChosen][profileChosen]);
+			let keys = Object.keys(RouterToolpathTimeLookup[materialChosen][thicknessChosen][profileChosen]);
 			let keysLength = keys.length;
 			for(let i = 0; i < keysLength; i++) {
 				returnOptions.push(createDropdownOption(keys[i], keys[i]));
 			}
 		} else if(requestFrom == "Speed") {
 			let materialChosen = materialField.value;
+			let thicknessChosen = thicknessField.value;
 			let profileChosen = profileField.value;
 			let qualityChosen = qualityField.value;
-			return parseFloat(RouterToolpathTimeLookup[materialChosen][profileChosen][qualityChosen]);
+			return parseFloat(RouterToolpathTimeLookup[materialChosen][thicknessChosen][profileChosen][qualityChosen]);
 		}
 		return returnOptions;
 	};

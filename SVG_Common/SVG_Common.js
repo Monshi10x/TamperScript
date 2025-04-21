@@ -673,6 +673,8 @@ function getPolygonBounds(polygon) {
 async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true) {
       let svg;
 
+      console.log(svgStringOrObject.outerHTML);///bad at this point
+
       if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
             svg = svg_makeFromString(svgStringOrObject);
             svg_convertShapesToPaths(svg);
@@ -696,6 +698,7 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
             let elementDs = [];
             let innerPathElements = [];
             for(let i = 0; i < svgElements.length; i++) {
+                  console.log(svgElements[i].outerHTML);
                   elementDs.push(svgElements[i].getAttribute("d"));
                   innerPathElements.push(svgElements[i].classList.contains("innerPath"));
             }
@@ -707,7 +710,9 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
             webWorker.onmessage = async function(event) {
                   if(event.data.totalArea) totalArea = event.data.totalArea;
                   if(event.data.shapeAreas) {
+
                         for(let i = 0; i < svgElements.length; i++) {
+                              console.log(svgElements[i].outerHTML);///bad at this point
                               svgElements[i].setAttribute("data-area", event.data.shapeAreas[i]);
                         }
                         console.log(event.data.shapeAreas);
@@ -814,6 +819,7 @@ function svg_getPathQty(svgStringOrObject) {
             if(svgStringOrObject[i].nodeName == "g" || svgStringOrObject[i].nodeName == "defs" || svgStringOrObject[i].nodeName == "style" || svgStringOrObject[i].nodeName == "text") continue;
 
             let element = svgStringOrObject[i];
+            console.log(element);
 
             if(element.className.baseVal.includes("outerPath")) returnObject.outerPaths++;
             if(element.className.baseVal.includes("innerPath")) returnObject.innerPaths++;
@@ -833,7 +839,6 @@ function svg_convertShapesToPaths(svgObject) {
             if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "path" || svgElements[i].nodeName == "defs" || svgElements[i].nodeName == "style" || svgElements[i].nodeName == "text") continue;
 
             let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
-
       }
 
       return svgObject;
@@ -844,7 +849,6 @@ function svg_formatCompoundPaths(svgObject) {
       let mainGroup = svgObject.querySelector("#mainGcreatedByT");
 
       let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-
       newGroup.id = "pathGroup";
       mainGroup.appendChild(newGroup);
 
@@ -855,6 +859,7 @@ function svg_formatCompoundPaths(svgObject) {
       for(let i = 0; i < svgElementsLength; i++) {
 
             let pathString = svgElements[i].getAttribute("d");
+            let pathClass = svgElements[i].classList;
             let pathStringSplitOverZ = pathString.split("Z");
 
             let outerPathParent_id;
@@ -862,7 +867,7 @@ function svg_formatCompoundPaths(svgObject) {
                   if(pathStringSplitOverZ[j] == "") continue;
                   //Outer Compound
 
-                  if(j == 0) {
+                  if(j == 0 && !pathClass.contains("innerPath")) {
                         let compoundPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
                         compoundPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
                         compoundPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";

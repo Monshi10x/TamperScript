@@ -144,4 +144,55 @@ function costAnalysisSummaryTick() {
     newPanelContent_TimeClock_Time.innerHTML = smhd[0] + "d " + smhd[1] + "h " + smhd[2] + "m " + smhd[3] + "s";
 
     newPanelContent_Install_Address.innerHTML = getKOStorageVariable().installAddress || "";
+
+    tickCreateCustomerModal();
+}
+
+let isCompanyPopupOpen = false;
+let createHelper = false;
+function tickCreateCustomerModal() {
+    let companyPopup = document.getElementById("addCompanyPopup") || null;
+
+    if(companyPopup == null) return;
+
+    if(isCompanyPopupOpen == false && companyPopup.style.display == "block") {
+        isCompanyPopupOpen = true;
+        createHelper = true;
+    }
+
+    if(companyPopup.style.display != "block") {
+        isCompanyPopupOpen = false;
+        createHelper = false;
+    }
+
+    if(createHelper) {
+        let billingAddressTable = companyPopup.querySelector("table[id^='BillingAddressTable']");
+
+        let address1Field = companyPopup.querySelector("input[id^='AccountBillingStreetTextBox']");
+        let address2Field = companyPopup.querySelector("input[id^='AccountBillingStreet2TextBox']");
+        let cityField = companyPopup.querySelector("input[id^='AccountBillingCityTextBox']");
+        let stateField = companyPopup.querySelector("input[id^='AccountBillingStateTextBox']");
+        let postCodeField = companyPopup.querySelector("input[id^='AccountBillingPostalCodeTextBox']");
+
+        let newRow = document.createElement("tr");
+        billingAddressTable.getElementsByTagName("tbody")[0].appendChild(newRow);
+
+        let useInstallAddressBtn = createButton("Use Install Address", "width:150px", () => {
+            let koObject = getKOStorageVariable();
+            if(koObject == null || !getKOStorageVariable().formattedInstallAddress) {
+                alert("no install address set");
+                return;
+            }
+
+            let [street, suburb, state, postCode, country] = getKOStorageVariable().formattedInstallAddress.split(", ");
+
+            $(address1Field).val(street);
+            $(cityField).val(suburb);
+            $(stateField).val(state);
+            $(postCodeField).val(postCode);
+
+        }, newRow);
+    }
+
+    createHelper = false;
 }

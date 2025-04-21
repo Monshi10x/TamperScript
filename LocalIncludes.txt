@@ -68,11 +68,11 @@
 // @resource     Image_Scissor https://github.com/Monshi10x/TamperScript/raw/main/Images/ScissorImage.png
 // @resource     SVGWebWorker file://C:\Users\monsh\Documents\TamperScript\SVG_Common\SVG_WebWorker.js
 // @resource     GoogleScript file://C:\Users\monsh\Documents\TamperScript\GoogleMap\GoogleMap.js
-// @require      https://cdn.plot.ly/plotly-latest.min.js
+// @require      https://cdn.plot.ly/plotly-3.0.1.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js
-// @require      https://unpkg.com/panzoom@8.7.3/dist/panzoom.min.js
+// @require      https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js
 // @require      https://cdn.jsdelivr.net/npm/svg-path-commander/dist/svg-path-commander.js
 // @require      https://cdn.jsdelivr.net/npm/path-data-polyfill@1.0.6/path-data-polyfill.min.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Charts\Chart.js

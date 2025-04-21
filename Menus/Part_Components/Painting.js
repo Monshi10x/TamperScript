@@ -70,14 +70,24 @@ class Painting extends Material {
             this.#f_colourMatchTime = createInput_Infield("Colour Match Time", this.#defaultColourMatchTime.as("minutes"), "width:30%;margin-right:60%;", () => {this.UpdateFromChange();}, f_colourMatchContainer, false, 5, {postfix: "min"});
 
             let f_runContainer = createDivStyle5(null, "Run", f_timeContainer)[1];
-            this.#f_numberCoats = createDropdown_Infield("Number of Coats", 0, "width:50%;", [createDropdownOption("x2 (2K for Acrylic/ACM)", 2), createDropdownOption("x3 (2K for Raw Metals Alum/Steel/Stainless...)", 3)], () => {this.UpdateFromChange();}, f_runContainer);
+            this.#f_numberCoats = createDropdown_Infield("Number of Coats", 0, "width:50%;", [
+                  createDropdownOption("x2 (2K for Acrylic/ACM)", 2),
+                  createDropdownOption("x3 (2K for Raw Metals Alum/Steel/Stainless...)", 3),
+                  createDropdownOption("x4 (x2 Base + x2 Clear)", 4)
+            ], () => {this.UpdateFromChange();}, f_runContainer);
             this.#f_perCoatTime = createInput_Infield("Per Coat Time", this.#defaultCoatTime.as("minutes"), "width:20%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "min"});
             this.#f_flashTime = createInput_Infield("Flash Time", this.#defaultFlashTime.as("minutes"), "width:20%;", () => {this.UpdateFromChange();}, f_runContainer, false, 5, {postfix: "min"});
 
             let f_litresContainer = createDivStyle5(null, "Litres", this.container)[1];
             let f_formulaContainer = createDivStyle5(null, "Formula", f_litresContainer)[1];
             this.#f_useLitresFormula = createCheckbox_Infield("Use Formula", this.#defaultUseLitresFormula, "width:30%;", () => {
-                  if(!this.#f_useLitresFormula[1].checked) $(this.#f_litres[0]).show();
+                  if(!this.#f_useLitresFormula[1].checked) {
+                        $(this.#f_litres[0]).show();
+                        setFieldDisabled(false, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
+                  } else {
+                        setFieldDisabled(true, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
+                        $(this.#f_litresPerSquareMetrePerCoat[1]).val(this.#defaultLitresPerSquareMetrePerCoat).change();
+                  }
                   this.UpdateFromChange();
             }, f_formulaContainer);
             this.#f_litresFormulas = createDropdown_Infield_Icons_Search("Use Formula", 2, "width:30%;margin-right:30%;", 200, false, [
@@ -86,7 +96,9 @@ class Painting extends Material {
                   ["Fabricated FRONT-LIT Letters", GM_getResourceURL("Image_FrontLitLettersPainted")],
                   ["Fabricated BACK-LIT Letters", GM_getResourceURL("Image_FabLettersPainted")],
                   ["Fabricated NON-LIT Letters", GM_getResourceURL("Image_FabLettersPainted")]
-            ], () => {this.UpdateFromChange();}, f_formulaContainer, false);
+            ], () => {
+                  this.UpdateFromChange();
+            }, f_formulaContainer, false);
 
             let f_totalContainer = createDivStyle5(null, "Total", f_litresContainer)[1];
             this.#f_areaToPaint = createInput_Infield("Area To Paint", 0, "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "m2"});
@@ -96,7 +108,7 @@ class Painting extends Material {
             createText("=", "width:30px;height:50px;font-size:32px;color:blue;", f_totalContainer);
             setFieldDisabled(true, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
 
-            this.#f_litres = createInput_Infield("Litres", this.#defaultLitres.as("litres"), "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "L"});
+            this.#f_litres = createInput_Infield("Litres", this.#defaultLitres.as("litres"), "width:25%;", () => {this.UpdateFromChange({updateLitresField: false});}, f_totalContainer, false, 0.1, {postfix: "L"});
 
             makeFieldGroup("Checkbox", this.#f_useLitresFormula[1], true, this.#f_litresFormulas[0]);
             /*
@@ -115,12 +127,12 @@ class Painting extends Material {
 
       /*
       Inherited*/
-      UpdateFromChange() {
+      UpdateFromChange(options = {updateLitresField: true}) {
             super.UpdateFromChange();
 
             this.UpdateFromInheritedData();
 
-            this.UpdateLitres();
+            if(options.updateLitresField) this.UpdateLitres();
 
             this.UpdateOutput();
             this.UpdateDataForSubscribers();
@@ -150,7 +162,7 @@ class Painting extends Material {
       };
 
       UpdateLitres() {
-            if(!this.#f_useLitresFormula[1].checked) return;
+            //if(!this.#f_useLitresFormula[1].checked) return;
 
             let calculatedArea = 0;
 

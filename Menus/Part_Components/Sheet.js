@@ -150,19 +150,19 @@ class Sheet extends Material {
 
       setSheetMaterial(value, triggerChange = true) {
             dropdownSetSelectedText(this.#material[1], value, triggerChange);
-            this.UpdateFilters2(triggerChange);
+            this.UpdateFilters(triggerChange);
       }
       setSheetSize(value, triggerChange = true) {
             dropdownSetSelectedText(this.#sheetSize[1], value, triggerChange);
-            this.UpdateFilters2(triggerChange);
+            this.UpdateFilters(triggerChange);
       }
       setSheetThickness(value, triggerChange = true) {
             dropdownSetSelectedText(this.#thickness[1], value, triggerChange);
-            this.UpdateFilters2(triggerChange);
+            this.UpdateFilters(triggerChange);
       }
       setSheetFinish(value, triggerChange = true) {
             dropdownSetSelectedText(this.#finish[1], value, triggerChange);
-            this.UpdateFilters2(triggerChange);
+            this.UpdateFilters(triggerChange);
       }
 
       #sheetPerimeterIsCut = true;
@@ -453,14 +453,14 @@ class Sheet extends Material {
 
             let sheetFilterContainer = createDivStyle5("width:calc(100%)", "Filters", f_container_sheetSize[1]);
 
-            this.#material = createDropdown_Infield("Material", 0, "width:80px", [createDropdownOption("", "")].concat(this.#materialOptions), () => {this.UpdateFilters2();}, sheetFilterContainer[1]);
+            this.#material = createDropdown_Infield("Material", 0, "width:80px", [createDropdownOption("", "")].concat(this.#materialOptions), () => {this.UpdateFilters();}, sheetFilterContainer[1]);
 
-            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer[1]);
+            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters();}, sheetFilterContainer[1]);
             this.#sheetSize[1].id = "Sheet Size";
 
-            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters2();}, sheetFilterContainer[1]);
+            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters();}, sheetFilterContainer[1]);
 
-            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters2();}, sheetFilterContainer[1]);
+            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters();}, sheetFilterContainer[1]);
 
             this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 40, false, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize[1], false);
 
@@ -1018,7 +1018,7 @@ class Sheet extends Material {
 
       /**
        * 
-       * @param {*} machine = "router" || "guillotine"
+       * @param {*} machine = "router" || "laser" || "guillotine"
        */
       setCuttingMachine(machine = "router") {
             switch(machine) {
@@ -1070,7 +1070,7 @@ class Sheet extends Material {
             return optionsArray;
       }
 
-      UpdateFilters2(triggerChange = true) {
+      UpdateFilters(triggerChange = true) {
             let chosenMaterial = this.#material[1].value || null;
             let chosenSheetSize = this.#sheetSize[1].value || null;
             let chosenThickness = this.#thickness[1].value || null;
@@ -1124,28 +1124,6 @@ class Sheet extends Material {
             dropdownSetSelectedText(this.#sheetSize[1], chosenSheetSize, false);
             dropdownSetSelectedText(this.#thickness[1], chosenThickness, false);
             dropdownSetSelectedText(this.#finish[1], chosenFinish, false);
-
-            if(triggerChange) $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value).change();
-            else $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value);
-
-            this.#sheetMaterial[5]();
-      }
-
-      UpdateFilters(updateFromFilter, triggerChange = true) {
-            if(updateFromFilter == "Material") {
-                  this.setSheetSizeOptions(...this.getSheetSizeOptions());
-                  this.setThicknessOptions(...this.getThicknessOptions());
-                  this.setFinishOptions(...this.getFinishOptions());
-            }
-
-            if(updateFromFilter == "Sheet Size") {
-                  this.setThicknessOptions(...this.getThicknessOptions());
-                  this.setFinishOptions(...this.getFinishOptions());
-            }
-
-            if(updateFromFilter == "Thickness") {
-                  this.setFinishOptions(...this.getFinishOptions());
-            }
 
             if(triggerChange) $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value).change();
             else $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value);

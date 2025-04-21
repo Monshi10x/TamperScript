@@ -6,6 +6,108 @@ const assert = function(condition, message) {
         throw Error('Assert failed: ' + (message || ''));
 };
 
+const KEYCODE = {
+    BACKSPACE: 8,        // Backspace
+    TAB: 9,              // Tab
+    ENTER: 13,           // Enter
+    SHIFT: 16,           // Shift
+    CTRL: 17,            // Control
+    ALT: 18,             // Alt
+    PAUSE_BREAK: 19,     // Pause/Break
+    CAPS_LOCK: 20,       // Caps Lock
+    ESCAPE: 27,          // Escape (Esc)
+    SPACE: 32,           // Space
+    PAGE_UP: 33,         // Page Up
+    PAGE_DOWN: 34,       // Page Down
+    END: 35,             // End
+    HOME: 36,            // Home
+    LEFT_ARROW: 37,      // Left Arrow
+    UP_ARROW: 38,        // Up Arrow
+    RIGHT_ARROW: 39,     // Right Arrow
+    DOWN_ARROW: 40,      // Down Arrow
+    INSERT: 45,          // Insert
+    DELETE: 46,          // Delete
+    KEY_0: 48,           // 0
+    KEY_1: 49,           // 1
+    KEY_2: 50,           // 2
+    KEY_3: 51,           // 3
+    KEY_4: 52,           // 4
+    KEY_5: 53,           // 5
+    KEY_6: 54,           // 6
+    KEY_7: 55,           // 7
+    KEY_8: 56,           // 8
+    KEY_9: 57,           // 9
+    A: 65,               // A
+    B: 66,               // B
+    C: 67,               // C
+    D: 68,               // D
+    E: 69,               // E
+    F: 70,               // F
+    G: 71,               // G
+    H: 72,               // H
+    I: 73,               // I
+    J: 74,               // J
+    K: 75,               // K
+    L: 76,               // L
+    M: 77,               // M
+    N: 78,               // N
+    O: 79,               // O
+    P: 80,               // P
+    Q: 81,               // Q
+    R: 82,               // R
+    S: 83,               // S
+    T: 84,               // T
+    U: 85,               // U
+    V: 86,               // V
+    W: 87,               // W
+    X: 88,               // X
+    Y: 89,               // Y
+    Z: 90,               // Z
+    LEFT_WINDOW_KEY: 91, // Left Windows key (Meta)
+    RIGHT_WINDOW_KEY: 92,// Right Windows key (Meta)
+    SELECT_KEY: 93,      // Select Key (Context Menu)
+    NUMPAD_0: 96,        // Numpad 0
+    NUMPAD_1: 97,        // Numpad 1
+    NUMPAD_2: 98,        // Numpad 2
+    NUMPAD_3: 99,        // Numpad 3
+    NUMPAD_4: 100,       // Numpad 4
+    NUMPAD_5: 101,       // Numpad 5
+    NUMPAD_6: 102,       // Numpad 6
+    NUMPAD_7: 103,       // Numpad 7
+    NUMPAD_8: 104,       // Numpad 8
+    NUMPAD_9: 105,       // Numpad 9
+    MULTIPLY: 106,       // Numpad *
+    ADD: 107,            // Numpad +
+    SUBTRACT: 109,       // Numpad -
+    DECIMAL_POINT: 110,  // Numpad .
+    DIVIDE: 111,         // Numpad /
+    F1: 112,             // F1
+    F2: 113,             // F2
+    F3: 114,             // F3
+    F4: 115,             // F4
+    F5: 116,             // F5
+    F6: 117,             // F6
+    F7: 118,             // F7
+    F8: 119,             // F8
+    F9: 120,             // F9
+    F10: 121,            // F10
+    F11: 122,            // F11
+    F12: 123,            // F12
+    NUM_LOCK: 144,       // Num Lock
+    SCROLL_LOCK: 145,    // Scroll Lock
+    SEMICOLON: 186,      // ; and :
+    EQUAL_SIGN: 187,     // = and +
+    COMMA: 188,          // , and <
+    DASH: 189,           // - and _
+    PERIOD: 190,         // . and >
+    FORWARD_SLASH: 191,  // / and ?
+    GRAVE_ACCENT_TILDE: 192,   // ` and ~
+    OPEN_BRACKET: 219,   // [ and {
+    BACKSLASH: 220,      // \ and |
+    CLOSE_BRACKET: 221,  // ] and }
+    SINGLE_QUOTE: 222    // ' and "
+};
+
 function getMHD(minutes) {
     var days = Math.floor((minutes / 60) / dayHours);
     var days_remainderMinutes = minutes - (dayHours * days * 60);

@@ -2,6 +2,8 @@ var GLOBAL_KO_ORDER = null;
 
 function getKOStorageVariable() {
 	let product = document.querySelector('div[class^="ord-prod-model-item"]');
+	if(!product) return {};
+
 	let db = ko.contextFor(product).$parent.AvalaraDocCodeStatus;
 
 	if(!db) return {};
@@ -41,7 +43,7 @@ function partInfoTick() {
 	//******************************//
 
 	//console.log(ko.contextFor(products[0]).$parent.AvalaraDocCode);
-	GLOBAL_KO_ORDER = ko.contextFor(products[0]).$parent;
+	GLOBAL_KO_ORDER = products[0] ? ko.contextFor(products[0]).$parent : null;
 	//ko.contextFor(products[0]).$parent.TaxJarDocCode = "{quoteSeconds_Stored: 0}";
 	for(var product = 0; product < products.length; product++) {
 		var koProduct = ko.contextFor(products[product]).$data;
@@ -222,8 +224,6 @@ function partInfoTick() {
 				relevantPart.style.border = "0px";
 			}
 
-
-
 			if(part == 0) prevPartNameNumber = partNameNumber;
 			partsInGroup++;
 			productNumber = product + 1;
@@ -240,28 +240,10 @@ function partInfoTick() {
 			}
 
 			if(parts[part].querySelectorAll(".partNameBtn").length == 0 && partHasLoaded) {
-				//console.log(parts[part].querySelectorAll("span[id^='lblPartInformation_']"));
-				//let nameElement = parts[part].querySelectorAll("span[id^='lblPartInformation_']")[0].innerText;
-				//console.log(nameElement);
-				//let name2 = nameElement ? nameElement.split("Name: ")[1] : "";
-				//console.log(name2);
-				//let name = name2 ? name2.split("Part")[0] : "";
-				//console.log(name);
 				createNameBtn(parts[part].querySelector(".ord-prod-part-header"), "partNameBtn", parts[part].querySelector(".txtPartDescription"), koPartName);
 			}
 
 			partPrice = koPartTotalPrice;
-
-			/*
-			if(parts[part].querySelectorAll(".partCombinedPrice").length == 0) {
-				createPartCombinedPrice(parts[part].querySelector(".ord-prod-part-header"), "partCombinedPrice", parts[part]);
-			}
-			if(parts[part].querySelectorAll(".partCombinedPrice").length != 0) {
-				if(parts[part].querySelectorAll(".partCombinedPrice")[0].checked) {
-					partCombinedPrice += partPrice;
-					partCombinedPrice_anyIsTicked = true;
-				}
-			}*/
 
 			if(parts[part].querySelectorAll(".partPrice").length == 0) {
 				let label = createLabel("$" + partPrice, "color:blue;font-weight:bold;width:80px;height:30px;font-size:14px;float:right;", parts[part].querySelector(".ord-prod-part-header"));
@@ -271,9 +253,6 @@ function partInfoTick() {
 			} else {
 				parts[part].querySelector(".partPrice").innerText = "$" + partPrice;
 			}
-
-
-
 
 			if(partHasInstall && partPrice == 0) {
 				setPartBorderColour(product + 1, part + 1, "red");

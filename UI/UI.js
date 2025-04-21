@@ -580,7 +580,7 @@ function createTextarea(text, defaultValue, overrideCssStyles, optionalCallback,
     if(defaultValue != null) input.value = defaultValue;
     if(overrideCssStyles) input.style.cssText += overrideCssStyles;
     if(optionalCallback) {
-        input.onkeyup = optionalCallback;
+        input.onchange = optionalCallback;
     }
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(input);
@@ -918,8 +918,13 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
                     optionIcon = document.createElement('div');
                     optionIcon.style.background = dropdownOptions[o][1];
                 } else {
-                    optionIcon = document.createElement('img');
-                    if(dropdownOptions[o][1] != null) optionIcon.src = dropdownOptions[o][1];
+
+                    if(dropdownOptions[o][1] != null && dropdownOptions[o][1] != "null") {
+                        optionIcon = document.createElement('img');
+                        optionIcon.src = dropdownOptions[o][1];
+                    } else {
+                        optionIcon = document.createElement('div');
+                    }
                 }
                 optionIcon.style.cssText += "display: block; float: left; width: " + widthOfIcon + "px; height: " + widthOfIcon + "px; margin: 10px 10px; background-size: cover;";
                 optionDiv.appendChild(optionIcon);

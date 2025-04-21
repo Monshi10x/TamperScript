@@ -66,8 +66,6 @@ class BillboardMenu extends LHSMenuWindow {
             this.#dragZoomCanvas.canvas.style.cssText += "float:right;";
             this.#dragZoomCanvas.canvas.style.cssText += ";display:none;";//TEMPORARY
 
-
-
             this.#canvasCtx = this.#dragZoomCanvas.canvasCtx;
 
             var infoContainer = document.createElement("div");

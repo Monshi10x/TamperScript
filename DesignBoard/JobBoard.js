@@ -122,7 +122,7 @@ class JobBoard {
             container.contentContainer.classList.add("x-scrollable");
             container.headingContainer.classList.add("x-scrollable");
 
-            let self = this;
+            let _this = this;
             new Sortable(container.contentContainer, {
                   animation: 120,
                   group: 'shared',
@@ -130,7 +130,7 @@ class JobBoard {
                   ghostClass: 'sortable-ghost',
                   direction: 'vertical',
                   onEnd: function(event) {
-                        self.OnMoveEnd(event);
+                        _this.OnMoveEnd(event);
                   }
             });
             this.columnContainers.push({title: title, containerObject: container});

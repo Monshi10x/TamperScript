@@ -45,6 +45,7 @@ class ModalSVG extends Modal {
       constructor(headerText, incrementAmount, callback, svgText, callerObject) {
             super(headerText, incrementAmount, callback);
             this.#svgText = svgText;
+            console.log("in Modal SVG svgText given as: " + svgText);//up until this point still contains class names
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
 
@@ -138,7 +139,7 @@ class ModalSVG extends Modal {
                   }
                   this.hide();
             }, null);
-            this.#f_cancelSave = createButton("Cancel Changes", "", () => { }, null);
+            this.#f_cancelSave = createButton("Cancel Changes", "", () => {this.hide();}, null);
 
             this.addFooterElement(this.#f_saveSVG);
             this.addFooterElement(this.#f_cancelSave);
@@ -178,65 +179,29 @@ class ModalSVG extends Modal {
 
             let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
             let pathGroup = this.#dragZoomSVG.svg.querySelector("#pathGroup");
-            let pathGroupBounds = pathGroup.getBBox();
-            let svgScale = this.#dragZoomSVG.scale;
-
-            // let clientRect = pathGroup.getBBox();
-
-            //in mm
-            let scaledBox = {
-                  width: pathGroupBounds.width,
-                  height: pathGroupBounds.height,
-                  x: pathGroupBounds.x,
-                  y: pathGroupBounds.y
-            };
 
             let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             newGroup.id = "overallMeasures";
 
-            let widthText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            widthText.innerHTML = roundNumber(svg_pixelToMM(scaledBox.width), 2) + " mmW";
-            widthText.style = "font-size:" + this.#measurementOffset_Large / svgScale + "px;";
-            widthText.setAttribute('fill', `rgb(206, 206, 206)`);
-            widthText.setAttribute('text-anchor', "middle");
-            widthText.setAttribute('dominant-baseline', "Auto");
-            widthText.setAttribute('x', scaledBox.x + scaledBox.width / 2);
-            widthText.setAttribute('y', scaledBox.y - (this.#measurementOffset_Large + this.#textOffset) / svgScale);
-
-            let widthLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            widthLine.setAttribute('stroke', `rgb(206, 206, 206)`);
-            widthLine.setAttribute('stroke-width', 2 / svgScale);
-            widthLine.setAttribute('x1', scaledBox.x);
-            widthLine.setAttribute('y1', scaledBox.y - this.#measurementOffset_Large / svgScale);
-            widthLine.setAttribute('x2', scaledBox.x + scaledBox.width);
-            widthLine.setAttribute('y2', scaledBox.y - this.#measurementOffset_Large / svgScale);
-
-            let heightText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            heightText.innerHTML = roundNumber(svg_pixelToMM(scaledBox.height), 2) + " mmH";
-            heightText.setAttribute('fill', `rgb(206, 206, 206)`);
-            heightText.setAttribute('text-anchor', "middle");
-            heightText.setAttribute('dominant-baseline', "Auto");
-            heightText.style = "font-size:" + this.#measurementOffset_Large / svgScale + "px;";
-            heightText.setAttribute('x', scaledBox.x - (this.#measurementOffset_Large + this.#textOffset) / svgScale);
-            heightText.setAttribute('y', scaledBox.y + scaledBox.height / 2);
-            heightText.setAttribute('transform', "rotate(270," +
-                  ((- this.#measurementOffset_Large - this.#textOffset) / svgScale) +
-                  "," +
-                  ((scaledBox.y + scaledBox.height / 2)) + ")");
-
-
-            let heightLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            heightLine.setAttribute('stroke', `rgb(206, 206, 206)`);
-            heightLine.setAttribute('stroke-width', 2 / svgScale);
-            heightLine.setAttribute('x1', scaledBox.x - this.#measurementOffset_Large / svgScale);
-            heightLine.setAttribute('y1', scaledBox.y);
-            heightLine.setAttribute('x2', scaledBox.x - this.#measurementOffset_Large / svgScale);
-            heightLine.setAttribute('y2', scaledBox.y + scaledBox.height);
-
-            newGroup.appendChild(widthText);
-            newGroup.appendChild(widthLine);
-            newGroup.appendChild(heightText);
-            newGroup.appendChild(heightLine);
+            let measures = new TSVGMeasurement(newGroup, {
+                  target: pathGroup,
+                  direction: "both",
+                  sides: ["top", "left"],
+                  autoLabel: true,
+                  unit: "mm",
+                  scale: svg_pixelToMM(1),
+                  precision: 2,
+                  arrowSize: 5,
+                  textOffset: 20,
+                  stroke: "#000",
+                  lineWidth: 20,
+                  fontSize: "240px",
+                  tickLength: 100,
+                  handleRadius: 8,
+                  offsetX: 100,
+                  offsetY: 100,
+                  sideHint: null
+            });
 
             mainGroup.appendChild(newGroup);
       }
@@ -257,19 +222,7 @@ class ModalSVG extends Modal {
       }
 
       addElementMeasures(element) {
-
             let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
-            let svgScale = this.#dragZoomSVG.scale;
-            let clientRect = element.getBBox();
-
-            //in mm
-            let scaledBox = {
-                  width: clientRect.width,
-                  height: clientRect.height,
-                  x: clientRect.x,
-                  y: clientRect.y
-            };
-
             let newGroup = mainGroup.querySelector("#itemMeasures");
 
             if(!newGroup) {
@@ -278,49 +231,25 @@ class ModalSVG extends Modal {
                   mainGroup.appendChild(newGroup);
             }
 
-            let widthText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            widthText.innerHTML = roundNumber(svg_pixelToMM(scaledBox.width), 2) + " mmW";
-            widthText.style = "font-size:" + 12 / svgScale + "px;";
-            widthText.setAttribute('fill', `rgb(206, 206, 206)`);
-            widthText.setAttribute('text-anchor', "middle");
-            widthText.setAttribute('dominant-baseline', "Auto");
-            widthText.setAttribute('x', scaledBox.x + (scaledBox.width / 2));
-            widthText.setAttribute('y', scaledBox.y + (- this.#measurementOffset_Small - this.#textOffset) / svgScale);
-
-            let widthLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            widthLine.setAttribute('stroke', `rgb(206, 206, 206)`);
-            widthLine.setAttribute('stroke-width', 2 / svgScale);
-            widthLine.setAttribute('x1', scaledBox.x);
-            widthLine.setAttribute('y1', scaledBox.y + (- this.#measurementOffset_Small) / svgScale);
-            widthLine.setAttribute('x2', (scaledBox.x + scaledBox.width));
-            widthLine.setAttribute('y2', scaledBox.y + (- this.#measurementOffset_Small) / svgScale);
-
-            let heightText = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            heightText.innerHTML = roundNumber(svg_pixelToMM(scaledBox.height), 2) + " mmH";
-            heightText.setAttribute('fill', `rgb(206, 206, 206)`);
-            heightText.style = "font-size:" + 12 / svgScale + "px;";
-            heightText.setAttribute('text-anchor', "middle");
-            heightText.setAttribute('dominant-baseline', "Auto");
-            heightText.setAttribute('x', scaledBox.x + (- this.#measurementOffset_Small - this.#textOffset) / svgScale);
-            heightText.setAttribute('y', scaledBox.y + (scaledBox.height / 2));
-            heightText.setAttribute('transform', "rotate(270," +
-                  (scaledBox.x + (- this.#measurementOffset_Small - this.#textOffset) / svgScale) +
-                  "," +
-                  (scaledBox.y + (scaledBox.height / 2)) + ")");
-
-            let heightLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            heightLine.setAttribute('stroke', `rgb(206, 206, 206)`);
-            heightLine.setAttribute('stroke-width', 2 / svgScale);
-            heightLine.setAttribute('x1', scaledBox.x + (- this.#measurementOffset_Small) / svgScale);
-            heightLine.setAttribute('y1', scaledBox.y);
-            heightLine.setAttribute('x2', scaledBox.x + (- this.#measurementOffset_Small) / svgScale);
-            heightLine.setAttribute('y2', scaledBox.y + scaledBox.height);
-
-            newGroup.appendChild(widthText);
-            newGroup.appendChild(widthLine);
-            newGroup.appendChild(heightText);
-            newGroup.appendChild(heightLine);
-
+            let measures = new TSVGMeasurement(newGroup, {
+                  target: element,
+                  direction: "both",
+                  sides: ["top", "left"],
+                  autoLabel: true,
+                  unit: "mm",
+                  scale: svg_pixelToMM(1),
+                  precision: 2,
+                  arrowSize: 3,
+                  textOffset: 5,
+                  stroke: "#000",
+                  lineWidth: 8,
+                  fontSize: "48px",
+                  tickLength: 20,
+                  handleRadius: 8,
+                  offsetX: 10,
+                  offsetY: 10,
+                  sideHint: null
+            });
       }
 
       showElementMeasures() {

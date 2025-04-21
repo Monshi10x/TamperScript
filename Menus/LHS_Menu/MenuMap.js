@@ -153,7 +153,7 @@ class MenuMap extends LHSMenuWindow {
             await google.maps.importLibrary("places");
 
             this.placeAutocomplete = new google.maps.places.Autocomplete(this.#f_searchField[1], {
-                  fields: ["formatted_address", "geometry", "name"],
+                  fields: ["formatted_address", "geometry", "name", "address_components", "icon"],
                   strictBounds: false,
             });
             this.placeAutocomplete.bindTo('bounds', googleMap);
@@ -162,6 +162,8 @@ class MenuMap extends LHSMenuWindow {
                   let place = this.placeAutocomplete.getPlace();
 
                   if(!place) return;
+
+                  this.formattedAddressString = this.formatedAddressString(place);
 
                   GoogleMap.deleteAllMapMarkers();
                   GoogleMap.deleteAllDirections();
@@ -187,9 +189,101 @@ class MenuMap extends LHSMenuWindow {
             });
       }
 
+
+      formatedAddressString(place) {
+            if(!place.address_components) {
+                  throw new Error("Invalid place object: no address_components found.");
+            }
+
+            const components = {
+                  street_number: '',
+                  route: '',
+                  locality: '',          // City
+                  administrative_area_level_1: '', // State
+                  postal_code: '',
+                  country: ''
+            };
+
+            place.address_components.forEach(component => {
+                  const types = component.types;
+                  if(types.includes('street_number')) {
+                        components.street_number = component.long_name;
+                  }
+                  if(types.includes('route')) {
+                        components.route = component.long_name;
+                  }
+                  if(types.includes('locality')) {
+                        components.locality = component.long_name;
+                  }
+                  if(types.includes('administrative_area_level_1')) {
+                        components.administrative_area_level_1 = component.short_name;
+                  }
+                  if(types.includes('postal_code')) {
+                        components.postal_code = component.long_name;
+                  }
+                  if(types.includes('country')) {
+                        components.country = component.long_name;
+                  }
+            });
+
+            // Build your final string
+            const street = [components.street_number, components.route].filter(Boolean).join(' ');
+
+            return `${street}, ${components.locality}, ${components.administrative_area_level_1}, ${components.postal_code}, ${components.country}`;
+      }
+
+      formatedAddressObject(place) {
+            if(!place.address_components) {
+                  throw new Error("Invalid place object: no address_components found.");
+            }
+
+            const components = {
+                  street_number: '',
+                  route: '',
+                  locality: '',                  // City
+                  administrative_area_level_1: '',// State
+                  postal_code: '',
+                  country: ''
+            };
+
+            place.address_components.forEach(component => {
+                  const types = component.types;
+                  if(types.includes('street_number')) {
+                        components.street_number = component.long_name;
+                  }
+                  if(types.includes('route')) {
+                        components.route = component.long_name;
+                  }
+                  if(types.includes('locality')) {
+                        components.locality = component.long_name;
+                  }
+                  if(types.includes('administrative_area_level_1')) {
+                        components.administrative_area_level_1 = component.short_name;
+                  }
+                  if(types.includes('postal_code')) {
+                        components.postal_code = component.long_name;
+                  }
+                  if(types.includes('country')) {
+                        components.country = component.long_name;
+                  }
+            });
+
+            const street = [components.street_number, components.route].filter(Boolean).join(' ');
+
+            return {
+                  street: street || null,
+                  city: components.locality || null,
+                  state: components.administrative_area_level_1 || null,
+                  postcode: components.postal_code || null,
+                  country: components.country || null
+            };
+      }
+
+
       async setOrderInstallAddress() {
             let koStorageObject = getKOStorageVariable();
 
+            koStorageObject.formattedInstallAddress = this.formattedAddressString;
             koStorageObject.installAddress = this.#f_searchField[1].value;
             koStorageObject.travelDistance = this.#f_travelDistanceMeters[1].value || 0;
             koStorageObject.travelTime = this.#f_travelTimeMins[1].value || 0;
@@ -236,58 +330,100 @@ class MenuMap extends LHSMenuWindow {
 
             let domProducts = document.getElementsByClassName("ord-prod-model-item");
 
-            //let totalTravelPrice = 0;
-
             //delete travel-auto parts from those that dont need it anymore
             for(let i = 0; i < numProducts; i++) {
 
                   let partNamesInProduct = getPartNamesInProduct(i + 1);
-
                   let travelPartNo = null;
                   let travelPrice = 0;
                   let productPrice = getProductPrice(i + 1);
+                  let productNumberIsPartOfList = productNumbersToAddTo.includes(i + 1);
+                  let productNumberListEmpty = productNumbersToAddTo.length == 0;
+                  let includesTravel = false;
 
                   for(let j = 0; j < partNamesInProduct.length; j++) {
                         if(partNamesInProduct[j] == "TRAVEL [Automatic]") {
                               travelPartNo = j + 1;
+                              includesTravel = true;
 
                               travelPrice = parseFloat(domProducts[i].getElementsByClassName("ord-prod-part-header")[j].getElementsByClassName("partPrice")[0].innerText.replace("$", ""));
-                              totalOrderPriceLessTravel -= travelPrice;
                         }
                   }
 
                   travelPrices.push({
                         productNo: i + 1,
-                        travelPrice: travelPrice
+                        includesTravel: includesTravel,
+                        productPrice: productPrice,
+                        travelPrice: travelPrice,
+                        excludedFromCalculations: false,
+                        priceExcludingTravel: productPrice - travelPrice
                   });
 
-                  console.log((productPrice - travelPrice) == 0);
+                  if(productNumberIsPartOfList) continue;
+                  if(/*doesn't include travel*/travelPartNo == null) continue;
 
-                  if(productNumbersToAddTo.includes(i + 1)) continue;
+                  if(travelPrices[i].includesTravel && travelPrices[i].priceExcludingTravel == 0) {
+                        await DeletePart(i + 1, travelPartNo);
 
-                  if(!productNumbersToAddTo.includes(i + 1) && travelPartNo != null) await DeletePart(i + 1, travelPartNo);
-                  if((productPrice - travelPrice) == 0) await DeletePart(i + 1, travelPartNo);
+                        travelPrices[i] = {
+                              productNo: i + 1,
+                              includesTravel: false,
+                              productPrice: productPrice,
+                              travelPrice: 0,
+                              excludedFromCalculations: false,
+                              priceExcludingTravel: productPrice - travelPrice
+                        };
+                  }
+                  if(travelPrices[i].includesTravel && !productNumberListEmpty) {
+                        await DeletePart(i + 1, travelPartNo);
 
+                        travelPrices[i] = {
+                              productNo: i + 1,
+                              includesTravel: false,
+                              productPrice: productPrice,
+                              travelPrice: 0,
+                              excludedFromCalculations: false,
+                              priceExcludingTravel: productPrice - travelPrice
+                        };
+                  }
             }
-
-            console.log(travelPrices);
-            console.log("totalOrderPriceLessTravel: ", totalOrderPriceLessTravel);
-
 
             for(let i = 0; i < numProducts; i++) {
-                  let productPrice = getProductPrice(i + 1);
 
-                  if(productPrice == 0) numProductsToDivideAgainst--;
-                  if(productNames[i].toLowerCase().includes("ewp") && this.#f_setting_excludeEWPs[1].checked) numProductsToDivideAgainst--;
-                  if(productNames[i].toLowerCase().includes("artwork") && this.#f_setting_excludeArtwork[1].checked) numProductsToDivideAgainst--;
+                  //totalOrderPrice += productPrice;
+                  totalOrderPriceLessTravel += travelPrices[i].priceExcludingTravel;
 
-                  totalOrderPrice += productPrice;
+                  //if not part of list
+                  if(productNumbersToAddTo.length != 0 && !productNumbersToAddTo.includes(i + 1)) {
+                        numProductsToDivideAgainst--;
+                        priceOfProductsNotIncluded += travelPrices[i].priceExcludingTravel;
+                        travelPrices[i].excludedFromCalculations = true;
+                        continue;
+                  }
 
-                  if(!productNumbersToAddTo.includes(i + 1)) priceOfProductsNotIncluded += productPrice;
+                  if(travelPrices[i].priceExcludingTravel == 0 && !productNumbersToAddTo.includes(i + 1)) {
+                        numProductsToDivideAgainst--;
+                        priceOfProductsNotIncluded += travelPrices[i].priceExcludingTravel;
+                        travelPrices[i].excludedFromCalculations = true;
+                        continue;
+                  }
+
+                  //if ewp
+                  if(productNames[i].toLowerCase().includes("ewp") && this.#f_setting_excludeEWPs[1].checked) {
+                        numProductsToDivideAgainst--;
+                        priceOfProductsNotIncluded += travelPrices[i].priceExcludingTravel;
+                        travelPrices[i].excludedFromCalculations = true;
+                        continue;
+                  }
+
+                  //if artwork
+                  if(productNames[i].toLowerCase().includes("artwork") && this.#f_setting_excludeArtwork[1].checked) {
+                        numProductsToDivideAgainst--;
+                        priceOfProductsNotIncluded += travelPrices[i].priceExcludingTravel;
+                        travelPrices[i].excludedFromCalculations = true;
+                        continue;
+                  }
             }
-
-            totalOrderPriceLessTravel += totalOrderPrice;
-            console.log("totalOrderPriceLessTravel after add: ", totalOrderPriceLessTravel);
 
             //if product numbers specified
             if(productNumbersToAddTo.length != 0) {
@@ -297,22 +433,10 @@ class MenuMap extends LHSMenuWindow {
             //Final Creation
             for(let i = 0; i < numProducts; i++) {
                   let productPrice = getProductPrice(i + 1);
-                  let productPriceLessTravel = productPrice - travelPrices[i].travelPrice;
+                  let productPriceLessTravel = travelPrices[i].priceExcludingTravel;
 
-                  //console.log(productNames[i].toLowerCase().includes("ewp"), productNames[i].toLowerCase().includes("artwork"), this.#f_setting_excludeEWPs[1].checked, this.#f_setting_excludeArtwork[1].checked);
 
-                  console.log(i + 1, productNumbersToAddTo.length != 0 && !productNumbersToAddTo.includes(i + 1), productPriceLessTravel == 0 && !productNumbersToAddTo.includes(i + 1));
-
-                  //if productNo not in specified textarea
-                  if(productNumbersToAddTo.length != 0 && !productNumbersToAddTo.includes(i + 1)) continue;
-                  //if productPriceLessTravel==0 and not in specified textarea
-                  if(productPriceLessTravel == 0 && !productNumbersToAddTo.includes(i + 1)) continue;
-                  //if exclude EWP checked
-                  if(productNames[i].toLowerCase().includes("ewp") && this.#f_setting_excludeEWPs[1].checked) continue;
-                  //if exclude Artwork checked
-                  if(productNames[i].toLowerCase().includes("artwork") && this.#f_setting_excludeArtwork[1].checked) continue;
-
-                  console.log("in");
+                  if(travelPrices[i].excludedFromCalculations == true) continue;
 
                   let productNo = i + 1;
                   let partIndex = getNumPartsInProduct(productNo); //last index by default
@@ -330,26 +454,33 @@ class MenuMap extends LHSMenuWindow {
 
                   let productTravelTime = 0;
 
+                  let travelPrices_reduced = travelPrices.filter(item => item["excludedFromCalculations"] === false);
 
                   if(method == "Split Equally") {
                         productTravelTime = totalTravelMins / numProductsToDivideAgainst;
                   } else if(method == "Divide By $ Percentage") {
-                        if(priceOfProductsNotIncluded == totalOrderPriceLessTravel)
-                              productTravelTime = totalTravelMins * 1;
-                        else
+
+                        let isAllZeros = travelPrices_reduced.every(item => item['priceExcludingTravel'] === 0);
+
+
+                        if(isAllZeros) {
+                              productTravelTime = totalTravelMins / numProductsToDivideAgainst;
+                        } else {
                               productTravelTime = totalTravelMins * (productPriceLessTravel / (totalOrderPriceLessTravel - priceOfProductsNotIncluded));
+                        }
                   }
-                  console.table(i + 1, productTravelTime, productPriceLessTravel, totalOrderPriceLessTravel, priceOfProductsNotIncluded);
 
                   if(productIncludesTravelAlready.value == false) {
                         await AddPart("Install - IH", productNo);
                         partIndex++;
+                        console.log("adding part ", productNo, partIndex);
                         await setPartDescription(productNo, partIndex, "TRAVEL [Automatic]");
                         setPartDescriptionDisabled(productNo, partIndex, true);
                         await setTravelTimeMHD(productNo, partIndex, productTravelTime, 0, 0);
                         await setTravelType(productNo, partIndex, this.travelRate);
                         await savePart(productNo, partIndex);
                   } else if(productIncludesTravelAlready.value == true) {
+                        console.log("opening part ", productNo, partIndex);
                         await openPart(productNo, partIndex);
                         await setTravelTimeMHD(productNo, partIndex, productTravelTime, 0, 0);
                         await setTravelType(productNo, partIndex, this.travelRate);
