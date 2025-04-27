@@ -1075,7 +1075,7 @@ class UIContainer_Design2 {
             if(data.OrderInformation.OrderInformation.M1) {
                   let koStorageString = data.OrderInformation.OrderInformation.M1;
                   let koStorageObject = JSON.parse(this.parseKOStorageVariable(koStorageString));
-                  this.#installAddress = koStorageObject.installAddress;
+                  this.#installAddress = koStorageObject.formattedInstallAddress;
 
                   $(this.#f_address[1]).val(this.#installAddress);
 
