@@ -75,6 +75,13 @@ class DragZoomSVG {
       get relativeMouseXY() {return this.#relativeMouseXY;}
       get isHolding() {return this.#holding;}
       get allPathElements() {return this.#allPathElements;}
+      get unscaledSVGString() {
+            let svgClone = this.svg.cloneNode(true);
+            console.log(svgClone);
+            svgClone.getElementById("mainGcreatedByT").setAttribute('transform', "matrix(" + svg_mmToPixel(1) + " 0 0 " + svg_mmToPixel(1) + " 0 0)");
+
+            return svgClone.outerHTML;
+      }
       /*
                         
       Setter            */
@@ -89,7 +96,7 @@ class DragZoomSVG {
             splitCompoundPaths: true,
             scaleStrokeOnScroll: true,
             scaleFontOnScroll: true,
-            defaultStrokeWidth: 2,
+            defaultStrokeWidth: 1,
             defaultFontSize: 12
       }) {
             let _this = this;
@@ -101,7 +108,7 @@ class DragZoomSVG {
             this.#defaultFontSize = options.defaultFontSize;
 
             this.#f_container = document.createElement("div");
-            this.#f_container.innerHTML += svgText;
+            this.#f_container.innerHTML += svgText || '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"></svg>';
             this.#f_container.style = "display: block;float: left;outline:1px solid black;";
             this.#f_container.style.cssText += "width:" + svgWidth + "px;height:" + svgHeight + "px;";
             this.#f_container.className = "svgContainerDiv";
@@ -110,6 +117,7 @@ class DragZoomSVG {
             this.#f_svg = this.#f_container.querySelector("svg");
             this.#f_svg.setAttribute("width", svgWidth);
             this.#f_svg.setAttribute("height", svgHeight);
+            this.#f_svg.setAttribute("data-scaleStrokeOnScroll", this.#scaleStrokeOnScroll);
             this.#f_svg.style.cssText += ";background-color:white;";
 
             this.#f_svgG = document.createElementNS('http://www.w3.org/2000/svg', "g");
@@ -135,6 +143,33 @@ class DragZoomSVG {
             this.#panZoomInstance.on('zoom', (e) => {
                   this.onZoom(e);
             });
+
+            this.#panZoomInstance.on('transform', (e) => {
+                  this.onTransform(e);
+                  //console.log('Fired when any transformation has happened', e);
+            });
+
+            this.#panZoomInstance.on('panstart', (e) => {
+                  //console.log('Fired when pan is just started ', e);
+            });
+
+            this.#panZoomInstance.on('pan', (e) => {
+                  //console.log('Fired when the `element` is being panned', e);
+            });
+
+            this.#panZoomInstance.on('panend', (e) => {
+                  //console.log('Fired when pan ended', e);
+            });
+
+            this.#panZoomInstance.on('zoom', (e) => {
+                  //console.log('Fired when `element` is zoomed', e);
+            });
+
+            this.#panZoomInstance.on('zoomend', (e) => {
+                  //console.log('Fired when zoom animation ended', e);
+            });
+
+
 
 
             if(options.convertShapesToPaths) this.convertShapesToPaths();
@@ -325,5 +360,7 @@ class DragZoomSVG {
       }
 
       /*overrideable*/onMouseUpdate(updateFrom) { }
+
+      /*overrideable*/onTransform(e) { }
 
 }

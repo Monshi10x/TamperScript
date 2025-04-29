@@ -1,19 +1,55 @@
 {
       "LaserToolpathTimes": {
             "Acrylic": {
-                  "Cut Through": {
-                        "Glossy Edge": 600,
-                        "Painted Edge (faster)": 1000
+                  "2mm": {
+                        "Cut Through": {
+                              "Glossy Edge": 600,
+                              "Painted Edge (faster)": 1000
+                        }
+                  },
+                  "3mm": {
+                        "Cut Through": {
+                              "Glossy Edge": 600,
+                              "Painted Edge (faster)": 1000
+                        }
+                  },
+                  "4.5mm": {
+                        "Cut Through": {
+                              "Glossy Edge": 600,
+                              "Painted Edge (faster)": 1000
+                        }
+                  },
+                  "6mm": {
+                        "Cut Through": {
+                              "Glossy Edge": 600,
+                              "Painted Edge (faster)": 1000
+                        }
+                  },
+                  "10mm": {
+                        "Cut Through": {
+                              "Glossy Edge": 600,
+                              "Painted Edge (faster)": 1000
+                        }
+                  },
+                  "20mm": {
+                        "Cut Through": {
+                              "Glossy Edge": 600,
+                              "Painted Edge (faster)": 1000
+                        }
                   }
             },
             "Stainless": {
-                  "Cut Through": {
-                        "Good Quality": 6000
+                  "1.2mm": {
+                        "Cut Through": {
+                              "Good Quality": 6000
+                        }
                   }
             },
             "Corflute": {
-                  "Cut Through": {
-                        "Good Quality": 5000
+                  "3mm": {
+                        "Cut Through": {
+                              "Good Quality": 5000
+                        }
                   }
             }
       }

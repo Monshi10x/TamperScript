@@ -3,26 +3,26 @@ class Sheet extends Material {
       static DISPLAY_NAME = "SHEET";
       /*override*/get Type() {return "SHEET";}
 
-      routerCutProfile = {material: "ACM", profile: "Cut Through", quality: "Good Quality"};
-      setRouterCutProfile(material, profile, quality) {
-            this.routerCutProfile = {material: material, profile: profile, quality: quality};
+      routerCutProfile = {material: "ACM", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"};
+      setRouterCutProfile(options = {material: null, thickness: null, profile: null, quality: null}) {
+            this.routerCutProfile = {material: options.material, thickness: options.thickness, profile: options.profile, quality: options.quality};
             this.UpdateFromChange();
       }
 
       staticRouterRows = [];
-      addStaticRouterRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", profile: "Cut Through", quality: "Good Quality"}) {
+      addStaticRouterRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", thickness: "", profile: "Cut Through", quality: "Good Quality"}) {
             this.staticRouterRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
             this.UpdateFromChange();
       }
 
-      laserCutProfile = {material: "Stainless", profile: "Cut Through", quality: "Good Quality"};
-      setLaserCutProfile(material, profile, quality) {
-            this.laserCutProfile = {material: material, profile: profile, quality: quality};
+      laserCutProfile = {material: "Stainless", thickness: "1.2mm", profile: "Cut Through", quality: "Good Quality"};
+      setLaserCutProfile(options = {material: null, thickness: null, profile: null, quality: null}) {
+            this.laserCutProfile = {material: options.material, thickness: options.thickness, profile: options.profile, quality: options.quality};
             this.UpdateFromChange();
       }
 
       staticLaserRows = [];
-      addStaticLaserRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", profile: "Cut Through", quality: "Good Quality"}) {
+      addStaticLaserRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", thickness: "", profile: "Cut Through", quality: "Good Quality"}) {
             this.staticLaserRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
             this.UpdateFromChange();
       }

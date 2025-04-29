@@ -503,7 +503,7 @@ class LightboxMenu extends LHSMenuWindow {
                 //--------------POWDERCOATING---------------//
                 if(sprayType == "Powdercoat") {
                     var boxOuterArea_m2 = (boxWidth * boxDepth * 2 + boxHeight * boxDepth * 2) / 1000000;
-                    var powdercoatCost = getLightboxPowdercoatCost(boxOuterArea_m2, boxIsDoubleSided);
+                    var powdercoatCost = getPowdercoatCost(boxOuterArea_m2, boxIsDoubleSided);
                     await q_AddPart_CostMarkup(productIndex, partIndex, true, false, 1, powdercoatCost, 1.6, "[PAINTING] Powdercoat");
                     partIndex++;
                 }
@@ -593,7 +593,7 @@ class LightboxMenu extends LHSMenuWindow {
     }
 }
 
-function getLightboxPowdercoatCost(sqm, isDoubleSided) {
+function getPowdercoatCost(sqm, isDoubleSided) {
     if(!isDoubleSided) {
         return ((35 * sqm) + 25).toFixed(2);
     } else {

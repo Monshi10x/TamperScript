@@ -97,38 +97,52 @@ function partInfoTick() {
 		var groupCounter = 0;
 		var partsInGroup = 0;
 		partInfo = products[product].querySelectorAll('span[id^="lblPartInformation_"]');
+
+
+		let productHeader = products[product].querySelector("div.ord-prod-header > div:nth-child(2)");
+		let productFooter = products[product].querySelector(".ord-prod-footer");
+
 		if(products[product].querySelectorAll(".addOpenAllBtn").length == 0) {
-			createOpenPartsBtn(products[product].querySelector("div.ord-prod-header > div:nth-child(2)"), "addOpenAllBtn", product + 1, products[product]);
+			createOpenPartsBtn(productHeader, "addOpenAllBtn", product + 1, products[product]);
 		}
 		if(products[product].querySelectorAll(".addCloseAllBtn").length == 0) {
-			createClosePartsBtn(products[product].querySelector("div.ord-prod-header > div:nth-child(2)"), "addCloseAllBtn", product + 1, products[product]);
+			createClosePartsBtn(productHeader, "addCloseAllBtn", product + 1, products[product]);
 		}
 		if(products[product].querySelectorAll(".moveProductBtn").length == 0) {
-			createMoveProductBtn(products[product].querySelector("div.ord-prod-header > div:nth-child(2)"), "moveProductBtn", koProduct.LineItemOrder() - 1, products[product]);
+			createMoveProductBtn(productHeader, "moveProductBtn", koProduct.LineItemOrder() - 1, products[product]);
 		}
+		if(products[product].querySelectorAll(".showProductParts").length == 0) {
+			createCloseProductPartsBtn(productHeader, "showProductParts", koProduct.LineItemOrder() - 1, products[product]);
+		}
+
+
+
+		//createCloseProductPartsBtn(partInstance, classN, productIndex, productInstance)
+
+
 		if(products[product].querySelectorAll(".addArtworkBtn").length == 0) {
-			createAddArtworkBtn(products[product].querySelector(".ord-prod-footer"), "addArtworkBtn", product + 1, products[product]);
+			createAddArtworkBtn(productFooter, "addArtworkBtn", product + 1, products[product]);
 		}
 		if(products[product].querySelectorAll(".addInstallBtn").length == 0) {
-			createAddInstallBtn(products[product].querySelector(".ord-prod-footer"), "addInstallBtn", product + 1, products[product]);
+			createAddInstallBtn(productFooter, "addInstallBtn", product + 1, products[product]);
 		}
 		if(products[product].querySelectorAll(".addProductionBtn").length == 0) {
-			createAddProductionBtn(products[product].querySelector(".ord-prod-footer"), "addProductionBtn", product + 1, products[product]);
+			createAddProductionBtn(productFooter, "addProductionBtn", product + 1, products[product]);
 		}
 		if(products[product].querySelectorAll(".addRouterBtn").length == 0) {
-			createAddRouterBtn(products[product].querySelector(".ord-prod-footer"), "addRouterBtn", product + 1, products[product]);
+			createAddRouterBtn(productFooter, "addRouterBtn", product + 1, products[product]);
 		}
 		if(products[product].querySelectorAll(".addPaintingBtn").length == 0) {
-			createAddPaintingBtn(products[product].querySelector(".ord-prod-footer"), "addPaintingBtn", product + 1, products[product]);
+			createAddPaintingBtn(productFooter, "addPaintingBtn", product + 1, products[product]);
 		}
 		if(products[product].querySelectorAll(".addKitEaBtn").length == 0) {
-			createAddKitBtn(products[product].querySelector(".ord-prod-footer"), "addKitEaBtn", product + 1, products[product]);
+			createAddKitBtn(productFooter, "addKitEaBtn", product + 1, products[product]);
 		}
 		if(products[product].querySelectorAll(".addBreakBtn").length == 0) {
-			createAddBreakBtn(products[product].querySelector(".ord-prod-footer"), "addBreakBtn", product + 1, products[product]);
+			createAddBreakBtn(productFooter, "addBreakBtn", product + 1, products[product]);
 		}
 		if(products[product].querySelectorAll(".addMissingBtn").length == 0) {
-			createAddMissingBtn(products[product].querySelector(".ord-prod-footer"), "addMissingBtn", product + 1, products[product]);
+			createAddMissingBtn(productFooter, "addMissingBtn", product + 1, products[product]);
 		}
 
 		//******************************//
@@ -149,6 +163,8 @@ function partInfoTick() {
 			let koPartHeight = (koPart.Height()) * 25.4;
 			var partHasInstall = false;
 			let koPartDescription = koPart.PartDescription();
+			let partHeader = parts[part].querySelector(".ord-prod-part-header");
+			let partDescriptionField = parts[part].querySelector(".txtPartDescription");
 
 			let p1 = parts[part];
 
@@ -210,19 +226,23 @@ function partInfoTick() {
 				}
 			}
 			if(koPartDescription.includes("@")) {
-				parts[part].querySelector(".ord-prod-part-header").style.backgroundColor = COLOUR.Yellow;
+				partHeader.style.backgroundColor = COLOUR.Yellow;
 			} else if(koPartDescription.includes("?")) {
-				parts[part].querySelector(".ord-prod-part-header").style.backgroundColor = COLOUR.Red;
+				partHeader.style.backgroundColor = COLOUR.Red;
 			} else {
-				parts[part].querySelector(".ord-prod-part-header").style.backgroundColor = "#eee";
+				partHeader.style.backgroundColor = "#eee";
 			}
 
+			let partDescriptionDisabled = false;
 			if(koPartDescription.includes("TRAVEL [Automatic]") || koPartDescription.includes("CODE [Automatic]")) {
-				let relevantPart = parts[part].querySelector(".txtPartDescription");
+				let relevantPart = partDescriptionField;
 				relevantPart.disabled = true;
+				partDescriptionDisabled = true;
 				relevantPart.style.color = COLOUR.Blue;
 				relevantPart.style.border = "0px";
 			}
+
+
 
 			if(part == 0) prevPartNameNumber = partNameNumber;
 			partsInGroup++;
@@ -236,20 +256,30 @@ function partInfoTick() {
 			var partHasLoaded = (koPartName != "") || (koPartName == null) || (isNaN(koPartName));
 
 			if(parts[part].querySelectorAll(".copyPartBtn").length == 0) {
-				createCopyPartBtn(parts[part].querySelector(".ord-prod-part-header"), "copyPartBtn", parts[part]);
+				createCopyPartBtn(partHeader, "copyPartBtn", parts[part]);
 			}
 
-			if(parts[part].querySelectorAll(".partNameBtn").length == 0 && partHasLoaded) {
-				createNameBtn(parts[part].querySelector(".ord-prod-part-header"), "partNameBtn", parts[part].querySelector(".txtPartDescription"), koPartName);
+			if(parts[part].querySelectorAll(".partNameBtn").length == 0 && partHasLoaded && !partDescriptionDisabled) {
+				createNameBtn(partHeader, "partNameBtn", partDescriptionField, koPartName);
+			}
+
+			if(koPartDescription.includes("CODE [Automatic]")) {
+				let partText = koPart.PartNotes();
+				if(partText.includes("svg") && partHeader.querySelectorAll(".seeSVGButton").length == 0) {
+					let btn = createButton("SVG", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
+						let modalSVG = new ModalSVG("SVG Modal", 1, () => { }, partText, null, {convertShapesToPaths: false, splitCompoundPaths: false, defaultStrokeWidth: 2, scaleStrokeOnScroll: !partText.includes('data-scaleStrokeOnScroll="false"')});
+					}, partHeader);
+					btn.classList.add('seeSVGButton');
+				}
 			}
 
 			partPrice = koPartTotalPrice;
 
 			if(parts[part].querySelectorAll(".partPrice").length == 0) {
-				let label = createLabel("$" + partPrice, "color:blue;font-weight:bold;width:80px;height:30px;font-size:14px;float:right;", parts[part].querySelector(".ord-prod-part-header"));
+				let label = createLabel("$" + partPrice, "color:blue;font-weight:bold;width:80px;height:30px;font-size:14px;float:right;", partHeader);
 				label.className = "partPrice";
 
-				parts[part].querySelector(".txtPartDescription").style.cssText += "width:240px;";
+				partDescriptionField.style.cssText += "width:240px;";
 			} else {
 				parts[part].querySelector(".partPrice").innerText = "$" + partPrice;
 			}
@@ -458,6 +488,27 @@ function partInfoTick() {
 				await MoveProduct(l_currentProductIndex, l_newProductIndex);
 			});
 		}, partInstance);
+		btn.className = classN;
+	}
+
+	function createCloseProductPartsBtn(partInstance, classN, productIndex, productInstance) {
+		let btn = createButton("▲", "height:27px;min-height:27px;width:68px;padding:0px;margin:0px 5px;font-size:11px;", async function() {
+			toggle(btn.innerHTML == "▲", () => {btn.innerHTML = "▼";}, () => {btn.innerHTML = "▲";});
+
+			let elements = productInstance.querySelectorAll(".ord-prod-part");
+			let elementFooters = productInstance.querySelectorAll(".ord-prod-footer");
+			for(let i = 0; i < elements.length; i++) {
+				if(btn.innerHTML == "▲") {
+					$(elements[i]).show();
+					$(elementFooters[i]).show();
+				} else {
+					$(elements[i]).hide();
+					$(elementFooters[i]).hide();
+				}
+
+			}
+		}, partInstance);
+		//btn.innerHTML = "&#9650";
 		btn.className = classN;
 	}
 

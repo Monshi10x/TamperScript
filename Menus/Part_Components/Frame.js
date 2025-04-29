@@ -1,6 +1,8 @@
 class Frame {
 
       #canvasCtx;
+      powdercoatingMarkup = 1.8;
+
 
       constructor(parentObject, canvasCtx, updateFunction, DragZoomSVG) {
             this.createGUI(parentObject, canvasCtx, updateFunction, DragZoomSVG);
@@ -51,11 +53,17 @@ class Frame {
             this.l_frameCornerFinishing = createDropdown_Infield("Corner Finishing", 0, "width:150px;", [createDropdownOption("Mitred", "Mitred"), createDropdownOption("Open", "Open")], this.callback, this.l_frameContainer);
             this.l_frameSeparateFromLegs = createDropdown_Infield("Frame Separate From Legs", 0, "width:150px;", [createDropdownOption("Separate From Legs", "Separate From Legs"), createDropdownOption("Welded to Legs", "Welded to Legs")], this.callback, this.l_frameContainer);
             this.l_hr3 = createHr("width:95%", this.l_frameContainer);
-            this.l_addPowdercoatingBtn = createButton("Powdercoating +", "width:150px;margin-right:400px;", this.togglePowdercoating);
-            this.l_frameContainer.appendChild(this.l_addPowdercoatingBtn);
-            this.l_powdercoatingCost = createInput_Infield("Cost", null, "width:100px;display:none;margin-left:50px;", null, this.l_frameContainer);
-            this.l_powdercoatingMarkup = createInput_Infield("Markup", 1.8, "width:100px;display:none", null, this.l_frameContainer, false, 0.1);
-            this.l_powdercoatingTotalEach = createDropdown_Infield("Total or Each", 1, "width:100px;display:none;margin-right:50px;", [createDropdownOption("Total", "Total"), createDropdownOption("Each (Per Frame)", "Each")], this.callback, this.l_frameContainer);
+
+
+            //this.l_addPowdercoatingBtn = createButton("Powdercoating +", "width:150px;margin-right:400px;", this.togglePowdercoating);
+            //this.l_frameContainer.appendChild(this.l_addPowdercoatingBtn);
+            //this.l_powdercoatingCost = createInput_Infield("Cost", null, "width:100px;display:none;margin-left:50px;", null, this.l_frameContainer);
+            //this.l_powdercoatingMarkup = createInput_Infield("Markup", 1.8, "width:100px;display:none", null, this.l_frameContainer, false, 0.1);
+            //this.l_powdercoatingTotalEach = createDropdown_Infield("Total or Each", 1, "width:100px;display:none;margin-right:50px;", [createDropdownOption("Total", "Total"), createDropdownOption("Each (Per Frame)", "Each")], this.callback, this.l_frameContainer);
+
+
+            this.l_addPowdercoatingCkb = createCheckbox_Infield("Is Powdercoated", false, "", () => { }, this.l_frameContainer);
+
             this.l_add2PacBtn = createButton("2Pac +", "width:150px;margin-right:400px;", this.toggle2Pac);
             this.l_frameContainer.appendChild(this.l_add2PacBtn);
             this.l_2PacLitres = createInput_Infield("Litres", null, "width:100px;display:none;margin-left:50px;margin-right:400px;", null, this.l_frameContainer, false, 0.000000000001);
@@ -210,6 +218,9 @@ class Frame {
       set frameMaterial(value) {
             this.l_frameMaterial[1].value = value;
       }
+      /**
+       * Returns eg '25x25x3'
+       */
       get frameDimensions() {
             return this.l_frameDimensions[1].value;
       }
@@ -252,7 +263,13 @@ class Frame {
       set frameSeparateFromLegs(value) {
             this.l_frameSeparateFromLegs[1].value = value;
       }
-      get powdercoatingRequired() {
+      get powdercoatingCost() {
+            let [materialW, materialH, materialT] = this.frameDimensions.split("x");
+            let frameSurfaceArea = parseFloat(materialW) * parseFloat(materialH) * (this.getFrameLinearMm(true) * 0.001 + this.getFrameLinearMm(this.hasSecondSide) * 0.001);
+            return getPowdercoatCost(frameSurfaceArea, false);
+
+      }
+      /*get powdercoatingRequired() {
             return this.l_powdercoatingCost[0].style.display == "block";
       }
       get powdercoatingCost() {
@@ -272,7 +289,7 @@ class Frame {
       }
       set powdercoatingTotalEach(value) {
             this.l_powdercoatingTotalEach[1].value = value;
-      }
+      }*/
       get twoPacRequired() {
             return this.l_2PacLitres[0].style.display == "block";
       }
@@ -341,6 +358,9 @@ class Frame {
       }
       get measurementOffsetX() {
             return 200 + this.legClass.measurementOffsetX;
+      }
+      get hasSecondSide() {
+            return attachmentType == "3 Post, Centre Frame, Centre Sign" || attachmentType == "3 Post, Forward Frame, Front Sign" || attachmentType == "3 Post, Front Frame, Front Sign";
       }
 
 
@@ -440,7 +460,7 @@ class Frame {
       };
 
       toggleSideB() {
-            if(attachmentType == "3 Post, Centre Frame, Centre Sign" || attachmentType == "3 Post, Forward Frame, Front Sign" || attachmentType == "3 Post, Front Frame, Front Sign") {
+            if(this.hasSecondSide) {
                   this.qty = 2;
                   setFieldHidden(false, this.l_frameWidth_SideB[1], this.l_frameWidth_SideB[0]);
                   setFieldHidden(false, this.l_frameHeight_SideB[1], this.l_frameHeight_SideB[0]);
@@ -473,7 +493,7 @@ class Frame {
             this.callback();
       };
 
-      getFrameLinearMetres(sideA) {
+      getFrameLinearMm(sideA) {
             if(sideA) {
                   if(this.frameCornerFinishing == "Mitred") {
                         return this.frameWidth_SideA * 2 + this.frameHeight_SideA * 2 + this.frameVerticalPartitions * (this.frameHeight_SideA - 2 * this.frameThickness) + this.frameHorizontalPartitions * (this.frameWidth_SideA - 2 * this.frameThickness) - this.frameVerticalPartitions * this.frameHorizontalPartitions * this.frameThickness;
@@ -1036,14 +1056,23 @@ class Frame {
                               partIndex++;
                         }
                   }
-                  if(this.powdercoatingRequired) {
-                        await AddPart(this.powdercoatingTotalEach == "Total" ? "Outsource - Powdercoating (ACE) (total)" : "Outsource - Powdercoating (ACE) (ea)", productNo);
+                  if(this.l_addPowdercoatingCkb[1].checked) {
+                        //Outsource - Powdercoating (ACE) (ea)
+                        await AddPart("Outsource - Powdercoating (ACE) (ea)", productNo);
                         partIndex++;
-                        await setPartQty(productNo, partIndex, this.powdercoatingTotalEach == "Total" ? 1 : this.qty);
+                        await setPartQty(productNo, partIndex, 1);
                         await setPartVendorCostEa(productNo, partIndex, this.powdercoatingCost);
-                        await setPartMarkup(productNo, partIndex, this.powdercoatingMarkup);
+                        await setPartMarkupEa(productNo, partIndex, this.powdercoatingMarkup);
                         await setPartDescription(productNo, partIndex, "[FRAME(s)] Powdercoating");
                         await savePart(productNo, partIndex);
+
+                        /* await AddPart(this.powdercoatingTotalEach == "Total" ? "Outsource - Powdercoating (ACE) (total)" : "Outsource - Powdercoating (ACE) (ea)", productNo);
+                         partIndex++;
+                         await setPartQty(productNo, partIndex, this.powdercoatingTotalEach == "Total" ? 1 : this.qty);
+                         await setPartVendorCostEa(productNo, partIndex, this.powdercoatingCost);
+                         await setPartMarkup(productNo, partIndex, this.powdercoatingMarkup);
+                         await setPartDescription(productNo, partIndex, "[FRAME(s)] Powdercoating");
+                         await savePart(productNo, partIndex);*/
                   }
                   if(this.twoPacRequired) {
                         await q_AddPart_Painting(productNo, partIndex, true, this.twoPacTotalEach == "Total" ? true : false, this.twoPacTotalEach == "Total" ? 1 : this.qty, this.twoPacLitres, this.twoPacColourMatchTime, this.twoPacNumberCoats, this.twoPacSetupTime, this.twoPacFlashTime, this.twoPacSprayTime, "[FRAME(s)] 2Pac Painting");

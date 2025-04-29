@@ -128,8 +128,6 @@ class BillboardMenu extends LHSMenuWindow {
                   infoContainer.appendChild(container);
             }
 
-
-
             createAttachmentTypeContainer();
 
             page.appendChild(infoContainer);
@@ -154,14 +152,11 @@ class BillboardMenu extends LHSMenuWindow {
             this.#artwork = null;
 
             this.#totalQuantity = new TotalQuantity(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-
-
             this.#sign = new Sign(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
             this.#frame = new Frame(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
             this.#leg = new Leg(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
             this.#footing = new Footing(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
             this.#baseplate = new Baseplate(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-
             this.#production = new Production(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
             this.#install = new Install(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
             this.#artwork = new Artwork(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
@@ -173,8 +168,6 @@ class BillboardMenu extends LHSMenuWindow {
             this.#footing.setReferences(this.#frame, this.#leg, this.#baseplate, this.#sign);
             this.#baseplate.setReferences(this.#frame, this.#leg, this.#footing, this.#sign);
             this.#leg.setReferences(this.#frame, this.#leg, this.#footing, this.#baseplate, this.#sign);
-
-
             this.#frame.setReferences(this.#frame, this.#leg, this.#footing, this.#baseplate);
             this.#sign.setReferences(this.#frame, this.#leg);
 
@@ -206,7 +199,7 @@ class BillboardMenu extends LHSMenuWindow {
             await AddPart("No Cost Part", productNo);
             partIndex++;
             await setPartDescription(productNo, partIndex, "CODE [Automatic]");
-            partIndex = await setPartNotes(productNo, partIndex, this.#dragZoomSVG.svg.outerHTML);
+            partIndex = await setPartNotes(productNo, partIndex, this.#dragZoomSVG.unscaledSVGString);
             await savePart(productNo, partIndex);
 
             partIndex = await tempThis.#sign.Create(productNo, partIndex);

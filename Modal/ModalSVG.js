@@ -42,14 +42,21 @@ class ModalSVG extends Modal {
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
 
-      constructor(headerText, incrementAmount, callback, svgText, callerObject) {
+      constructor(headerText, incrementAmount, callback, svgText, callerObject, options = {
+            convertShapesToPaths: true,
+            splitCompoundPaths: true,
+            scaleStrokeOnScroll: true,
+            scaleFontOnScroll: true,
+            defaultStrokeWidth: 1,
+            defaultFontSize: 12
+      }) {
             super(headerText, incrementAmount, callback);
             this.#svgText = svgText;
             console.log("in Modal SVG svgText given as: " + svgText);//up until this point still contains class names
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
 
-            this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width, 500, svgText, this.getBodyElement());
+            this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width, 500, svgText, this.getBodyElement(), options);
             this.#dragZoomSVG.onMouseUpdate = this.onMouseUpdate;
 
             this.#statsContainer = createDivStyle5(null, "Stats", this.getBodyElement())[1];
@@ -126,12 +133,12 @@ class ModalSVG extends Modal {
                         for(let i = 0; i < groups.length; i++) {
                               if(groups[i].id == "mainGcreatedByT") continue;
                               if(groups[i].id == "pathGroup") {
-                                    pathGroup = groups[i].innerHTML;
+                                    pathGroup = groups[i].outerHTML;
                               }
                         }
 
                         for(let i = 0; i < groups.length; i++) {
-                              deleteElement(groups[i]);
+                              if(groups[i].id != "pathGroup") deleteElement(groups[i]);
                         }
 
                         callerObject.svgFile = this.#dragZoomSVG.svg.outerHTML.replaceAll("</svg>", pathGroup + "</svg>").replaceAll("\n", "").replaceAll("  ", "");
@@ -180,6 +187,8 @@ class ModalSVG extends Modal {
             let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
             let pathGroup = this.#dragZoomSVG.svg.querySelector("#pathGroup");
 
+            if(!pathGroup) return console.warn("no pathGroup exists");
+
             let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             newGroup.id = "overallMeasures";
 
@@ -208,10 +217,8 @@ class ModalSVG extends Modal {
 
       showOverallMeasures() {
             let elements = this.#dragZoomSVG.svg.querySelector("#overallMeasures");
-            if(elements) {
-                  $(elements).show();
-                  return;
-            }
+            if(!elements) return;
+            $(elements).show();
 
             this.addOverallMeasures();
       }
@@ -593,7 +600,7 @@ class ModalSVG extends Modal {
                                     let element = pathElements[i];
 
                                     let elementFirstPoint = element.getPointAtLength(0);
-                                    let isWithinSelection = pointInPolygon(elementFirstPoint, selectionPolygon);
+                                    let isWithinSelection = svgNest_pointInPolygon(elementFirstPoint, selectionPolygon);
                                     if(isWithinSelection) {
                                           element.classList.add("SVGSelected");
                                     }

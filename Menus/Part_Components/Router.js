@@ -186,7 +186,7 @@ class Router extends SubMenu {
 		l_profile = createDropdown_Infield("Profile", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Profile", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer);
 		l_quality = createDropdown_Infield("Quality", 0, "width:80px;margin:0px;", [], () => {this.updateCutProfile("Quality", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer);
 		l_speed = createInput_Infield("Speed", 1000, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " mm/min"});
-		l_totalTime = createInput_Infield("Total Time", 0, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " min"});
+		l_totalTime = createInput_Infield("Total Time", 0, "width:80px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " min"});
 
 		if(options.material != null) dropdownSetSelectedValue(l_material[1], options.material);
 		if(options.thickness != null) dropdownSetSelectedValue(l_thickness[1], options.thickness);

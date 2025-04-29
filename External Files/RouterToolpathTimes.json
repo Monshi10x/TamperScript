@@ -1,7 +1,22 @@
 {
       "RouterToolpathTimes": {
             "ACM": {
+                  "2mm": {
+                        "Cut Through": {
+                              "Good Quality": 3000,
+                              "Fast": 5000
+                        }
+                  },
                   "3mm": {
+                        "Cut Through": {
+                              "Good Quality": 3000,
+                              "Fast": 5000
+                        },
+                        "Groove": {
+                              "Good Quality": 3000
+                        }
+                  },
+                  "4mm": {
                         "Cut Through": {
                               "Good Quality": 3000,
                               "Fast": 5000
@@ -24,6 +39,11 @@
             },
             "Acrylic": {
                   "4.5mm": {
+                        "Opal Cut Through And Rebate": {
+                              "Good Quality": 1000
+                        }
+                  },
+                  "10mm": {
                         "Opal Cut Through And Rebate": {
                               "Good Quality": 1000
                         }

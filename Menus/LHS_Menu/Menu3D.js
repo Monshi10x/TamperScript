@@ -97,7 +97,8 @@ class Menu3D extends LHSMenuWindow {
             ["3D Non-lit Letters", "https://cdn.gorilladash.com/images/media/3752855/signarama-australia-atco-small-fascia-resized-thumbnail-5f38fe9719f20.jpg"],
             ["3D Front-lit Letters", "https://cdn.gorilladash.com/images/media/12562260/signarama-australia-homeco-cafe-63-lightbox-thumbnail-663186cf397a7.jpg"],
             ["3D 10mm Acrylic Letters", "https://cdn.gorilladash.com/images/media/5077109/signarama-australia-img-1060-2-small-square-61611e488aba9.jpg?auto=webp&width=1600"],
-            ["3D 20mm Acrylic Letters", "https://cdn.gorilladash.com/images/media/5077109/signarama-australia-img-1060-2-small-square-61611e488aba9.jpg?auto=webp&width=1600"]
+            ["3D 20mm Acrylic Letters", ""],
+            ["2D Cut ACM Letters", ""]
       ];
 
 
@@ -169,7 +170,7 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetSize = "2440x1220";
                         sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
                         sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", thickness: "1.2mm", profile: "Cut Through", quality: "Good Quality"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "STAINLESS SHEET";
 
@@ -179,7 +180,7 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetSize = "2440x1220";
                         sheet.sheetMaterial = "Foamed PVC - (sqm) - 2440x1220x10.0 Matte White (Signex Mulfords)";
                         sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Foamed PVC", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Foamed PVC", thickness: "10mm", profile: "Cut Through", quality: "Good Quality"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "CELUKA SHEET";
 
@@ -189,8 +190,8 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetSize = "2440x1220";
                         sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
                         sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "CORFLUTE POUNCE";
 
@@ -224,7 +225,7 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetSize = "2440x1220";
                         sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
                         sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", thickness: "1.2mm", profile: "Cut Through", quality: "Good Quality"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "STAINLESS SHEET";
 
@@ -234,7 +235,7 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetSize = "2440x1220";
                         sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
                         sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10mm", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "OPAL FACE SHEET";
 
@@ -250,7 +251,7 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetSize = "2440x1220";
                         sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
                         sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", profile: "Cut Through", quality: "Fast"});
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "2mm", profile: "Cut Through", quality: "Fast"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "ACM for LEDs";
 
@@ -262,8 +263,8 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetSize = "2440x1220";
                         sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
                         sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "CORFLUTE POUNCE";
 
@@ -293,7 +294,7 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetMaterial = "Acrylic - (sqm) - White/Black 2440x1220x10 (Mulfords)";
                         sheet.setCuttingMachine("laser");
                         sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", profile: "Cut Through", quality: "Glossy Edge"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10mm", profile: "Cut Through", quality: "Glossy Edge"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "ACRYLIC SHEET";
 
@@ -303,8 +304,8 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetSize = "2440x1220";
                         sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
                         sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "CORFLUTE POUNCE";
 
@@ -333,7 +334,7 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetMaterial = "Acrylic - (sqm) - White/Black 2440x1220x20 (Mulfords)";
                         sheet.setCuttingMachine("laser");
                         sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", profile: "Cut Through", quality: "Glossy Edge"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "20mm", profile: "Cut Through", quality: "Glossy Edge"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "ACRYLIC SHEET";
 
@@ -343,8 +344,8 @@ class Menu3D extends LHSMenuWindow {
                         sheet.sheetSize = "2440x1220";
                         sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
                         sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile("Corflute", "Cut Through", "Good Quality");
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
                         sheet.UPDATES_PAUSED = false;
                         sheet.typeLabel = "CORFLUTE POUNCE";
 
@@ -353,6 +354,40 @@ class Menu3D extends LHSMenuWindow {
                         painting.formula = "10-20mmD Letters";
                         painting.numberOfCoats = "x2 (2K for Acrylic/ACM)";
                         painting.UPDATES_PAUSED = false;
+
+                        artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+                        artwork.artworkItem.artworkTime = 60;
+                        install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+                        break;
+                  case "2D Cut ACM Letters":
+                        productDetails = this.#add(ProductDetails, this.page1, []);
+                        productDetails.productLocation = "";
+                        productDetails.productName = "2D Cut ACM Letters";
+
+                        svgCutfile = this.#add(SVGCutfile, this.page1, []);
+
+                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+                        sheet.UPDATES_PAUSED = true;
+                        sheet.material = "ACM";
+                        sheet.sheetSize = "2440x1220";
+                        sheet.thickness = "3";
+                        //sheet.sheetMaterial = "";
+                        sheet.setCuttingMachine("router");
+                        sheet.sheetPerimeterIsCut = false;
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.UPDATES_PAUSED = false;
+                        sheet.typeLabel = "ACM SHEET";
+
+                        sheet = this.#add(Sheet, this.page1, [svgCutfile]);
+                        sheet.UPDATES_PAUSED = true;
+                        sheet.material = "Corflute";
+                        sheet.sheetSize = "2440x1220";
+                        sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
+                        sheet.useOverallSVGSize = true;
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.UPDATES_PAUSED = false;
+                        sheet.typeLabel = "CORFLUTE POUNCE";
 
                         artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;

@@ -42,8 +42,6 @@ self.addEventListener("message", function(e) {
       let shapeAreas = [];
       let shapeAreaPolygons = [];
 
-      console.log(e.data);
-
       for(let i = 0; i < e.data.elementDs.length; i++) {
 
             let pathPointsArray = convertPathToPolygon(e.data.elementDs[i]);

@@ -597,7 +597,15 @@ function _onSegment(A, B, p, tolerance) {
 }
 
 // return true if point is in the polygon, false if outside, and null if exactly on a point or edge
-function pointInPolygon(point, polygon, tolerance) {
+/**
+ * 
+ * @param {*} point {x,y}
+ * @param {*} polygon [{x,y}, {x,y}, ...] 
+ * @param {*} tolerance 
+ * @see https://github.com/Jack000/SVGnest
+ * @returns 
+ */
+function svgNest_pointInPolygon(point, polygon, tolerance) {
       if(!polygon || polygon.length < 3) {
             return null;
       }
@@ -633,6 +641,59 @@ function pointInPolygon(point, polygon, tolerance) {
       }
 
       return inside;
+}
+
+/**
+ * 
+ * @param {*} point {x,y}
+ * @param {*} precomputedPolygon - use precomputePolygon(polygon) function cached in a variable
+ * @returns true or false 
+ */
+function gpt_isPointInPolygon(point, precomputedPolygon) {
+      let {x, y} = point;
+      const {polygon, constants, multiples} = precomputedPolygon;
+      let inside = false;
+
+      for(let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            const yi = polygon[i].y;
+            const yj = polygon[j].y;
+
+            if((yi > y) !== (yj > y)) {
+                  const xIntersect = multiples[i] * (y - yi) + polygon[i].x;
+                  if(x < xIntersect) inside = !inside;
+            }
+      }
+
+      return inside;
+}
+
+/**
+ * 
+ * @param {*} polygon [{x,y}, {x,y}, ...]
+ * @returns cached polygon and calculations to avoid re-calculations, thus improving speed
+ */
+function gpt_precomputePolygon(polygon) {
+      const constants = [];
+      const multiples = [];
+
+      for(let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+            const yi = polygon[i].y;
+            const yj = polygon[j].y;
+            const xi = polygon[i].x;
+            const xj = polygon[j].x;
+
+            if(yi === yj) {
+                  constants.push(xi);
+                  multiples.push(0);
+            } else {
+                  const c = (xi - (yi * (xj - xi)) / (yj - yi));
+                  const m = (xj - xi) / (yj - yi);
+                  constants.push(c);
+                  multiples.push(m);
+            }
+      }
+
+      return {polygon, constants, multiples};
 }
 
 // returns the rectangular bounding box of the given polygon
@@ -673,8 +734,6 @@ function getPolygonBounds(polygon) {
 async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true) {
       let svg;
 
-      console.log(svgStringOrObject.outerHTML);///bad at this point
-
       if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
             svg = svg_makeFromString(svgStringOrObject);
             svg_convertShapesToPaths(svg);
@@ -698,7 +757,6 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
             let elementDs = [];
             let innerPathElements = [];
             for(let i = 0; i < svgElements.length; i++) {
-                  console.log(svgElements[i].outerHTML);
                   elementDs.push(svgElements[i].getAttribute("d"));
                   innerPathElements.push(svgElements[i].classList.contains("innerPath"));
             }
@@ -712,11 +770,12 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
                   if(event.data.shapeAreas) {
 
                         for(let i = 0; i < svgElements.length; i++) {
-                              console.log(svgElements[i].outerHTML);///bad at this point
                               svgElements[i].setAttribute("data-area", event.data.shapeAreas[i]);
                         }
-                        console.log(event.data.shapeAreas);
+
                   }
+                  console.log("%cWEB WORKER DATA AREAS", "background-color:yellow; color:black;");
+                  console.log(event.data);
                   webWorker.terminate();
                   webWorkerFinished = true;
             };
@@ -834,11 +893,12 @@ function svg_getPathQty(svgStringOrObject) {
 
 function svg_convertShapesToPaths(svgObject) {
       let svgElements = svgObject.getElementsByTagName("*");
+      let supportedTypes = ['rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline'];
 
       for(let i = 0; i < svgElements.length; i++) {
-            if(svgElements[i].nodeName == "g" || svgElements[i].nodeName == "path" || svgElements[i].nodeName == "defs" || svgElements[i].nodeName == "style" || svgElements[i].nodeName == "text") continue;
+            if(!supportedTypes.includes(svgElements[i].nodeName)) continue;
 
-            let newShape = SVGPathCommander.shapeToPath(svgElements[i], true);
+            let newShape = SVGPathCommander.shapeToPath(svgElements[i], /*transferAllAttributes*/true);
       }
 
       return svgObject;
@@ -949,10 +1009,10 @@ class TSVGRectangle {
                   miterSides: [],
                   fill: 'blue',
                   stroke: 'black',
-                  strokeWidth: 2,
+                  strokeWidth: 1,
                   origin: 'top-left',
                   usePattern: false,
-                  patternType: 'hatch45', // or "soil"
+                  patternType: 'hatch45',// Available patternType values: 'hatch45', 'hatchHorizontal', 'hatchVertical', 'soil'
                   hatchFill: 'none',
                   hatchLineColor: 'black',
                   hatchLineWidth: 4,
@@ -961,7 +1021,9 @@ class TSVGRectangle {
             };
 
             if(this.options.usePattern) {
-                  const fillColor = this.options.hatchFill === 'none' ? this.options.fill : this.options.hatchFill;
+                  const fillColor = this.options.hatchFill === 'none'
+                        ? this.options.fill
+                        : this.options.hatchFill;
                   this.ensurePattern(fillColor);
                   this.options.fill = `url(#${this.patternId})`;
             }
@@ -969,14 +1031,29 @@ class TSVGRectangle {
             this.rect = this.createRectangle();
       }
 
+      camelToKebab(str) {
+            return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+      }
+
       ensurePattern(hatchFill) {
             const svgNS = 'http://www.w3.org/2000/svg';
             this.defs = document.createElementNS(svgNS, 'defs');
 
-            const patternType = this.options.patternType;
-            const pattern = (patternType === 'soil')
-                  ? this.createSoilPattern(svgNS, hatchFill)
-                  : this.createHatch45Pattern(svgNS, hatchFill);
+            let pattern;
+            switch(this.options.patternType) {
+                  case 'hatchHorizontal':
+                        pattern = this.createHatchHorizontalPattern(svgNS, hatchFill);
+                        break;
+                  case 'hatchVertical':
+                        pattern = this.createHatchVerticalPattern(svgNS, hatchFill);
+                        break;
+                  case 'soil':
+                        pattern = this.createSoilPattern(svgNS, hatchFill);
+                        break;
+                  case 'hatch45':
+                  default:
+                        pattern = this.createHatch45Pattern(svgNS, hatchFill);
+            }
 
             this.defs.appendChild(pattern);
             const svg = this.parentToAppendTo.closest('svg');
@@ -984,8 +1061,7 @@ class TSVGRectangle {
       }
 
       createHatch45Pattern(svgNS, hatchFill) {
-            const spacing = this.options.hatchSpacing || 10;
-
+            const spacing = this.options.hatchSpacing;
             const pattern = document.createElementNS(svgNS, 'pattern');
             pattern.setAttribute('id', this.patternId);
             pattern.setAttribute('patternUnits', 'userSpaceOnUse');
@@ -1011,9 +1087,60 @@ class TSVGRectangle {
             return pattern;
       }
 
+      createHatchHorizontalPattern(svgNS, hatchFill) {
+            const spacing = this.options.hatchSpacing;
+            const pattern = document.createElementNS(svgNS, 'pattern');
+            pattern.setAttribute('id', this.patternId);
+            pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+            pattern.setAttribute('width', spacing);
+            pattern.setAttribute('height', spacing);
+
+            const background = document.createElementNS(svgNS, 'rect');
+            background.setAttribute('width', spacing);
+            background.setAttribute('height', spacing);
+            background.setAttribute('fill', hatchFill);
+            pattern.appendChild(background);
+
+            const line = document.createElementNS(svgNS, 'line');
+            line.setAttribute('x1', '0');
+            line.setAttribute('y1', '0');
+            line.setAttribute('x2', spacing);
+            line.setAttribute('y2', '0');
+            line.setAttribute('stroke', this.options.hatchLineColor);
+            line.setAttribute('stroke-width', this.options.hatchLineWidth);
+            pattern.appendChild(line);
+
+            return pattern;
+      }
+
+      createHatchVerticalPattern(svgNS, hatchFill) {
+            const spacing = this.options.hatchSpacing;
+            const pattern = document.createElementNS(svgNS, 'pattern');
+            pattern.setAttribute('id', this.patternId);
+            pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+            pattern.setAttribute('width', spacing);
+            pattern.setAttribute('height', spacing);
+
+            const background = document.createElementNS(svgNS, 'rect');
+            background.setAttribute('width', spacing);
+            background.setAttribute('height', spacing);
+            background.setAttribute('fill', hatchFill);
+            pattern.appendChild(background);
+
+            const line = document.createElementNS(svgNS, 'line');
+            line.setAttribute('x1', '0');
+            line.setAttribute('y1', '0');
+            line.setAttribute('x2', '0');
+            line.setAttribute('y2', spacing);
+            line.setAttribute('stroke', this.options.hatchLineColor);
+            line.setAttribute('stroke-width', this.options.hatchLineWidth);
+            pattern.appendChild(line);
+
+            return pattern;
+      }
+
       createSoilPattern(svgNS, hatchFill) {
             const patternSize = 240;
-
             const pattern = document.createElementNS(svgNS, 'pattern');
             pattern.setAttribute('id', this.patternId);
             pattern.setAttribute('patternUnits', 'userSpaceOnUse');
@@ -1026,7 +1153,6 @@ class TSVGRectangle {
             background.setAttribute('fill', hatchFill);
             pattern.appendChild(background);
 
-            // 12× scaled specks
             const specks = [
                   {cx: 36, cy: 60, r: 9.6},
                   {cx: 180, cy: 84, r: 12},
@@ -1046,27 +1172,27 @@ class TSVGRectangle {
             return pattern;
       }
 
-
-
       adjustCoordinatesForOrigin(x, y, width, height, origin) {
             switch(origin) {
-                  case "TL": case 'top-left': return {x, y};
-                  case "T": case 'top-middle': return {x: x - width / 2, y};
-                  case "TR": case 'top-right': return {x: x - width, y};
-                  case "L": case 'center-left': return {x, y: y - height / 2};
-                  case "M": case 'center': return {x: x - width / 2, y: y - height / 2};
-                  case "R": case 'center-right': return {x: x - width, y: y - height / 2};
-                  case "BL": case 'bottom-left': return {x, y: y - height};
-                  case "B": case 'bottom-middle': return {x: x - width / 2, y: y - height};
-                  case "BR": case 'bottom-right': return {x: x - width, y: y - height};
+                  case 'TL': case 'top-left': return {x, y};
+                  case 'T': case 'top-middle': return {x: x - width / 2, y};
+                  case 'TR': case 'top-right': return {x: x - width, y};
+                  case 'L': case 'center-left': return {x, y: y - height / 2};
+                  case 'M': case 'center': return {x: x - width / 2, y: y - height / 2};
+                  case 'R': case 'center-right': return {x: x - width, y: y - height / 2};
+                  case 'BL': case 'bottom-left': return {x, y: y - height};
+                  case 'B': case 'bottom-middle': return {x: x - width / 2, y: y - height};
+                  case 'BR': case 'bottom-right': return {x: x - width, y: y - height};
                   default: return {x, y};
             }
       }
 
       createRectangle() {
-            let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            if(this.options.miter && this.options.miterSides.length > 0)
-                  rect = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            const svgNS = 'http://www.w3.org/2000/svg';
+            let rect = document.createElementNS(svgNS, 'rect');
+            if(this.options.miter && this.options.miterSides.length > 0) {
+                  rect = document.createElementNS(svgNS, 'polygon');
+            }
 
             const {x, y, width, height, origin, ...attrs} = this.options;
             const adjusted = this.adjustCoordinatesForOrigin(x, y, width, height, origin);
@@ -1109,7 +1235,9 @@ class TSVGRectangle {
             }
 
             for(const key in attrs) {
-                  if(key !== 'origin') rect.setAttribute(key, attrs[key]);
+                  if(key !== 'origin') {
+                        rect.setAttribute(this.camelToKebab(key), attrs[key]);
+                  }
             }
 
             this.parentToAppendTo.appendChild(rect);
@@ -1119,9 +1247,13 @@ class TSVGRectangle {
       updateAttributes(newOptions = {}) {
             Object.assign(this.options, newOptions);
             if(this.options.usePattern) {
-                  this.ensureHatchPattern(this.options.hatchFill === 'none' ? this.options.fill : this.options.hatchFill);
-                  this.options.fill = `url(#${this.hatchId})`;
+                  const fillColor = this.options.hatchFill === 'none'
+                        ? this.options.fill
+                        : this.options.hatchFill;
+                  this.ensurePattern(fillColor);
+                  this.options.fill = `url(#${this.patternId})`;
             }
+
             const {x, y, width, height, origin} = this.options;
             const adjusted = this.adjustCoordinatesForOrigin(x, y, width, height, origin);
             const has = side => this.options.miterSides.includes(side);
@@ -1164,7 +1296,7 @@ class TSVGRectangle {
 
             for(const key in newOptions) {
                   if(!['x', 'y', 'width', 'height', 'origin'].includes(key)) {
-                        this.rect.setAttribute(key, newOptions[key]);
+                        this.rect.setAttribute(this.camelToKebab(key), newOptions[key]);
                   }
             }
       }
@@ -1175,10 +1307,10 @@ class TSVGRectangle {
 
       setAttribute(attr, value) {
             this.options[attr] = value;
-            if(['x', 'y', 'width', 'height', 'origin', 'miter', 'miterSides', 'usePattern', 'hatchFill', 'hatchLineColor', 'hatchLineWidth', 'hatchSpacing'].includes(attr)) {
+            if(['x', 'y', 'width', 'height', 'origin', 'miter', 'miterSides', 'usePattern', 'hatchFill', 'hatchLineColor', 'hatchLineWidth', 'hatchSpacing', 'patternType'].includes(attr)) {
                   this.updateAttributes({});
             } else {
-                  this.rect.setAttribute(attr, value);
+                  this.rect.setAttribute(this.camelToKebab(attr), value);
             }
       }
 
@@ -1191,6 +1323,8 @@ class TSVGRectangle {
             }
       }
 }
+
+
 
 
 
@@ -1632,322 +1766,6 @@ function getRandomPointsInPath(pathElement, numberOfPoints) {
 
       return points;
 }
-
-/*
-new TSVGMeasurement(svg, {
-  target: rect,
-  direction: "both",
-  autoLabel: true,
-  deletable: true,
-  unit: "mm",
-  scale: 10,
-  precision: 1
-});
-*/
-
-class TSVGMeasurement_1 {
-      static idCounter = 0;
-
-      constructor(svgElement, options = {}) {
-            if(!(svgElement instanceof SVGElement)) {
-                  throw new Error("First argument must be an SVG element.");
-            }
-
-            this.svgElement = svgElement;
-            this.subMeasures = [];
-
-            const {
-                  x1, y1, x2, y2,
-                  target,
-                  direction = "both",
-                  sides = [],
-                  autoLabel = false,
-                  unit = "mm",
-                  scale = 1,
-                  precision = 0,
-                  arrowSize = 5,
-                  textOffset = 20,
-                  stroke = "#000",
-                  lineWidth = 1,
-                  fontSize = "12px",
-                  tickLength = 8,
-                  handleRadius = 8,
-                  offsetX = 10,
-                  offsetY = 10,
-                  sideHint = null
-            } = options;
-
-            this.sideHint = sideHint;
-
-            if(target instanceof SVGGraphicsElement) {
-                  const bbox = target.getBBox();
-
-                  const apply = (cond, x1, y1, x2, y2, sideHint) => {
-                        if(cond) {
-                              this.subMeasures.push(new TSVGMeasurement(svgElement, {
-                                    x1, y1, x2, y2,
-                                    autoLabel, unit, scale, precision,
-                                    arrowSize, textOffset, stroke, fontSize,
-                                    tickLength, handleRadius, lineWidth,
-                                    sideHint
-                              }));
-                        }
-                  };
-
-                  const useSides = sides.length > 0;
-                  const doWidth = direction === "width" || direction === "both";
-                  const doHeight = direction === "height" || direction === "both";
-
-                  apply(useSides ? sides.includes("top") : doWidth,
-                        bbox.x, bbox.y - offsetY, bbox.x + bbox.width, bbox.y - offsetY, 'top');
-
-                  apply(useSides ? sides.includes("bottom") : doWidth,
-                        bbox.x, bbox.y + bbox.height + offsetY, bbox.x + bbox.width, bbox.y + bbox.height + offsetY, 'bottom');
-
-                  apply(useSides ? sides.includes("left") : doHeight,
-                        bbox.x - offsetX, bbox.y, bbox.x - offsetX, bbox.y + bbox.height, 'left');
-
-                  apply(useSides ? sides.includes("right") : doHeight,
-                        bbox.x + bbox.width + offsetX, bbox.y, bbox.x + bbox.width + offsetX, bbox.y + bbox.height, 'right');
-
-                  return;
-            }
-
-            this.x1 = x1;
-            this.y1 = y1;
-            this.x2 = x2;
-            this.y2 = y2;
-            this.text = options.text ?? null;
-
-            this.autoLabel = autoLabel;
-            this.unit = unit;
-            this.scale = scale;
-            this.precision = precision;
-            this.arrowSize = arrowSize;
-            this.textOffset = textOffset;
-            this.stroke = stroke;
-            this.lineWidth = lineWidth;
-            this.fontSize = fontSize;
-            this.tickLength = tickLength;
-            this.handleRadius = handleRadius;
-
-            this.markerId = `arrowhead-${TSVGMeasurement.idCounter++}`;
-            this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
-
-            this.initDefs();
-            this.createElements();
-            this.attachDragHandlers();
-
-            this.svgElement.appendChild(this.group);
-            this.update();
-      }
-
-      initDefs() {
-            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-            defs.appendChild(this.createArrowMarker(this.markerId));
-            this.group.appendChild(defs);
-      }
-
-      createArrowMarker(id) {
-            const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-            marker.setAttribute("id", id);
-            marker.setAttribute("viewBox", "0 0 10 10");
-            marker.setAttribute("refX", "5");
-            marker.setAttribute("refY", "5");
-            marker.setAttribute("markerWidth", this.arrowSize);
-            marker.setAttribute("markerHeight", this.arrowSize);
-            marker.setAttribute("orient", "auto-start-reverse");
-
-            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
-            path.setAttribute("fill", this.stroke);
-
-            marker.appendChild(path);
-            return marker;
-      }
-
-      createSVGElement(type, attributes = {}) {
-            const el = document.createElementNS("http://www.w3.org/2000/svg", type);
-            for(const [key, value] of Object.entries(attributes)) {
-                  el.setAttribute(key, value);
-            }
-            return el;
-      }
-
-      createElements() {
-            this.line = this.createSVGElement("line", {
-                  stroke: this.stroke,
-                  "stroke-width": this.lineWidth,
-                  "marker-start": `url(#${this.markerId})`,
-                  "marker-end": `url(#${this.markerId})`,
-            });
-
-            this.tick1 = this.createSVGElement("line", {stroke: this.stroke, "stroke-width": this.lineWidth});
-            this.tick2 = this.createSVGElement("line", {stroke: this.stroke, "stroke-width": this.lineWidth});
-
-            this.label = this.createSVGElement("text", {
-                  fill: this.stroke,
-                  "font-size": this.fontSize,
-                  "text-anchor": this.getTextAnchor(),
-                  "alignment-baseline": this.getAlignmentBaseline(),
-            });
-
-            this.handle1 = this.createSVGElement("circle", {
-                  r: this.handleRadius,
-                  fill: "transparent",
-                  cursor: "pointer",
-            });
-
-            this.handle2 = this.createSVGElement("circle", {
-                  r: this.handleRadius,
-                  fill: "transparent",
-                  cursor: "pointer",
-            });
-
-            this.group.append(this.line, this.tick1, this.tick2, this.label, this.handle1, this.handle2);
-      }
-
-      getTextAnchor() {
-            switch(this.sideHint) {
-                  case 'left': return 'middle';
-                  case 'right': return 'middle';
-                  default: return 'middle';
-            }
-      }
-
-      getAlignmentBaseline() {
-            switch(this.sideHint) {
-                  case 'top': return 'baseline';
-                  case 'bottom': return 'hanging';
-                  case 'left': return 'baseline';
-                  case 'right': return 'baseline';
-                  default: return 'baseline';
-            }
-      }
-
-      getSmartOffset(dx, dy) {
-            const length = Math.sqrt(dx * dx + dy * dy);
-            if(length === 0) return [0, 0];
-
-            const px = -dy / length;
-            const py = dx / length;
-
-            switch(this.sideHint) {
-                  case 'top': return [-px * this.textOffset, -py * this.textOffset];
-                  case 'bottom': return [px * this.textOffset, py * this.textOffset];
-                  case 'left': return [px * this.textOffset, py * this.textOffset];
-                  case 'right': return [-px * this.textOffset, -py * this.textOffset];
-                  default: return [-px * this.textOffset, -py * this.textOffset];
-            }
-      }
-
-      update() {
-            const dx = this.x2 - this.x1;
-            const dy = this.y2 - this.y1;
-            const length = Math.sqrt(dx * dx + dy * dy);
-            const ux = dx / length;
-            const uy = dy / length;
-
-            const tickInset = this.tickLength / 2 + 1;
-            const adjX1 = this.x1 + ux * tickInset;
-            const adjY1 = this.y1 + uy * tickInset;
-            const adjX2 = this.x2 - ux * tickInset;
-            const adjY2 = this.y2 - uy * tickInset;
-
-            this.line.setAttribute("x1", adjX1);
-            this.line.setAttribute("y1", adjY1);
-            this.line.setAttribute("x2", adjX2);
-            this.line.setAttribute("y2", adjY2);
-
-            const px = -dy / length;
-            const py = dx / length;
-            const tx = px * this.tickLength / 2;
-            const ty = py * this.tickLength / 2;
-
-            this.tick1.setAttribute("x1", this.x1 - tx);
-            this.tick1.setAttribute("y1", this.y1 - ty);
-            this.tick1.setAttribute("x2", this.x1 + tx);
-            this.tick1.setAttribute("y2", this.y1 + ty);
-
-            this.tick2.setAttribute("x1", this.x2 - tx);
-            this.tick2.setAttribute("y1", this.y2 - ty);
-            this.tick2.setAttribute("x2", this.x2 + tx);
-            this.tick2.setAttribute("y2", this.y2 + ty);
-
-            const midX = (this.x1 + this.x2) / 2;
-            const midY = (this.y1 + this.y2) / 2;
-            const [offsetX, offsetY] = this.getSmartOffset(dx, dy);
-
-            const labelX = midX + offsetX;
-            const labelY = midY + offsetY;
-
-            let angle = Math.atan2(dy, dx) * (180 / Math.PI);
-            if(angle > 90 || angle < -90 || this.sideHint === 'left') {
-                  angle += 180;
-            }
-
-            const scaledLength = length * this.scale;
-            const formattedLength = scaledLength.toFixed(this.precision);
-
-            this.label.setAttribute("x", labelX);
-            this.label.setAttribute("y", labelY);
-            this.label.setAttribute("transform", `rotate(${angle} ${labelX} ${labelY})`);
-            this.label.setAttribute("text-anchor", this.getTextAnchor());
-            this.label.setAttribute("alignment-baseline", this.getAlignmentBaseline());
-            this.label.textContent = this.autoLabel ? `${formattedLength} ${this.unit}` : this.text;
-
-            this.handle1.setAttribute("cx", this.x1);
-            this.handle1.setAttribute("cy", this.y1);
-            this.handle2.setAttribute("cx", this.x2);
-            this.handle2.setAttribute("cy", this.y2);
-      }
-
-      attachDragHandlers() {
-            const startDrag = (handleIndex, evt) => {
-                  evt.preventDefault();
-                  const moveHandler = (moveEvt) => {
-                        const svgPoint = this.svgElement.createSVGPoint();
-                        svgPoint.x = moveEvt.clientX;
-                        svgPoint.y = moveEvt.clientY;
-                        const pt = svgPoint.matrixTransform(this.svgElement.getScreenCTM().inverse());
-
-                        if(handleIndex === 1) {
-                              this.x1 = pt.x;
-                              this.y1 = pt.y;
-                        } else {
-                              this.x2 = pt.x;
-                              this.y2 = pt.y;
-                        }
-
-                        this.update();
-                  };
-
-                  const stopDrag = () => {
-                        window.removeEventListener("mousemove", moveHandler);
-                        window.removeEventListener("mouseup", stopDrag);
-                  };
-
-                  window.addEventListener("mousemove", moveHandler);
-                  window.addEventListener("mouseup", stopDrag);
-            };
-
-            this.handle1.addEventListener("mousedown", (e) => startDrag(1, e));
-            this.handle2.addEventListener("mousedown", (e) => startDrag(2, e));
-      }
-
-      Delete = () => {
-            if(this.group && this.group.parentNode) {
-                  this.group.parentNode.removeChild(this.group);
-            }
-
-            if(this.subMeasures.length > 0) {
-                  for(let i = 0; i < this.subMeasures.length; i++) {
-                        this.subMeasures[i].Delete();
-                  }
-            }
-      };
-}
-
 class TSVGMeasurement {
       static idCounter = 0;
 
