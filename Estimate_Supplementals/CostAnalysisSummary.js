@@ -143,7 +143,7 @@ function costAnalysisSummaryTick() {
     let smhd = getSMHD(secondsToUse);
     newPanelContent_TimeClock_Time.innerHTML = smhd[0] + "d " + smhd[1] + "h " + smhd[2] + "m " + smhd[3] + "s";
 
-    newPanelContent_Install_Address.innerHTML = getKOStorageVariable().installAddress || "";
+    newPanelContent_Install_Address.innerHTML = getKOStorageVariable().formattedInstallAddress || "";
 
     tickCreateCustomerModal();
 }
