@@ -52,7 +52,6 @@ class ModalSVG extends Modal {
       }) {
             super(headerText, incrementAmount, callback);
             this.#svgText = svgText;
-            console.log("in Modal SVG svgText given as: " + svgText);//up until this point still contains class names
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
 
@@ -187,10 +186,10 @@ class ModalSVG extends Modal {
             let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
             let pathGroup = this.#dragZoomSVG.svg.querySelector("#pathGroup");
 
-            if(!pathGroup) return console.warn("no pathGroup exists");
-
             let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             newGroup.id = "overallMeasures";
+
+            //if(!pathGroup) return console.warn("no pathGroup exists");
 
             let measures = new TSVGMeasurement(newGroup, {
                   target: pathGroup,
@@ -217,8 +216,7 @@ class ModalSVG extends Modal {
 
       showOverallMeasures() {
             let elements = this.#dragZoomSVG.svg.querySelector("#overallMeasures");
-            if(!elements) return;
-            $(elements).show();
+            if(!elements) $(elements).show();
 
             this.addOverallMeasures();
       }

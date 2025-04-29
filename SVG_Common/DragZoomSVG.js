@@ -77,7 +77,6 @@ class DragZoomSVG {
       get allPathElements() {return this.#allPathElements;}
       get unscaledSVGString() {
             let svgClone = this.svg.cloneNode(true);
-            console.log(svgClone);
             svgClone.getElementById("mainGcreatedByT").setAttribute('transform', "matrix(" + svg_mmToPixel(1) + " 0 0 " + svg_mmToPixel(1) + " 0 0)");
 
             return svgClone.outerHTML;

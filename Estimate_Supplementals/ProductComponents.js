@@ -492,7 +492,7 @@ function partInfoTick() {
 	}
 
 	function createCloseProductPartsBtn(partInstance, classN, productIndex, productInstance) {
-		let btn = createButton("▲", "height:27px;min-height:27px;width:68px;padding:0px;margin:0px 5px;font-size:11px;", async function() {
+		let btn = createButton("▲", "height:27px;min-height:27px;width:25px;padding:0px;margin:0px 5px;font-size:11px;", async function() {
 			toggle(btn.innerHTML == "▲", () => {btn.innerHTML = "▼";}, () => {btn.innerHTML = "▲";});
 
 			let elements = productInstance.querySelectorAll(".ord-prod-part");
