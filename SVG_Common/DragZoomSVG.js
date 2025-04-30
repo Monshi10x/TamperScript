@@ -308,7 +308,7 @@ class DragZoomSVG {
                   element.addEventListener("mouseout", (e) => {
                         element.classList.remove("SVGHover");
                   });
-                  element.addEventListener("mousedown", (e) => {
+                  element.addEventListener("mouseup", (e) => {
                         if(element.classList.contains("innerPath")) return;
 
                         element.classList.toggle("SVGSelected");
