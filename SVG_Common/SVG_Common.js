@@ -878,7 +878,6 @@ function svg_getPathQty(svgStringOrObject) {
             if(svgStringOrObject[i].nodeName == "g" || svgStringOrObject[i].nodeName == "defs" || svgStringOrObject[i].nodeName == "style" || svgStringOrObject[i].nodeName == "text") continue;
 
             let element = svgStringOrObject[i];
-            console.log(element);
 
             if(element.className.baseVal.includes("outerPath")) returnObject.outerPaths++;
             if(element.className.baseVal.includes("innerPath")) returnObject.innerPaths++;
@@ -907,88 +906,64 @@ function svg_convertShapesToPaths(svgObject) {
 function svg_formatCompoundPaths(svgObject) {
 
       let mainGroup = svgObject.querySelector("#mainGcreatedByT");
-      let newGroup = svgObject.querySelector("#pathGroup");
+      let pathGroup = svgObject.querySelector("#pathGroup");
 
-      if(!newGroup) {
-            newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            newGroup.id = "pathGroup";
-            mainGroup.appendChild(newGroup);
+      if(!pathGroup) {
+            pathGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            pathGroup.id = "pathGroup";
+            mainGroup.appendChild(pathGroup);
       }
 
-      let svgElements = mainGroup.getElementsByTagName("path");
-      let svgElementsLength = svgElements.length;
+      let svgElements = Array.from(mainGroup.getElementsByTagName("path"));
 
       //format outer/inner paths
-      for(let i = 0; i < svgElementsLength; i++) {
+      for(let i = svgElements.length - 1; i >= 0; i--) {
+
+            let pathClass = svgElements[i].classList;
+
+            if(pathClass.contains("innerPath") || pathClass.contains("outerPath")) continue;
 
             let pathString = svgElements[i].getAttribute("d");
-            let pathClass = svgElements[i].classList;
             let pathStringSplitOverZ = pathString.split("Z");
+
+            //Shape Group:
+            let newPathGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            newPathGroup.id = "newPathGroup";
+            pathGroup.appendChild(newPathGroup);
 
             let outerPathParent_id;
             for(let j = 0; j < pathStringSplitOverZ.length; j++) {
                   if(pathStringSplitOverZ[j] == "") continue;
-                  //Outer Compound
 
+                  //Outer Compound
                   if(j == 0 && !pathClass.contains("innerPath")) {
-                        let compoundPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                        compoundPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                        compoundPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#ffe;";
-                        compoundPathElement.className.baseVal = "outerPath";
+                        let outerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        outerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
+                        outerPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#ffe;";
+                        outerPathElement.className.baseVal = "outerPath";
                         outerPathParent_id = generateUniqueID("outerPath-");
-                        compoundPathElement.id = outerPathParent_id;
-                        newGroup.appendChild(compoundPathElement);
+                        outerPathElement.id = outerPathParent_id;
+                        newPathGroup.appendChild(outerPathElement);
                   }
                   //if has Inner compound paths
                   else {
-                        let compoundPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                        compoundPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                        compoundPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#eee;";
-                        compoundPathElement.className.baseVal = "innerPath";
-                        compoundPathElement.setAttribute("data-outerPathParent", outerPathParent_id);
-                        newGroup.appendChild(compoundPathElement);
+                        let innerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        innerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
+                        innerPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#eee;";
+                        innerPathElement.className.baseVal = "innerPath";
+                        innerPathElement.setAttribute("data-outerPathParent", outerPathParent_id);
+                        newPathGroup.appendChild(innerPathElement);
                   }
             }
+
+            //remove previous unformatted elements
+            deleteElement(svgElements[i]);
+            svgElements.splice(i, 1);
       }
 
-
-
-      //remove previous unformatted elements
-      let elemsToDelete = [];
-      for(let i = 0; i < svgElementsLength; i++) {
-            elemsToDelete.push(svgElements[i]);
-      }
-      for(let i = 0; i < elemsToDelete.length; i++) {
-            deleteElement(elemsToDelete[i]);
-      }
-
-      const paths = svgObject.querySelectorAll("svg path");
-
-      paths.forEach(path => {
-            let previousStrokeColour = path.style.stroke;
-            let previousFillColour = path.style.fill;
-            console.log(previousStrokeColour);
-            path.addEventListener("mouseenter", () => {
-                  gsap.to(path, {
-                        duration: 0.2,
-                        scale: 1,
-                        transformOrigin: "center",
-                        stroke: "#007bff",
-                        fill: "#ffd54f",
-                        ease: "power2.out"
-                  });
-            });
-
-            path.addEventListener("mouseleave", () => {
-                  console.log(previousStrokeColour);
-                  gsap.to(path, {
-                        duration: 0.2,
-                        scale: 1,
-                        stroke: previousStrokeColour,
-                        fill: previousFillColour,
-                        ease: "power2.out"
-                  });
-            });
+      //Delete Un-used <g>
+      mainGroup.querySelectorAll('g:not([id])').forEach(group => {
+            deleteElement(group);
       });
 
       return svgObject;

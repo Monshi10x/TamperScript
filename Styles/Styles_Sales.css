@@ -44,6 +44,13 @@
 .selected{
       border:2px solid red;
 }
+.SVGHover{
+  fill: #e1e1e1 !important ;
+  filter: brightness(80%);
+}
+.SVGSelected{
+  fill:green !important ;
+}
 
 .sortable-ghost{
       opacity: 0;

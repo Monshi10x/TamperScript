@@ -16,6 +16,7 @@ class DragZoomSVG {
       #holding = false;
       #allowPanning = true;
       #allowZoom = true;
+      supportedSVGTypes = ['rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline', 'path'];
 
       /**
        * @summary mouse X,Y position relative to SVG Container
@@ -119,15 +120,18 @@ class DragZoomSVG {
             this.#f_svg.setAttribute("data-scaleStrokeOnScroll", this.#scaleStrokeOnScroll);
             this.#f_svg.style.cssText += ";background-color:white;";
 
-            this.#f_svgG = document.createElementNS('http://www.w3.org/2000/svg', "g");
-            this.#f_svgG.id = "mainGcreatedByT";
-            let numChildren = this.#f_svg.children.length;
-            for(let i = 0; i < numChildren; i++) {
-                  this.#f_svgG.appendChild(this.#f_svg.children[0]);
+            this.#f_svgG = this.#f_svg.querySelector("#mainGcreatedByT");
+            if(!this.#f_svgG) {
+                  this.#f_svgG = document.createElementNS('http://www.w3.org/2000/svg', "g");
+                  this.#f_svgG.id = "mainGcreatedByT";
+                  let numChildren = this.#f_svg.children.length;
+                  for(let i = 0; i < numChildren; i++) {
+                        this.#f_svgG.appendChild(this.#f_svg.children[0]);
+                  }
+                  this.#f_svg.appendChild(this.#f_svgG);
             }
-            this.#f_svg.appendChild(this.#f_svgG);
 
-            this.#allElements = this.#f_svgG.getElementsByTagName("*");
+
 
 
             this.#panZoomInstance = panzoom(this.#f_svgG, {
@@ -167,8 +171,6 @@ class DragZoomSVG {
             this.#panZoomInstance.on('zoomend', (e) => {
                   //console.log('Fired when zoom animation ended', e);
             });
-
-
 
 
             if(options.convertShapesToPaths) this.convertShapesToPaths();
@@ -270,6 +272,8 @@ class DragZoomSVG {
       onZoom() {
             this.scale = this.#panZoomInstance.getTransform().scale;
 
+            this.#allElements = this.#f_svgG.querySelectorAll(this.supportedSVGTypes.map(tag => `${tag}`).join(", "));
+
             for(let i = 0; i < this.#allElements.length; i++) {
                   if(this.#scaleStrokeOnScroll) this.#allElements[i].style.cssText += 'stroke-width:' + (this.#defaultStrokeWidth / this.scale) + ";";
                   if(this.#scaleFontOnScroll) this.#allElements[i].style.cssText += "font-size:" + (this.#defaultFontSize / this.scale) + "px;";
@@ -279,7 +283,7 @@ class DragZoomSVG {
       convertShapesToPaths() {
             svg_convertShapesToPaths(this.#f_svgG);
 
-            this.#allElements = this.#f_svgG.getElementsByTagName("*");
+            this.#allElements = this.#f_svgG.getElementsByTagName("path");
       }
 
       async getTotalPathArea_m2() {
@@ -297,12 +301,16 @@ class DragZoomSVG {
                   element.setAttribute('stroke-miterlimit', `0`);
 
                   element.addEventListener("mouseover", (e) => {
+                        if(element.classList.contains("innerPath")) return;
+
                         element.classList.add("SVGHover");
                   });
                   element.addEventListener("mouseout", (e) => {
                         element.classList.remove("SVGHover");
                   });
                   element.addEventListener("mousedown", (e) => {
+                        if(element.classList.contains("innerPath")) return;
+
                         element.classList.toggle("SVGSelected");
                   });
             });

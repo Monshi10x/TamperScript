@@ -123,24 +123,36 @@ class ModalSVG extends Modal {
             this.loadPathArea();
             this.loadBoundingRectAreas();
 
+            ///Save Changes
             this.#f_saveSVG = createButton("Save Changes", "", () => {
                   if(callerObject instanceof SVGCutfile) {
-                        let groups = this.#dragZoomSVG.svg.getElementsByTagName("g");
+                        let groups = Array.from(this.#dragZoomSVG.svg.getElementsByTagName("g"));
 
                         let pathGroup;
 
-                        for(let i = 0; i < groups.length; i++) {
-                              if(groups[i].id == "mainGcreatedByT") continue;
+                        for(let i = groups.length - 1; i >= 0; i--) {
                               if(groups[i].id == "pathGroup") {
                                     pathGroup = groups[i].outerHTML;
                               }
+                              console.log(groups[i].id);
+                              if(["overallMeasures", "itemMeasures", "shapeAreas", "partAreas", "shapeBoundingRects", "itemPoints"].includes(groups[i].id)) {
+                                    groups[i].remove();
+                                    groups.splice(i, 1);
+                              }
                         }
 
-                        for(let i = 0; i < groups.length; i++) {
-                              if(groups[i].id != "pathGroup") deleteElement(groups[i]);
-                        }
+                        /* for(let i = 0; i < groups.length; i++) {
+                               if(groups[i].id == "pathGroup") {
+                                     pathGroup = groups[i].outerHTML;
+                               }
+                               if(["overallMeasures", "itemMeasures", "shapeAreas", "partAreas", "shapeBoundingRects"].includes(groups[i].id)) deleteElement(groups[i]);
+                         }*/
 
-                        callerObject.svgFile = this.#dragZoomSVG.svg.outerHTML.replaceAll("</svg>", pathGroup + "</svg>").replaceAll("\n", "").replaceAll("  ", "");
+                        //for(let i = 0; i < groups.length; i++) {
+
+                        //}
+
+                        callerObject.svgFile = this.#dragZoomSVG.svg.outerHTML;//.replaceAll("</svg>", pathGroup + "</svg>").replaceAll("\n", "").replaceAll("  ", "");
                         callerObject.onFileChange();
                   }
                   this.hide();
@@ -600,7 +612,7 @@ class ModalSVG extends Modal {
                                     let elementFirstPoint = element.getPointAtLength(0);
                                     let isWithinSelection = svgNest_pointInPolygon(elementFirstPoint, selectionPolygon);
                                     if(isWithinSelection) {
-                                          element.classList.add("SVGSelected");
+                                          if(!element.classList.contains("innerPath")) element.classList.add("SVGSelected");
                                     }
                               }
                               if(this.selectionRect) this.selectionRect.Delete();
@@ -609,7 +621,7 @@ class ModalSVG extends Modal {
                   case "Delete Tool":
                         let elementsToDelete = [];
                         this.#dragZoomSVG.allPathElements.forEach((element) => {
-                              if(element.classList.contains("SVGSelected")) elementsToDelete.push(element);
+                              if(element.classList.contains("SVGSelected")) elementsToDelete.push(element.parentNode/*Deletes the group containing outer & inner paths*/);
                         });
 
                         let countToDelete = elementsToDelete.length;
