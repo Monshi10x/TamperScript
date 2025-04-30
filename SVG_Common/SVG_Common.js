@@ -907,10 +907,13 @@ function svg_convertShapesToPaths(svgObject) {
 function svg_formatCompoundPaths(svgObject) {
 
       let mainGroup = svgObject.querySelector("#mainGcreatedByT");
+      let newGroup = svgObject.querySelector("#pathGroup");
 
-      let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      newGroup.id = "pathGroup";
-      mainGroup.appendChild(newGroup);
+      if(!newGroup) {
+            newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            newGroup.id = "pathGroup";
+            mainGroup.appendChild(newGroup);
+      }
 
       let svgElements = mainGroup.getElementsByTagName("path");
       let svgElementsLength = svgElements.length;
@@ -930,7 +933,7 @@ function svg_formatCompoundPaths(svgObject) {
                   if(j == 0 && !pathClass.contains("innerPath")) {
                         let compoundPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
                         compoundPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                        compoundPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
+                        compoundPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#ffe;";
                         compoundPathElement.className.baseVal = "outerPath";
                         outerPathParent_id = generateUniqueID("outerPath-");
                         compoundPathElement.id = outerPathParent_id;
@@ -940,13 +943,15 @@ function svg_formatCompoundPaths(svgObject) {
                   else {
                         let compoundPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
                         compoundPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                        compoundPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
+                        compoundPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#eee;";
                         compoundPathElement.className.baseVal = "innerPath";
                         compoundPathElement.setAttribute("data-outerPathParent", outerPathParent_id);
                         newGroup.appendChild(compoundPathElement);
                   }
             }
       }
+
+
 
       //remove previous unformatted elements
       let elemsToDelete = [];
@@ -956,6 +961,35 @@ function svg_formatCompoundPaths(svgObject) {
       for(let i = 0; i < elemsToDelete.length; i++) {
             deleteElement(elemsToDelete[i]);
       }
+
+      const paths = svgObject.querySelectorAll("svg path");
+
+      paths.forEach(path => {
+            let previousStrokeColour = path.style.stroke;
+            let previousFillColour = path.style.fill;
+            console.log(previousStrokeColour);
+            path.addEventListener("mouseenter", () => {
+                  gsap.to(path, {
+                        duration: 0.2,
+                        scale: 1,
+                        transformOrigin: "center",
+                        stroke: "#007bff",
+                        fill: "#ffd54f",
+                        ease: "power2.out"
+                  });
+            });
+
+            path.addEventListener("mouseleave", () => {
+                  console.log(previousStrokeColour);
+                  gsap.to(path, {
+                        duration: 0.2,
+                        scale: 1,
+                        stroke: previousStrokeColour,
+                        fill: previousFillColour,
+                        ease: "power2.out"
+                  });
+            });
+      });
 
       return svgObject;
 }

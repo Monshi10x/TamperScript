@@ -75,6 +75,7 @@
 // @require      https://unpkg.com/panzoom@9.4.0/dist/panzoom.min.js
 // @require      https://cdn.jsdelivr.net/npm/svg-path-commander/dist/svg-path-commander.js
 // @require      https://cdn.jsdelivr.net/npm/path-data-polyfill@1.0.6/path-data-polyfill.min.js
+// @require      https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Charts/Chart.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Loaders/Loader.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/DragAndDrop/DragAndDrop.js

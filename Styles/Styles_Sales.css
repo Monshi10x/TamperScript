@@ -83,13 +83,7 @@
     border: 13px none #ffffff;
   }
 
-  .SVGSelected{
-      stroke-dasharray: 50,50;
-  }
 
-  .SVGHover{
-      stroke-opacity: 0.5;
-  }
 
   .T-dropdown {
       position: relative;
