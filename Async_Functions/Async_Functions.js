@@ -681,13 +681,13 @@ async function tickSelected(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.LinkedBtn(productNo, partNo)));
     productContext.$data.PartGroupSelected(value);
     console.log("ticked part " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
 }
 async function GroupParts(productNo) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo))).$data;
     OrderStep2.Product_GroupOrderProductParts(productContext);
     console.log("grouped parts " + productNo);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
 }
 async function setPartWidth(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
@@ -700,7 +700,7 @@ async function setPartWidth(productNo, partNo, value) {
     if(secondaryField) secondaryField.value = value;
 
     console.log("set width " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
 }
 async function setPartHeight(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo, partNo)));
@@ -713,7 +713,7 @@ async function setPartHeight(productNo, partNo, value) {
     if(secondaryField) secondaryField.value = value;
 
     console.log("set height " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
 }
 async function setPartQty(productNo, partNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo)));
@@ -722,12 +722,12 @@ async function setPartQty(productNo, partNo, value) {
 
     part.Quantity(value);
     console.log("set quantity " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
 }
 async function setPartBorderColour(productNo, partNo, value) {
     var partBorder = document.querySelector(Field.PartBorderField(productNo, partNo));
     partBorder.style.border = "5px solid " + value;
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
 }
 async function setProductQty(productNo, value) {
     var productContext = ko.contextFor(document.querySelector(Field.ProductQtyField(productNo))).$data;
@@ -754,7 +754,7 @@ async function setProductQty(productNo, value) {
     });
 
     console.log("set product quantity " + productNo);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return productNo;
 }
 async function setProductName(productNo, value) {
@@ -779,7 +779,7 @@ async function setProductName(productNo, value) {
     });
 
     console.log("set product name " + productNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return productNo;
 }
 async function setProductSummary(productNo, value) {
@@ -795,7 +795,7 @@ async function setPartMarkup(productNo, partNo, value) {
 
     productContext.$data.Value(value);
     console.log("set markup " + partNo + " to " + value);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 async function setPartMarkupEa(productNo, partNo, value) {
@@ -803,7 +803,7 @@ async function setPartMarkupEa(productNo, partNo, value) {
 
     productContext.$data.Value(value);
     console.log("set markup " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPartDescription(productNo, partNo, value) {
@@ -815,7 +815,7 @@ async function setPartDescription(productNo, partNo, value) {
     console.log(productNo, partNo, value, partList);
     part.PartDescription(value);
     console.log("set part description " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 function setPartDescriptionDisabled(productNo, partNo, tf) {
@@ -833,7 +833,7 @@ async function setPartText(productNo, partNo, value) {
 
     part.PartText(value);
     console.log("set part text " + partNo);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 async function setPartNotes(productNo, partNo, value) {
@@ -844,7 +844,7 @@ async function setPartNotes(productNo, partNo, value) {
     document.querySelector(Field.NotesField(productNo, partNo)).maxLength = 1000000;
     part.PartNotes(value);
     console.log("set part notes in " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPartVendorCostEa(productNo, partNo, value) {
@@ -853,7 +853,7 @@ async function setPartVendorCostEa(productNo, partNo, value) {
     var part = partList[partNo - 1];
     part.VendorCost(value);
     console.log("set part vendor cost " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPartPriceEa(productNo, partNo, value) {
@@ -861,7 +861,7 @@ async function setPartPriceEa(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set part price to " + partNo);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 async function setPartPrice(productNo, partNo, value) {
@@ -869,7 +869,7 @@ async function setPartPrice(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set part price to " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 //ARTWORK
@@ -881,7 +881,7 @@ async function setArtworkTime(productNo, partNo, value) {
     ko.contextFor(Field.ArtworkTimeTotal(productNo, partNo)[2]).$data.Value(time[2]);
 
     console.log("set minutes " + partNo + " to " + time);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 async function setArtworkTimeEa(productNo, partNo, value) {
@@ -892,7 +892,7 @@ async function setArtworkTimeEa(productNo, partNo, value) {
     ko.contextFor(Field.ArtworkTimeEach(productNo, partNo)[2]).$data.Value(time[2]);
 
     console.log("set minutes ea " + partNo + " to " + value);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 //PRODUCTION
@@ -904,7 +904,7 @@ async function setProductionTime(productNo, partNo, value) {
     ko.contextFor(Field.ProductionTime(productNo, partNo)[2]).$data.Value(time[2]);
 
     console.log("set minutes " + partNo + " to " + time);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 //INSTALL
@@ -918,7 +918,7 @@ async function setInstallTime(productNo, partNo, value) {
     ko.contextFor(fields[2]).$data.Value(time[2]);
 
     console.log("set install minutes " + partNo + " to " + time);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 async function setInstallTimeEa(productNo, partNo, value) {
@@ -930,7 +930,7 @@ async function setInstallTimeEa(productNo, partNo, value) {
     ko.contextFor(fields[2]).$data.Value(time[2]);
 
     console.log("set install ea minutes " + partNo + " to " + time);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setInstallTimeMHD(productNo, partNo, minutes, hours, days) {
@@ -941,7 +941,7 @@ async function setInstallTimeMHD(productNo, partNo, minutes, hours, days) {
     ko.contextFor(fields[2]).$data.Value(zeroIfNaN(parseFloat(days)));
 
     console.log("set install minutes " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setInstallTimeMHDEa(productNo, partNo, minutes, hours, days) {
@@ -952,7 +952,7 @@ async function setInstallTimeMHDEa(productNo, partNo, minutes, hours, days) {
     ko.contextFor(fields[2]).$data.Value(zeroIfNaN(parseFloat(days)));
 
     console.log("set install ea minutes " + partNo);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 async function setInstallPartType(productNo, partNo, value) {
@@ -960,7 +960,7 @@ async function setInstallPartType(productNo, partNo, value) {
 
     productContext.$data.ListDataItemChangeValue(value);
     console.log("set install type of " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setInstallPartTypeEa(productNo, partNo, value) {
@@ -968,7 +968,7 @@ async function setInstallPartTypeEa(productNo, partNo, value) {
 
     productContext.$data.ListDataItemChangeValue(value);
     console.log("set install type ea of " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setTravelTime(productNo, partNo, value) {
@@ -980,7 +980,7 @@ async function setTravelTime(productNo, partNo, value) {
     ko.contextFor(fields[2]).$data.Value(time[2]);
 
     console.log("set travel minutes " + partNo + " to " + time);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setTravelTimeEa(productNo, partNo, value) {
@@ -992,7 +992,7 @@ async function setTravelTimeEa(productNo, partNo, value) {
     ko.contextFor(fields[2]).$data.Value(time[2]);
 
     console.log("set travel ea minutes " + partNo + " to " + time);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setTravelTimeMHD(productNo, partNo, minutes, hours, days) {
@@ -1003,7 +1003,7 @@ async function setTravelTimeMHD(productNo, partNo, minutes, hours, days) {
     ko.contextFor(fields[2]).$data.Value(zeroIfNaN(parseFloat(days)));
 
     console.log("set travel minutes " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setTravelTimeMHDEa(productNo, partNo, minutes, hours, days) {
@@ -1014,7 +1014,7 @@ async function setTravelTimeMHDEa(productNo, partNo, minutes, hours, days) {
     ko.contextFor(fields[2]).$data.Value(zeroIfNaN(parseFloat(days)));
 
     console.log("set travel ea minutes " + partNo);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setTravelType(productNo, partNo, value) {
@@ -1022,7 +1022,7 @@ async function setTravelType(productNo, partNo, value) {
 
     productContext.$data.ListDataItemChangeValue(value);
     console.log("set travel type of " + partNo + " to " + value);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 async function setTravelTypeEa(productNo, partNo, value) {
@@ -1030,7 +1030,7 @@ async function setTravelTypeEa(productNo, partNo, value) {
 
     productContext.$data.ListDataItemChangeValue(value);
     console.log("set travel type ea of " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 //PAINT
@@ -1039,7 +1039,7 @@ async function setPaintLitresEach(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintLitresTotal(productNo, partNo, value) {
@@ -1047,7 +1047,7 @@ async function setPaintLitresTotal(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintColourMatchTimeEach(productNo, partNo, value) {
@@ -1055,7 +1055,7 @@ async function setPaintColourMatchTimeEach(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintColourMatchTimeTotal(productNo, partNo, value) {
@@ -1063,7 +1063,7 @@ async function setPaintColourMatchTimeTotal(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintNumberCoatsEach(productNo, partNo, value) {
@@ -1071,7 +1071,7 @@ async function setPaintNumberCoatsEach(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintNumberCoatsTotal(productNo, partNo, value) {
@@ -1079,7 +1079,7 @@ async function setPaintNumberCoatsTotal(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintSetupTimeEach(productNo, partNo, value) {
@@ -1087,7 +1087,7 @@ async function setPaintSetupTimeEach(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintSetupTimeTotal(productNo, partNo, value) {
@@ -1095,7 +1095,7 @@ async function setPaintSetupTimeTotal(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintFlashTimeEach(productNo, partNo, value) {
@@ -1103,7 +1103,7 @@ async function setPaintFlashTimeEach(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintFlashTimeTotal(productNo, partNo, value) {
@@ -1111,7 +1111,7 @@ async function setPaintFlashTimeTotal(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintSprayTimeEach(productNo, partNo, value) {
@@ -1119,7 +1119,7 @@ async function setPaintSprayTimeEach(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setPaintSprayTimeTotal(productNo, partNo, value) {
@@ -1127,7 +1127,7 @@ async function setPaintSprayTimeTotal(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 //***********************************************************************//
@@ -1290,7 +1290,7 @@ async function setRouterSetupTimeEach(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setRouterSetupTimeTotal(productNo, partNo, value) {
@@ -1298,7 +1298,7 @@ async function setRouterSetupTimeTotal(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("set paint litres " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setRouterSetupOnceOff(productNo, partNo, value) {
@@ -1306,7 +1306,7 @@ async function setRouterSetupOnceOff(productNo, partNo, value) {
 
     productContext.$data.ValueDisplay(value);
     console.log("setRouterSetupOnceOff " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setRouterRunTimeEach(productNo, partNo, value) {
@@ -1314,7 +1314,7 @@ async function setRouterRunTimeEach(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("setRouterRunTime " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setRouterRunTimeTotal(productNo, partNo, value) {
@@ -1322,7 +1322,7 @@ async function setRouterRunTimeTotal(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("setRouterRunTime " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setRouterPostJobTimeEach(productNo, partNo, value) {
@@ -1330,7 +1330,7 @@ async function setRouterPostJobTimeEach(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("setRouterPostJobTime " + partNo + " to " + value);
-    await sleep(sleepMS);
+    //await sleep(sleepMS);
     return partNo;
 }
 async function setRouterPostJobTimeTotal(productNo, partNo, value) {
@@ -1338,7 +1338,7 @@ async function setRouterPostJobTimeTotal(productNo, partNo, value) {
 
     productContext.$data.Value(parseFloat(value));
     console.log("setRouterPostJobTime " + partNo + " to " + value);
-    await sleep(sleepMS);
+    // await sleep(sleepMS);
     return partNo;
 }
 //PARTS
