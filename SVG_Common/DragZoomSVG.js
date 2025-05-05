@@ -16,7 +16,7 @@ class DragZoomSVG {
       #holding = false;
       #allowPanning = true;
       #allowZoom = true;
-      supportedSVGTypes = ['rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline', 'path'];
+      supportedSVGTypes = ['rect', 'circle', 'ellipse', 'line', 'polygon', 'polyline', 'path', 'text'];
 
       /**
        * @summary mouse X,Y position relative to SVG Container
