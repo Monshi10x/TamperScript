@@ -846,7 +846,8 @@ function svg_getTotalBoundingRectAreas_m2(svgStringOrObject, useShallowCopy = tr
 
       totalArea /= 1000000;
 
-      if(newSvg) deleteElement(newSvg);
+      console.log(newSvg);
+      // if(newSvg) deleteElement(newSvg);
 
       return totalArea;
 }
@@ -1775,6 +1776,8 @@ function getRandomPointsInPath(pathElement, numberOfPoints) {
 
       return points;
 }
+
+
 class TSVGMeasurement {
       static idCounter = 0;
 
@@ -1843,7 +1846,6 @@ class TSVGMeasurement {
                   return;
             }
 
-            // Apply offsetX and offsetY when no target is specified
             this.x1 = x1 + offsetX;
             this.y1 = y1 + offsetY;
             this.x2 = x2 + offsetX;
@@ -1862,39 +1864,11 @@ class TSVGMeasurement {
             this.tickLength = tickLength;
             this.handleRadius = handleRadius;
 
-            this.markerId = `arrowhead-${TSVGMeasurement.idCounter++}`;
             this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
-            this.initDefs();
             this.createElements();
-            this.attachDragHandlers();
-
             this.svgElement.appendChild(this.group);
             this.update();
-      }
-
-      initDefs() {
-            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-            defs.appendChild(this.createArrowMarker(this.markerId));
-            this.group.appendChild(defs);
-      }
-
-      createArrowMarker(id) {
-            const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
-            marker.setAttribute("id", id);
-            marker.setAttribute("viewBox", "0 0 10 10");
-            marker.setAttribute("refX", "5");
-            marker.setAttribute("refY", "5");
-            marker.setAttribute("markerWidth", this.arrowSize);
-            marker.setAttribute("markerHeight", this.arrowSize);
-            marker.setAttribute("orient", "auto-start-reverse");
-
-            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-            path.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
-            path.setAttribute("fill", this.stroke);
-
-            marker.appendChild(path);
-            return marker;
       }
 
       createSVGElement(type, attributes = {}) {
@@ -1908,10 +1882,11 @@ class TSVGMeasurement {
       createElements() {
             this.line = this.createSVGElement("line", {
                   stroke: this.stroke,
-                  "stroke-width": this.lineWidth,
-                  "marker-start": `url(#${this.markerId})`,
-                  "marker-end": `url(#${this.markerId})`,
+                  "stroke-width": this.lineWidth
             });
+
+            this.arrowHead1 = this.createSVGElement("path", {fill: this.stroke});
+            this.arrowHead2 = this.createSVGElement("path", {fill: this.stroke});
 
             this.tick1 = this.createSVGElement("line", {stroke: this.stroke, "stroke-width": this.lineWidth});
             this.tick2 = this.createSVGElement("line", {stroke: this.stroke, "stroke-width": this.lineWidth});
@@ -1923,35 +1898,17 @@ class TSVGMeasurement {
                   "alignment-baseline": this.getAlignmentBaseline(),
             });
 
-            this.handle1 = this.createSVGElement("circle", {
-                  r: this.handleRadius,
-                  fill: "transparent",
-                  cursor: "pointer",
-            });
-
-            this.handle2 = this.createSVGElement("circle", {
-                  r: this.handleRadius,
-                  fill: "transparent",
-                  cursor: "pointer",
-            });
-
-            this.group.append(this.line, this.tick1, this.tick2, this.label, this.handle1, this.handle2);
+            this.group.append(this.line, this.arrowHead1, this.arrowHead2, this.tick1, this.tick2, this.label);
       }
 
       getTextAnchor() {
-            switch(this.sideHint) {
-                  case 'left': return 'middle';
-                  case 'right': return 'middle';
-                  default: return 'middle';
-            }
+            return 'middle';
       }
 
       getAlignmentBaseline() {
             switch(this.sideHint) {
                   case 'top': return 'baseline';
                   case 'bottom': return 'hanging';
-                  case 'left': return 'baseline';
-                  case 'right': return 'baseline';
                   default: return 'baseline';
             }
       }
@@ -1959,7 +1916,6 @@ class TSVGMeasurement {
       getSmartOffset(dx, dy) {
             const length = Math.sqrt(dx * dx + dy * dy);
             if(length === 0) return [0, 0];
-
             const px = -dy / length;
             const py = dx / length;
 
@@ -1970,6 +1926,29 @@ class TSVGMeasurement {
                   case 'right': return [-px * this.textOffset, -py * this.textOffset];
                   default: return [-px * this.textOffset, -py * this.textOffset];
             }
+      }
+
+      setArrowhead(pathElement, x, y, dx, dy, direction = 1) {
+            const len = Math.sqrt(dx * dx + dy * dy);
+            if(len === 0) return;
+
+            const ux = dx / len;
+            const uy = dy / len;
+            const size = this.arrowSize;
+            const px = -uy;
+            const py = ux;
+
+            const baseX = x + direction * ux * size;
+            const baseY = y + direction * uy * size;
+
+            const leftX = baseX + px * size * 0.5;
+            const leftY = baseY + py * size * 0.5;
+
+            const rightX = baseX - px * size * 0.5;
+            const rightY = baseY - py * size * 0.5;
+
+            const d = `M ${x} ${y} L ${leftX} ${leftY} L ${rightX} ${rightY} Z`;
+            pathElement.setAttribute("d", d);
       }
 
       update() {
@@ -1985,10 +1964,10 @@ class TSVGMeasurement {
             const adjX2 = this.x2 - ux * tickInset;
             const adjY2 = this.y2 - uy * tickInset;
 
-            this.line.setAttribute("x1", adjX1);
-            this.line.setAttribute("y1", adjY1);
-            this.line.setAttribute("x2", adjX2);
-            this.line.setAttribute("y2", adjY2);
+            this.line.setAttribute("x1", this.x1);
+            this.line.setAttribute("y1", this.y1);
+            this.line.setAttribute("x2", this.x2);
+            this.line.setAttribute("y2", this.y2);
 
             const px = -dy / length;
             const py = dx / length;
@@ -2030,43 +2009,8 @@ class TSVGMeasurement {
             this.label.setAttribute("alignment-baseline", this.getAlignmentBaseline());
             this.label.textContent = this.autoLabel ? `${formattedLength} ${this.unit}` : this.text;
 
-            this.handle1.setAttribute("cx", this.x1);
-            this.handle1.setAttribute("cy", this.y1);
-            this.handle2.setAttribute("cx", this.x2);
-            this.handle2.setAttribute("cy", this.y2);
-      }
-
-      attachDragHandlers() {
-            const startDrag = (handleIndex, evt) => {
-                  evt.preventDefault();
-                  const moveHandler = (moveEvt) => {
-                        const svgPoint = this.svgElement.createSVGPoint();
-                        svgPoint.x = moveEvt.clientX;
-                        svgPoint.y = moveEvt.clientY;
-                        const pt = svgPoint.matrixTransform(this.svgElement.getScreenCTM().inverse());
-
-                        if(handleIndex === 1) {
-                              this.x1 = pt.x;
-                              this.y1 = pt.y;
-                        } else {
-                              this.x2 = pt.x;
-                              this.y2 = pt.y;
-                        }
-
-                        this.update();
-                  };
-
-                  const stopDrag = () => {
-                        window.removeEventListener("mousemove", moveHandler);
-                        window.removeEventListener("mouseup", stopDrag);
-                  };
-
-                  window.addEventListener("mousemove", moveHandler);
-                  window.addEventListener("mouseup", stopDrag);
-            };
-
-            this.handle1.addEventListener("mousedown", (e) => startDrag(1, e));
-            this.handle2.addEventListener("mousedown", (e) => startDrag(2, e));
+            this.setArrowhead(this.arrowHead1, this.x1, this.y1, dx, dy, 1);
+            this.setArrowhead(this.arrowHead2, this.x2, this.y2, dx, dy, -1);
       }
 
       Delete = () => {
@@ -2081,4 +2025,5 @@ class TSVGMeasurement {
             }
       };
 }
+
 

@@ -218,7 +218,7 @@ class Material extends SubscriptionManager {
       onPopOut() {
             this.prePopOutState = this.#isMinimized;
 
-            this.#f_popOutModal = new ModalPopOut("Expanded View", () => {
+            this.#f_popOutModal = new ModalProductPopOut("Expanded View", () => {
                   this.onPopOutLeave();
             }, this.#f_container);
 

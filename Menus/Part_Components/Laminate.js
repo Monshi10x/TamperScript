@@ -5,6 +5,7 @@ class Laminate extends Material {
       static DISPLAY_NAME = "LAMINATE";
       #useRollLength = false;
       #dataForSubscribers = [{QWHD: new QWHD()}];
+      get DEBUG_SHOW() {return true;}
       #totalRunLength = 0;
       /*
                         

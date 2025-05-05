@@ -1,9 +1,8 @@
-class ModalPopOut extends Modal {
+class ModalProductPopOut extends Modal {
       #containersToBorrow;
       #borrowedFields = [];
 
-      #whenClosedReturnBorrowed = true;
-      set whenClosedReturnBorrowed(value) {this.#whenClosedReturnBorrowed = value;}
+      whenClosedReturnBorrowed = true;
 
       constructor(headerText, callback, ...containersToBorrow) {
             super(headerText, callback);
@@ -14,8 +13,7 @@ class ModalPopOut extends Modal {
             this.borrowFields(...containersToBorrow);
 
             this.btn = createButton("Close", "width:100px;float:right;", () => {
-                  if(this.#whenClosedReturnBorrowed == true) this.returnAllBorrowedFields();
-                  console.log("in callback modal popout");
+                  if(this.whenClosedReturnBorrowed == true) this.returnAllBorrowedFields();
                   this.callback();
             });
 
@@ -23,7 +21,9 @@ class ModalPopOut extends Modal {
       }
 
       /**@Override */
+      /*note this is similar, but not exactly same as Modal's method*/
       borrowFields(...fieldContainers) {
+            this.#borrowedFields = [];
             for(let i = 0; i < fieldContainers.length; i++) {
                   let borrowedElement = fieldContainers[i];
                   let placeholder = document.createElement("div");
@@ -42,6 +42,7 @@ class ModalPopOut extends Modal {
       }
 
       /**@Override */
+      /*note this is similar, but not exactly same as Modal's method*/
       returnAllBorrowedFields() {
             for(let i = 0; i < this.#borrowedFields.length; i++) {
                   this.#borrowedFields[i].placeholder.replaceWith(this.#borrowedFields[i].fieldContainer);
@@ -58,7 +59,7 @@ class ModalPopOut extends Modal {
       }
 
       hide() {
-            if(this.#whenClosedReturnBorrowed == true) this.returnAllBorrowedFields();
+            if(this.whenClosedReturnBorrowed == true) this.returnAllBorrowedFields();
             super.hide();
       }
 

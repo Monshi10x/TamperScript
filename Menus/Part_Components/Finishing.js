@@ -13,7 +13,6 @@ class Finishing extends Material {
        * [{parent: 'SHEET-1699952073332-95570559', data: []},
        *  {parent: 'SHEET-1699952073332-95574529', data: []}]
        */
-      //#inheritedData2 = [];
       #inheritedSizes = [];
       #inheritedSizeTable;
 

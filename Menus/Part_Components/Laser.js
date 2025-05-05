@@ -7,7 +7,7 @@ class Laser extends SubMenu {
       #showIDInContainer = true;
 
       constructor(parentContainer, canvasCtx, updateFunction, sizeClass) {
-            super(parentContainer, canvasCtx, updateFunction, "CNC Router");
+            super(parentContainer, canvasCtx, updateFunction, "CNC Laser");
 
             /*Qty*/
             let f_container_qty = createDivStyle5(null, "Qty", this.contentContainer);

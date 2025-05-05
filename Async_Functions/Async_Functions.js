@@ -1244,7 +1244,7 @@ async function q_AddPart_CostPrice(productNo, partNo, newOrEdit, totalOrEach, pa
 //***********************************************************************//
 //          newOrEdit: True if new part, false if edit
 //***********************************************************************//
-async function q_AddPart_DimensionWH(productNo, partNo, newOrEdit, partName, partQty, partWidth, partHeight, partDescription, partInnerText, tickSelectedTF) {
+async function q_AddPart_DimensionWH(productNo, partNo, newOrEdit, partName, partQty, partWidth, partHeight, partDescription, partInnerText, tickSelectedTF, partInnerNotes) {
     //if new
     if(newOrEdit) {
         await AddPart(partName, productNo);
@@ -1259,6 +1259,7 @@ async function q_AddPart_DimensionWH(productNo, partNo, newOrEdit, partName, par
     if(partHeight) await setPartHeight(productNo, partNo, partHeight);
     if(partDescription) await setPartDescription(productNo, partNo, partDescription);
     if(partInnerText) await setPartText(productNo, partNo, partInnerText);
+    if(partInnerNotes) await setPartNotes(productNo, partNo, partInnerNotes);
     if(tickSelectedTF) await tickSelected(productNo, partNo, tickSelectedTF);
     await savePart(productNo, partNo);
     return partNo;

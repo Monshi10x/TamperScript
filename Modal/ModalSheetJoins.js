@@ -1,7 +1,7 @@
 class ModalSheetJoins extends ModalWidthHeight {
 
       #ID = "ModalSheetJoins " + generateUniqueID();
-      #dragZoomCanvas;
+      dragZoomSVG;
       #borrowedFields = [];
 
 
@@ -36,6 +36,7 @@ class ModalSheetJoins extends ModalWidthHeight {
       }
 
       get flipped() {
+            if(!this.#flippedField) return false;
             return this.#flippedField.checked;
       }
 
@@ -45,6 +46,7 @@ class ModalSheetJoins extends ModalWidthHeight {
       }
 
       get hasGrain() {
+            if(!this.#hasGrainField) return false;
             return this.#hasGrainField.checked;
       }
 
@@ -54,6 +56,7 @@ class ModalSheetJoins extends ModalWidthHeight {
       }
 
       get grainDirection() {
+            if(!this.#grainDirectionField) return false;
             return this.#grainDirectionField.value;
       }
 
@@ -63,6 +66,7 @@ class ModalSheetJoins extends ModalWidthHeight {
       }
 
       get isFolded() {
+            if(!this.#isFoldedField) return false;
             return this.#isFoldedField.checked;
       }
 
@@ -72,6 +76,7 @@ class ModalSheetJoins extends ModalWidthHeight {
       }
 
       get folds() {
+            if(!this.#foldFields) return false;
             return [
                   this.#foldFields[0],
                   this.#foldFields[1],
@@ -83,6 +88,9 @@ class ModalSheetJoins extends ModalWidthHeight {
       setDepth(field) {this.#depth = field;}
       get depth() {return this.#depth;}
 
+      get svgFile() {return this.dragZoomSVG.svgFile;}
+      get unscaledSVGString() {return this.dragZoomSVG.unscaledSVGString;}
+
       #gapBetweenX = 0;
       #gapBetweenXField;
       #gapBetweenY = 0;
@@ -90,6 +98,8 @@ class ModalSheetJoins extends ModalWidthHeight {
 
       #containerBeforeCanvas;
       #containerAfterCanvas;
+
+      /*override*/get shouldShowOnCreation() {return false;};
 
       constructor(headerText, incrementAmount, callback, sheetClass) {
             super(headerText, incrementAmount, callback);
@@ -99,7 +109,10 @@ class ModalSheetJoins extends ModalWidthHeight {
             setFieldDisabled(true, this.widthField[1], this.widthField[0]);
             setFieldDisabled(true, this.heightField[1], this.heightField[0]);
 
-            this.#dragZoomCanvas = new DragZoomSVG(this.container.getBoundingClientRect().width, 500, '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1243.89mm" height="988.13mm" viewBox="0 0 3526 2801"></svg>', this.getBodyElement(),
+
+            this.svgContainer = createDiv("width:100%;", null, this.getBodyElement());
+
+            this.dragZoomSVG = new DragZoomSVG(/*this.container.getBoundingClientRect().width*/"calc(100%)", "500px", null, this.svgContainer,
                   {
                         convertShapesToPaths: true,
                         splitCompoundPaths: false,
@@ -108,8 +121,7 @@ class ModalSheetJoins extends ModalWidthHeight {
                         defaultStrokeWidth: 1,
                         defaultFontSize: 12
                   });
-            this.#dragZoomCanvas.onTransform = () => {this.draw();};
-            //DragZoomCanvas(this.container.getBoundingClientRect().width, 500, () => this.draw(), this.getBodyElement());
+            this.dragZoomSVG.onTransform = () => {this.draw();};
 
             this.#containerBeforeCanvas = createDivStyle5("width: calc(100%);height:300px;", "Borrowed Fields", this.getBodyElement())[1];
             AddCssStyle("overflow-y:auto;", this.#containerBeforeCanvas);
@@ -121,23 +133,36 @@ class ModalSheetJoins extends ModalWidthHeight {
             this.#gapBetweenYField = createInput_Infield("Gap Between Panels (y)", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
       }
 
-      updateFromFields() {
-            super.updateFromFields();
-            this.draw();
-            this.#dragZoomCanvas.updateFromFields();
+      show() {
+            super.show();
+
+            this.modalOpaqueBackground.style.zIndex = "1004";
+
+            if(!this.dragZoomSVG) {
+
+            } else {
+                  setTimeout(() => {
+                        this.dragZoomSVG.centerAndFitSVGContent();
+                  }, 1);
+            }
       }
 
-      Close() {
-            this.returnAllBorrowedFields();
-            this.#dragZoomCanvas.Close();
+      updateFromFields() {
+            super.updateFromFields();
+
+            if(this.dragZoomSVG) {
+                  this.draw();
+                  this.dragZoomSVG.updateFromFields();
+            }
+
       }
 
       rects = [];
       measurements = [];
       DrawRect(params) {
-            let rect = new TSVGRectangle(this.#dragZoomCanvas.svgG, {
-                  fill: "blue",
-                  strokeWidth: 2 / this.#dragZoomCanvas.scale,
+            let rect = new TSVGRectangle(this.dragZoomSVG.svgG, {
+                  fill: COLOUR.LightBlue,
+                  strokeWidth: 2 / this.dragZoomSVG.scale,
                   stroke: "black",
                   opacity: 1,
                   usePattern: false,
@@ -164,8 +189,6 @@ class ModalSheetJoins extends ModalWidthHeight {
                   this.measurements[r].Delete();
             }
             this.measurements = [];
-            /// let canvasCtx = this.#dragZoomCanvas.canvasCtx;
-            ///let canvasScale = this.#dragZoomCanvas.scale;
 
             let xo = 0, yo = 0;
 
@@ -189,7 +212,6 @@ class ModalSheetJoins extends ModalWidthHeight {
                                     let rectWidth_Initial = rectWidth;
 
                                     //draw matrixSize
-                                    ///drawRect(canvasCtx, xo, yo, rectWidth, rectHeight, "TL", COLOUR.Black, 1);
                                     let rect = this.DrawRect({
                                           x: xo,
                                           y: yo,
@@ -200,10 +222,8 @@ class ModalSheetJoins extends ModalWidthHeight {
 
                                     });
 
-                                    ///if(isFirstRow) drawMeasurement_Verbose(canvasCtx, xo, yo, rectWidth, 0, "T", roundNumber(rectWidth, 2), this.#textSize, COLOUR.Blue, this.#lineWidth, this.#crossScale, this.#offsetFromShape, true, "B", false, canvasScale);
-
                                     if(isFirstRow) {
-                                          this.measurements.push(new TSVGMeasurement(this.#dragZoomCanvas.svgG, {
+                                          this.measurements.push(new TSVGMeasurement(this.dragZoomSVG.svgG, {
                                                 direction: "width",
                                                 x1: xo,
                                                 y1: yo,
@@ -215,24 +235,21 @@ class ModalSheetJoins extends ModalWidthHeight {
                                                 unit: "mm",
                                                 precision: 2,
                                                 scale: 1,
-                                                arrowSize: 5,
-                                                textOffset: 10 / this.#dragZoomCanvas.scale,
+                                                arrowSize: 10 / this.dragZoomSVG.scale,
+                                                textOffset: 10 / this.dragZoomSVG.scale,
                                                 stroke: "#000",
                                                 sides: ["top"],
-                                                lineWidth: 2 / this.#dragZoomCanvas.scale,
-                                                fontSize: 12 / this.#dragZoomCanvas.scale + "px",
-                                                tickLength: 20 / this.#dragZoomCanvas.scale,
-                                                handleRadius: 8 / this.#dragZoomCanvas.scale,
+                                                lineWidth: 2 / this.dragZoomSVG.scale,
+                                                fontSize: 12 / this.dragZoomSVG.scale + "px",
+                                                tickLength: 20 / this.dragZoomSVG.scale,
+                                                handleRadius: 8 / this.dragZoomSVG.scale,
                                                 offsetX: 0,
-                                                offsetY: -20 / this.#dragZoomCanvas.scale
+                                                offsetY: -20 / this.dragZoomSVG.scale
                                           }));
                                     }
 
-
-                                    ///if(isFirstColumn) drawMeasurement_Verbose(canvasCtx, xo, yo, 0, rectHeight, "L", roundNumber(rectHeight, 2), this.#textSize, COLOUR.Blue, this.#lineWidth, this.#crossScale, this.#offsetFromShape, false, "R", false, canvasScale);
-
                                     if(isFirstColumn) {
-                                          this.measurements.push(new TSVGMeasurement(this.#dragZoomCanvas.svgG, {
+                                          this.measurements.push(new TSVGMeasurement(this.dragZoomSVG.svgG, {
                                                 direction: "height",
                                                 x1: xo,
                                                 y1: yo,
@@ -244,51 +261,24 @@ class ModalSheetJoins extends ModalWidthHeight {
                                                 unit: "mm",
                                                 precision: 2,
                                                 scale: 1,
-                                                arrowSize: 5,
-                                                textOffset: 10 / this.#dragZoomCanvas.scale,
+                                                arrowSize: 10 / this.dragZoomSVG.scale,
+                                                textOffset: 10 / this.dragZoomSVG.scale,
                                                 stroke: "#000",
                                                 sides: ["left"],
-                                                lineWidth: 2 / this.#dragZoomCanvas.scale,
-                                                fontSize: 12 / this.#dragZoomCanvas.scale + "px",
-                                                tickLength: 20 / this.#dragZoomCanvas.scale,
-                                                handleRadius: 8 / this.#dragZoomCanvas.scale,
-                                                offsetX: -20 / this.#dragZoomCanvas.scale,
+                                                lineWidth: 2 / this.dragZoomSVG.scale,
+                                                fontSize: 12 / this.dragZoomSVG.scale + "px",
+                                                tickLength: 20 / this.dragZoomSVG.scale,
+                                                handleRadius: 8 / this.dragZoomSVG.scale,
+                                                offsetX: -20 / this.dragZoomSVG.scale,
                                                 offsetY: 0,
                                                 sideHint: "left"
                                           }));
                                     }
 
-
-                                    ///drawFillRect(canvasCtx, xo, yo, rectWidth, rectHeight, "TL", COLOUR.Red, 0.3);
-
                                     //draw grain
                                     if(this.hasGrain) {
                                           rect.setAttribute('usePattern', true);
                                           rect.setAttribute('useHatch', 'hatchHorizontal');
-
-                                          console.log(this.flipped, this.grainDirection);
-                                          if(!this.flipped && this.grainDirection == "With Long Side") {
-                                                let numberOfGrains = (rectHeight / 20) - 1;
-                                                for(let g = 0; g < numberOfGrains; g++) {
-                                                      ///drawLine_WH(canvasCtx, xo, yo + ((g + 1) * 20), rectWidth, 0, COLOUR.Blue, 1, 1);
-                                                }
-                                          } if(!this.flipped && this.grainDirection == "With Short Side") {
-                                                let numberOfGrains = (rectWidth / 20) - 1;
-                                                for(let g = 0; g < numberOfGrains; g++) {
-                                                      ///drawLine_WH(canvasCtx, xo + ((g + 1) * 20), yo, 0, rectHeight, COLOUR.Blue, 1, 1);
-                                                }
-                                          } if(this.flipped && this.grainDirection == "With Long Side") {
-                                                let numberOfGrains = (rectWidth / 20) - 1;
-                                                for(let g = 0; g < numberOfGrains; g++) {
-                                                      ///drawLine_WH(canvasCtx, xo + ((g + 1) * 20), yo, 0, rectHeight, COLOUR.Blue, 1, 1);
-                                                }
-                                          } if(this.flipped && this.grainDirection == "With Short Side") {
-                                                let numberOfGrains = (rectHeight / 20) - 1;
-                                                for(let g = 0; g < numberOfGrains; g++) {
-                                                      ///drawLine_WH(canvasCtx, xo, yo + ((g + 1) * 20), rectWidth, 0, COLOUR.Blue, 1, 1);
-                                                }
-
-                                          }
                                     }
 
                                     if(this.isFolded) {
@@ -338,13 +328,13 @@ class ModalSheetJoins extends ModalWidthHeight {
       }
 
       hide() {
-            this.returnAllBorrowedFields();
+            //this.returnAllBorrowedFields();
             super.hide();
       }
 
       onWindowResize(event) {
             super.onWindowResize(event);
-            this.#dragZoomCanvas.canvasWidth = this.container.getBoundingClientRect().width;
+            if(this.dragZoomSVG) this.dragZoomSVG.canvasWidth = this.container.getBoundingClientRect().width;
             this.updateFromFields();
       }
 }

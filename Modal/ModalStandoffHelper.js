@@ -1,107 +1,7 @@
-class ModalStandoffHelper extends ModalWidthHeight {
-
-      #ID = "ModalStandoffHelper " + generateUniqueID();
-      #typicalSpacing = 600;
-      #spacingAllowance = 100; //spacing < 700
-      #initialRectWidth = 100;
-      #initialRectHeight = 100;
-      #offsetFromEdge = 25;
-
-      #dragZoomCanvas;
-      #numberOnTop;
-      #numberOnSide;
-      #diameterField;
-      #offsetFromEdgeField;
-
-      get qty() {return (this.numberOnTop) * 2 + (this.numberOnSide - 2) * 2;}
-
-      set numberOnTop(value) {$(this.#numberOnTop[1]).val(value).change();}
-      get numberOnTop() {return parseFloat(this.#numberOnTop[1].value);}
-
-      set numberOnSide(value) {$(this.#numberOnSide[1]).val(value).change();}
-      get numberOnSide() {return parseFloat(this.#numberOnSide[1].value);}
-
-      set diameter(value) {$(this.#diameterField[1]).val(value).change();}
-      get diameter() {return parseFloat(this.#diameterField[1].value);}
-
-      set offsetFromEdge(value) {$(this.#offsetFromEdgeField[1]).val(value).change();}
-      get offsetFromEdge() {return parseFloat(this.#offsetFromEdgeField[1].value);}
-
-      constructor(headerText, incrementAmount, callback) {
-            super(headerText, incrementAmount, callback);
-
-            this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
-
-            this.#numberOnTop = createInput_Infield("Number On Top/Bottom", this.calculatedQtyPerSide(this.#initialRectWidth), "width:40%;", () => {this.#dragZoomCanvas.updateFromFields();}, null, true, 1);
-            this.addBodyElement(this.#numberOnTop[0]);
-            this.#numberOnSide = createInput_Infield("Number On Side", this.calculatedQtyPerSide(this.#initialRectHeight), "width:40%;", () => {this.#dragZoomCanvas.updateFromFields();}, null, true, 1);
-            this.addBodyElement(this.#numberOnSide[0]);
-            this.#diameterField = createInput_Infield("Diameter", 19, "width:40%;", () => this.updateFromFields(), null, true, 1);
-            this.addBodyElement(this.#diameterField[0]);
-            this.#offsetFromEdgeField = createInput_Infield("Offset From Edge", this.#offsetFromEdge, "width:40%;", () => this.updateFromFields(), null, true, 1);
-            this.addBodyElement(this.#offsetFromEdgeField[0]);
-            this.width = this.#initialRectHeight;
-            this.height = this.#initialRectHeight;
-
-            this.draw();
-      }
-
-      calculatedQtyPerSide = (sideLength) => {
-            return 2 + Math.ceil(sideLength / (this.#typicalSpacing + this.#spacingAllowance)) - 1;
-      };
-
-      draw() {
-            let canvasCtx = this.#dragZoomCanvas.canvasCtx;
-            let scaledWidth = this.width;
-            let scaledHeight = this.height;
-            let edgeOffset = this.offsetFromEdgeField;
-            let numOnTop = this.numberOnTop;
-            let numOnSide = this.numberOnSide;
-            let diameter = this.diameter;
-
-            drawFillRect(canvasCtx, 0, 0, scaledWidth, scaledHeight, "TL", COLOUR.Blue, 0.4);
-            drawMeasurement_Verbose(canvasCtx, 0, 0, scaledWidth, 0, "T", scaledWidth, 15 / this.#dragZoomCanvas.scale, COLOUR.Blue, 1, 0.2, 15, true, "B");
-            drawMeasurement_Verbose(canvasCtx, 0, 0, 0, scaledHeight, "L", scaledHeight, 15 / this.#dragZoomCanvas.scale, COLOUR.Blue, 1, 0.2, 15, false, "R");
-
-            //drawTopBottom
-            for(let a = 0; a < numOnTop; a++) {
-                  let widthSpacing = (scaledWidth - edgeOffset * 2) / (numOnTop - 1);
-                  //Top
-                  drawFillCircle(canvasCtx, 0 + edgeOffset + widthSpacing * a, 0 + edgeOffset, diameter / 2, 'M', 'red', 0.5);
-                  //Bottom
-                  drawFillCircle(canvasCtx, 0 + edgeOffset + widthSpacing * a, 0 - edgeOffset + scaledHeight, diameter / 2, 'M', 'red', 0.7);
-            }
-
-            //drawSides
-            for(let a = 0; a < numOnSide; a++) {
-                  let heightSpacing = (scaledHeight - edgeOffset * 2) / (numOnSide - 1);
-                  //left side
-                  drawFillCircle(canvasCtx, 0 + edgeOffset, 0 + edgeOffset + heightSpacing * a, diameter / 2, 'M', 'red', 0.5);
-                  //right side
-                  drawFillCircle(canvasCtx, 0 - edgeOffset + scaledWidth, 0 + edgeOffset + heightSpacing * a, diameter / 2, 'M', 'red', 0.5);
-            }
-
-            canvasCtx.lineWidth = 3;
-      };
-
-      updateFromFields() {
-            super.updateFromFields();
-            this.#dragZoomCanvas.updateFromFields();
-      }
-
-      onWindowResize(event) {
-            super.onWindowResize(event);
-
-            this.#dragZoomCanvas.canvasWidth = this.container.getBoundingClientRect().width;
-            this.#dragZoomCanvas.canvasHeight = 400;
-            this.updateFromFields();
-      }
-}
-
 class ModalStandoffHelper2 extends ModalWidthHeight {
 
       #ID = "ModalSheetJoins2 " + generateUniqueID();
-      #dragZoomCanvas;
+      #dragZoomSVG;
       #borrowedFields = [];
 
       #textSize = 15;
@@ -172,6 +72,9 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
             });
       }
 
+      get svgFile() {return this.#dragZoomSVG.svgFile;}
+      get unscaledSVGString() {return this.#dragZoomSVG.unscaledSVGString;}
+
       constructor(headerText, incrementAmount, callback, sheetClass) {
             super(headerText, incrementAmount, callback);
 
@@ -183,7 +86,18 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
             this.borrowFieldsContainer = this.#containerBeforeCanvas;
 
-            this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
+            //this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
+
+            this.#dragZoomSVG = new DragZoomSVG(/*this.container.getBoundingClientRect().width*/500, 500, '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1243.89mm" height="988.13mm" viewBox="0 0 3526 2801"></svg>', this.getBodyElement(),
+                  {
+                        convertShapesToPaths: true,
+                        splitCompoundPaths: false,
+                        scaleStrokeOnScroll: true,
+                        scaleFontOnScroll: true,
+                        defaultStrokeWidth: 1,
+                        defaultFontSize: 12
+                  });
+            this.#dragZoomSVG.onTransform = () => {this.draw();};
 
             this.#containerAfterCanvas = createDivStyle5(null, "View Settings", this.getBodyElement())[1];
 
@@ -193,17 +107,71 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
 
       updateFromFields() {
             super.updateFromFields();
-            this.#dragZoomCanvas.updateFromFields();
+            this.draw();
+            this.#dragZoomSVG.updateFromFields();
       }
 
+
       Close() {
-            this.returnAllBorrowedFields();
-            this.#dragZoomCanvas.Close();
+            //this.returnAllBorrowedFields();
+            this.#dragZoomSVG.Close();
+      }
+
+      rects = [];
+      measurements = [];
+      DrawRect(params) {
+            let rect = new TSVGRectangle(this.#dragZoomSVG.svgG, {
+                  fill: COLOUR.LightBlue,
+                  strokeWidth: 2 / this.#dragZoomSVG.scale,
+                  stroke: "black",
+                  opacity: 1,
+                  usePattern: false,
+                  patternType: 'hatchHorizontal',// Available patternType values: 'hatch45', 'hatchHorizontal', 'hatchVertical', 'soil'
+                  hatchFill: 'none',
+                  hatchLineColor: 'black',
+                  hatchLineWidth: 4,
+                  hatchSpacing: 20,
+                  ...params
+            });
+
+            this.rects.push(rect);
+
+            return rect.rect;
+      }
+
+      DrawCircle(params) {
+            let circle = new TSVGCircle(this.#dragZoomSVG.svgG, {
+                  fill: COLOUR.White,
+                  strokeWidth: 2 / this.#dragZoomSVG.scale,
+                  stroke: "black",
+                  opacity: 1,
+                  usePattern: false,
+                  patternType: 'hatchHorizontal',// Available patternType values: 'hatch45', 'hatchHorizontal', 'hatchVertical', 'soil'
+                  hatchFill: 'none',
+                  hatchLineColor: 'black',
+                  hatchLineWidth: 4,
+                  hatchSpacing: 20,
+                  ...params
+            });
+
+            this.rects.push(circle);
+
+            return circle.circle;
       }
 
       draw() {
-            let canvasCtx = this.#dragZoomCanvas.canvasCtx;
-            let canvasScale = this.#dragZoomCanvas.scale;
+            for(let r = this.rects.length - 1; r >= 0; r--) {
+                  this.rects[r].Delete();
+            }
+            this.rects = [];
+
+            for(let r = this.measurements.length - 1; r >= 0; r--) {
+                  this.measurements[r].Delete();
+            }
+            this.measurements = [];
+
+            //let canvasCtx = this.#dragZoomCanvas.canvasCtx;
+            // let canvasScale = this.#dragZoomCanvas.scale;
 
             let xo = 0, yo = 0;
 
@@ -227,11 +195,70 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
                                     let [rectWidth_Initial, rectHeight_Initial] = [rectWidth, rectHeight];
 
                                     //draw sheetSize
-                                    drawRect(canvasCtx, xo, yo, rectWidth, rectHeight, "TL", COLOUR.Black, 1);
+                                    ///drawRect(canvasCtx, xo, yo, rectWidth, rectHeight, "TL", COLOUR.Black, 1);
+                                    //draw matrixSize
+                                    let rect = this.DrawRect({
+                                          x: xo,
+                                          y: yo,
+                                          width: rectWidth,
+                                          height: rectHeight
+                                    });
 
                                     //draw Measurements
-                                    if(isFirstRow) drawMeasurement_Verbose(canvasCtx, xo, yo, rectWidth, 0, "T", roundNumber(rectWidth, 2), this.#textSize, COLOUR.Blue, this.#lineWidth, this.#crossScale, 20, true, "B", false, canvasScale);
-                                    if(isFirstColumn) drawMeasurement_Verbose(canvasCtx, xo, yo, 0, rectHeight, "L", roundNumber(rectHeight, 2), this.#textSize, COLOUR.Blue, this.#lineWidth, this.#crossScale, 20, false, "R", false, canvasScale);
+                                    ///if(isFirstRow) drawMeasurement_Verbose(canvasCtx, xo, yo, rectWidth, 0, "T", roundNumber(rectWidth, 2), this.#textSize, COLOUR.Blue, this.#lineWidth, this.#crossScale, 20, true, "B", false, canvasScale);
+                                    ///if(isFirstColumn) drawMeasurement_Verbose(canvasCtx, xo, yo, 0, rectHeight, "L", roundNumber(rectHeight, 2), this.#textSize, COLOUR.Blue, this.#lineWidth, this.#crossScale, 20, false, "R", false, canvasScale);
+                                    if(isFirstRow) {
+                                          this.measurements.push(new TSVGMeasurement(this.#dragZoomSVG.svgG, {
+                                                direction: "width",
+                                                x1: xo,
+                                                y1: yo,
+                                                x2: xo + rectWidth,
+                                                y2: yo,
+                                                autoLabel: true,
+                                                text: roundNumber(rectWidth, 2) + " mm",
+                                                deletable: true,
+                                                unit: "mm",
+                                                precision: 2,
+                                                scale: 1,
+                                                arrowSize: 10 / this.#dragZoomSVG.scale,
+                                                textOffset: 10 / this.#dragZoomSVG.scale,
+                                                stroke: "#000",
+                                                sides: ["top"],
+                                                lineWidth: 2 / this.#dragZoomSVG.scale,
+                                                fontSize: 12 / this.#dragZoomSVG.scale + "px",
+                                                tickLength: 20 / this.#dragZoomSVG.scale,
+                                                handleRadius: 8 / this.#dragZoomSVG.scale,
+                                                offsetX: 0,
+                                                offsetY: -20 / this.#dragZoomSVG.scale
+                                          }));
+                                    }
+
+                                    if(isFirstColumn) {
+                                          this.measurements.push(new TSVGMeasurement(this.#dragZoomSVG.svgG, {
+                                                direction: "height",
+                                                x1: xo,
+                                                y1: yo,
+                                                x2: xo,
+                                                y2: yo + rectHeight,
+                                                autoLabel: true,
+                                                text: roundNumber(rectHeight, 2) + " mm",
+                                                deletable: true,
+                                                unit: "mm",
+                                                precision: 2,
+                                                scale: 1,
+                                                arrowSize: 10 / this.#dragZoomSVG.scale,
+                                                textOffset: 10 / this.#dragZoomSVG.scale,
+                                                stroke: "#000",
+                                                sides: ["left"],
+                                                lineWidth: 2 / this.#dragZoomSVG.scale,
+                                                fontSize: 12 / this.#dragZoomSVG.scale + "px",
+                                                tickLength: 20 / this.#dragZoomSVG.scale,
+                                                handleRadius: 8 / this.#dragZoomSVG.scale,
+                                                offsetX: -20 / this.#dragZoomSVG.scale,
+                                                offsetY: 0,
+                                                sideHint: "left"
+                                          }));
+                                    }
 
                                     //draw Stand-offs
                                     let numberTop = 2 + Math.ceil((rectWidth - 2 * this.offsetFromEdge) / clamp((this.horizontalSpacing + this.spacingAllowance), 1, Infinity));
@@ -242,32 +269,48 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
                                     //top
                                     for(let x = 0; x < numberTop - 1; x++) {
                                           this.#totalNumber++;
-                                          drawFillCircle(canvasCtx, xo + this.offsetFromEdge + spacingTop * x, yo + this.offsetFromEdge, this.diameter / 2, 'M', 'red', 0.5);
+                                          let circle = this.DrawCircle({
+                                                cx: xo + this.offsetFromEdge + spacingTop * x,
+                                                cy: yo + this.offsetFromEdge,
+                                                r: this.diameter / 2,
+                                          });
                                     }
                                     //bottom
                                     for(let x = 0; x < numberTop - 1; x++) {
                                           this.#totalNumber++;
-                                          drawFillCircle(canvasCtx, xo + this.offsetFromEdge + spacingTop * x, yo + rectHeight - this.offsetFromEdge, this.diameter / 2, 'M', 'red', 0.5);
+                                          let circle = this.DrawCircle({
+                                                cx: xo + this.offsetFromEdge + spacingTop * x,
+                                                cy: yo + rectHeight - this.offsetFromEdge,
+                                                r: this.diameter / 2,
+                                          });
                                     }
                                     //left
                                     for(let x = 0; x < numberLeft - 1; x++) {
                                           if(x == 0 || x == (numberLeft - 2)) continue;
                                           this.#totalNumber++;
-                                          drawFillCircle(canvasCtx, xo + this.offsetFromEdge, yo + this.offsetFromEdge + spacingLeft * x, this.diameter / 2, 'M', 'red', 0.5);
+                                          let circle = this.DrawCircle({
+                                                cx: xo + this.offsetFromEdge,
+                                                cy: yo + this.offsetFromEdge + spacingLeft * x,
+                                                r: this.diameter / 2,
+                                          });
                                     }
                                     //right
                                     for(let x = 0; x < numberLeft - 1; x++) {
                                           if(x == 0 || x == (numberLeft - 2)) continue;
                                           this.#totalNumber++;
-                                          drawFillCircle(canvasCtx, xo + rectWidth - this.offsetFromEdge, yo + this.offsetFromEdge + spacingLeft * x, this.diameter / 2, 'M', 'red', 0.5);
+                                          let circle = this.DrawCircle({
+                                                cx: xo + rectWidth - this.offsetFromEdge,
+                                                cy: yo + this.offsetFromEdge + spacingLeft * x,
+                                                r: this.diameter / 2,
+                                          });
                                     }
 
                                     //Standoff measurements
                                     if(isFirstRow && isFirstColumn) {
                                           /*top*/
-                                          drawMeasurement_Verbose(canvasCtx, xo + this.offsetFromEdge, yo, spacingTop, 0, "T", roundNumber(spacingTop, 2), this.#textSize, COLOUR.DarkGrey, this.#lineWidth, this.#crossScale, 60, true, "B", false, canvasScale);
+                                          ///drawMeasurement_Verbose(canvasCtx, xo + this.offsetFromEdge, yo, spacingTop, 0, "T", roundNumber(spacingTop, 2), this.#textSize, COLOUR.DarkGrey, this.#lineWidth, this.#crossScale, 60, true, "B", false, canvasScale);
                                           /*left*/
-                                          drawMeasurement_Verbose(canvasCtx, xo, yo + this.offsetFromEdge, 0, spacingLeft, "L", roundNumber(spacingLeft, 2), this.#textSize, COLOUR.DarkGrey, this.#lineWidth, this.#crossScale, 60, false, "R", false, canvasScale);
+                                          ///drawMeasurement_Verbose(canvasCtx, xo, yo + this.offsetFromEdge, 0, spacingLeft, "L", roundNumber(spacingLeft, 2), this.#textSize, COLOUR.DarkGrey, this.#lineWidth, this.#crossScale, 60, false, "R", false, canvasScale);
                                     }
 
                                     xo += rectWidth_Initial + this.#gapBetweenX;
@@ -280,7 +323,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
       }
 
       hide() {
-            this.returnAllBorrowedFields();
+            //this.returnAllBorrowedFields();
             super.hide();
       }
 
@@ -291,7 +334,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
 
       onWindowResize(event) {
             super.onWindowResize(event);
-            this.#dragZoomCanvas.canvasWidth = this.container.getBoundingClientRect().width;
+            //this.#dragZoomCanvas.canvasWidth = this.container.getBoundingClientRect().width;
             this.updateFromFields();
       }
 }

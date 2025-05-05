@@ -12,7 +12,6 @@ class DragZoomSVG {
       #measurementOffset_Small = 10;
       #measurementOffset_Large = 50;
       #textOffset = 5;
-      #defaultStrokeWidth = 2;
       #holding = false;
       #allowPanning = true;
       #allowZoom = true;
@@ -29,26 +28,20 @@ class DragZoomSVG {
       #panZoomInstance;
       #addOverallMeasure = true;
       #totalPathArea = 0;
-      #allElements = [];
-      #allPathElements = [];
-      #outerPathElements = [];
-      #innerPathElements = [];
       #measurementElements = [];
       #areaElements = [];
       #shapeAreaPolygons = [];
       #scaleMeasurementsWithScale = false;
-      #scaleStrokeOnScroll = true;
-      #scaleFontOnScroll = false;
-      #defaultFontSize = 12;
       #convertShapesToPaths;
-      #splitCompoundPaths;
+
       /*
                         
       Fields            */
       #f_svg;
       #f_container;
-      #f_moveFunctionRef;
-      #f_mouseupFunctionRef;
+      #f_mouseMoveRef;
+      #f_mouseUpRef;
+      #f_mouseDownRef;
       #f_svgG;
       /*
                         
@@ -63,22 +56,28 @@ class DragZoomSVG {
       get totalPathLengths() {
             let totalPathLength = 0;
 
-            for(let i = 0; i < this.#allPathElements.length; i++) {
-                  totalPathLength += svg_getPathLength_mm(this.#allPathElements[i]);
+            let paths = this.allPathElements;
+            for(let i = 0; i < paths.length; i++) {
+                  totalPathLength += svg_getPathLength_mm(paths[i]);
             }
 
             return totalPathLength;
       }
-      get outerPathElements() {return this.#outerPathElements;}
-      get innerPathElements() {return this.#innerPathElements;}
+      get allPathElements() {return this.#f_svgG.querySelectorAll(".outerPath, .innerPath");}
+      get outerPathElements() {return this.#f_svgG.getElementsByClassName("outerPath");}
+      get innerPathElements() {return this.#f_svgG.getElementsByClassName("innerPath");}
       get allowPanning() {return this.#allowPanning;}
       get allowZoom() {return this.#allowZoom;}
       get relativeMouseXY() {return this.#relativeMouseXY;}
       get isHolding() {return this.#holding;}
-      get allPathElements() {return this.#allPathElements;}
+      get svgFile() {return this.#f_svg.outerHTML;}
+
       get unscaledSVGString() {
             let svgClone = this.svg.cloneNode(true);
-            svgClone.getElementById("mainGcreatedByT").setAttribute('transform', "matrix(" + svg_mmToPixel(1) + " 0 0 " + svg_mmToPixel(1) + " 0 0)");
+            let group = svgClone.getElementById("mainGcreatedByT");
+            if(group) {
+                  group.setAttribute('transform', `matrix(${svg_mmToPixel(1)} 0 0 ${svg_mmToPixel(1)} 0 0)`);
+            }
 
             return svgClone.outerHTML;
       }
@@ -91,37 +90,37 @@ class DragZoomSVG {
       /*
                         
       Start             */
-      constructor(svgWidth, svgHeight, svgText, parentToAppendTo, options = {
-            convertShapesToPaths: true,
-            splitCompoundPaths: true,
-            scaleStrokeOnScroll: true,
-            scaleFontOnScroll: true,
-            defaultStrokeWidth: 1,
-            defaultFontSize: 12
-      }) {
+      constructor(svgWidth = "calc(100%)", svgHeight = "500px", svgText = "", parentToAppendTo, options = {}) {
+            const defaultOptions = {
+                  convertShapesToPaths: true,
+                  splitCompoundPaths: true,
+                  scaleStrokeOnScroll: true,
+                  scaleFontOnScroll: true,
+                  defaultStrokeWidth: 1,
+                  defaultFontSize: 12
+            };
+
+            this.options = {...defaultOptions, ...options};
+
             let _this = this;
-            this.#convertShapesToPaths = options.convertShapesToPaths;
-            this.#splitCompoundPaths = options.splitCompoundPaths;
-            this.#scaleStrokeOnScroll = options.scaleStrokeOnScroll;
-            this.#defaultStrokeWidth = options.defaultStrokeWidth;
-            this.#scaleFontOnScroll = options.scaleFontOnScroll;
-            this.#defaultFontSize = options.defaultFontSize;
 
             this.#f_container = document.createElement("div");
-            this.#f_container.innerHTML += svgText || '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"></svg>';
+            this.#f_container.innerHTML = svgText || '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)"></g></svg>';
             this.#f_container.style = "display: block;float: left;outline:1px solid black;";
-            this.#f_container.style.cssText += "width:" + svgWidth + "px;height:" + svgHeight + "px;";
+            this.#f_container.style.cssText += "width:" + svgWidth + ";height:" + svgHeight + ";";
             this.#f_container.className = "svgContainerDiv";
             if(parentToAppendTo) parentToAppendTo.appendChild(this.#f_container);
 
             this.#f_svg = this.#f_container.querySelector("svg");
-            this.#f_svg.setAttribute("width", svgWidth);
-            this.#f_svg.setAttribute("height", svgHeight);
-            this.#f_svg.setAttribute("data-scaleStrokeOnScroll", this.#scaleStrokeOnScroll);
+            this.#f_svg.setAttribute("width", 'calc(100%)');
+            this.#f_svg.setAttribute("height", 'calc(100%)');
+            this.#f_svg.setAttribute("data-scaleStrokeOnScroll", this.options.scaleStrokeOnScroll);
             this.#f_svg.style.cssText += ";background-color:white;";
 
             this.#f_svgG = this.#f_svg.querySelector("#mainGcreatedByT");
+            //Add mainGcreatedByT Group if not already
             if(!this.#f_svgG) {
+                  console.log("creating new group");
                   this.#f_svgG = document.createElementNS('http://www.w3.org/2000/svg', "g");
                   this.#f_svgG.id = "mainGcreatedByT";
                   let numChildren = this.#f_svg.children.length;
@@ -131,8 +130,7 @@ class DragZoomSVG {
                   this.#f_svg.appendChild(this.#f_svgG);
             }
 
-
-
+            console.log(this.#f_svgG);
 
             this.#panZoomInstance = panzoom(this.#f_svgG, {
                   zoomSpeed: this.#scrollSpeed,
@@ -144,60 +142,65 @@ class DragZoomSVG {
                   }
             });
             this.#panZoomInstance.on('zoom', (e) => {
+                  console.log("zoom");
                   this.onZoom(e);
             });
 
+            //Fired when any transformation has happened
             this.#panZoomInstance.on('transform', (e) => {
                   this.onTransform(e);
-                  //console.log('Fired when any transformation has happened', e);
             });
 
-            this.#panZoomInstance.on('panstart', (e) => {
-                  //console.log('Fired when pan is just started ', e);
-            });
+            console.log(this.#panZoomInstance);
 
-            this.#panZoomInstance.on('pan', (e) => {
-                  //console.log('Fired when the `element` is being panned', e);
-            });
-
-            this.#panZoomInstance.on('panend', (e) => {
-                  //console.log('Fired when pan ended', e);
-            });
-
-            this.#panZoomInstance.on('zoom', (e) => {
-                  //console.log('Fired when `element` is zoomed', e);
-            });
-
-            this.#panZoomInstance.on('zoomend', (e) => {
-                  //console.log('Fired when zoom animation ended', e);
-            });
-
-
-            if(options.convertShapesToPaths) this.convertShapesToPaths();
-            if(options.splitCompoundPaths) this.splitCompoundPaths();
+            if(options.convertShapesToPaths) svg_convertShapesToPaths(this.#f_svgG);
+            if(options.splitCompoundPaths) svg_formatCompoundPaths(this.#f_svg);
 
             this.#scale = this.#panZoomInstance.getTransform().scale;
 
             this.initSVGStyles();
 
-            _this.#f_moveFunctionRef = function(e) {_this.onMouseMove(e);};//necessary for removeEventListener
-            _this.#f_mouseupFunctionRef = function(e) {_this.onMouseUp(e);};//necessary for removeEventListener
+            this.#f_mouseUpRef = (e) => this.onMouseUp(e);//necessary for removeEventListener
+            this.#f_mouseDownRef = (e) => this.onMouseDown(e);//necessary for removeEventListener
+            //~60fps
+            let lastMove = 0;
+            this.#f_mouseMoveRef = (e) => {
+                  if(Date.now() - lastMove > 16) {
+                        this.onMouseMove(e);
+                        lastMove = Date.now();
+                  }
+            };
 
-            window.addEventListener('mousemove', _this.#f_moveFunctionRef);
-            $(this.#f_svg).mousedown((e) => {this.onMouseDown(e);});
-            window.addEventListener('mouseup', _this.#f_mouseupFunctionRef);
+            this.#f_svg.addEventListener('mousedown', this.#f_mouseDownRef);
+            window.addEventListener('mousemove', this.#f_mouseMoveRef);
+            window.addEventListener('mouseup', this.#f_mouseUpRef);
 
             this.#f_container.onmouseover = (e) => this.onHoverEnter(e);
             this.#f_container.onmouseout = (e) => this.onHoverExit(e);
 
             setTimeout(() => {
-                  this.centerAndFitSVGContent(this.#f_svgG, this.svg, this.#panZoomInstance);
+                  this.centerAndFitSVGContent(this.svg, this.#f_svgG, this.#panZoomInstance);
             }, 1);
       }
 
-      centerAndFitSVGContent(svg, container, panzoomInstance, margin = 20) {
-            const bbox = svg.getBBox();
-            const containerRect = container.getBoundingClientRect();
+      /**
+       * 
+       * @param {*} svg 
+       * @param {*} elementToFit 
+       * @param {*} panzoomInstance 
+       * @param {*} margin 
+       * @description arguments are optional and will default otherwise
+       */
+      centerAndFitSVGContent(svg, elementToFit, panzoomInstance, margin = 20) {
+            //defaults:
+            if(svg == null) svg = this.svg;
+            if(elementToFit == null) elementToFit = this.#f_svgG;
+            if(panzoomInstance == null) panzoomInstance = this.#panZoomInstance;
+
+            const bbox = elementToFit.getBBox();
+            const containerRect = svg.getBoundingClientRect();
+
+            if(bbox.width <= 0 || bbox.height <= 0) return console.warn("elementToFix width || height <=0");
 
             const availableWidth = containerRect.width - margin * 2;
             const availableHeight = containerRect.height - margin * 2;
@@ -218,9 +221,14 @@ class DragZoomSVG {
       }
 
       Close() {
-            window.removeEventListener('mousemove', this.#f_moveFunctionRef);
-            window.removeEventListener('mouseup', this.#f_mouseupFunctionRef);
-            this.#panZoomInstance.dispose();
+            this.#f_svg.removeEventListener('mousedown', this.#f_mouseDownRef);
+            window.removeEventListener('mousemove', this.#f_mouseMoveRef);
+            window.removeEventListener('mouseup', this.#f_mouseUpRef);
+
+            this.#f_container.onmouseover = null;
+            this.#f_container.onmouseout = null;
+            this.#panZoomInstance?.dispose();
+            this.deleteElement(this.#f_container);
       }
 
       onHoverEnter(e) {
@@ -260,30 +268,26 @@ class DragZoomSVG {
       }
 
       onBeforeMouseDown(e) {
-            if(this.#allowPanning == false) return false;
+            if(!this.#allowPanning) return false;
             else return true;
       }
 
       onBeforeWheel(e) {
-            if(this.#allowZoom == false) return false;
+            if(!this.#allowZoom) return false;
             else return true;
       }
 
       onZoom() {
-            this.scale = this.#panZoomInstance.getTransform().scale;
-
-            this.#allElements = this.#f_svgG.querySelectorAll(this.supportedSVGTypes.map(tag => `${tag}`).join(", "));
-
-            for(let i = 0; i < this.#allElements.length; i++) {
-                  if(this.#scaleStrokeOnScroll) this.#allElements[i].style.cssText += 'stroke-width:' + (this.#defaultStrokeWidth / this.scale) + ";";
-                  if(this.#scaleFontOnScroll) this.#allElements[i].style.cssText += "font-size:" + (this.#defaultFontSize / this.scale) + "px;";
-            }
+            this.#scale = this.#panZoomInstance.getTransform().scale;
+            this.refreshElementStyles();
       }
 
-      convertShapesToPaths() {
-            svg_convertShapesToPaths(this.#f_svgG);
-
-            this.#allElements = this.#f_svgG.getElementsByTagName("path");
+      refreshElementStyles() {
+            let allElements = this.#f_svgG.querySelectorAll(this.supportedSVGTypes.join(", "));
+            allElements.forEach(el => {
+                  if(this.options.scaleStrokeOnScroll) el.style.strokeWidth = `${this.options.defaultStrokeWidth / this.#scale}`;
+                  if(this.options.scaleFontOnScroll) el.style.fontSize = `${this.options.defaultFontSize / this.#scale}px`;
+            });
       }
 
       async getTotalPathArea_m2() {
@@ -302,7 +306,6 @@ class DragZoomSVG {
 
                   element.addEventListener("mouseover", (e) => {
                         if(element.classList.contains("innerPath")) return;
-
                         element.classList.add("SVGHover");
                   });
                   element.addEventListener("mouseout", (e) => {
@@ -310,30 +313,9 @@ class DragZoomSVG {
                   });
                   element.addEventListener("mouseup", (e) => {
                         if(element.classList.contains("innerPath")) return;
-
                         element.classList.toggle("SVGSelected");
                   });
             });
-      }
-      /**
-       * @summary separates path elements with inner paths into separate outer/inner path elements
-       * @example letter 'B' will be split into 1 outer + 2 inner separate path elements 
-       * @satisfies only SVGPath elements, not shapes i.e. SVGRect
-       */
-      splitCompoundPaths() {
-            this.#allPathElements = [];
-            this.#outerPathElements = [];
-            this.#innerPathElements = [];
-
-            svg_formatCompoundPaths(this.#f_svg);
-
-            this.#allElements = this.#f_svgG.getElementsByTagName("path");
-            for(let i = 0; i < this.#allElements.length; i++) {
-                  if(this.#allElements[i].classList.contains("outerPath")) this.#outerPathElements.push(this.#allElements[i]);
-                  if(this.#allElements[i].classList.contains("innerPath")) this.#innerPathElements.push(this.#allElements[i]);
-
-                  this.#allPathElements.push(this.#allElements[i]);
-            }
       }
 
       updateMouseXY(e) {
@@ -347,18 +329,7 @@ class DragZoomSVG {
             };
       }
 
-      updateFromFields() {
-            this.#outerPathElements = [];
-            this.#innerPathElements = [];
-            this.#allPathElements = [];
-
-            [...this.#f_svgG.getElementsByTagName("path")].forEach(element => {
-
-                  if(element.classList.contains("outerPath")) this.#outerPathElements.push(element);
-                  if(element.classList.contains("innerPath")) this.#innerPathElements.push(element);
-                  this.#allPathElements.push(element);
-            });
-      }
+      updateFromFields() { }
 
       deleteElement(element) {
             deleteElement(element);

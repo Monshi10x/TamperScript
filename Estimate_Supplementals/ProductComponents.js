@@ -263,15 +263,15 @@ function partInfoTick() {
 				createNameBtn(partHeader, "partNameBtn", partDescriptionField, koPartName);
 			}
 
-			if(koPartDescription.includes("CODE [Automatic]")) {
-				let partText = koPart.PartNotes();
-				if(partText.includes("svg") && partHeader.querySelectorAll(".seeSVGButton").length == 0) {
-					let btn = createButton("SVG", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
-						let modalSVG = new ModalSVG("SVG Modal", 1, () => { }, partText, null, {convertShapesToPaths: false, splitCompoundPaths: false, defaultStrokeWidth: 2, scaleStrokeOnScroll: !partText.includes('data-scaleStrokeOnScroll="false"')});
-					}, partHeader);
-					btn.classList.add('seeSVGButton');
-				}
+			//if(koPartDescription.includes("CODE [Automatic]")) {
+			let partText = koPart.PartNotes();
+			if(partText.includes("svg") && partHeader.querySelectorAll(".seeSVGButton").length == 0) {
+				let btn = createButton("SVG", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
+					let modalSVG = new ModalSVG("SVG Modal", 1, () => { }, partText, null, {convertShapesToPaths: false, splitCompoundPaths: false, defaultStrokeWidth: 2, scaleStrokeOnScroll: !partText.includes('data-scaleStrokeOnScroll="false"')});
+				}, partHeader);
+				btn.classList.add('seeSVGButton');
 			}
+			//}
 
 			partPrice = koPartTotalPrice;
 

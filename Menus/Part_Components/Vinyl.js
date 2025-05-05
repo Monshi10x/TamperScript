@@ -8,6 +8,7 @@ class Vinyl extends Material {      /*
       }];
 
       #finalRollSize = new QWHD();
+      get DEBUG_SHOW() {return true;}
       /*
                         
       Fields            */
@@ -391,13 +392,11 @@ class Vinyl extends Material {      /*
 
             let dataEntries = [];
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.#dataForSubscribers.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
 
-                  subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
-
-                        dataEntries.push(dataEntry);
-                  });
+                  dataEntries.push(dataEntry);
             });
+
 
             for(let i = 0; i < dataEntries.length; i++) {
                   partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, dataEntries[i].QWHD.qty, dataEntries[i].QWHD.width, dataEntries[i].QWHD.height, partFullName, "", false);

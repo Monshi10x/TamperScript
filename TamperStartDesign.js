@@ -49,7 +49,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Mouse/ContextMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/Modal.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInput.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalPopOut.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalProductPopOut.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSetOrder.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInputText.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInputCheckbox.js

@@ -173,7 +173,7 @@ class UIContainer_Design {
                   self.onCallback();
                   self.modalIsOpen = false;
             };
-            this.#f_popOutModal = new ModalPopOut("Expanded View", cb, self.#f_container);
+            this.#f_popOutModal = new ModalProductPopOut("Expanded View", cb, self.#f_container);
             this.#f_popOutModal.shouldHideOnEnterKeyPress = false;
             this.#f_popOutModal.whenClosedReturnBorrowed = this.whenClosedReturnBorrowed;
 

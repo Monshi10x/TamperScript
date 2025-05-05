@@ -90,7 +90,7 @@ class ModalVinylJoins extends ModalWidthHeight {
       }
 
       Close() {
-            this.returnAllBorrowedFields();
+            //this.returnAllBorrowedFields();
             this.#dragZoomCanvas.Close();
       }
 
@@ -174,7 +174,7 @@ class ModalVinylJoins extends ModalWidthHeight {
       }
 
       hide() {
-            this.returnAllBorrowedFields();
+            //this.returnAllBorrowedFields();
             super.hide();
       }
 
