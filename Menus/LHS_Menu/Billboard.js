@@ -132,7 +132,7 @@ class BillboardMenu extends LHSMenuWindow {
 
             page.appendChild(infoContainer);
 
-            this.#dragZoomSVG = new DragZoomSVG(page.getBoundingClientRect().width / 2 + 50, this.height, '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"></svg>',
+            this.#dragZoomSVG = new DragZoomSVG(page.getBoundingClientRect().width / 2 + 50 + "px", this.height + "px", '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"></svg>',
                   page, {
                   convertShapesToPaths: false,
                   scaleStrokeOnScroll: false,

@@ -179,7 +179,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
 				break;
 			case "Lightbox Face - Opal Acrylic":
-				productDetails = this.#add(ProductDetails, "PRODUCT QTY", this.page1, []);
+				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "Acrylic Lightbox Face";
 

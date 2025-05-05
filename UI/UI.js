@@ -87,7 +87,7 @@ function createDivStyle3(overrideCssStyles, headingText, parentObjectToAppendTo)
      */
     let popOutBtn = createButton("\u274F", "display: block; float: right; width: 35px;height:30px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkBlue + ";", () => {
         setFieldDisabled(true, popOutBtn);
-        new ModalPopOut("Expanded View", () => {setFieldDisabled(false, popOutBtn);}, div);
+        new ModalProductPopOut("Expanded View", () => {setFieldDisabled(false, popOutBtn);}, div);
     }, div);
 
     div.appendChild(divContent);

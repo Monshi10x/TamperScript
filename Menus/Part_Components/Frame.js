@@ -265,9 +265,8 @@ class Frame {
       }
       get powdercoatingCost() {
             let [materialW, materialH, materialT] = this.frameDimensions.split("x");
-            let frameSurfaceArea = parseFloat(materialW) * parseFloat(materialH) * (this.getFrameLinearMm(true) * 0.001 + this.getFrameLinearMm(this.hasSecondSide) * 0.001);
-            return getPowdercoatCost(frameSurfaceArea, false);
-
+            let frameSurfaceArea = mmToM(parseFloat(materialW)) * mmToM(parseFloat(materialH)) * (mmToM(this.getFrameLinearMm(true)) + mmToM(this.getFrameLinearMm(this.hasSecondSide)));
+            return Powdercoat.cost(frameSurfaceArea, "Coat Only");
       }
       /*get powdercoatingRequired() {
             return this.l_powdercoatingCost[0].style.display == "block";
@@ -1056,8 +1055,8 @@ class Frame {
                               partIndex++;
                         }
                   }
+                  //Outsource - Powdercoating (ACE) (ea)
                   if(this.l_addPowdercoatingCkb[1].checked) {
-                        //Outsource - Powdercoating (ACE) (ea)
                         await AddPart("Outsource - Powdercoating (ACE) (ea)", productNo);
                         partIndex++;
                         await setPartQty(productNo, partIndex, 1);
@@ -1066,13 +1065,6 @@ class Frame {
                         await setPartDescription(productNo, partIndex, "[FRAME(s)] Powdercoating");
                         await savePart(productNo, partIndex);
 
-                        /* await AddPart(this.powdercoatingTotalEach == "Total" ? "Outsource - Powdercoating (ACE) (total)" : "Outsource - Powdercoating (ACE) (ea)", productNo);
-                         partIndex++;
-                         await setPartQty(productNo, partIndex, this.powdercoatingTotalEach == "Total" ? 1 : this.qty);
-                         await setPartVendorCostEa(productNo, partIndex, this.powdercoatingCost);
-                         await setPartMarkup(productNo, partIndex, this.powdercoatingMarkup);
-                         await setPartDescription(productNo, partIndex, "[FRAME(s)] Powdercoating");
-                         await savePart(productNo, partIndex);*/
                   }
                   if(this.twoPacRequired) {
                         await q_AddPart_Painting(productNo, partIndex, true, this.twoPacTotalEach == "Total" ? true : false, this.twoPacTotalEach == "Total" ? 1 : this.qty, this.twoPacLitres, this.twoPacColourMatchTime, this.twoPacNumberCoats, this.twoPacSetupTime, this.twoPacFlashTime, this.twoPacSprayTime, "[FRAME(s)] 2Pac Painting");

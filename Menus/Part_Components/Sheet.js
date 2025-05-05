@@ -504,11 +504,8 @@ class Sheet extends Material {
             Joins*/
             let f_container_joins = createDivStyle5(null, "Joins", this.container)[1];
 
-            this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 20px);margin-right:55%;height:40px;background-color:" + COLOUR.Orange + ";", () => {
-                  this.#visualiser = new ModalSheetJoins("Join Helper", 100, () => {
-                        this.UpdateFromChange();
-                  }, this);
 
+            this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 20px);margin-right:55%;height:40px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#visualiser.borrowFields(sheetFilterContainer[0], this.#sheetMaterial[0], this.#flip[0], this.#hasGrain[0], methodContainer, this.#f_foldSideContainer);
                   this.#visualiser.setFlippedField(this.#flip[1]);
                   this.#visualiser.setSheetSizeField(this.#sheetSize[1]);
@@ -520,6 +517,7 @@ class Sheet extends Material {
                   this.#visualiser.width = this.getQWH().width;
                   this.#visualiser.height = this.getQWH().height;
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
+                  this.#visualiser.show();
             }, f_container_joins, true);
 
             let methodContainer = createDivStyle4("width:calc(50% - 20px);", f_container_joins);
@@ -609,6 +607,12 @@ class Sheet extends Material {
             //this.setSheetSize("2440x1220", false);
             // this.setSheetThickness("3x0.21", false);
             //this.setSheetFinish("Primer", false);
+
+
+
+            this.#visualiser = new ModalSheetJoins("Join Helper", 100, () => {
+                  this.UpdateFromChange();
+            }, this);
 
             this.UpdateFromChange();
       }
@@ -1141,7 +1145,7 @@ class Sheet extends Material {
 
             for(let i = 0; i < this.#outputSizeTableData.length; i++) {
                   let [partQty, partWidth, partHeight, aaa, aab, aac, aad] = this.#outputSizeTableData[i];
-                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, "", false);
+                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, null, false, this.#visualiser.unscaledSVGString);
             }
 
             partIndex = await this.#guillotineProduction.Create(productNo, partIndex);

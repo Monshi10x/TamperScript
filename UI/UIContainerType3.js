@@ -64,7 +64,7 @@ class UIContainerType3 {
             this.#popOutBtn = createButton("\u274F", "display: block; float: right; width: " + this.#popOutBtn_Width + "px;height:" + this.#popOutBtn_Height + "px; border:none;padding:2px; color:white;min-height: 20px; margin: 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.DarkBlue + ";", () => {
                   setFieldDisabled(true, this.#popOutBtn);
                   this.onPopOut();
-                  this.#popOutModal = new ModalPopOut("Expanded View", () => {
+                  this.#popOutModal = new ModalProductPopOut("Expanded View", () => {
                         setFieldDisabled(false, this.#popOutBtn);
                         this.onPopOutLeave();
                         this.callbackOverridable();

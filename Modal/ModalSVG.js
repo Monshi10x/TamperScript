@@ -41,6 +41,7 @@ class ModalSVG extends Modal {
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
+      get svgFile() {return this.#dragZoomSVG.svg.outerHTML;}
 
       constructor(headerText, incrementAmount, callback, svgText, callerObject, options = {
             convertShapesToPaths: true,
@@ -55,7 +56,7 @@ class ModalSVG extends Modal {
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
 
-            this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width, 500, svgText, this.getBodyElement(), options);
+            this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width + "px", "500px", svgText, this.getBodyElement(), options);
             this.#dragZoomSVG.onMouseUpdate = this.onMouseUpdate;
 
             this.#statsContainer = createDivStyle5(null, "Stats", this.getBodyElement())[1];
@@ -134,25 +135,13 @@ class ModalSVG extends Modal {
                               if(groups[i].id == "pathGroup") {
                                     pathGroup = groups[i].outerHTML;
                               }
-                              console.log(groups[i].id);
                               if(["overallMeasures", "itemMeasures", "shapeAreas", "partAreas", "shapeBoundingRects", "itemPoints"].includes(groups[i].id)) {
                                     groups[i].remove();
                                     groups.splice(i, 1);
                               }
                         }
 
-                        /* for(let i = 0; i < groups.length; i++) {
-                               if(groups[i].id == "pathGroup") {
-                                     pathGroup = groups[i].outerHTML;
-                               }
-                               if(["overallMeasures", "itemMeasures", "shapeAreas", "partAreas", "shapeBoundingRects"].includes(groups[i].id)) deleteElement(groups[i]);
-                         }*/
-
-                        //for(let i = 0; i < groups.length; i++) {
-
-                        //}
-
-                        callerObject.svgFile = this.#dragZoomSVG.svg.outerHTML;//.replaceAll("</svg>", pathGroup + "</svg>").replaceAll("\n", "").replaceAll("  ", "");
+                        callerObject.svgFile = this.#dragZoomSVG.svg.outerHTML;
                         callerObject.onFileChange();
                   }
                   this.hide();
@@ -183,7 +172,7 @@ class ModalSVG extends Modal {
 
       hide() {
             this.#dragZoomSVG.Close();
-            this.returnAllBorrowedFields();
+            //this.returnAllBorrowedFields();
             super.hide();
       }
 
@@ -201,7 +190,7 @@ class ModalSVG extends Modal {
             let newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
             newGroup.id = "overallMeasures";
 
-            //if(!pathGroup) return console.warn("no pathGroup exists");
+            if(!pathGroup) return console.warn("no pathGroup exists");
 
             let measures = new TSVGMeasurement(newGroup, {
                   target: pathGroup,
@@ -380,27 +369,15 @@ class ModalSVG extends Modal {
       }
 
       addShapeBoundingRect() {
-            console.log("in addShapeBoundingRect");
-
             let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
             let pathGroup = this.#dragZoomSVG.svg.querySelector("#pathGroup");
             let svgScale = this.#dragZoomSVG.scale;
 
             let outerPathElements = this.#dragZoomSVG.outerPathElements;
-            //let innerPathElements = this.#dragZoomSVG.innerPathElements;
 
             for(let i = 0; i < outerPathElements.length; i++) {
-
                   let element = outerPathElements[i];
                   let clientRect = element.getBBox();
-
-                  //in mm
-                  let scaledBox = {
-                        width: clientRect.width,
-                        height: clientRect.height,
-                        x: clientRect.x,
-                        y: clientRect.y
-                  };
 
                   let newGroup = mainGroup.querySelector("#shapeBoundingRects");
 
@@ -410,12 +387,11 @@ class ModalSVG extends Modal {
                         mainGroup.appendChild(newGroup);
                   }
 
-                  // new TSVGRect(newGroup, "stroke-width:" + 1 / svgScale + ";stroke:black;fill:#ddd;opacity:0.4", );
                   let boundingRect = new TSVGRectangle(newGroup, {
-                        x: scaledBox.x,
-                        y: scaledBox.y,
-                        width: scaledBox.width,
-                        height: scaledBox.height,
+                        x: clientRect.x,
+                        y: clientRect.y,
+                        width: clientRect.width,
+                        height: clientRect.height,
                         strokeWidth: 1 / svgScale,
                         stroke: "black",
                         fill: "#ddd",
@@ -425,7 +401,6 @@ class ModalSVG extends Modal {
       }
 
       showShapeBoundingRect() {
-
             let elements = this.#dragZoomSVG.svg.querySelector("#shapeBoundingRects");
             if(elements) {
                   $(elements).show();
@@ -554,7 +529,6 @@ class ModalSVG extends Modal {
 
                         if(state == "Mouse Down") {
                               this.selectionRect_mouseDownPos = this.#dragZoomSVG.relativeMouseXY;
-                              // this.selectionRect = new TSVGRect(this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT"), "stroke-width:" + (1 / this.#dragZoomSVG.scale), this.selectionRect_mouseDownPos.x, this.selectionRect_mouseDownPos.y, 0, 0);
 
                               this.selectionRect = new TSVGRectangle(this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT"), {
                                     x: this.selectionRect_mouseDownPos.x,

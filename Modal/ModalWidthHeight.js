@@ -17,9 +17,7 @@ class ModalWidthHeight extends Modal {
             this.#widthField[1].focus();
       }
 
-      updateFromFields() {
-
-      }
+      updateFromFields() { }
 
       get width() {return parseFloat(this.#widthField[1].value);}
       set width(val) {$(this.#widthField[1]).val(val).change();}
