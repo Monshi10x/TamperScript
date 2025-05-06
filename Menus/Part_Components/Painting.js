@@ -22,7 +22,6 @@ class Painting extends Material {
       #f_inheritedSizeTable;
       #f_outputSizeTable;
       #f_setupTime;
-
       #f_numberCoats;
       #f_flashTime;
       #f_perCoatTime;
