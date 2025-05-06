@@ -12,7 +12,10 @@ class Painting extends Material {
       #defaultColourMatchTime = new UOM(0, "minutes");
       #defaultLitres = new UOM(0.5, "litres");
       #defaultUseLitresFormula = true;
-      #defaultLitresPerSquareMetrePerCoat = 0.3;
+      /**
+       * Based on Aidan @ 550-600ml/m2 on 10-20mm board letters
+       */
+      #defaultLitresPerSquareMetrePerCoat = new UOM(0.3, "litres");
       /*
                         
       Fields            */
@@ -86,7 +89,7 @@ class Painting extends Material {
                         setFieldDisabled(false, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
                   } else {
                         setFieldDisabled(true, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
-                        $(this.#f_litresPerSquareMetrePerCoat[1]).val(this.#defaultLitresPerSquareMetrePerCoat).change();
+                        $(this.#f_litresPerSquareMetrePerCoat[1]).val(this.#defaultLitresPerSquareMetrePerCoat.as("litres")).change();
                   }
                   this.UpdateFromChange();
             }, f_formulaContainer);
@@ -104,7 +107,7 @@ class Painting extends Material {
             this.#f_areaToPaint = createInput_Infield("Area To Paint", 0, "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "m2"});
             createText("X", "width:30px;height:50px;font-size:32px;color:blue;", f_totalContainer);
             setFieldDisabled(true, this.#f_areaToPaint[1], this.#f_areaToPaint[0]);
-            this.#f_litresPerSquareMetrePerCoat = createInput_Infield("Litres Per m2 Per Coat", this.#defaultLitresPerSquareMetrePerCoat, "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "L/m2"});
+            this.#f_litresPerSquareMetrePerCoat = createInput_Infield("Litres Per m2 Per Coat", this.#defaultLitresPerSquareMetrePerCoat.as("litres"), "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "L/m2"});
             createText("=", "width:30px;height:50px;font-size:32px;color:blue;", f_totalContainer);
             setFieldDisabled(true, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
 
