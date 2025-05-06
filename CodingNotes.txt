@@ -470,7 +470,7 @@ class Size extends SubMenu {
 		return false;
 	};
 
-	getQWH(SubscriberID) {
+	getQWHD(SubscriberID) {
 		let obj = {
 			Qty: 0,
 			Width: 0,

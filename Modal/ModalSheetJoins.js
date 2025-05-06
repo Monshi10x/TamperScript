@@ -84,9 +84,9 @@ class ModalSheetJoins extends ModalWidthHeight {
                   this.#foldFields[3]];
       }
 
-      #depth;
-      setDepth(field) {this.#depth = field;}
-      get depth() {return this.#depth;}
+      #foldDepth;
+      setFoldDepth(field) {this.#foldDepth = field;}
+      get foldDepth() {return this.#foldDepth;}
 
       get svgFile() {return this.dragZoomSVG.svgFile;}
       get unscaledSVGString() {return this.dragZoomSVG.unscaledSVGString;}
@@ -138,9 +138,7 @@ class ModalSheetJoins extends ModalWidthHeight {
 
             this.modalOpaqueBackground.style.zIndex = "1004";
 
-            if(!this.dragZoomSVG) {
-
-            } else {
+            if(this.dragZoomSVG) {
                   setTimeout(() => {
                         this.dragZoomSVG.centerAndFitSVGContent();
                   }, 1);
@@ -154,10 +152,9 @@ class ModalSheetJoins extends ModalWidthHeight {
                   this.draw();
                   this.dragZoomSVG.updateFromFields();
             }
-
       }
 
-      rects = [];
+      shapes = [];
       measurements = [];
       DrawRect(params) {
             let rect = new TSVGRectangle(this.dragZoomSVG.svgG, {
@@ -174,16 +171,28 @@ class ModalSheetJoins extends ModalWidthHeight {
                   ...params
             });
 
-            this.rects.push(rect);
+            this.shapes.push(rect);
 
             return rect.rect;
       }
 
+      DrawLine(params) {
+            let line = new TSVGLine(this.dragZoomSVG.svgG, {
+                  stroke: 'black',
+                  'stroke-width': 2 / this.dragZoomSVG.scale,
+                  ...params
+            });
+
+            this.shapes.push(line);
+
+            return line.line;
+      }
+
       draw() {
-            for(let r = this.rects.length - 1; r >= 0; r--) {
-                  this.rects[r].Delete();
+            for(let r = this.shapes.length - 1; r >= 0; r--) {
+                  this.shapes[r].Delete();
             }
-            this.rects = [];
+            this.shapes = [];
 
             for(let r = this.measurements.length - 1; r >= 0; r--) {
                   this.measurements[r].Delete();
@@ -206,6 +215,8 @@ class ModalSheetJoins extends ModalWidthHeight {
                               for(let c = 0; c < matrixSize[r].length; c++) {//per matrix column i.e. size [w, h]
                                     isFirstColumn = c == 0;
                                     isLastColumn = c == matrixSize[r].length - 1;
+
+                                    console.log(matrixSize[r]);
 
                                     let [rectWidth, rectHeight] = matrixSize[r][c];
 
@@ -283,38 +294,63 @@ class ModalSheetJoins extends ModalWidthHeight {
 
                                     if(this.isFolded) {
                                           console.log(this.folds);
+                                          console.log(this.foldDepth);
                                           //top
                                           if(this.folds[0].checked && isFirstRow) {
-                                                ///drawLine_WH(canvasCtx, xo, yo + this.depth, rectWidth, 0, COLOUR.Black, 1, 1, {stroke: [10, 10]});
+                                                this.DrawLine({
+                                                      x1: xo,
+                                                      y1: yo + this.foldDepth,
+                                                      x2: xo + rectWidth,
+                                                      y2: yo + this.foldDepth
+                                                });
+                                                ///drawLine_WH(canvasCtx, xo, yo + this.foldDepth, rectWidth, 0, COLOUR.Black, 1, 1, {stroke: [10, 10]});
                                           }
                                           //left
                                           if(this.folds[1].checked && isFirstColumn) {
-                                                ///drawLine_WH(canvasCtx, xo + this.depth, yo, 0, rectHeight, COLOUR.Black, 1, 1, {stroke: [10, 10]});
+                                                this.DrawLine({
+                                                      x1: xo + this.foldDepth,
+                                                      y1: yo,
+                                                      x2: xo + this.foldDepth,
+                                                      y2: yo + rectHeight
+                                                });
+                                                ///drawLine_WH(canvasCtx, xo + this.foldDepth, yo, 0, rectHeight, COLOUR.Black, 1, 1, {stroke: [10, 10]});
                                           }
                                           //right
                                           if(this.folds[2].checked && isLastColumn) {
-                                                ///drawLine_WH(canvasCtx, xo + rectWidth - this.depth, yo, 0, rectHeight, COLOUR.Black, 1, 1, {stroke: [10, 10]});
+                                                this.DrawLine({
+                                                      x1: xo + rectWidth - this.foldDepth,
+                                                      y1: yo,
+                                                      x2: xo + rectWidth - this.foldDepth,
+                                                      y2: yo + rectHeight
+                                                });
+                                                ///drawLine_WH(canvasCtx, xo + rectWidth - this.foldDepth, yo, 0, rectHeight, COLOUR.Black, 1, 1, {stroke: [10, 10]});
                                           }
                                           //bottom
                                           if(this.folds[3].checked && isLastRow) {
-                                                ///drawLine_WH(canvasCtx, xo, yo + rectHeight - this.depth, rectWidth, 0, COLOUR.Black, 1, 1, {stroke: [10, 10]});
+                                                this.DrawLine({
+                                                      x1: xo,
+                                                      y1: yo + rectHeight - this.foldDepth,
+                                                      x2: xo + rectWidth,
+                                                      y2: yo + rectHeight - this.foldDepth
+                                                });
+                                                ///drawLine_WH(canvasCtx, xo, yo + rectHeight - this.foldDepth, rectWidth, 0, COLOUR.Black, 1, 1, {stroke: [10, 10]});
                                           }
 
                                           //top/Left corner
                                           if(this.folds[0].checked && this.folds[1].checked && isFirstRow && isFirstColumn) {
-                                                ///drawFillRect(canvasCtx, xo - 1, yo - 1, this.depth + 2, this.#depth + 2, "TL", COLOUR.White, 1);
+                                                ///drawFillRect(canvasCtx, xo - 1, yo - 1, this.foldDepth + 2, this.#foldDepth + 2, "TL", COLOUR.White, 1);
                                           }
                                           //top/right corner
                                           if(this.folds[0].checked && this.folds[2].checked && isFirstRow && isLastColumn) {
-                                                ///drawFillRect(canvasCtx, xo + rectWidth + 1, yo - 1, this.depth + 2, this.#depth + 2, "TR", COLOUR.White, 1);
+                                                ///drawFillRect(canvasCtx, xo + rectWidth + 1, yo - 1, this.foldDepth + 2, this.#foldDepth + 2, "TR", COLOUR.White, 1);
                                           }
                                           //bottom/left corner
                                           if(this.folds[3].checked && this.folds[1].checked && isLastRow && isFirstColumn) {
-                                                ///drawFillRect(canvasCtx, xo - 1, yo + rectHeight - this.depth - 1, this.depth + 2, this.#depth + 2, "TL", COLOUR.White, 1);
+                                                ///drawFillRect(canvasCtx, xo - 1, yo + rectHeight - this.foldDepth - 1, this.foldDepth + 2, this.#foldDepth + 2, "TL", COLOUR.White, 1);
                                           }
                                           //bottom/right corner
                                           if(this.folds[3].checked && this.folds[2].checked && isLastRow && isLastColumn) {
-                                                ///drawFillRect(canvasCtx, xo + rectWidth + 1, yo + rectHeight - this.depth - 1, this.depth + 2, this.#depth + 2, "TR", COLOUR.White, 1);
+                                                ///drawFillRect(canvasCtx, xo + rectWidth + 1, yo + rectHeight - this.foldDepth - 1, this.foldDepth + 2, this.#foldDepth + 2, "TR", COLOUR.White, 1);
                                           }
                                     }
 

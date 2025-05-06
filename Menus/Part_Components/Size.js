@@ -268,8 +268,8 @@ class Size extends SubscriptionManager {
             this.#dataForSubscribers = [];
             this.#matrixSizes = [];
 
-            this.#dataForSubscribers.push({QWHD: this.getQWH(), matrixSizes: this.#matrixSizes});
-            this.#matrixSizes.push([[[this.getQWH().width, this.getQWH().height, this.getQWH().depth]]]);
+            this.#dataForSubscribers.push({QWHD: this.getQWHD(), matrixSizes: this.#matrixSizes});
+            this.#matrixSizes.push([[[this.getQWHD().width, this.getQWHD().height, this.getQWHD().depth]]]);
 
             this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
@@ -277,7 +277,7 @@ class Size extends SubscriptionManager {
             };
       }
 
-      getQWH() {
+      getQWHD() {
             return new QWHD(this.qty, this.width, this.height, this.depth);
       }
 
@@ -320,7 +320,7 @@ class Size extends SubscriptionManager {
       }
 
       Description() {
-            let qwh = this.getQWH();
+            let qwh = this.getQWHD();
             if(this.#includeSizeInDescription) return "x" + qwh.qty + " @ " + qwh.width + "mmW x " + qwh.height + "mmH";
             return "";
       }

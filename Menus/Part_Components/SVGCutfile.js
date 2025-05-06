@@ -252,7 +252,7 @@ class SVGCutfile extends SubscriptionManager {
                   boundingRectAreas: zeroIfNaNNullBlank(this.#totalBoundingRectAreas),
                   paintedArea: zeroIfNaNNullBlank(this.#shapeAreas),
                   pathQty: this.getNumberOfShapes(),
-                  QWHD: this.getQWH()
+                  QWHD: this.getQWHD()
             });
 
             this.DATA_FOR_SUBSCRIBERS = {
@@ -266,7 +266,7 @@ class SVGCutfile extends SubscriptionManager {
             return svg_getPathQty(this.#f_svgFile);
       }
 
-      getQWH() {
+      getQWHD() {
             let qty = zeroIfNaNNullBlank(this.qty);
             let width = zeroIfNaNNullBlank(this.#f_width[1].value);
             let height = zeroIfNaNNullBlank(this.#f_height[1].value);

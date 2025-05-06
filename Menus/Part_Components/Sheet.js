@@ -512,10 +512,10 @@ class Sheet extends Material {
                   this.#visualiser.setHasGrainField(this.#hasGrain[1]);
                   this.#visualiser.setGrainDirectionField(this.#grainDirection[1]);
                   this.#visualiser.setFoldFields(this.#foldedTop[1], this.#foldedLeft[1], this.#foldedRight[1], this.#foldedBottom[1]);
-                  this.#visualiser.setDepth(this.getQWH().depth);
+                  this.#visualiser.setFoldDepth(this.getQWHD().depth);
                   this.#visualiser.setIsFoldedField(this.#isFolded[1]);
-                  this.#visualiser.width = this.getQWH().width;
-                  this.#visualiser.height = this.getQWH().height;
+                  this.#visualiser.width = this.getQWHD().width;
+                  this.#visualiser.height = this.getQWHD().height;
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
                   this.#visualiser.show();
             }, f_container_joins, true);
@@ -772,19 +772,20 @@ class Sheet extends Material {
                         let w = uniqueSizes[u].width;
                         let h = uniqueSizes[u].height;
                         let q = uniqueSizes[u].qty;
+                        let d = uniqueSizes[u].depth;
                         let qty = q * this.qty;
 
                         let cutsEach = Sheet.getNumberOfGuillotineCuts(w, h, sheetSizeWidth, sheetSizeHeight);
                         let cutsTotal = cutsEach * qty;
 
                         this.#totalPerimeter = roundNumber((w * 2 + h * 2) * qty, 2);
-                        let options = this.createCuttingOptions(w, h, sheetSizeWidth, sheetSizeHeight, currentMaterial);
+                        let options = this.createCuttingOptions(w, h, d, sheetSizeWidth, sheetSizeHeight, currentMaterial);
 
                         let cuttingTypeDropDown = createDropdown_Infield("Panel Cutting Type", 0, ";width:-webkit-fill-available;", options, () => {
                               this.UpdateOutputTable();
                         }, null);
 
-                        this.#dataForSubscribers.push({QWHD: new QWHD(qty, w, h), matrixSizes: this.#matrixSizes, paintedArea: mmToM(width) * mmToM(height) * qty});
+                        this.#dataForSubscribers.push({QWHD: new QWHD(qty, w, h, d), matrixSizes: this.#matrixSizes, paintedArea: mmToM(width) * mmToM(height) * qty});
 
                         this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[0], cutsTotal, this.#totalPerimeter);
                         this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[1], cutsTotal, this.#totalPerimeter]);
@@ -910,26 +911,27 @@ class Sheet extends Material {
                   let foldedLeft = this.#foldedLeft[1].checked;
                   let foldedRight = this.#foldedRight[1].checked;
                   let foldedBottom = this.#foldedBottom[1].checked;
+                  TODO("Add fold perimeter");
                   if(foldedTop) {
-                        foldPerimeter += this.width;
+                        //foldPerimeter += this.width;
                   } if(foldedLeft) {
-                        foldPerimeter += this.height;
+                        //foldPerimeter += this.height;
                   } if(foldedRight) {
-                        foldPerimeter += this.height;
+                        //foldPerimeter += this.height;
                   } if(foldedBottom) {
-                        foldPerimeter += this.width;
+                        //foldPerimeter += this.width;
                   }
 
-                  for(let i = 0; i < this.matrixSizes.length; i++) {
-                        let numberRows = this.matrixSizes[i].length;
-                        let numberColumns = this.matrixSizes[i][0].length;
+                  for(let i = 0; i < this.#matrixSizes.length; i++) {
+                        let numberRows = this.#matrixSizes[i].length;
+                        let numberColumns = this.#matrixSizes[i][0].length;
                         numberShapes += foldedTop ? numberColumns : 0;
                         numberShapes += foldedLeft ? numberRows : 0;
                         numberShapes += foldedRight ? numberRows : 0;
                         numberShapes += foldedBottom ? numberColumns : 0;
                   }
 
-                  this.#router.addRunRow(foldPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", profile: "Groove", quality: "Good Quality", speed: null});
+                  this.#router.addRunRow(foldPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", thickness: "3mm", profile: "Groove", quality: "Good Quality", speed: null});
                   TODO("Laser folding");
             }
             if(this.#totalRouterNumberOfShapes > 1) {
@@ -989,11 +991,11 @@ class Sheet extends Material {
             }
       };
 
-      createCuttingOptions = (width, height, sheetWidth, sheetHeight, material) => {
+      createCuttingOptions = (width, height, foldDepth, sheetWidth, sheetHeight, material) => {
             let returnArray = [];
-            let sheetIsFolded = this.#isFolded[1].checked && this.depth > 0;
+            let sheetIsFolded = this.#isFolded[1].checked && foldDepth > 0;
             let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet" && !sheetIsFolded;
-            let canUseFactoryEdge = this.#materialsWithUsableFactoryEdge.includes(material);
+            let canUseFactoryEdge = this.#materialsWithUsableFactoryEdge.includes(material) && !sheetIsFolded;
             let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material) && !sheetIsFolded;
             let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material);
             let canLaserSheet = Sheet.canLaserSheet(width, height, sheetWidth, sheetHeight, material);
@@ -1022,7 +1024,7 @@ class Sheet extends Material {
 
       /**
        * 
-       * @param {*} machine = "router" || "laser" || "guillotine"
+       * @param {*} machine "router" || "laser" || "guillotine"
        */
       setCuttingMachine(machine = "router") {
             switch(machine) {

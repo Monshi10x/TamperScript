@@ -76,8 +76,8 @@ class Production extends SubMenu {
 		this.#eyeletsHelper;
 		this.#eyeletsHelperBtn = createButton("Helper", "width:100px;display:none;margin:5px;border-width:1px;min-height:40px;", () => {
 			this.#eyeletsHelper = new ModalStandoffHelper("Eyelet Helper", 100, () => {this.#eyeletsQty[1].value = this.#eyeletsHelper.qty;});
-			this.#eyeletsHelper.width = this.getQWH().width;
-			this.#eyeletsHelper.height = this.getQWH().height;
+			this.#eyeletsHelper.width = this.getQWHD().width;
+			this.#eyeletsHelper.height = this.getQWHD().height;
 			this.#eyeletsHelper.value_numberOnSide = this.#eyeletsHelper.calculatedQtyPerSide(this.#eyeletsHelper.height);
 			this.#eyeletsHelper.value_numberOnTop = this.#eyeletsHelper.calculatedQtyPerSide(this.#eyeletsHelper.width);
 			this.#eyeletsHelper.updateFromFields();
@@ -100,8 +100,8 @@ class Production extends SubMenu {
 		this.#standOffHelper;
 		this.#standOffHelperBtn = createButton("Helper", "width:100px;display:none;margin:5px;border-width:1px;min-height:40px;", () => {
 			this.#standOffHelper = new ModalStandoffHelper("Standoff Helper", 100, () => {this.#standOffQty[1].value = this.#standOffHelper.qty;});
-			this.#standOffHelper.width = this.getQWH().width;
-			this.#standOffHelper.height = this.getQWH().height;
+			this.#standOffHelper.width = this.getQWHD().width;
+			this.#standOffHelper.height = this.getQWHD().height;
 			this.#standOffHelper.value_numberOnSide = this.#standOffHelper.calculatedQtyPerSide(this.#standOffHelper.height);
 			this.#standOffHelper.value_numberOnTop = this.#standOffHelper.calculatedQtyPerSide(this.#standOffHelper.width);
 			this.#standOffHelper.updateFromFields();
@@ -156,7 +156,7 @@ class Production extends SubMenu {
 		this.sizeClass.addSubscriberToRows2(this, ...rowIDs);
 	};
 
-	getQWH() {
+	getQWHD() {
 		for(let i = 0; i < this.subscriptions.length; i++) {
 			if(this.subscriptions[i].qty && this.subscriptions[i].width && this.subscriptions[i].height) {
 				return new QWHD(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);

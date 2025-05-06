@@ -328,17 +328,18 @@ function uniqueSizeArrayWithOccurenceCount(array) {
     for(let i = 0; i < array.length; i++) {
         let itemWidth = array[i][0];
         let itemHeight = array[i][1];
+        let itemDepth = array[i][1];
         if(i == 0) {
-            returnArray.push(new QWHD(1, itemWidth, itemHeight));
+            returnArray.push(new QWHD(1, itemWidth, itemHeight, itemDepth));
             continue;
         }
         for(let j = 0; j < returnArray.length; j++) {
-            if(returnArray[j].width == itemWidth && returnArray[j].height == itemHeight) {
+            if(returnArray[j].width == itemWidth && returnArray[j].height == itemHeight && returnArray[j].depth == itemDepth) {
                 returnArray[j].qty += 1;
                 break;
             }
             if(j == returnArray.length - 1) {
-                returnArray.push(new QWHD(1, itemWidth, itemHeight));
+                returnArray.push(new QWHD(1, itemWidth, itemHeight, itemDepth));
                 break;
             }
         }
@@ -536,18 +537,23 @@ function catchNull(value, valueIfNull) {
     else return value;
 }
 
-function IFELSE(expression, valueIf, valueElse) {
-    if(expression) {
-        return valueIf;
+function IFELSE(expression, valueIfTrue, valueIfFalse) {
+    if(expression == true) {
+        return valueIfTrue;
     } else {
-        return valueElse;
+        return valueIfFalse;
     }
 }
-function IFELSEF(expression, functionIf, functionElse) {
+/**
+ * @param {*} expression 
+ * @param {*} functionIf - run function if true
+ * @param {*} functionElse - fun function if false
+ */
+function IFELSEF(expression, functionIfTrue, functionIfFalse) {
     if(expression) {
-        functionIf();
+        functionIfTrue();
     } else {
-        functionElse();
+        functionIfFalse();
     }
 }
 

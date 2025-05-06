@@ -67,7 +67,7 @@ class Laser extends SubMenu {
             this.Update();
       }
 
-      getQWH() {
+      getQWHD() {
             for(let i = 0; i < this.subscriptions.length; i++) {
                   if(this.subscriptions[i].Type.toLowerCase().includes("size")) {
                         return new QWHD(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);

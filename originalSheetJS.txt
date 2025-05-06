@@ -210,8 +210,8 @@ class Sheet extends Material {
                   this.#visualiser.borrowFields(...this.#filterContainersOrdered, this.#flip[0], methodContainer);
                   this.#visualiser.setFlippedField(this.#flip[1]);
                   this.#visualiser.setSheetSizeField(this.#sheetSize[1]);
-                  this.#visualiser.width = this.getQWH().width;
-                  this.#visualiser.height = this.getQWH().height;
+                  this.#visualiser.width = this.getQWHD().width;
+                  this.#visualiser.height = this.getQWHD().height;
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
             }, this.container, true);
 

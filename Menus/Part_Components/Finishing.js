@@ -119,8 +119,8 @@ class Finishing extends Material {
                   this.#standOffHelper.setHorizontalSpacingField(this.#standoff_horizontalSpacingField[1]);
                   this.#standOffHelper.setVerticalSpacingField(this.#standoff_verticalSpacingField[1]);
                   this.#standOffHelper.setSpacingAllowanceField(this.#standoff_spacingAllowanceField[1]);
-                  this.#standOffHelper.width = this.getQWH().width;
-                  this.#standOffHelper.height = this.getQWH().height;
+                  this.#standOffHelper.width = this.getQWHD().width;
+                  this.#standOffHelper.height = this.getQWHD().height;
 
                   let matrixSizeArrays = [];
                   this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
@@ -170,8 +170,8 @@ class Finishing extends Material {
                   this.#eyeletsHelper.setHorizontalSpacingField(this.#eyelets_horizontalSpacingField[1]);
                   this.#eyeletsHelper.setVerticalSpacingField(this.#eyelets_verticalSpacingField[1]);
                   this.#eyeletsHelper.setSpacingAllowanceField(this.#eyelets_spacingAllowanceField[1]);
-                  this.#eyeletsHelper.width = this.getQWH().width;
-                  this.#eyeletsHelper.height = this.getQWH().height;
+                  this.#eyeletsHelper.width = this.getQWHD().width;
+                  this.#eyeletsHelper.height = this.getQWHD().height;
 
                   let matrixSizeArrays = [];
                   for(let i = 0; i < this.INHERITED_DATA.length; i++) {

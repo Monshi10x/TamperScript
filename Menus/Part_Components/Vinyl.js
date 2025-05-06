@@ -132,8 +132,8 @@ class Vinyl extends Material {      /*
                   this.#f_visualiser.setJoinOrientationField(this.#f_joinOrientation[1]);
                   this.#f_visualiser.setRollWidthField(this.#f_rollWidth[1]);
                   this.#f_visualiser.setJoinOverlapField(this.#f_joinOverlap[1]);
-                  this.#f_visualiser.width = this.getQWH().width;
-                  this.#f_visualiser.height = this.getQWH().height;
+                  this.#f_visualiser.width = this.getQWHD().width;
+                  this.#f_visualiser.height = this.getQWHD().height;
 
                   let matrixSizeArrays = [];
                   this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
@@ -393,11 +393,10 @@ class Vinyl extends Material {      /*
             let dataEntries = [];
 
             this.#dataForSubscribers.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
-
                   dataEntries.push(dataEntry);
             });
 
-
+            //Must be done in stages because await doesnt work with foreach
             for(let i = 0; i < dataEntries.length; i++) {
                   partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, dataEntries[i].QWHD.qty, dataEntries[i].QWHD.width, dataEntries[i].QWHD.height, partFullName, "", false);
             }

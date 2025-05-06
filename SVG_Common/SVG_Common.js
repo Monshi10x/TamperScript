@@ -1343,8 +1343,8 @@ class TSVGLine {
       constructor(parentToAppendTo, options = {}) {
             this.parentToAppendTo = parentToAppendTo;
             this.options = {
-                  x: 0,
-                  y: 0,
+                  x1: 0,
+                  y1: 0,
                   x2: 100,
                   y2: 100,
                   stroke: 'black',

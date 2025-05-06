@@ -9,7 +9,6 @@ class Material extends SubscriptionManager {
       #UNIQUEID = generateUniqueID();
       #backgroundColor = COLOUR.Black;
       #textColor = COLOUR.White;
-      #isLocked;
       static DISPLAY_NAME = "MATERIAL";
       /*
                         
@@ -18,7 +17,7 @@ class Material extends SubscriptionManager {
       #f_qty;
       #f_width;
       #f_height;
-      #f_depth;
+      //#f_depth;
       #f_lockBtn;
       #f_deleteBtn;
       #f_container;
@@ -31,7 +30,7 @@ class Material extends SubscriptionManager {
       #f_lhsMenuWindow;
       #f_popOutModal;
       #f_popOutBtn;
-      #f_debugInheritedData;
+      #f_debugTextArea;
       #f_requiresInputTag;
       /*
                         
@@ -40,7 +39,7 @@ class Material extends SubscriptionManager {
       get qtyField() {return this.#f_qty[1];}
       get width() {return zeroIfNaNNullBlank(this.#f_width[1].value);}
       get height() {return zeroIfNaNNullBlank(this.#f_height[1].value);}
-      get depth() {return zeroIfNaNNullBlank(this.#f_depth[1].value);}
+      //get depth() {return zeroIfNaNNullBlank(this.#f_depth[1].value);}
       get container() {return this.#f_container;}
       get Type() {return this.TYPE;}
       get ID() {return this.#Type + "-" + this.#UNIQUEID;}
@@ -128,8 +127,8 @@ class Material extends SubscriptionManager {
             this.#f_overallQtyContainer = createDivStyle5(null, "Overall Qty", this.#f_container)[1];
 
 
-            this.#f_debugInheritedData = createTextarea("DEBUG", "", "width:90%;", () => { }, this.#f_overallQtyContainer);
-            if(!this.DEBUG_SHOW) $(this.#f_debugInheritedData).hide();
+            this.#f_debugTextArea = createTextarea("DEBUG", "", "width:90%;", () => { }, this.#f_overallQtyContainer);
+            if(!this.DEBUG_SHOW) $(this.#f_debugTextArea).hide();
 
             this.#f_qty = createInput_Infield("Qty", 1, "width:20%", () => {this.UpdateFromChange();}, this.#f_overallQtyContainer, true, 1);
             setFieldDisabled(false, this.#f_qty[1], this.#f_qty[0]);
@@ -147,7 +146,7 @@ class Material extends SubscriptionManager {
       }
 
       UpdateDebug() {
-            let debugData = "";
+            let debugData = "INHERITED DATA:\n";
 
             this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
@@ -155,7 +154,12 @@ class Material extends SubscriptionManager {
                   debugData += JSON.stringify(subscription.data, null, 4) + "\n\n";
             });
 
-            this.#f_debugInheritedData.value = debugData;
+            debugData += "SEND DATA:\n";
+
+            debugData += IFELSE(this.DATA_FOR_SUBSCRIBERS.parent !== null, this.DATA_FOR_SUBSCRIBERS.parent?.constructor.name + "\n", "");
+            debugData += IFELSE(this.DATA_FOR_SUBSCRIBERS.data !== null, JSON.stringify(this.DATA_FOR_SUBSCRIBERS.data, null, 4) + "\n\n", "");
+
+            this.#f_debugTextArea.value = debugData;
       }
 
       OpenSubscriptionsModal() {
@@ -180,15 +184,13 @@ class Material extends SubscriptionManager {
 
       }
 
-      getQWH() {
-            if(!this.#isLocked) return new QWHD(this.qty, 0, 0, 0);
-
+      getQWHD() {
             for(let i = 0; i < this.subscriptions.length; i++) {
                   if(this.subscriptions[i].qty && this.subscriptions[i].width && this.subscriptions[i].height) {
-                        return this.subscriptions[i].getQWH();//new QWHD(this.subscriptions[i].qty, this.subscriptions[i].width, this.subscriptions[i].height);
+                        return this.subscriptions[i].getQWHD();
                   }
             }
-            return new QWHD(0, 0, 0);
+            return new QWHD(0, 0, 0, 0);
       };
 
       Delete() {
