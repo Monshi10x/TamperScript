@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Floating Image Select with Search + Blank</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 50px;
+      background: #f9f9f9;
+    }
+
+    .floating-image-select-wrapper {
+      position: relative;
+      width: 300px;
+      margin-top: 40px;
+      user-select: none;
+    }
+
+    .floating-select-display {
+      width: 100%;
+      padding: 12px;
+      padding-right: 40px;
+      border: 2px solid #6a0dad;
+      border-radius: 5px;
+      background: white;
+      font-size: 16px;
+      cursor: pointer;
+      box-sizing: border-box;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .floating-select-label {
+      position: absolute;
+      top: 16px;
+      left: 12px;
+      background: #f9f9f9;
+      padding: 0 4px;
+      font-size: 16px;
+      color: #aaa;
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+
+    .floating-image-select-wrapper.open .floating-select-label,
+    .floating-image-select-wrapper.selected .floating-select-label {
+      top: -10px;
+      left: 10px;
+      font-size: 12px;
+      color: #6a0dad;
+    }
+
+    .dropdown-arrow {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: #6a0dad;
+      pointer-events: none;
+      transition: transform 0.2s ease;
+    }
+
+    .floating-image-select-wrapper.open .dropdown-arrow {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .dropdown-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      border: 2px solid #6a0dad;
+      border-top: none;
+      background: white;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 10;
+      box-sizing: border-box;
+    }
+
+    .dropdown-search {
+      width: 100%;
+      padding: 8px 10px;
+      border: none;
+      border-bottom: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+      gap: 8px;
+    }
+
+    .dropdown-item:hover {
+      background: #f0e6ff;
+    }
+
+    .dropdown-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .reset-button {
+      position: absolute;
+      top: 12px;
+      right: 36px;
+      width: 20px;
+      height: 20px;
+      background: #6a0dad;
+      color: white;
+      text-align: center;
+      line-height: 20px;
+      border-radius: 3px;
+      cursor: pointer;
+      display: none;
+      transition: background 0.2s ease;
+    }
+
+    .reset-button:hover {
+      background: #4e078c;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app"></div>
+
+  <script>
+    class FloatingImageSelectInput {
+      constructor({ label, options, defaultValue = '', parent, onChange }) {
+        this.options = [{ label: '— None —', value: '', img: '' }, ...options];
+        this.defaultValue = defaultValue;
+        this.onChange = onChange;
+
+        this.wrapper = document.createElement('div');
+        this.wrapper.className = 'floating-image-select-wrapper';
+
+        this.display = document.createElement('div');
+        this.display.className = 'floating-select-display';
+        this.display.tabIndex = 0;
+
+        this.label = document.createElement('label');
+        this.label.className = 'floating-select-label';
+        this.label.innerText = label;
+
+        this.arrow = document.createElement('div');
+        this.arrow.className = 'dropdown-arrow';
+        this.arrow.innerHTML = '&#9660;';
+
+        this.resetBtn = document.createElement('div');
+        this.resetBtn.className = 'reset-button';
+        this.resetBtn.innerHTML = '&#8634;';
+
+        this.list = document.createElement('div');
+        this.list.className = 'dropdown-list';
+        this.list.style.display = 'none';
+
+        this.searchInput = document.createElement('input');
+        this.searchInput.className = 'dropdown-search';
+        this.searchInput.placeholder = 'Search...';
+        this.list.appendChild(this.searchInput);
+
+        this.itemContainer = document.createElement('div');
+        this.list.appendChild(this.itemContainer);
+
+        this.filteredOptions = [...this.options];
+        this.renderOptions();
+
+        this.searchInput.addEventListener('input', () => {
+          const term = this.searchInput.value.toLowerCase();
+          this.filteredOptions = this.options.filter(o =>
+            o.label.toLowerCase().includes(term)
+          );
+          this.renderOptions();
+        });
+
+        this.display.addEventListener('click', () => this.toggle());
+        this.resetBtn.addEventListener('click', () => this.setValue(this.defaultValue));
+
+        document.addEventListener('click', (e) => {
+          if (!this.wrapper.contains(e.target)) this.close();
+        });
+
+        this.wrapper.appendChild(this.display);
+        this.wrapper.appendChild(this.label);
+        this.wrapper.appendChild(this.arrow);
+        this.wrapper.appendChild(this.resetBtn);
+        this.wrapper.appendChild(this.list);
+        parent.appendChild(this.wrapper);
+
+        this.setValue(this.defaultValue);
+      }
+
+      renderOptions() {
+        this.itemContainer.innerHTML = '';
+        this.filteredOptions.forEach(opt => {
+          const item = document.createElement('div');
+          item.className = 'dropdown-item';
+          item.dataset.value = opt.value;
+
+          if (opt.img) {
+            const img = document.createElement('img');
+            img.src = opt.img;
+            item.appendChild(img);
+          }
+
+          const text = document.createElement('span');
+          text.innerText = opt.label;
+          item.appendChild(text);
+
+          item.addEventListener('click', () => {
+            this.setValue(opt.value);
+            this.close();
+          });
+
+          this.itemContainer.appendChild(item);
+        });
+      }
+
+      toggle() {
+        this.list.style.display === 'block' ? this.close() : this.open();
+      }
+
+      open() {
+        this.list.style.display = 'block';
+        this.wrapper.classList.add('open');
+        this.searchInput.focus();
+      }
+
+      close() {
+        this.list.style.display = 'none';
+        this.wrapper.classList.remove('open');
+        this.searchInput.value = '';
+        this.filteredOptions = [...this.options];
+        this.renderOptions();
+      }
+
+      setValue(val) {
+        const option = this.options.find(o => o.value === val);
+        if (!option) return;
+
+        this.display.innerHTML = '';
+
+        if (option.img) {
+          const img = document.createElement('img');
+          img.src = option.img;
+          img.style.width = '20px';
+          img.style.height = '20px';
+          img.style.objectFit = 'contain';
+          this.display.appendChild(img);
+        }
+
+        const text = document.createElement('span');
+        text.innerText = option.label;
+        this.display.appendChild(text);
+
+        this.display.appendChild(this.arrow);
+        this.display.appendChild(this.resetBtn);
+
+        this.selectedValue = val;
+        this.wrapper.classList.toggle('selected', val !== '');
+
+        this.resetBtn.style.display = val !== this.defaultValue ? 'block' : 'none';
+
+        if (this.onChange) this.onChange(val);
+      }
+
+      getValue() {
+        return this.selectedValue;
+      }
+
+      get element() {
+        return this.wrapper;
+      }
+    }
+
+    // Example usage
+    new FloatingImageSelectInput({
+      label: 'Material Type',
+      defaultValue: '',
+      options: [
+        { label: 'Acrylic', value: 'acrylic', img: 'https://via.placeholder.com/50/6a0dad/ffffff?text=A' },
+        { label: 'Aluminium', value: 'aluminium', img: 'https://via.placeholder.com/50/999/ffffff?text=Al' },
+        { label: 'Steel', value: 'steel', img: 'https://via.placeholder.com/50/333/ffffff?text=S' },
+        { label: 'Vinyl', value: 'vinyl', img: 'https://via.placeholder.com/50/0cf/ffffff?text=V' }
+      ],
+      parent: document.getElementById('app'),
+      onChange: val => console.log('Selected:', val)
+    });
+  </script>
+
+</body>
+</html>
