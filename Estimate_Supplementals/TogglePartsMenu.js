@@ -1,4 +1,4 @@
-function createOptionsContainer() {
+function createTogglePartsContainer() {
     sidePanel = document.getElementById('divLeftColumn');
     var newPanel = document.createElement('div');
     newPanel.className = "ord-box";
@@ -25,17 +25,12 @@ function createOptionsContainer() {
     newPanel.appendChild(newPanelContent2);
 
     let togglePartsVisible = createCheckbox_Infield("Toggle Parts Visible", true, "", () => {
-        let elements = document.querySelectorAll(".ord-prod-part");
-        let elementFooters = document.querySelectorAll(".ord-prod-footer");
-        for(let i = 0; i < elements.length; i++) {
-            if(togglePartsVisible[1].checked) {
-                $(elements[i]).show();
-                $(elementFooters[i]).show();
-            } else {
-                $(elements[i]).hide();
-                $(elementFooters[i]).hide();
-            }
+        let elements = document.querySelectorAll(".showProductParts");
 
+        for(let i = 0; i < elements.length; i++) {
+
+            IFELSEF(togglePartsVisible[1].checked && elements[i].innerHTML == "▼", () => {$(elements[i]).click();}, () => { });
+            IFELSEF(!togglePartsVisible[1].checked && elements[i].innerHTML == "▲", () => {$(elements[i]).click();}, () => { });
         }
 
     }, newPanelContent2);

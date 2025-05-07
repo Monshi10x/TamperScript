@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FloatingUnitInput Final</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 50px;
+      background: #f9f9f9;
+    }
+
+    .floating-input-wrapper {
+      position: relative;
+      width: 300px;
+      margin-top: 0px;
+    }
+
+    .floating-input-wrapper input {
+      width: 100%;
+      padding: 12px 95px 12px 60px;
+      border: 2px solid #6a0dad;
+      border-radius: 5px;
+      font-size: 16px;
+      outline: none;
+      box-sizing: border-box;
+      background: transparent;
+      color: #333;
+    }
+
+    .floating-input-wrapper label {
+      position: absolute;
+      top: 16px;
+      left: 60px;
+      background: #f9f9f9;
+      padding: 0 4px;
+      font-size: 16px;
+      color: #aaa;
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+
+    .floating-input-wrapper input:focus + label,
+    .floating-input-wrapper input:not(:placeholder-shown) + label {
+      top: -10px;
+      left: 10px;
+      font-size: 12px;
+      color: #6a0dad;
+    }
+
+    .prefix,
+    .postfix,
+    .arrow-up,
+    .arrow-down,
+    .reset-button {
+      position: absolute;
+      font-size: 14px;
+      color: #6a0dad;
+      user-select: none;
+    }
+
+    .prefix {
+      top: 50%;
+      left: 10px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .postfix {
+      top: 50%;
+      right: 75px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .arrow-up,
+    .arrow-down,
+    .reset-button {
+      width: 20px;
+      height: 20px;
+      background: #6a0dad;
+      color: white;
+      text-align: center;
+      line-height: 20px;
+      border-radius: 3px;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: background 0.2s ease;
+    }
+
+    .arrow-up:hover,
+    .arrow-down:hover,
+    .reset-button:hover {
+      background: #4e078c;
+    }
+
+    .arrow-up {
+      top: 0px;
+      right: 0px;
+    }
+
+    .arrow-down {
+      bottom: 0px;
+      right: 0px;
+    }
+
+    .reset-button {
+      top: 18px;
+      right: 40px;
+      display: none;
+    }
+
+    .floating-input-wrapper input::placeholder {
+      color: transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app"></div>
+
+  <script>
+    class FloatingUnitInput {
+      constructor({
+        label = 'Label',
+        value = '100',
+        prefix = 'W:',
+        postfix = 'm²',
+        step = 10,
+        precision = 2,
+        parent = document.body,
+        onChange = null
+      }) {
+        this.defaultValue = parseFloat(value);
+        this.step = step;
+        this.precision = precision;
+        this.onChange = onChange;
+
+        this.wrapper = document.createElement('div');
+        this.wrapper.className = 'floating-input-wrapper';
+
+        this.input = document.createElement('input');
+        this.input.type = 'text';
+        this.input.placeholder = ' ';
+        this.input.value = this.formatValue(this.defaultValue);
+
+        this.label = document.createElement('label');
+        this.label.innerText = label;
+
+        this.prefix = document.createElement('span');
+        this.prefix.className = 'prefix';
+        this.prefix.innerText = prefix;
+
+        this.postfix = document.createElement('span');
+        this.postfix.className = 'postfix';
+        this.postfix.innerHTML = postfix.includes('²') ? postfix.replace('²', '<sup>2</sup>') : postfix;
+
+        this.arrowUp = document.createElement('div');
+        this.arrowUp.className = 'arrow-up';
+        this.arrowUp.innerHTML = '&#9650;';
+
+        this.arrowDown = document.createElement('div');
+        this.arrowDown.className = 'arrow-down';
+        this.arrowDown.innerHTML = '&#9660;';
+
+        this.resetBtn = document.createElement('div');
+        this.resetBtn.className = 'reset-button';
+        this.resetBtn.innerHTML = '&#8634;';
+
+        this.wrapper.appendChild(this.input);
+        this.wrapper.appendChild(this.label);
+        this.wrapper.appendChild(this.prefix);
+        this.wrapper.appendChild(this.postfix);
+        this.wrapper.appendChild(this.arrowUp);
+        this.wrapper.appendChild(this.arrowDown);
+        this.wrapper.appendChild(this.resetBtn);
+        parent.appendChild(this.wrapper);
+
+        this.arrowUp.addEventListener('click', () => this.changeValue(this.step));
+        this.arrowDown.addEventListener('click', () => this.changeValue(-this.step));
+        this.resetBtn.addEventListener('click', () => this.resetValue());
+
+        this.input.addEventListener('input', this.filterNumeric.bind(this));
+        this.input.addEventListener('change', () => this.checkResetVisibility(true));
+      }
+
+      formatValue(val) {
+        return parseFloat(val).toFixed(this.precision);
+      }
+
+      getValue() {
+        return parseFloat(this.input.value) || 0;
+      }
+
+      setValue(val) {
+        this.input.value = this.formatValue(val);
+        this.checkResetVisibility();
+        this.input.dispatchEvent(new Event('change'));
+      }
+
+      changeValue(delta) {
+        const val = this.getValue() + delta;
+        this.setValue(val);
+      }
+
+      resetValue() {
+        this.setValue(this.defaultValue);
+      }
+
+      checkResetVisibility(triggerChange = false) {
+        const current = parseFloat(this.input.value);
+        const def = parseFloat(this.defaultValue);
+        const show = Math.abs(current - def) > Math.pow(10, -this.precision);
+
+        this.resetBtn.style.display = show ? 'block' : 'none';
+
+        if (triggerChange && this.onChange) {
+          this.onChange(this.getValue());
+        }
+      }
+
+      filterNumeric() {
+        const clean = this.input.value.replace(/[^\d.\-]/g, '');
+        this.input.value = clean;
+      }
+
+      get element() {
+        return this.wrapper;
+      }
+    }
+
+    // Example usage
+    new FloatingUnitInput({
+      label: 'Area',
+      value: '100',
+      prefix: 'margin:',
+      postfix: 'm²',
+      step: 10,
+      precision: 2,
+      parent: document.getElementById('app'),
+      onChange: val => console.log('Changed to:', val)
+    });
+  </script>
+
+</body>
+</html>

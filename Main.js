@@ -65,7 +65,7 @@ var quoteSeconds_Total = 0;
 
   createCopyPartModal();
   createCostAnalysisSummaryContainer();
-  createOptionsContainer();
+  createTogglePartsContainer();
   createSummaryHelper();
   installSummary = new InstallSummary();
   initLHSMenu();
