@@ -622,8 +622,6 @@ class Sheet extends Material {
       UpdateFromChange() {
             if(this.UPDATES_PAUSED) return;
 
-            super.UpdateFromChange();
-
             this.UpdateFromInheritedData();
             this.UpdateGrainDirection();
             this.UpdateOutput();
@@ -632,6 +630,8 @@ class Sheet extends Material {
 
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();
+
+            super.UpdateFromChange();
       }
 
       UpdateVisualizer() {
@@ -922,13 +922,25 @@ class Sheet extends Material {
                         //foldPerimeter += this.width;
                   }
 
-                  for(let i = 0; i < this.#matrixSizes.length; i++) {
+                  for(let i = 0; i < this.#matrixSizes.length; i++) {//per subscription
                         let numberRows = this.#matrixSizes[i].length;
                         let numberColumns = this.#matrixSizes[i][0].length;
                         numberShapes += foldedTop ? numberColumns : 0;
                         numberShapes += foldedLeft ? numberRows : 0;
                         numberShapes += foldedRight ? numberRows : 0;
                         numberShapes += foldedBottom ? numberColumns : 0;
+                        /*per row*/for(let j = 0; j < this.#matrixSizes[i].length; j++) {
+                              /*per item in row*/for(let k = 0; k < this.#matrixSizes[i][j].length; k++) {
+                                    /*first row*/if(j == 0) {
+                                          foldPerimeter += foldedTop ? this.#matrixSizes[i][j][k][0/*width*/] : 0;
+                                          foldPerimeter += foldedBottom ? this.#matrixSizes[i][j][k][0/*width*/] : 0;
+                                    }
+                                    /*first column*/if(k == 0) {
+                                          foldPerimeter += foldedLeft ? this.#matrixSizes[i][j][k][1/*height*/] : 0;
+                                          foldPerimeter += foldedRight ? this.#matrixSizes[i][j][k][1/*height*/] : 0;
+                                    }
+                              }
+                        }
                   }
 
                   this.#router.addRunRow(foldPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", thickness: "3mm", profile: "Groove", quality: "Good Quality", speed: null});
