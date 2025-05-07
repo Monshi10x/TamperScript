@@ -72,24 +72,24 @@ class Coil extends Material {
             var coilDropdownElements = [];
             coilParts.forEach(element => coilDropdownElements.push([element.Name, GM_getResourceURL("Image_Coil")]));
 
-            this.#f_material = createDropdown_Infield_Icons_Search("Coil", 0, "width:60%;", 50, false, coilDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
+            this.#f_material = createDropdown_Infield_Icons_Search("Coil", 0, "width:60%;", 50, false, coilDropdownElements, () => {this.UpdateFromFields();}, f_container_material);
 
             /*
             Machine*/
             let f_container_machine = createDivStyle5(null, "Machine", this.container)[1];
 
             let f_setupContainer = createDivStyle5(null, "Setup", f_container_machine)[1];
-            this.#f_machineSetupTime = createInput_Infield("Setup Time Average", this.defaultSetupTime.as("mins"), "width:30%;", () => {this.UpdateFromChange();}, f_setupContainer, false, 0.1, {postfix: "min"});
+            this.#f_machineSetupTime = createInput_Infield("Setup Time Average", this.defaultSetupTime.as("mins"), "width:30%;", () => {this.UpdateFromFields();}, f_setupContainer, false, 0.1, {postfix: "min"});
 
             let f_runContainer = createDivStyle5(null, "Run", f_container_machine)[1];
-            this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "m"});
+            this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromFields();}, f_runContainer, false, 1, {postfix: "m"});
             setFieldDisabled(true, this.#f_machineLengthToRun[1], this.#f_machineLengthToRun[0]);
-            this.#f_machineRunSpeed = createInput_Infield("Run Speed", this.defaultRunSpeed.as("m/min"), "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 0.1, {postfix: "m/min"});
-            this.#f_machineRunTime = createInput_Infield("Run Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "mins"});
+            this.#f_machineRunSpeed = createInput_Infield("Run Speed", this.defaultRunSpeed.as("m/min"), "width:30%;", () => {this.UpdateFromFields();}, f_runContainer, false, 0.1, {postfix: "m/min"});
+            this.#f_machineRunTime = createInput_Infield("Run Time", -1, "width:30%;", () => {this.UpdateFromFields();}, f_runContainer, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineRunTime[1], this.#f_machineRunTime[0]);
 
             let f_totalContainer = createDivStyle5(null, "Total", f_container_machine)[1];
-            this.#f_machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 1, {postfix: "mins"});
+            this.#f_machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromFields();}, f_totalContainer, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineTotalTime[1], this.#f_machineTotalTime[0]);
 
             /*
@@ -115,13 +115,13 @@ class Coil extends Material {
 
             /*
             Update*/
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       /*
       Inherited*/
-      UpdateFromChange() {
-            super.UpdateFromChange();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             this.UpdateFromInheritedData();
 

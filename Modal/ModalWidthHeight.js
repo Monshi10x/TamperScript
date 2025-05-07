@@ -7,8 +7,8 @@ class ModalWidthHeight extends Modal {
 
             this.#incrementAmount = incrementAmount;
             let sizeContainer = createDivStyle5(null, "Dimensions", this.getBodyElement())[1];
-            this.#widthField = createInput_Infield("Width", 1, "width:45%;", () => {this.updateFromFields();}, sizeContainer, true, incrementAmount);
-            this.#heightField = createInput_Infield("Height", 1, "width:45%;", () => {this.updateFromFields();}, sizeContainer, true, incrementAmount);
+            this.#widthField = createInput_Infield("Width", 1, "width:45%;", () => {this.UpdateFromFields();}, sizeContainer, true, incrementAmount);
+            this.#heightField = createInput_Infield("Height", 1, "width:45%;", () => {this.UpdateFromFields();}, sizeContainer, true, incrementAmount);
 
 
             this.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {this.callback(); console.log("in callback");}));
@@ -17,7 +17,7 @@ class ModalWidthHeight extends Modal {
             this.#widthField[1].focus();
       }
 
-      updateFromFields() { }
+      UpdateFromFields() { }
 
       get width() {return parseFloat(this.#widthField[1].value);}
       set width(val) {$(this.#widthField[1]).val(val).change();}

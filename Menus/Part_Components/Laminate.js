@@ -48,7 +48,7 @@ class Laminate extends Material {
             InheritedParentSizeSplits*/
             let f_container_inheritedParentSizeSplits = createDivStyle5(null, "Inherited Parent Size Splits", this.container)[1];
 
-            this.#f_useRollLength = createCheckbox_Infield("Use Approx. Roll Length", this.#useRollLength, "width:300px;", () => {this.#useRollLength = this.#f_useRollLength[1].checked; this.UpdateFromChange();}, f_container_inheritedParentSizeSplits);
+            this.#f_useRollLength = createCheckbox_Infield("Use Approx. Roll Length", this.#useRollLength, "width:300px;", () => {this.#useRollLength = this.#f_useRollLength[1].checked; this.UpdateFromFields();}, f_container_inheritedParentSizeSplits);
             this.#f_inheritedSizeTable = new Table(f_container_inheritedParentSizeSplits, "100%", 20, 250);
             this.#f_inheritedSizeTable.setHeading("Qty", "Width", "Height/Length");
             this.#f_inheritedSizeTable.addRow("-", "-", "-");
@@ -81,7 +81,7 @@ class Laminate extends Material {
                   laminateDropdownElements.push([element.Name, isStocked ? "blue" : "white"]);
             });
 
-            this.#f_material = createDropdown_Infield_Icons_Search("Laminate", 0, "width:60%;", 10, true, laminateDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
+            this.#f_material = createDropdown_Infield_Icons_Search("Laminate", 0, "width:60%;", 10, true, laminateDropdownElements, () => {this.UpdateFromFields();}, f_container_material);
             dropdownInfieldIconsSearchSetSelected(this.#f_material, LaminateLookup["Gloss"], false, false);
 
             /*
@@ -89,16 +89,16 @@ class Laminate extends Material {
             let f_container_machine = createDivStyle5(null, "Machine", this.container)[1];
 
             createText("Setup", "width:100%;height:20px", f_container_machine);
-            this.#f_machineSetupTime = createInput_Infield("Setup Time Average", 3, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "min"});
+            this.#f_machineSetupTime = createInput_Infield("Setup Time Average", 3, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "min"});
 
             createText("Run", "width:100%;height:20px", f_container_machine);
-            this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "m"});
+            this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "m"});
             setFieldDisabled(true, this.#f_machineLengthToRun[1], this.#f_machineLengthToRun[0]);
-            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 2, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "m/min"});
-            this.#f_machineRunTime = createInput_Infield("Run Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
+            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 2, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "m/min"});
+            this.#f_machineRunTime = createInput_Infield("Run Time", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineRunTime[1], this.#f_machineRunTime[0]);
             createText("Total", "width:100%;height:20px", f_container_machine);
-            this.#f_machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
+            this.#f_machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineTotalTime[1], this.#f_machineTotalTime[0]);
 
             /*
@@ -124,13 +124,13 @@ class Laminate extends Material {
 
             /*
             Update*/
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       /*
       Inherited*/
-      UpdateFromChange() {
-            super.UpdateFromChange();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             this.UpdateFromInheritedData();
 

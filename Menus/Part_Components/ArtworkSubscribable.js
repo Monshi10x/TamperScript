@@ -39,8 +39,8 @@ class ArtworkSubscribable extends Material {
 
       /*
       Inherited*/
-      UpdateFromChange() {
-            super.UpdateFromChange();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             this.UpdateFromInheritedData();
             this.UpdateDataForSubscribers();

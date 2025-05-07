@@ -93,8 +93,8 @@ class HandTrimming extends Material {
 
       /*
       Inherited */
-      UpdateFromChange() {
-            super.UpdateFromChange();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             this.UpdateInheritedSizes();
             this.UpdateTrimmingTimes();

@@ -329,12 +329,12 @@ class DragZoomSVG {
             };
       }
 
-      updateFromFields() { }
+      UpdateFromFields() { }
 
       deleteElement(element) {
             deleteElement(element);
 
-            this.updateFromFields();
+            this.UpdateFromFields();
       }
 
       /*overrideable*/onMouseUpdate(updateFrom) { }

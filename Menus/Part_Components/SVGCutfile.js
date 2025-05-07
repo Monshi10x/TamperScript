@@ -96,20 +96,20 @@ class SVGCutfile extends SubscriptionManager {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
                         this.productNumber = modal.value;
 
-                        this.UpdateFromChange();
+                        this.UpdateFromFields();
                   });
                   modal.value = this.productNumber;
             }, this.#f_container);
 
             this.#f_typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;position:relative;border:1px solid " + this.#backgroundColor + ";", this.#f_container);
 
-            this.#f_qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#f_container, true, 1);
+            this.#f_qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 1);
 
-            this.#f_pathLength = createInput_Infield("Path Length", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#f_container, true, 100, {postfix: "mm"});
+            this.#f_pathLength = createInput_Infield("Path Length", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "mm"});
 
-            this.#f_shapeAreas = createInput_Infield("Shape Areas", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#f_container, true, 100, {postfix: "m2"});
+            this.#f_shapeAreas = createInput_Infield("Shape Areas", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "m2"});
 
-            this.#f_totalBoundingRectAreas = createInput_Infield("Bounding Rect Areas", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#f_container, true, 100, {postfix: "m2"});
+            this.#f_totalBoundingRectAreas = createInput_Infield("Bounding Rect Areas", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "m2"});
 
             let settingsButton = createButton("", "width:40px;height:40px;margin:0px;margin-left:5px;margin-right:10px;font-size:20px;", () => {
                   this.#openSettingsModal();
@@ -140,7 +140,7 @@ class SVGCutfile extends SubscriptionManager {
 
             this.#f_visualiserBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 10px);display:none;height:40px;margin:5px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#f_visualiser = new ModalSVG("SVG", 100, () => {
-                        this.UpdateFromChange();
+                        this.UpdateFromFields();
                   }, this.#f_svgFile, this);
             }, f_container_fileChooser, true);
 
@@ -155,7 +155,7 @@ class SVGCutfile extends SubscriptionManager {
             this.#f_sizeMethod1 = createCheckbox_Infield("Method 1 - Use Bounding Rect Areas", true, "width:300px;", () => {
                   setFieldDisabled(true, this.#f_shapeAreas[1], this.#f_shapeAreas[0]);
                   setFieldDisabled(false, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, f_container_materialUsage);
 
             let icon_boundingArea = document.createElement('img');
@@ -167,7 +167,7 @@ class SVGCutfile extends SubscriptionManager {
             this.#f_sizeMethod2 = createCheckbox_Infield("Method 2 - Use Shape Areas", false, "width:300px;", () => {
                   setFieldDisabled(false, this.#f_shapeAreas[1], this.#f_shapeAreas[0]);
                   setFieldDisabled(true, this.#f_totalBoundingRectAreas[1], this.#f_totalBoundingRectAreas[0]);
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, f_container_materialUsage);
 
             let icon_shapeArea = document.createElement('img');
@@ -180,13 +180,13 @@ class SVGCutfile extends SubscriptionManager {
             let f_container_outputSizes = createDivStyle5(null, "Output Sizes", this.#f_container)[1];
 
 
-            this.#f_width = createInput_Infield("Width", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, f_container_outputSizes, true, 100, {postfix: "mm"});
+            this.#f_width = createInput_Infield("Width", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, f_container_outputSizes, true, 100, {postfix: "mm"});
             setFieldDisabled(true, this.#f_width[1], this.#f_width[0]);
 
-            this.#f_height = createInput_Infield("Height", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, f_container_outputSizes, true, 100, {postfix: "mm"});
+            this.#f_height = createInput_Infield("Height", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, f_container_outputSizes, true, 100, {postfix: "mm"});
             setFieldDisabled(true, this.#f_height[1], this.#f_height[0]);
 
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       async onFileChange() {
@@ -215,10 +215,10 @@ class SVGCutfile extends SubscriptionManager {
 
             console.log("file 2:" + this.#f_svgFile);
 
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
-      UpdateFromChange() {
+      UpdateFromFields() {
             this.UpdateWH();
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();

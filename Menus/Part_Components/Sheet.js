@@ -6,25 +6,25 @@ class Sheet extends Material {
       routerCutProfile = {material: "ACM", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"};
       setRouterCutProfile(options = {material: null, thickness: null, profile: null, quality: null}) {
             this.routerCutProfile = {material: options.material, thickness: options.thickness, profile: options.profile, quality: options.quality};
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       staticRouterRows = [];
       addStaticRouterRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", thickness: "", profile: "Cut Through", quality: "Good Quality"}) {
             this.staticRouterRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       laserCutProfile = {material: "Stainless", thickness: "1.2mm", profile: "Cut Through", quality: "Good Quality"};
       setLaserCutProfile(options = {material: null, thickness: null, profile: null, quality: null}) {
             this.laserCutProfile = {material: options.material, thickness: options.thickness, profile: options.profile, quality: options.quality};
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       staticLaserRows = [];
       addStaticLaserRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", thickness: "", profile: "Cut Through", quality: "Good Quality"}) {
             this.staticLaserRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       #materialOptions = [
@@ -168,13 +168,13 @@ class Sheet extends Material {
       #sheetPerimeterIsCut = true;
       set sheetPerimeterIsCut(value) {
             this.#sheetPerimeterIsCut = value;
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       #useOverallSVGSize = false;
       set useOverallSVGSize(value) {
             this.#useOverallSVGSize = value;
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       #updateOrderBtn;
@@ -462,7 +462,7 @@ class Sheet extends Material {
 
             this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters();}, sheetFilterContainer[1]);
 
-            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 40, false, this.getSheetDropdownOptions(), () => {this.UpdateFromChange();}, f_container_sheetSize[1], false);
+            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 40, false, this.getSheetDropdownOptions(), () => {this.UpdateFromFields();}, f_container_sheetSize[1], false);
 
             /*
             Folded*/
@@ -485,16 +485,16 @@ class Sheet extends Material {
                         setFieldHidden(true, this.#foldedBottom[1], this.#foldedBottom[0]);
                         $(alertDiv).hide();
                   }
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, this.#f_foldSideContainer);
             alertDiv = createFloatingDiv("Depth is 0, has no effect", "width:120px;padding-left:4px;top:10px;", this.#isFolded[0]);
 
 
 
-            this.#foldedTop = createCheckbox_Infield("Top", false, "margin-left: 20%; width:20%;margin-right: 50%; ", () => {this.UpdateFromChange();}, this.#f_foldSideContainer);
-            this.#foldedLeft = createCheckbox_Infield("Left", false, "width:20%;margin-right: 20%;", () => {this.UpdateFromChange();}, this.#f_foldSideContainer);
-            this.#foldedRight = createCheckbox_Infield("Right", false, " width:20%;margin-right: 30%;", () => {this.UpdateFromChange();}, this.#f_foldSideContainer);
-            this.#foldedBottom = createCheckbox_Infield("Bottom", false, "margin-left: 20%;width:20%;", () => {this.UpdateFromChange();}, this.#f_foldSideContainer);
+            this.#foldedTop = createCheckbox_Infield("Top", false, "margin-left: 20%; width:20%;margin-right: 50%; ", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
+            this.#foldedLeft = createCheckbox_Infield("Left", false, "width:20%;margin-right: 20%;", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
+            this.#foldedRight = createCheckbox_Infield("Right", false, " width:20%;margin-right: 30%;", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
+            this.#foldedBottom = createCheckbox_Infield("Bottom", false, "margin-left: 20%;width:20%;", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
             setFieldHidden(true, this.#foldedTop[1], this.#foldedTop[0]);
             setFieldHidden(true, this.#foldedLeft[1], this.#foldedLeft[0]);
             setFieldHidden(true, this.#foldedRight[1], this.#foldedRight[0]);
@@ -523,8 +523,8 @@ class Sheet extends Material {
             let methodContainer = createDivStyle4("width:calc(50% - 20px);", f_container_joins);
             let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
             let methodText = createText("Join Method", null, methodContainer);
-            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
-            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
+            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
+            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
 
             checkboxesAddToSelectionGroup(true, this.#method1, this.#method2);
 
@@ -540,14 +540,14 @@ class Sheet extends Material {
                         flipDiagram.style.height = "10px";
                         flipDiagram.style.width = "30px";
                   }
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, f_container_joins, true);
             flipDiagram = createDiv("background-color:yellow;width:30px;height:10px;margin-top:10px;", null, this.#flip[0]);
 
             this.#hasGrain = createCheckbox_Infield("Has Grain", false, "width:calc(50% - 20px);margin:10px;", () => {
                   setFieldHidden(!this.#hasGrain[1].checked, this.#grainDirection[1], this.#grainDirection[0]);
 
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, f_container_joins, true);
 
             this.#grainDirection = createDropdown_Infield("Grain Direction", 0, "width:calc(50% - 20px);", [createDropdownOption("With Long Side", "With Long Side"), createDropdownOption("With Short Side", "With Short Side")], () => { }, f_container_joins);
@@ -611,15 +611,15 @@ class Sheet extends Material {
 
 
             this.#visualiser = new ModalSheetJoins("Join Helper", 100, () => {
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, this);
 
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       /*
       Override*/
-      UpdateFromChange() {
+      UpdateFromFields() {
             if(this.UPDATES_PAUSED) return;
 
             this.UpdateFromInheritedData();
@@ -631,13 +631,13 @@ class Sheet extends Material {
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();
 
-            super.UpdateFromChange();
+            super.UpdateFromFields();
       }
 
       UpdateVisualizer() {
             if(this.#visualiser) {
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
-                  this.#visualiser.updateFromFields();
+                  this.#visualiser.UpdateFromFields();
             }
       }
 
@@ -911,16 +911,6 @@ class Sheet extends Material {
                   let foldedLeft = this.#foldedLeft[1].checked;
                   let foldedRight = this.#foldedRight[1].checked;
                   let foldedBottom = this.#foldedBottom[1].checked;
-                  TODO("Add fold perimeter");
-                  if(foldedTop) {
-                        //foldPerimeter += this.width;
-                  } if(foldedLeft) {
-                        //foldPerimeter += this.height;
-                  } if(foldedRight) {
-                        //foldPerimeter += this.height;
-                  } if(foldedBottom) {
-                        //foldPerimeter += this.width;
-                  }
 
                   for(let i = 0; i < this.#matrixSizes.length; i++) {//per subscription
                         let numberRows = this.#matrixSizes[i].length;
@@ -1042,15 +1032,15 @@ class Sheet extends Material {
             switch(machine) {
                   case "router":
                         this.#preferredCuttingMachine = "router";
-                        this.UpdateFromChange();
+                        this.UpdateFromFields();
                         break;
                   case "laser":
                         this.#preferredCuttingMachine = "laser";
-                        this.UpdateFromChange();
+                        this.UpdateFromFields();
                         break;
                   case "guillotine":
                         this.#preferredCuttingMachine = "guillotine";
-                        this.UpdateFromChange();
+                        this.UpdateFromFields();
                         break;
                   default: break;
             }

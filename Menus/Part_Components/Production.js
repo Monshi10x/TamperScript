@@ -80,7 +80,7 @@ class Production extends SubMenu {
 			this.#eyeletsHelper.height = this.getQWHD().height;
 			this.#eyeletsHelper.value_numberOnSide = this.#eyeletsHelper.calculatedQtyPerSide(this.#eyeletsHelper.height);
 			this.#eyeletsHelper.value_numberOnTop = this.#eyeletsHelper.calculatedQtyPerSide(this.#eyeletsHelper.width);
-			this.#eyeletsHelper.updateFromFields();
+			this.#eyeletsHelper.UpdateFromFields();
 		}, this.contentContainer);
 		makeFieldGroup("Checkbox", this.#eyeletsRequired[1], true, this.#eyeletsQty[0], this.#eyeletsHelperBtn);
 		this.#otherItemFields["Eyelets"]["linked field"] = this.#eyeletsRequired;
@@ -104,7 +104,7 @@ class Production extends SubMenu {
 			this.#standOffHelper.height = this.getQWHD().height;
 			this.#standOffHelper.value_numberOnSide = this.#standOffHelper.calculatedQtyPerSide(this.#standOffHelper.height);
 			this.#standOffHelper.value_numberOnTop = this.#standOffHelper.calculatedQtyPerSide(this.#standOffHelper.width);
-			this.#standOffHelper.updateFromFields();
+			this.#standOffHelper.UpdateFromFields();
 		}, this.contentContainer);
 		makeFieldGroup("Checkbox", this.#standOffRequired[1], true, this.#standOffQty[0], this.#standOffType[0], this.#standOffHelperBtn);
 		this.#otherItemFields["Stand-off"]["linked field"] = this.#standOffRequired;

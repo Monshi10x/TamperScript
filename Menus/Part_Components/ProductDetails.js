@@ -90,7 +90,7 @@ class ProductDetails extends SubscriptionManager {
 
             this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;position:relative;border:1px solid " + this.#backgroundColor + ";", this.#container);
 
-            this.#qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 1);
+            this.#qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#container, true, 1);
 
             this.#productLocationField = createInput_Infield("Product Location", null, "margin:0px 5px;box-shadow:none;box-sizing: border-box;width:180px;", null, this.#container, false, null);
             this.#productLocationField[1].placeholder = "i.e. Main Fascia";
@@ -103,7 +103,7 @@ class ProductDetails extends SubscriptionManager {
             this.UpdateDataForSubscribers();
       }
 
-      UpdateFromChange() {
+      UpdateFromFields() {
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();
       }

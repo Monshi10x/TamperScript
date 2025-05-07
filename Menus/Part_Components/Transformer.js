@@ -56,9 +56,9 @@ class Transformer extends Material {
             Draw*/
             let f_container_draw = createDivStyle5(null, "Transformer", this.container)[1]; 2;
 
-            this.#f_exactDraw = createInput_Infield("Exact Draw", this.#defaultExactDraw, "width:30%;", () => {this.UpdateFromChange();}, f_container_draw, false, 5, {postfix: "A"});
+            this.#f_exactDraw = createInput_Infield("Exact Draw", this.#defaultExactDraw, "width:30%;", () => {this.UpdateFromFields();}, f_container_draw, false, 5, {postfix: "A"});
             setFieldDisabled(true, this.#f_exactDraw[1], this.#f_exactDraw[0]);
-            this.#f_requiredDraw = createInput_Infield("Total Draw Required for " + this.#defaultLoadingPercentage + "% Loading", this.#defaultRequiredDraw, "width:30%;", () => {this.UpdateFromChange();}, f_container_draw, false, 5, {postfix: "A"});
+            this.#f_requiredDraw = createInput_Infield("Total Draw Required for " + this.#defaultLoadingPercentage + "% Loading", this.#defaultRequiredDraw, "width:30%;", () => {this.UpdateFromFields();}, f_container_draw, false, 5, {postfix: "A"});
 
             /*
             Material*/
@@ -68,7 +68,7 @@ class Transformer extends Material {
             var dropdownElements = [];
             parts.forEach(element => dropdownElements.push([element.Name, "https://sa-led.com/wp-content/uploads/2023/11/BT-1711_12V-300x300.jpg"]));
 
-            this.#f_material = createDropdown_Infield_Icons_Search("Transformer", 0, "width:60%;", 50, false, dropdownElements, () => {this.UpdateFromChange();}, f_container_material);
+            this.#f_material = createDropdown_Infield_Icons_Search("Transformer", 0, "width:60%;", 50, false, dropdownElements, () => {this.UpdateFromFields();}, f_container_material);
 
             /*
             OutputSizes*/
@@ -81,13 +81,13 @@ class Transformer extends Material {
 
             /*
             Update*/
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       /*
       Inherited*/
-      UpdateFromChange() {
-            super.UpdateFromChange();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             this.UpdateFromInheritedData();
 

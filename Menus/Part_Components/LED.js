@@ -97,7 +97,7 @@ class LED extends Material {
                   if(!this.#f_useQtyFormula[1].checked) $(this.#f_formula[0]).hide();
                   else $(this.#f_formula[0]).show();
 
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, f_formula);
             this.#f_formula = createDropdown_Infield("Formula", 0, "", [
                   createDropdownOption("Lightbox 150D - 50 per m2", "50"/**per square meter*/),
@@ -106,7 +106,7 @@ class LED extends Material {
                   createDropdownOption("3D Letters 100D - 200 per m2", "200"/**per square meter*/),
                   createDropdownOption("3D Letters 80D - 250 per m2", "250"/**per square meter*/),
                   createDropdownOption("3D Letters 50D - 380 per m2", "380"/**per square meter*/)
-            ], () => {this.UpdateFromChange();}, f_formula);
+            ], () => {this.UpdateFromFields();}, f_formula);
 
             /*
             Material*/
@@ -116,13 +116,13 @@ class LED extends Material {
             var dropdownElements = [];
             parts.forEach(element => dropdownElements.push([element.Name, "https://sa-led.com/wp-content/uploads/2021/06/1541_123456.jpg"]));
 
-            this.#f_material = createDropdown_Infield_Icons_Search("LED", 0, "width:60%;", 50, false, dropdownElements, () => {this.UpdateFromChange();}, f_container_material);
+            this.#f_material = createDropdown_Infield_Icons_Search("LED", 0, "width:60%;", 50, false, dropdownElements, () => {this.UpdateFromFields();}, f_container_material);
 
             /*
             Production*/
             let f_container_production = createDivStyle5(null, "LED Production", this.container)[1];
 
-            this.#f_LEDPerHour = createInput_Infield("LEDs per Hour", this.#defaultLEDPerHour, null, () => {this.UpdateFromChange();}, f_container_production, false, 1, {postfix: "LED/h"});
+            this.#f_LEDPerHour = createInput_Infield("LEDs per Hour", this.#defaultLEDPerHour, null, () => {this.UpdateFromFields();}, f_container_production, false, 1, {postfix: "LED/h"});
 
             this.#f_production = new Production(f_container_production, null, function() { }, this.sizeClass);
             this.#f_production.showContainerDiv = true;
@@ -143,15 +143,15 @@ class LED extends Material {
 
             /*
             Update*/
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       /*
       Inherited*/
-      UpdateFromChange() {
+      UpdateFromFields() {
             if(this.UPDATES_PAUSED) return;
 
-            super.UpdateFromChange();
+            super.UpdateFromFields();
 
             this.UpdateFromInheritedData();
 

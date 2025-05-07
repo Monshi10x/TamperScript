@@ -112,10 +112,10 @@ class Vinyl extends Material {      /*
                         $(this.#f_bleedLeft[1]).val(selectedOption[2]).change();
                         $(this.#f_bleedRight[1]).val(selectedOption[3]).change();
                   }, f_container_bleeds);
-            this.#f_bleedTop = createInput_Infield("Top", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10, {postfix: "mm"});
-            this.#f_bleedBottom = createInput_Infield("Bottom", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10, {postfix: "mm"});
-            this.#f_bleedLeft = createInput_Infield("Left", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10, {postfix: "mm"});
-            this.#f_bleedRight = createInput_Infield("Right", 20, "width:100px;", () => {this.UpdateFromChange();}, f_container_bleeds, false, 10, {postfix: "mm"});
+            this.#f_bleedTop = createInput_Infield("Top", 20, "width:100px;", () => {this.UpdateFromFields();}, f_container_bleeds, false, 10, {postfix: "mm"});
+            this.#f_bleedBottom = createInput_Infield("Bottom", 20, "width:100px;", () => {this.UpdateFromFields();}, f_container_bleeds, false, 10, {postfix: "mm"});
+            this.#f_bleedLeft = createInput_Infield("Left", 20, "width:100px;", () => {this.UpdateFromFields();}, f_container_bleeds, false, 10, {postfix: "mm"});
+            this.#f_bleedRight = createInput_Infield("Right", 20, "width:100px;", () => {this.UpdateFromFields();}, f_container_bleeds, false, 10, {postfix: "mm"});
 
             /*
             JoinOverlap*/
@@ -123,7 +123,7 @@ class Vinyl extends Material {      /*
 
             this.#f_joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 20px);height:40px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#f_visualiser = new ModalVinylJoins("Join Helper", 100, () => {
-                        this.UpdateFromChange();
+                        this.UpdateFromFields();
                   }, this);
 
                   this.#f_visualiser.borrowFields(this.#f_joinOverlap[0], this.#f_joinOrientation[0], this.#f_rollWidth[0], this.#f_material[0], this.#f_bleedDropdown[0], this.#f_bleedTop[0], this.#f_bleedBottom[0], this.#f_bleedLeft[0], this.#f_bleedRight[0]);
@@ -145,23 +145,23 @@ class Vinyl extends Material {      /*
                   });
                   this.#f_visualiser.setSizeArrays(...matrixSizeArrays);
             }, f_container_joins, true);
-            this.#f_joinOverlap = createInput_Infield("Join Overlap", 10, "width:30%;", () => {this.UpdateFromChange();}, f_container_joins, false, 5, {postfix: "mm"});
-            this.#f_joinOrientation = createCheckbox_Infield("Join Horizontal", true, "width:30%", () => {this.UpdateFromChange();}, f_container_joins, () => {this.UpdateFromChange();});
+            this.#f_joinOverlap = createInput_Infield("Join Overlap", 10, "width:30%;", () => {this.UpdateFromFields();}, f_container_joins, false, 5, {postfix: "mm"});
+            this.#f_joinOrientation = createCheckbox_Infield("Join Horizontal", true, "width:30%", () => {this.UpdateFromFields();}, f_container_joins, () => {this.UpdateFromFields();});
 
             /*
             RollUsage*/
             let f_container_rollUsage = createDivStyle5(null, "Roll Usage", this.container)[1];
 
-            this.#f_rollWidth = createInput_Infield("Roll Width", 1370, "width:30%;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "mm"});
-            this.#f_rollWastage = createInput_Infield("Roll Wastage *Approx", 20, "width:30%;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "%"});
-            this.#f_rollLengthUsed = createInput_Infield("Roll Length Used *Approx", 0, "width:30%;", () => {this.UpdateFromChange();}, f_container_rollUsage, false, 10, {postfix: "m"});
+            this.#f_rollWidth = createInput_Infield("Roll Width", 1370, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "mm"});
+            this.#f_rollWastage = createInput_Infield("Roll Wastage *Approx", 20, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "%"});
+            this.#f_rollLengthUsed = createInput_Infield("Roll Length Used *Approx", 0, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "m"});
             setFieldDisabled(true, this.#f_rollLengthUsed[1], this.#f_rollLengthUsed[0]);
 
             /*
             Material*/
             let f_container_material = createDivStyle5(null, "Material", this.container)[1];
 
-            this.#f_materialUsageArea = createInput_Infield("Total Area", 0, "30%;", () => {this.UpdateFromChange();}, f_container_material, false, 1, {postfix: "m2"});
+            this.#f_materialUsageArea = createInput_Infield("Total Area", 0, "30%;", () => {this.UpdateFromFields();}, f_container_material, false, 1, {postfix: "m2"});
             setFieldDisabled(true, this.#f_materialUsageArea[1], this.#f_materialUsageArea[0]);
 
             let vinylParts = getPredefinedParts("Vinyl - ");
@@ -174,7 +174,7 @@ class Vinyl extends Material {      /*
                   }
                   vinylDropdownElements.push([element.Name, isStocked ? "blue" : "white"]);
             });
-            this.#f_material = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:60%;", 10, true, vinylDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
+            this.#f_material = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:60%;", 10, true, vinylDropdownElements, () => {this.UpdateFromFields();}, f_container_material);
             dropdownInfieldIconsSearchSetSelected(this.#f_material, VinylLookup["Air Release"], false, false);
 
             /*
@@ -182,17 +182,17 @@ class Vinyl extends Material {      /*
             let f_container_machine = createDivStyle5(null, "HP Printer", this.container)[1];
 
             createText("Setup", "width:100%;height:20px", f_container_machine);
-            this.#f_machineSetupTime = createInput_Infield("Setup Time", 2, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "min"});
+            this.#f_machineSetupTime = createInput_Infield("Setup Time", 2, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "min"});
 
             createText("Run", "width:100%;height:20px", f_container_machine);
-            this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "m"});
+            this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "m"});
             setFieldDisabled(true, this.#f_machineLengthToRun[1], this.#f_machineLengthToRun[0]);
-            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 0.3, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 0.1, {postfix: "m/min"});
-            this.#f_machineRunTime = createInput_Infield("Total Run Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
+            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 0.3, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "m/min"});
+            this.#f_machineRunTime = createInput_Infield("Total Run Time", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineRunTime[1], this.#f_machineRunTime[0]);
 
             createText("Total", "width:100%;height:20px", f_container_machine);
-            this.#f_machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromChange();}, f_container_machine, false, 1, {postfix: "mins"});
+            this.#f_machineTotalTime = createInput_Infield("Total Time", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineTotalTime[1], this.#f_machineTotalTime[0]);
 
             /*
@@ -224,13 +224,13 @@ class Vinyl extends Material {      /*
 
             /*
             Update*/
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       /*
       Inherited*/
-      UpdateFromChange() {
-            super.UpdateFromChange();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             this.UpdateFromInheritedData();
 
@@ -252,7 +252,7 @@ class Vinyl extends Material {      /*
       }
 
       UpdateVisualizer() {
-            if(this.#f_visualiser) this.#f_visualiser.updateFromFields();
+            if(this.#f_visualiser) this.#f_visualiser.UpdateFromFields();
       }
 
       UpdateFromInheritedData = () => {

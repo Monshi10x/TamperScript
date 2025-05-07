@@ -14,7 +14,7 @@ class SubscriptionManager {
       get subscriptions() {return this.#subscriptions;};
       INHERITED_DATA = [];
       /*overrideable*/get Type() {return "SubscriptionManager";}
-      /*overrideable*/UpdateFromChange() { }
+      /*overrideable*/UpdateFromFields() { }
 
 
       ///Subscriptions
@@ -27,7 +27,7 @@ class SubscriptionManager {
             if(!parent.AddSubscriber) return new Error("parent does not contain AddSubscriber method");
             parent.AddSubscriber(this);
             parent.PushToSubscribers();
-            this.UpdateFromChange();
+            this.UpdateFromFields();
 
       }
 
@@ -70,7 +70,7 @@ class SubscriptionManager {
             }
             if(dataFromNewParent) this.#subscriptions.push(data.parent);
 
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       UnSubscribeFrom(parent) {
@@ -92,8 +92,8 @@ class SubscriptionManager {
                   }
             }
 
-            if(parent.UpdateFromChange) parent.UpdateFromChange();
-            this.UpdateFromChange();
+            if(parent.UpdateFromFields) parent.UpdateFromFields();
+            this.UpdateFromFields();
       }
 
       ///Subscribers

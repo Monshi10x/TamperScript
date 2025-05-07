@@ -166,8 +166,8 @@ class ModalSVG extends Modal {
             loader.Delete();
       }
 
-      updateFromFields() {
-            this.#dragZoomSVG.updateFromFields();
+      UpdateFromFields() {
+            this.#dragZoomSVG.UpdateFromFields();
       }
 
       hide() {
@@ -179,7 +179,7 @@ class ModalSVG extends Modal {
       onWindowResize(event) {
             super.onWindowResize(event);
             this.#dragZoomSVG.svgWidth = this.container.getBoundingClientRect().width;
-            this.updateFromFields();
+            this.UpdateFromFields();
       }
 
       addOverallMeasures() {

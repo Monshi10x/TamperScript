@@ -17,7 +17,7 @@ class ModalSheetJoins extends ModalWidthHeight {
       #sizeArrays = [];
       setSizeArrays(...sizeArrays) {
             this.#sizeArrays = sizeArrays;
-            this.updateFromFields();
+            this.UpdateFromFields();
       }
 
       #sheetSizeField;
@@ -129,8 +129,8 @@ class ModalSheetJoins extends ModalWidthHeight {
 
             this.#containerAfterCanvas = createDivStyle5(null, "View Settings", this.getBodyElement())[1];
 
-            this.#gapBetweenXField = createInput_Infield("Gap Between Panels (x)", this.#gapBetweenX, null, () => {this.#gapBetweenX = zeroIfNaNNullBlank(this.#gapBetweenXField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
-            this.#gapBetweenYField = createInput_Infield("Gap Between Panels (y)", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
+            this.#gapBetweenXField = createInput_Infield("Gap Between Panels (x)", this.#gapBetweenX, null, () => {this.#gapBetweenX = zeroIfNaNNullBlank(this.#gapBetweenXField[1].value); this.UpdateFromFields();}, this.#containerAfterCanvas, true, 10);
+            this.#gapBetweenYField = createInput_Infield("Gap Between Panels (y)", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.UpdateFromFields();}, this.#containerAfterCanvas, true, 10);
       }
 
       show() {
@@ -145,12 +145,12 @@ class ModalSheetJoins extends ModalWidthHeight {
             }
       }
 
-      updateFromFields() {
-            super.updateFromFields();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             if(this.dragZoomSVG) {
                   this.draw();
-                  this.dragZoomSVG.updateFromFields();
+                  this.dragZoomSVG.UpdateFromFields();
             }
       }
 
@@ -215,8 +215,6 @@ class ModalSheetJoins extends ModalWidthHeight {
                               for(let c = 0; c < matrixSize[r].length; c++) {//per matrix column i.e. size [w, h]
                                     isFirstColumn = c == 0;
                                     isLastColumn = c == matrixSize[r].length - 1;
-
-                                    console.log(matrixSize[r]);
 
                                     let [rectWidth, rectHeight] = matrixSize[r][c];
 
@@ -293,15 +291,14 @@ class ModalSheetJoins extends ModalWidthHeight {
                                     }
 
                                     if(this.isFolded) {
-                                          console.log(this.folds);
-                                          console.log(this.foldDepth);
                                           //top
                                           if(this.folds[0].checked && isFirstRow) {
                                                 this.DrawLine({
                                                       x1: xo,
                                                       y1: yo + this.foldDepth,
                                                       x2: xo + rectWidth,
-                                                      y2: yo + this.foldDepth
+                                                      y2: yo + this.foldDepth,
+                                                      stroke: "red"
                                                 });
                                                 ///drawLine_WH(canvasCtx, xo, yo + this.foldDepth, rectWidth, 0, COLOUR.Black, 1, 1, {stroke: [10, 10]});
                                           }
@@ -311,7 +308,8 @@ class ModalSheetJoins extends ModalWidthHeight {
                                                       x1: xo + this.foldDepth,
                                                       y1: yo,
                                                       x2: xo + this.foldDepth,
-                                                      y2: yo + rectHeight
+                                                      y2: yo + rectHeight,
+                                                      stroke: "red"
                                                 });
                                                 ///drawLine_WH(canvasCtx, xo + this.foldDepth, yo, 0, rectHeight, COLOUR.Black, 1, 1, {stroke: [10, 10]});
                                           }
@@ -321,7 +319,8 @@ class ModalSheetJoins extends ModalWidthHeight {
                                                       x1: xo + rectWidth - this.foldDepth,
                                                       y1: yo,
                                                       x2: xo + rectWidth - this.foldDepth,
-                                                      y2: yo + rectHeight
+                                                      y2: yo + rectHeight,
+                                                      stroke: "red"
                                                 });
                                                 ///drawLine_WH(canvasCtx, xo + rectWidth - this.foldDepth, yo, 0, rectHeight, COLOUR.Black, 1, 1, {stroke: [10, 10]});
                                           }
@@ -331,7 +330,8 @@ class ModalSheetJoins extends ModalWidthHeight {
                                                       x1: xo,
                                                       y1: yo + rectHeight - this.foldDepth,
                                                       x2: xo + rectWidth,
-                                                      y2: yo + rectHeight - this.foldDepth
+                                                      y2: yo + rectHeight - this.foldDepth,
+                                                      stroke: "red"
                                                 });
                                                 ///drawLine_WH(canvasCtx, xo, yo + rectHeight - this.foldDepth, rectWidth, 0, COLOUR.Black, 1, 1, {stroke: [10, 10]});
                                           }
@@ -371,6 +371,6 @@ class ModalSheetJoins extends ModalWidthHeight {
       onWindowResize(event) {
             super.onWindowResize(event);
             if(this.dragZoomSVG) this.dragZoomSVG.canvasWidth = this.container.getBoundingClientRect().width;
-            this.updateFromFields();
+            this.UpdateFromFields();
       }
 }

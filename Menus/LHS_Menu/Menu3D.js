@@ -421,7 +421,7 @@ class Menu3D extends LHSMenuWindow {
             }
 
             this.#allMaterials.push(newItem);
-            this.#updateFromChange();
+            this.#UpdateFromFields();
             return newItem;
       }
 
@@ -431,7 +431,7 @@ class Menu3D extends LHSMenuWindow {
 
             this.#allMaterials.push(newItem);
 
-            this.#updateFromChange();
+            this.#UpdateFromFields();
       }
 
       #getProductNumber() {
@@ -448,7 +448,7 @@ class Menu3D extends LHSMenuWindow {
                         break;
                   }
             }
-            this.#updateFromChange();
+            this.#UpdateFromFields();
       }
 
       DeleteProduct(productNumber) {
@@ -470,7 +470,7 @@ class Menu3D extends LHSMenuWindow {
             }
       }
 
-      #updateFromChange() { }
+      #UpdateFromFields() { }
 
       #toggleAllOpen() {
             for(let i = 0; i < this.#containers.length; i++) {

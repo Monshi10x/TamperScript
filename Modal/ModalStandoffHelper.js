@@ -20,7 +20,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
       #sizeArrays = [];
       setSizeArrays(...sizeArrays) {
             this.#sizeArrays = sizeArrays;
-            this.updateFromFields();
+            this.UpdateFromFields();
       }
 
       #gapBetweenX = 0;
@@ -68,7 +68,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
             this.#standOffTypeField = field;
 
             $(field).on('change', () => {
-                  this.updateFromFields();
+                  this.UpdateFromFields();
             });
       }
 
@@ -101,14 +101,14 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
 
             this.#containerAfterCanvas = createDivStyle5(null, "View Settings", this.getBodyElement())[1];
 
-            this.#gapBetweenXField = createInput_Infield("gapBetweenX", this.#gapBetweenX, null, () => {this.#gapBetweenX = zeroIfNaNNullBlank(this.#gapBetweenXField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
-            this.#gapBetweenYField = createInput_Infield("gapBetweenY", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.updateFromFields();}, this.#containerAfterCanvas, true, 10);
+            this.#gapBetweenXField = createInput_Infield("gapBetweenX", this.#gapBetweenX, null, () => {this.#gapBetweenX = zeroIfNaNNullBlank(this.#gapBetweenXField[1].value); this.UpdateFromFields();}, this.#containerAfterCanvas, true, 10);
+            this.#gapBetweenYField = createInput_Infield("gapBetweenY", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.UpdateFromFields();}, this.#containerAfterCanvas, true, 10);
       }
 
-      updateFromFields() {
-            super.updateFromFields();
+      UpdateFromFields() {
+            super.UpdateFromFields();
             this.draw();
-            this.#dragZoomSVG.updateFromFields();
+            this.#dragZoomSVG.UpdateFromFields();
       }
 
 
@@ -335,6 +335,6 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
       onWindowResize(event) {
             super.onWindowResize(event);
             //this.#dragZoomCanvas.canvasWidth = this.container.getBoundingClientRect().width;
-            this.updateFromFields();
+            this.UpdateFromFields();
       }
 }

@@ -361,7 +361,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 		}
 
 		this.#allMaterials.push(newItem);
-		this.#updateFromChange();
+		this.#UpdateFromFields();
 		return newItem;
 	}
 
@@ -371,7 +371,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 		this.#allMaterials.push(newItem);
 
-		this.#updateFromChange();
+		this.#UpdateFromFields();
 	}
 
 	#getProductNumber() {
@@ -388,7 +388,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				break;
 			}
 		}
-		this.#updateFromChange();
+		this.#UpdateFromFields();
 	}
 
 	DeleteProduct(productNumber) {
@@ -410,7 +410,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 		}
 	}
 
-	#updateFromChange() { }
+	#UpdateFromFields() { }
 
 	#toggleAllOpen() {
 		for(let i = 0; i < this.#containers.length; i++) {

@@ -221,20 +221,20 @@ class Size extends SubscriptionManager {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
                         this.productNumber = modal.value;
 
-                        this.UpdateFromChange();
+                        this.UpdateFromFields();
                   });
                   modal.value = this.productNumber;
             }, this.#container);
 
             this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;position:relative;border:1px solid " + this.#backgroundColor + ";", this.#container);
 
-            this.#qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 1);
+            this.#qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#container, true, 1);
 
-            this.#width = createInput_Infield("Width", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
+            this.#width = createInput_Infield("Width", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#container, true, 100, {postfix: "mm"});
 
-            this.#height = createInput_Infield("Height", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, true, 100, {postfix: "mm"});
+            this.#height = createInput_Infield("Height", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#container, true, 100, {postfix: "mm"});
 
-            this.#depth = createInput_Infield("Depth", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromChange();}, this.#container, false, 10, {postfix: "mm"});
+            this.#depth = createInput_Infield("Depth", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#container, false, 10, {postfix: "mm"});
             $(this.#depth[0]).hide();
 
             let commonSizeButton = createButton("A4,...", "width:60px;height:40px;margin:0px;margin-left:5px;margin-right:10px", () => {
@@ -259,7 +259,7 @@ class Size extends SubscriptionManager {
             this.UpdateDataForSubscribers();
       }
 
-      UpdateFromChange() {
+      UpdateFromFields() {
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();
       }

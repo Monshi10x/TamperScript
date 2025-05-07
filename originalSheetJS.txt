@@ -204,7 +204,7 @@ class Sheet extends Material {
             this.#joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:40%;margin-right:55%;height:40px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#visualiser = new ModalSheetJoins("Join Helper", 100, () => {
                         this.#visualiser.Close();
-                        this.UpdateFromChange();
+                        this.UpdateFromFields();
                   }, this);
 
                   this.#visualiser.borrowFields(...this.#filterContainersOrdered, this.#flip[0], methodContainer);
@@ -227,7 +227,7 @@ class Sheet extends Material {
                         flipDiagram.style.height = "10px";
                         flipDiagram.style.width = "30px";
                   }
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, this.container, true);
             flipDiagram = createDiv("background-color:yellow;width:30px;height:10px;margin-top:10px;", null, this.#flip[0]);
 
@@ -235,8 +235,8 @@ class Sheet extends Material {
             let methodContainer = createDivStyle4("width:40%;margin-right:50%;", this.container);
             let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
             let methodText = createText("Join Method", null, methodContainer);
-            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
-            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromChange();}, methodContainer, false);
+            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
+            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
 
             checkboxesAddToSelectionGroup(true, this.#method1, this.#method2);
 
@@ -300,8 +300,8 @@ class Sheet extends Material {
 
       /*
       Override*/
-      UpdateFromChange() {
-            super.UpdateFromChange();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             this.UpdateInheritedTable();
             this.UpdateOutputTable();
@@ -315,7 +315,7 @@ class Sheet extends Material {
       UpdateVisualizer() {
             if(this.#visualiser) {
                   this.#visualiser.setSizeArrays(this.#matrixSizes);
-                  this.#visualiser.updateFromFields();
+                  this.#visualiser.UpdateFromFields();
             }
       }
 
@@ -883,7 +883,7 @@ class Sheet extends Material {
                         }
                   }
             }
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       setSheetSizeOptions(...options) {

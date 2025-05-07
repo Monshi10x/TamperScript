@@ -5,7 +5,7 @@ class DragZoomCanvas {
 
       #scale = 0.1;
       get scale() {return this.#scale;}
-      set scale(value) {this.#scale = value; this.updateFromFields();}
+      set scale(value) {this.#scale = value; this.UpdateFromFields();}
 
       #scrollSpeed = 0.2;
 
@@ -163,7 +163,7 @@ class DragZoomCanvas {
             this.canvasCtx.lineWidth = this.#ctxLineWidth;
       };
 
-      updateFromFields() {
+      UpdateFromFields() {
             this.resetCanvasOrigins();
 
             this.canvasCtx.translate(this.#xOffset, this.#yOffset);

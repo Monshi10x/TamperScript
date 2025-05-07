@@ -341,14 +341,14 @@ class Laser extends SubMenu {
       getProfileOptions = (requestFrom, materialField, thicknessField, profileField, qualityField, speedField) => {
             let returnOptions = [];
             if(requestFrom == "Material") {
-                  let keys = Object.keys(RouterToolpathTimeLookup);
+                  let keys = Object.keys(LaserToolpathTimeLookup);
                   let keysLength = keys.length;
                   for(let i = 0; i < keysLength; i++) {
                         returnOptions.push(createDropdownOption(keys[i], keys[i]));
                   }
             } else if(requestFrom == "Thickness") {
                   let materialChosen = materialField.value;
-                  let keys = Object.keys(RouterToolpathTimeLookup[materialChosen]);
+                  let keys = Object.keys(LaserToolpathTimeLookup[materialChosen]);
                   let keysLength = keys.length;
                   for(let i = 0; i < keysLength; i++) {
                         returnOptions.push(createDropdownOption(keys[i], keys[i]));
@@ -357,7 +357,7 @@ class Laser extends SubMenu {
             else if(requestFrom == "Profile") {
                   let materialChosen = materialField.value;
                   let thicknessChosen = thicknessField.value;
-                  let keys = Object.keys(RouterToolpathTimeLookup[materialChosen][thicknessChosen]);
+                  let keys = Object.keys(LaserToolpathTimeLookup[materialChosen][thicknessChosen]);
                   let keysLength = keys.length;
                   for(let i = 0; i < keysLength; i++) {
                         returnOptions.push(createDropdownOption(keys[i], keys[i]));
@@ -366,7 +366,7 @@ class Laser extends SubMenu {
                   let materialChosen = materialField.value;
                   let thicknessChosen = thicknessField.value;
                   let profileChosen = profileField.value;
-                  let keys = Object.keys(RouterToolpathTimeLookup[materialChosen][thicknessChosen][profileChosen]);
+                  let keys = Object.keys(LaserToolpathTimeLookup[materialChosen][thicknessChosen][profileChosen]);
                   let keysLength = keys.length;
                   for(let i = 0; i < keysLength; i++) {
                         returnOptions.push(createDropdownOption(keys[i], keys[i]));
@@ -376,7 +376,7 @@ class Laser extends SubMenu {
                   let thicknessChosen = thicknessField.value;
                   let profileChosen = profileField.value;
                   let qualityChosen = qualityField.value;
-                  return parseFloat(RouterToolpathTimeLookup[materialChosen][thicknessChosen][profileChosen][qualityChosen]);
+                  return parseFloat(LaserToolpathTimeLookup[materialChosen][thicknessChosen][profileChosen][qualityChosen]);
             }
             return returnOptions;
       };
@@ -392,7 +392,7 @@ class Laser extends SubMenu {
                               await setRouterRunTimeEach(productNo, partIndex, this.runTime);
                               await setRouterPostJobTimeEach(productNo, partIndex, this.cleanTime);
                               await setRouterSetupOnceOff(productNo, partIndex, this.setupOnceOff);
-                              await setPartDescription(productNo, partIndex, "[ROUTERING] Router Cutting per ea");
+                              await setPartDescription(productNo, partIndex, "[LASER] Laser Cutting per ea");
                               await savePart(productNo, partIndex);
                         } else {
                               await AddPart("Router Cutting (total)", productNo);
@@ -401,7 +401,7 @@ class Laser extends SubMenu {
                               await setRouterSetupTimeTotal(productNo, partIndex, this.setupTime);
                               await setRouterRunTimeTotal(productNo, partIndex, this.runTime);
                               await setRouterPostJobTimeTotal(productNo, partIndex, this.cleanTime);
-                              await setPartDescription(productNo, partIndex, "[ROUTERING] Router Cutting per total");
+                              await setPartDescription(productNo, partIndex, "[LASER] Laser Cutting per total");
                               await savePart(productNo, partIndex);
                         }
                   }

@@ -66,19 +66,19 @@ class Painting extends Material {
             let f_timeContainer = createDivStyle5(null, "Time", this.container)[1];
 
             let f_setupContainer = createDivStyle5(null, "Setup", f_timeContainer)[1];
-            this.#f_setupTime = createInput_Infield("Setup Time", this.#defaultSetupTime.as("minutes"), "width:30%;", () => {this.UpdateFromChange();}, f_setupContainer, false, 0.1, {postfix: "min"});
+            this.#f_setupTime = createInput_Infield("Setup Time", this.#defaultSetupTime.as("minutes"), "width:30%;", () => {this.UpdateFromFields();}, f_setupContainer, false, 0.1, {postfix: "min"});
 
             let f_colourMatchContainer = createDivStyle5(null, "Colour Match", f_timeContainer)[1];
-            this.#f_colourMatchTime = createInput_Infield("Colour Match Time", this.#defaultColourMatchTime.as("minutes"), "width:30%;margin-right:60%;", () => {this.UpdateFromChange();}, f_colourMatchContainer, false, 5, {postfix: "min"});
+            this.#f_colourMatchTime = createInput_Infield("Colour Match Time", this.#defaultColourMatchTime.as("minutes"), "width:30%;margin-right:60%;", () => {this.UpdateFromFields();}, f_colourMatchContainer, false, 5, {postfix: "min"});
 
             let f_runContainer = createDivStyle5(null, "Run", f_timeContainer)[1];
             this.#f_numberCoats = createDropdown_Infield("Number of Coats", 0, "width:50%;", [
                   createDropdownOption("x2 (2K for Acrylic/ACM)", 2),
                   createDropdownOption("x3 (2K for Raw Metals Alum/Steel/Stainless...)", 3),
                   createDropdownOption("x4 (x2 Base + x2 Clear)", 4)
-            ], () => {this.UpdateFromChange();}, f_runContainer);
-            this.#f_perCoatTime = createInput_Infield("Per Coat Time", this.#defaultCoatTime.as("minutes"), "width:20%;", () => {this.UpdateFromChange();}, f_runContainer, false, 1, {postfix: "min"});
-            this.#f_flashTime = createInput_Infield("Flash Time", this.#defaultFlashTime.as("minutes"), "width:20%;", () => {this.UpdateFromChange();}, f_runContainer, false, 5, {postfix: "min"});
+            ], () => {this.UpdateFromFields();}, f_runContainer);
+            this.#f_perCoatTime = createInput_Infield("Per Coat Time", this.#defaultCoatTime.as("minutes"), "width:20%;", () => {this.UpdateFromFields();}, f_runContainer, false, 1, {postfix: "min"});
+            this.#f_flashTime = createInput_Infield("Flash Time", this.#defaultFlashTime.as("minutes"), "width:20%;", () => {this.UpdateFromFields();}, f_runContainer, false, 5, {postfix: "min"});
 
             let f_litresContainer = createDivStyle5(null, "Litres", this.container)[1];
             let f_formulaContainer = createDivStyle5(null, "Formula", f_litresContainer)[1];
@@ -90,7 +90,7 @@ class Painting extends Material {
                         setFieldDisabled(true, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
                         $(this.#f_litresPerSquareMetrePerCoat[1]).val(this.#defaultLitresPerSquareMetrePerCoat.as("litres")).change();
                   }
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, f_formulaContainer);
             this.#f_litresFormulas = createDropdown_Infield_Icons_Search("Use Formula", 2, "width:30%;margin-right:30%;", 200, false, [
                   ["Flat Panels", GM_getResourceURL("Image_PaintedPanel")],
@@ -99,18 +99,18 @@ class Painting extends Material {
                   ["Fabricated BACK-LIT Letters", GM_getResourceURL("Image_FabLettersPainted")],
                   ["Fabricated NON-LIT Letters", GM_getResourceURL("Image_FabLettersPainted")]
             ], () => {
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, f_formulaContainer, false);
 
             let f_totalContainer = createDivStyle5(null, "Total", f_litresContainer)[1];
-            this.#f_areaToPaint = createInput_Infield("Area To Paint", 0, "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "m2"});
+            this.#f_areaToPaint = createInput_Infield("Area To Paint", 0, "width:25%;", () => {this.UpdateFromFields();}, f_totalContainer, false, 0.1, {postfix: "m2"});
             createText("X", "width:30px;height:50px;font-size:32px;color:blue;", f_totalContainer);
             setFieldDisabled(true, this.#f_areaToPaint[1], this.#f_areaToPaint[0]);
-            this.#f_litresPerSquareMetrePerCoat = createInput_Infield("Litres Per m2 Per Coat", this.#defaultLitresPerSquareMetrePerCoat.as("litres"), "width:25%;", () => {this.UpdateFromChange();}, f_totalContainer, false, 0.1, {postfix: "L/m2"});
+            this.#f_litresPerSquareMetrePerCoat = createInput_Infield("Litres Per m2 Per Coat", this.#defaultLitresPerSquareMetrePerCoat.as("litres"), "width:25%;", () => {this.UpdateFromFields();}, f_totalContainer, false, 0.1, {postfix: "L/m2"});
             createText("=", "width:30px;height:50px;font-size:32px;color:blue;", f_totalContainer);
             setFieldDisabled(true, this.#f_litresPerSquareMetrePerCoat[1], this.#f_litresPerSquareMetrePerCoat[0]);
 
-            this.#f_litres = createInput_Infield("Litres", this.#defaultLitres.as("litres"), "width:25%;", () => {this.UpdateFromChange({updateLitresField: false});}, f_totalContainer, false, 0.1, {postfix: "L"});
+            this.#f_litres = createInput_Infield("Litres", this.#defaultLitres.as("litres"), "width:25%;", () => {this.UpdateFromFields({updateLitresField: false});}, f_totalContainer, false, 0.1, {postfix: "L"});
 
             makeFieldGroup("Checkbox", this.#f_useLitresFormula[1], true, this.#f_litresFormulas[0]);
             /*
@@ -124,13 +124,13 @@ class Painting extends Material {
 
             /*
             Update*/
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       /*
       Inherited*/
-      UpdateFromChange(options = {updateLitresField: true}) {
-            super.UpdateFromChange();
+      UpdateFromFields(options = {updateLitresField: true}) {
+            super.UpdateFromFields();
 
             this.UpdateFromInheritedData();
 

@@ -91,7 +91,7 @@ class BillboardMenu extends LHSMenuWindow {
                         item.onclick = function() {
                               toggleSelectedType(this);
                               thisClass.draw();
-                              thisClass.updateFromFields();
+                              thisClass.UpdateFromFields();
                         };
                         item.onmouseover = function() {
                               this.style.boxShadow = "0 4px 8px 0 black";
@@ -151,15 +151,15 @@ class BillboardMenu extends LHSMenuWindow {
             this.#install = null;
             this.#artwork = null;
 
-            this.#totalQuantity = new TotalQuantity(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-            this.#sign = new Sign(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-            this.#frame = new Frame(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-            this.#leg = new Leg(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-            this.#footing = new Footing(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-            this.#baseplate = new Baseplate(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-            this.#production = new Production(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-            this.#install = new Install(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
-            this.#artwork = new Artwork(infoContainer, this.#canvasCtx, () => {this.updateFromFields();}, this.#dragZoomSVG);
+            this.#totalQuantity = new TotalQuantity(infoContainer, this.#canvasCtx, () => {this.UpdateFromFields();}, this.#dragZoomSVG);
+            this.#sign = new Sign(infoContainer, this.#canvasCtx, () => {this.UpdateFromFields();}, this.#dragZoomSVG);
+            this.#frame = new Frame(infoContainer, this.#canvasCtx, () => {this.UpdateFromFields();}, this.#dragZoomSVG);
+            this.#leg = new Leg(infoContainer, this.#canvasCtx, () => {this.UpdateFromFields();}, this.#dragZoomSVG);
+            this.#footing = new Footing(infoContainer, this.#canvasCtx, () => {this.UpdateFromFields();}, this.#dragZoomSVG);
+            this.#baseplate = new Baseplate(infoContainer, this.#canvasCtx, () => {this.UpdateFromFields();}, this.#dragZoomSVG);
+            this.#production = new Production(infoContainer, this.#canvasCtx, () => {this.UpdateFromFields();}, this.#dragZoomSVG);
+            this.#install = new Install(infoContainer, this.#canvasCtx, () => {this.UpdateFromFields();}, this.#dragZoomSVG);
+            this.#artwork = new Artwork(infoContainer, this.#canvasCtx, () => {this.UpdateFromFields();}, this.#dragZoomSVG);
 
             this.drawSVGGround();
 
@@ -388,8 +388,8 @@ class BillboardMenu extends LHSMenuWindow {
             }));
       }
 
-      updateFromFields() {
-            this.#dragZoomCanvas.updateFromFields();
+      UpdateFromFields() {
+            this.#dragZoomCanvas.UpdateFromFields();
 
 
             if(this.#totalQuantity.UpdateSVG) this.#totalQuantity.UpdateSVG();

@@ -130,7 +130,7 @@ class Material extends SubscriptionManager {
             this.#f_debugTextArea = createTextarea("DEBUG", "", "width:90%;", () => { }, this.#f_overallQtyContainer);
             if(!this.DEBUG_SHOW) $(this.#f_debugTextArea).hide();
 
-            this.#f_qty = createInput_Infield("Qty", 1, "width:20%", () => {this.UpdateFromChange();}, this.#f_overallQtyContainer, true, 1);
+            this.#f_qty = createInput_Infield("Qty", 1, "width:20%", () => {this.UpdateFromFields();}, this.#f_overallQtyContainer, true, 1);
             setFieldDisabled(false, this.#f_qty[1], this.#f_qty[0]);
 
             this.Minimize();
@@ -138,8 +138,8 @@ class Material extends SubscriptionManager {
 
       /*
       Override */
-      UpdateFromChange() {
-            super.UpdateFromChange();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             this.UpdateSubscribedLabel();
             this.UpdateDebug();
@@ -164,7 +164,7 @@ class Material extends SubscriptionManager {
 
       OpenSubscriptionsModal() {
             new ModalManageSubscriptions2("Manage Subscriptions", () => {
-                  this.UpdateFromChange();
+                  this.UpdateFromFields();
             }, this, this.#f_lhsMenuWindow);
       }
 
@@ -181,14 +181,11 @@ class Material extends SubscriptionManager {
 
                   this.#f_subscriptionsContainer.appendChild(subSlot);
             }
-
       }
 
       getQWHD() {
             for(let i = 0; i < this.subscriptions.length; i++) {
-                  if(this.subscriptions[i].qty && this.subscriptions[i].width && this.subscriptions[i].height) {
-                        return this.subscriptions[i].getQWHD();
-                  }
+                  return this.subscriptions[i]?.getQWHD();
             }
             return new QWHD(0, 0, 0, 0);
       };
@@ -237,7 +234,7 @@ class Material extends SubscriptionManager {
       }
 
       onProductNumberChange() {
-            this.UpdateFromChange();
+            this.UpdateFromFields();
       }
 
       /*

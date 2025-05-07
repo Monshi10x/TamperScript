@@ -87,7 +87,7 @@ class AppTaping extends Material {
             let materialParts = getPredefinedParts("Tape - Application");
             var materialDropdownElements = [];
             materialParts.forEach(element => materialDropdownElements.push([element.Name, "white"]));
-            this.#material = createDropdown_Infield_Icons_Search("App Tape", 0, "width:60%;", 10, true, materialDropdownElements, () => {this.UpdateFromChange();}, f_container_material);
+            this.#material = createDropdown_Infield_Icons_Search("App Tape", 0, "width:60%;", 10, true, materialDropdownElements, () => {this.UpdateFromFields();}, f_container_material);
             $(this.#material).val(AppTapeLookup["Medium Tack"]).change();
 
             /*
@@ -133,8 +133,8 @@ class AppTaping extends Material {
 
       /*
       Override*/
-      UpdateFromChange() {
-            super.UpdateFromChange();
+      UpdateFromFields() {
+            super.UpdateFromFields();
 
             this.UpdateFromInheritedData();
             this.UpdateMachineTimes();
