@@ -491,6 +491,7 @@ class Sheet extends Material {
 
 
 
+
             this.#foldedTop = createCheckbox_Infield("Top", false, "margin-left: 20%; width:20%;margin-right: 50%; ", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
             this.#foldedLeft = createCheckbox_Infield("Left", false, "width:20%;margin-right: 20%;", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
             this.#foldedRight = createCheckbox_Infield("Right", false, " width:20%;margin-right: 30%;", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
