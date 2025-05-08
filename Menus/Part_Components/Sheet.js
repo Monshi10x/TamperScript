@@ -468,16 +468,16 @@ class Sheet extends Material {
             Folded*/
             let f_container_folded = createDivStyle5(null, "Folded", this.container)[1];
             this.#f_foldSideContainer = document.createElement('div');
-            let alertDiv;
+            //let alertDiv;
             this.#isFolded = createCheckbox_Infield("Is Folded", false, "width:calc(50% - 20px);margin:10px;", () => {
                   if(this.#isFolded[1].checked) {
                         setFieldHidden(false, this.#foldedTop[1], this.#foldedTop[0]);
                         setFieldHidden(false, this.#foldedLeft[1], this.#foldedLeft[0]);
                         setFieldHidden(false, this.#foldedRight[1], this.#foldedRight[0]);
                         setFieldHidden(false, this.#foldedBottom[1], this.#foldedBottom[0]);
-                        if(this.depth == 0) {
-                              $(alertDiv).show();
-                        }
+                        //if(this.depth == 0) {
+                        //      $(alertDiv).show();
+                        //}
                   } else {
                         setFieldHidden(true, this.#foldedTop[1], this.#foldedTop[0]);
                         setFieldHidden(true, this.#foldedLeft[1], this.#foldedLeft[0]);
@@ -487,7 +487,7 @@ class Sheet extends Material {
                   }
                   this.UpdateFromFields();
             }, this.#f_foldSideContainer);
-            alertDiv = createFloatingDiv("Depth is 0, has no effect", "width:120px;padding-left:4px;top:10px;", this.#isFolded[0]);
+            //alertDiv = createFloatingDiv("Depth is 0, has no effect", "width:120px;padding-left:4px;top:10px;", this.#isFolded[0]);
 
 
 
