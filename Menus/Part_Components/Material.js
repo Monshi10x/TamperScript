@@ -10,6 +10,7 @@ class Material extends SubscriptionManager {
       #backgroundColor = COLOUR.Black;
       #textColor = COLOUR.White;
       static DISPLAY_NAME = "MATERIAL";
+      UPDATES_PAUSED = false;
       /*
                         
       FIELDS            */
@@ -17,7 +18,6 @@ class Material extends SubscriptionManager {
       #f_qty;
       #f_width;
       #f_height;
-      //#f_depth;
       #f_lockBtn;
       #f_deleteBtn;
       #f_container;
@@ -39,7 +39,6 @@ class Material extends SubscriptionManager {
       get qtyField() {return this.#f_qty[1];}
       get width() {return zeroIfNaNNullBlank(this.#f_width[1].value);}
       get height() {return zeroIfNaNNullBlank(this.#f_height[1].value);}
-      //get depth() {return zeroIfNaNNullBlank(this.#f_depth[1].value);}
       get container() {return this.#f_container;}
       get Type() {return this.TYPE;}
       get ID() {return this.#Type + "-" + this.#UNIQUEID;}
@@ -148,7 +147,7 @@ class Material extends SubscriptionManager {
       UpdateDebug() {
             let debugData = "INHERITED DATA:\n";
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   debugData += subscription.parent.constructor.name + "\n";
                   debugData += JSON.stringify(subscription.data, null, 4) + "\n\n";

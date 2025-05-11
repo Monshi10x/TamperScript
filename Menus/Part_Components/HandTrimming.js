@@ -61,7 +61,7 @@ class HandTrimming extends Material {
             TimeStats*/
             let f_container_stats = createDivStyle5(null, "Stats", this.container)[1];
 
-            this.#totalLinearMetresField = createInput_Infield("Total Linear Metres", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "m"});
+            this.#totalLinearMetresField = createInput_Infield("Total Linear Metres", 45, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "m"});
             setFieldDisabled(true, this.#totalLinearMetresField[1], this.#totalLinearMetresField[0]);
             this.#trimmingSecondsPerMetreField = createInput_Infield("Trimming Speed", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "sec/m"});
             this.#totalTrimmingText = createInput_Infield("Total Trimming", 0, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "sec"});
@@ -69,7 +69,7 @@ class HandTrimming extends Material {
             createHr(null, f_container_stats);
 
             this.#numberOfShapesField = createInput_Infield("Number Of Shapes", 0, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1);
-            this.#handlingTimePerShapeField = createInput_Infield("Handling Time Per Shape", 30, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "sec"});
+            this.#handlingTimePerShapeField = createInput_Infield("Handling Time Per Shape", 60, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "sec"});
             this.#totalHandlingText = createInput_Infield("Total Handling", 0, null, () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "mins"});
             createHr(null, f_container_stats);
             this.#totalTimeField = createInput_Infield("Total Time", 0, "margin: 5px calc(50% - 125px);", () => {this.UpdateTrimmingTimes();}, f_container_stats, true, 1, {postfix: "mins"});
@@ -114,13 +114,13 @@ class HandTrimming extends Material {
             this.#inheritedSizes = [];
             this.#inheritedSizeTable.deleteAllRows();
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD, finalRollSize: [...]}*/) => {
 
-                        if(!dataEntry.QWHD || !dataEntry.finalRollSize) return/**Only this iteration*/;
-
-                        this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height);
+                        if(dataEntry.QWHD) {
+                              this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height);
+                        }
                   });
             });
       };
@@ -129,14 +129,14 @@ class HandTrimming extends Material {
             let totalLinearMetres = 0;
             let numberOfShapes = 0;
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD, finalRollSize: [...]}*/) => {
 
-                        if(!dataEntry.QWHD || !dataEntry.finalRollSize) return/**Only this iteration*/;
-
-                        totalLinearMetres += mmToM(dataEntry.QWHD.qty * 2 * (dataEntry.QWHD.width + dataEntry.QWHD.height)) * this.qty;
-                        numberOfShapes += dataEntry.QWHD.qty * this.qty;
+                        if(dataEntry.QWHD) {
+                              totalLinearMetres += mmToM(dataEntry.QWHD.qty * 2 * (dataEntry.QWHD.width + dataEntry.QWHD.height)) * this.qty;
+                              numberOfShapes += dataEntry.QWHD.qty * this.qty;
+                        }
                   });
             });
 

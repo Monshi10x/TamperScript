@@ -142,8 +142,8 @@ class ModalVinylJoins extends ModalWidthHeight {
                                     let joinAmountY = 0;
 
                                     //joins
-                                    if(Vinyl.isSizeBiggerThanRoll(rectWidth, rectHeight, this.rollWidth)) {
-                                          let newSizes = Vinyl.createJoins(1, rectWidth, rectHeight, this.joinOrientation == "Horizontal", true, this.rollWidth, this.joinOverlap);
+                                    if(Vinyl.needsJoins(rectWidth, rectHeight, this.rollWidth)) {
+                                          let newSizes = Vinyl.getJoins(1, rectWidth, rectHeight, this.joinOrientation == "Horizontal", true, this.rollWidth, this.joinOverlap);
 
                                           times = newSizes[0].qty;
 

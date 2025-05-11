@@ -43,14 +43,21 @@
 				"text": "DATA_FOR_SUBSCRIBERS",
 				"color": "#ffffff",
 				"fontWeight": "bold",
-				"backgroundColor": "blue",
+				"backgroundColor": "#ff6f00",
 				"overviewRulerColor": "grey",
 				"padding": "5px"
 		},{
-				"text": "INHERITED_DATA",
+				"text": "#dataForSubscribers",
 				"color": "#ffffff",
 				"fontWeight": "bold",
-				"backgroundColor": "blue",
+				"backgroundColor": "#ff6f00",
+				"overviewRulerColor": "grey",
+				"padding": "5px"
+		},{
+				"text": "SUBSCRIPTION_DATA",
+				"color": "#ffffff",
+				"fontWeight": "bold",
+				"backgroundColor": "#ff6f00",
 				"overviewRulerColor": "grey",
 				"padding": "5px"
 		},{

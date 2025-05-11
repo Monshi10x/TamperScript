@@ -89,12 +89,12 @@ class Laminate extends Material {
             let f_container_machine = createDivStyle5(null, "Machine", this.container)[1];
 
             createText("Setup", "width:100%;height:20px", f_container_machine);
-            this.#f_machineSetupTime = createInput_Infield("Setup Time Average", 3, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "min"});
+            this.#f_machineSetupTime = createInput_Infield("Setup Time Average", 5, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "min"});
 
             createText("Run", "width:100%;height:20px", f_container_machine);
             this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "m"});
             setFieldDisabled(true, this.#f_machineLengthToRun[1], this.#f_machineLengthToRun[0]);
-            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 2, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "m/min"});
+            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "m/min"});
             this.#f_machineRunTime = createInput_Infield("Run Time", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineRunTime[1], this.#f_machineRunTime[0]);
             createText("Total", "width:100%;height:20px", f_container_machine);
@@ -130,35 +130,27 @@ class Laminate extends Material {
       /*
       Inherited*/
       UpdateFromFields() {
-            super.UpdateFromFields();
+            if(this.UPDATES_PAUSED) return;
 
             this.UpdateFromInheritedData();
-
+            this.UpdateOutput();
             this.UpdateMachineTimes();
             this.UpdateProductionTimes();
 
-            this.UpdateOutput();
             this.UpdateDataForSubscribers();
+
             this.PushToSubscribers();
-      }
 
-
-      UpdateDataForSubscribers() {
-            this.DATA_FOR_SUBSCRIBERS = {
-                  parent: this,
-                  data: this.#dataForSubscribers
-            };
+            super.UpdateFromFields();
       }
 
       UpdateFromInheritedData = () => {
             this.#totalRunLength = 0;
             this.#f_inheritedSizeTable.deleteAllRows();
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD, finalRollSize: QWHD}*/) => {
-
-                        if(!dataEntry.QWHD || !dataEntry.finalRollSize) return/**Only this iteration*/;
 
                         //If using roll length
                         if(dataEntry.finalRollSize && this.#useRollLength === true) {
@@ -166,13 +158,45 @@ class Laminate extends Material {
                               this.#totalRunLength += dataEntry.finalRollSize.height * dataEntry.finalRollSize.qty * this.qty;
                         }
                         //If using QWHD
-                        else {
+                        else if(dataEntry.QWHD && this.#useRollLength === false) {
                               this.#f_inheritedSizeTable.addRow(dataEntry.QWHD.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
                               this.#totalRunLength += Math.max(dataEntry.QWHD.width, dataEntry.QWHD.height) * dataEntry.QWHD.qty * this.qty;
                         }
+
                   });
             });
       };
+
+      UpdateOutput() {
+            this.#dataForSubscribers = [];
+            this.#f_outputSizeTable.deleteAllRows();
+
+            let sizeArray = [];
+
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{QWHD: QWHD}*/) => {
+
+                        if(dataEntry.finalRollSize && this.#useRollLength === true) {
+                              this.#dataForSubscribers.push({QWHD: new QWHD(dataEntry.finalRollSize.qty * this.qty, dataEntry.finalRollSize.width, dataEntry.finalRollSize.height)});
+                              this.#f_outputSizeTable.addRow(dataEntry.finalRollSize.qty * this.qty, roundNumber(dataEntry.finalRollSize.width, 2), roundNumber(dataEntry.finalRollSize.height, 2));
+
+                              sizeArray.push(new QWHD(dataEntry.finalRollSize.qty * this.qty, roundNumber(dataEntry.finalRollSize.width, 2), roundNumber(dataEntry.finalRollSize.height, 2)));
+                        }
+
+                        if(dataEntry.QWHD && this.#useRollLength === false) {
+
+                              this.#dataForSubscribers.push({QWHD: new QWHD(dataEntry.QWHD.qty * this.qty, dataEntry.QWHD.width, dataEntry.QWHD.height)});
+                              this.#f_outputSizeTable.addRow(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
+
+                              sizeArray.push(new QWHD(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2)));
+                        }
+                  });
+            });
+
+            $(this.#f_materialTotalArea[1]).val(combinedSqm(sizeArray));
+      };
+
 
       UpdateMachineTimes() {
             this.#f_machineLengthToRun[1].value = roundNumber(mmToM(this.#totalRunLength), 2);
@@ -184,27 +208,12 @@ class Laminate extends Material {
             this.#f_production.productionTime = this.machineTotalTime;
       }
 
-      UpdateOutput() {
-            this.#dataForSubscribers = [];
-            this.#f_outputSizeTable.deleteAllRows();
-
-            let sizeArray = [];
-
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
-
-                  subscription.data.forEach((dataEntry/**{QWHD: QWHD}*/) => {
-
-                        if(!dataEntry.QWHD) return/**Only this iteration*/;
-
-                        this.#dataForSubscribers.push({QWHD: new QWHD(dataEntry.QWHD.qty * this.qty, dataEntry.QWHD.width, dataEntry.QWHD.height)});
-                        this.#f_outputSizeTable.addRow(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
-
-                        sizeArray.push(new QWHD(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2)));
-                  });
-            });
-
-            $(this.#f_materialTotalArea[1]).val(combinedSqm(sizeArray));
-      };
+      UpdateDataForSubscribers() {
+            this.DATA_FOR_SUBSCRIBERS = {
+                  parent: this,
+                  data: this.#dataForSubscribers
+            };
+      }
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
@@ -213,7 +222,7 @@ class Laminate extends Material {
 
             let dataEntries = [];
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
 
@@ -221,8 +230,13 @@ class Laminate extends Material {
                   });
             });
 
+            console.log(dataEntries);
+
             for(let i = 0; i < dataEntries.length; i++) {
-                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, dataEntries[i].QWHD.qty, dataEntries[i].QWHD.width, dataEntries[i].QWHD.height, partFullName, "", false);
+                  if(dataEntries[i].finalRollSize && this.#useRollLength === true)
+                        partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, dataEntries[i].finalRollSize.qty, dataEntries[i].finalRollSize.width, dataEntries[i].finalRollSize.height, partFullName, "", false);
+                  else if(!dataEntries[i].finalRollSize && this.#useRollLength === false)
+                        partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, dataEntries[i].QWHD.qty, dataEntries[i].QWHD.width, dataEntries[i].QWHD.height, partFullName, "", false);
             }
 
             partIndex = await this.#f_production.Create(productNo, partIndex);

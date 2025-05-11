@@ -328,7 +328,7 @@ function uniqueSizeArrayWithOccurenceCount(array) {
     for(let i = 0; i < array.length; i++) {
         let itemWidth = array[i][0];
         let itemHeight = array[i][1];
-        let itemDepth = array[i][1];
+        let itemDepth = array[i][2] || 0;
         if(i == 0) {
             returnArray.push(new QWHD(1, itemWidth, itemHeight, itemDepth));
             continue;

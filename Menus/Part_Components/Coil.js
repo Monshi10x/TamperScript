@@ -143,7 +143,7 @@ class Coil extends Material {
       UpdateFromInheritedData = () => {
             this.#f_inheritedSizeTable.deleteAllRows();
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{pathLength: 0, shapeAreas: 0, boundingRectAreas: 0, QWHD: QWHD}*/) => {
 
@@ -155,7 +155,7 @@ class Coil extends Material {
       UpdateMachineTimes() {
             let totalLength_mm = 0;
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{pathLength: 0, shapeAreas: 0, boundingRectAreas: 0, QWHD: QWHD}*/) => {
 
@@ -177,7 +177,7 @@ class Coil extends Material {
             this.#dataForSubscribers = [];
             this.#f_outputSizeTable.deleteAllRows();
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{pathLength: 0, shapeAreas: 0, boundingRectAreas: 0, QWHD: QWHD}*/) => {
 

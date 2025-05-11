@@ -106,8 +106,9 @@ class DragZoomSVG {
 
             this.#f_container = document.createElement("div");
             this.#f_container.innerHTML = svgText || '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)"></g></svg>';
-            this.#f_container.style = "display: block;float: left;outline:1px solid black;";
-            this.#f_container.style.cssText += "width:" + svgWidth + ";height:" + svgHeight + ";";
+            this.#f_container.style = "display: block;float: left;outline:1px solid black;width:" + svgWidth + ";height:" + svgHeight + ";";
+            console.log("width:" + svgWidth + ";height:" + svgHeight + ";");
+
             this.#f_container.className = "svgContainerDiv";
             if(parentToAppendTo) parentToAppendTo.appendChild(this.#f_container);
 

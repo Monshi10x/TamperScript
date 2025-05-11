@@ -12,7 +12,7 @@ class SubscriptionManager {
       ///Subscription
       #subscriptions = [];
       get subscriptions() {return this.#subscriptions;};
-      INHERITED_DATA = [];
+      SUBSCRIPTION_DATA = [];
       /*overrideable*/get Type() {return "SubscriptionManager";}
       /*overrideable*/UpdateFromFields() { }
 
@@ -45,17 +45,17 @@ class SubscriptionManager {
 
             let dataIsNew = true;
 
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(data.parent == this.INHERITED_DATA[i].parent) {
+            for(let i = 0; i < this.SUBSCRIPTION_DATA.length; i++) {
+                  if(data.parent == this.SUBSCRIPTION_DATA[i].parent) {
                         dataIsNew = false;
 
-                        this.INHERITED_DATA[i] = data;
+                        this.SUBSCRIPTION_DATA[i] = data;
                         break;
                   }
             }
 
             if(dataIsNew) {
-                  this.INHERITED_DATA.push(data);
+                  this.SUBSCRIPTION_DATA.push(data);
             }
 
             //:Add Parent to subscriptions if is new
@@ -77,9 +77,9 @@ class SubscriptionManager {
             console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " issues UnSubscribe request to ", parent.constructor.name + "(" + parent.ID + ")");
 
             //:Remove Parent data from my subscriptions
-            for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                  if(this.INHERITED_DATA[i].parent == parent) {
-                        this.INHERITED_DATA.splice(i, 1);
+            for(let i = 0; i < this.SUBSCRIPTION_DATA.length; i++) {
+                  if(this.SUBSCRIPTION_DATA[i].parent == parent) {
+                        this.SUBSCRIPTION_DATA.splice(i, 1);
                         break;
                   }
             }

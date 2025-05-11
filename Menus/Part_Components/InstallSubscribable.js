@@ -68,9 +68,11 @@ class InstallSubscribable extends Material {
             this.#inheritedSizeTable.deleteAllRows();
 
             //Per Parent Subscription:
-            for(let a = 0; a < this.INHERITED_DATA.length; a++) {
-                  let recievedInputSizes = this.INHERITED_DATA[a].data;
+            for(let a = 0; a < this.SUBSCRIPTION_DATA.length; a++) {
+                  let recievedInputSizes = this.SUBSCRIPTION_DATA[a].data;
                   for(let i = 0; i < recievedInputSizes.length; i++) {
+                        if(!recievedInputSizes[i].QWHD) continue/**Only this iteration*/;
+
                         this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
                         this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height);
                   }

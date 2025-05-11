@@ -151,7 +151,7 @@ class Painting extends Material {
       UpdateFromInheritedData = () => {
             this.#f_inheritedSizeTable.deleteAllRows();
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{pathLength: 0, shapeAreas: 0, boundingRectAreas: 0, QWHD: QWHD}*/) => {
 
@@ -168,7 +168,7 @@ class Painting extends Material {
 
             let calculatedArea = 0;
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{paintedArea: 0}*/) => {
 

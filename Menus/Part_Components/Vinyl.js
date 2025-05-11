@@ -59,6 +59,45 @@ class Vinyl extends Material {      /*
       get rollWastage() {return zeroIfNaNNullBlank(this.#f_rollWastage[1].value);};
       get rollWidth() {return zeroIfNaNNullBlank(this.#f_rollWidth[1].value);};
       /*override*/get Type() {return "VINYL";}
+
+      static needsJoins(width, height, rollWidth) {
+            if(width > rollWidth && height > rollWidth) return true;
+            return false;
+      }
+
+      /**
+       * @param {*} width 
+       * @param {*} height 
+       * @param {*} horizontal 
+       * @returns Array of Objects
+       * @example [{qty: qty, width: width, height: height},
+       *           {qty: qty, width: width, height: height}...]
+       */
+      static getJoins(qty = 1, width, height, horizontal = true, evenlyDistributed = true, rollWidth, joinOverlap) {
+            let vertical = !horizontal;
+            if(rollWidth < joinOverlap) return new Error("rollWidth < joinOverlap");
+            if(evenlyDistributed) {
+                  if(horizontal) {
+                        let numberOfPieces = Math.ceil(height / (rollWidth - joinOverlap));
+                        let numberOfJoins = numberOfPieces - 1;
+                        let extraWidthDueToJoins = numberOfJoins * joinOverlap;
+                        let extraEach = extraWidthDueToJoins / numberOfPieces;
+                        let newHeight2 = (height / numberOfPieces) + extraEach;
+
+                        return [{qty: numberOfPieces * qty, width: width, height: newHeight2}];
+                  } else if(vertical) {
+                        let numberOfPieces = Math.ceil(width / (rollWidth - joinOverlap));
+                        let numberOfJoins = numberOfPieces - 1;
+                        let extraWidthDueToJoins = numberOfJoins * joinOverlap;
+                        let extraEach = extraWidthDueToJoins / numberOfPieces;
+                        let newWidth2 = (width / numberOfPieces) + extraEach;
+
+                        return [{qty: numberOfPieces * qty, width: newWidth2, height: height}];
+                  }
+            } else {
+                  return new Error("Not yet implemented");
+            }
+      }
       /*
                         
       Setter            */
@@ -136,7 +175,7 @@ class Vinyl extends Material {      /*
                   this.#f_visualiser.height = this.getQWHD().height;
 
                   let matrixSizeArrays = [];
-                  this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+                  this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                         subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
 
@@ -147,15 +186,6 @@ class Vinyl extends Material {      /*
             }, f_container_joins, true);
             this.#f_joinOverlap = createInput_Infield("Join Overlap", 10, "width:30%;", () => {this.UpdateFromFields();}, f_container_joins, false, 5, {postfix: "mm"});
             this.#f_joinOrientation = createCheckbox_Infield("Join Horizontal", true, "width:30%", () => {this.UpdateFromFields();}, f_container_joins, () => {this.UpdateFromFields();});
-
-            /*
-            RollUsage*/
-            let f_container_rollUsage = createDivStyle5(null, "Roll Usage", this.container)[1];
-
-            this.#f_rollWidth = createInput_Infield("Roll Width", 1370, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "mm"});
-            this.#f_rollWastage = createInput_Infield("Roll Wastage *Approx", 20, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "%"});
-            this.#f_rollLengthUsed = createInput_Infield("Roll Length Used *Approx", 0, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "m"});
-            setFieldDisabled(true, this.#f_rollLengthUsed[1], this.#f_rollLengthUsed[0]);
 
             /*
             Material*/
@@ -178,16 +208,25 @@ class Vinyl extends Material {      /*
             dropdownInfieldIconsSearchSetSelected(this.#f_material, VinylLookup["Air Release"], false, false);
 
             /*
+            RollUsage*/
+            let f_container_rollUsage = createDivStyle5(null, "Roll Usage", this.container)[1];
+
+            this.#f_rollWidth = createInput_Infield("Roll Width", 1370, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "mm"});
+            this.#f_rollWastage = createInput_Infield("Roll Wastage *Approx", 20, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "%"});
+            this.#f_rollLengthUsed = createInput_Infield("Roll Length Used *Approx", 0, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "m"});
+            setFieldDisabled(true, this.#f_rollLengthUsed[1], this.#f_rollLengthUsed[0]);
+
+            /*
             Machine*/
             let f_container_machine = createDivStyle5(null, "HP Printer", this.container)[1];
 
             createText("Setup", "width:100%;height:20px", f_container_machine);
-            this.#f_machineSetupTime = createInput_Infield("Setup Time", 2, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "min"});
+            this.#f_machineSetupTime = createInput_Infield("Setup Time", 10, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "min"});
 
             createText("Run", "width:100%;height:20px", f_container_machine);
             this.#f_machineLengthToRun = createInput_Infield("Length to Run", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "m"});
             setFieldDisabled(true, this.#f_machineLengthToRun[1], this.#f_machineLengthToRun[0]);
-            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 0.3, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "m/min"});
+            this.#f_machineRunSpeed = createInput_Infield("Run Speed", 0.2, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 0.1, {postfix: "m/min"});
             this.#f_machineRunTime = createInput_Infield("Total Run Time", -1, "width:30%;", () => {this.UpdateFromFields();}, f_container_machine, false, 1, {postfix: "mins"});
             setFieldDisabled(true, this.#f_machineRunTime[1], this.#f_machineRunTime[0]);
 
@@ -230,29 +269,19 @@ class Vinyl extends Material {      /*
       /*
       Inherited*/
       UpdateFromFields() {
-            super.UpdateFromFields();
+            if(this.UPDATES_PAUSED) return;
 
             this.UpdateFromInheritedData();
-
-            this.UpdateRollOptions();
+            this.UpdateOutput();
             this.UpdateVisualizer();
             this.UpdateMachineTimes();
             this.UpdateProductionTimes();
 
             this.UpdateDataForSubscribers();
-            this.UpdateOutput();
+
             this.PushToSubscribers();
-      }
 
-      UpdateDataForSubscribers() {
-            this.DATA_FOR_SUBSCRIBERS = {
-                  parent: this,
-                  data: this.#dataForSubscribers
-            };
-      }
-
-      UpdateVisualizer() {
-            if(this.#f_visualiser) this.#f_visualiser.UpdateFromFields();
+            super.UpdateFromFields();
       }
 
       UpdateFromInheritedData = () => {
@@ -260,13 +289,13 @@ class Vinyl extends Material {      /*
 
             let rowNumber = 1;
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD}*/) => {
 
                         if(!dataEntry.QWHD) return/**Only this iteration*/;
 
-                        let needsJoins = Vinyl.isSizeBiggerThanRoll(dataEntry.QWHD.width, dataEntry.QWHD.height, this.rollWidth);
+                        let needsJoins = Vinyl.needsJoins(dataEntry.QWHD.width, dataEntry.QWHD.height, this.rollWidth);
 
                         this.#f_inheritedSizeTable.addRow(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height, "" + (needsJoins ? "yes" : "no"));
 
@@ -282,17 +311,35 @@ class Vinyl extends Material {      /*
             });
       };
 
-      UpdateMachineTimes() {
-            this.#f_machineLengthToRun[1].value = roundNumber(this.rollLengthUsed, 2);
-            this.#f_machineRunTime[1].value = roundNumber(this.rollLengthUsed / zeroIfNaNNullBlank(this.#f_machineRunSpeed[1].value), 2);
-            this.#f_machineTotalTime[1].value = this.machineSetupTime + this.machineRunTime;
-      }
+      UpdateOutput() {
+            this.#dataForSubscribers = [];
+            this.#f_outputSizeTable.deleteAllRows();
 
-      UpdateProductionTimes() {
-            this.#f_production.productionTime = this.machineTotalTime;
-      }
+            let sizeArray = [];
 
-      UpdateRollOptions() {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                        if(!dataEntry.QWHD) return/**Only this iteration*/;
+
+                        let qtyVal = dataEntry.QWHD.qty;
+                        let widthVal = dataEntry.QWHD.width + zeroIfNaNNullBlank(this.#f_bleedLeft[1].value) + zeroIfNaNNullBlank(this.#f_bleedRight[1].value);
+                        let heightVal = dataEntry.QWHD.height + zeroIfNaNNullBlank(this.#f_bleedTop[1].value) + zeroIfNaNNullBlank(this.#f_bleedBottom[1].value);
+
+                        if(Vinyl.needsJoins(widthVal, heightVal, this.rollWidth)) {
+                              let sizes = Vinyl.getJoins(qtyVal, widthVal, heightVal, this.isJoinHorizontal, true, this.rollWidth, this.joinOverlap);
+                              for(let j = 0; j < sizes.length; j++) {
+                                    sizeArray.push(new QWHD(sizes[j].qty * this.qty, sizes[j].width, sizes[j].height));
+                              }
+                        } else {
+                              sizeArray.push(new QWHD(qtyVal * this.qty, widthVal, heightVal));
+                        }
+                  });
+            });
+
+            $(this.#f_materialUsageArea[1]).val(combinedSqm(sizeArray));
+
             let rollWidth_M = mmToM(this.rollWidth);
             let rollWastage_Percentage = this.rollWastage;
             let rollWastage_Decimal = rollWastage_Percentage / 100;
@@ -309,80 +356,53 @@ class Vinyl extends Material {      /*
 
             this.#f_outputSizeTable2.deleteAllRows();
             this.#f_outputSizeTable2.addRow(this.#finalRollSize.qty, roundNumber(this.#finalRollSize.width, 2), roundNumber(this.#finalRollSize.height, 2));
+            this.#dataForSubscribers.push({finalRollSize: this.#finalRollSize});
 
-      }
 
-      static isSizeBiggerThanRoll(width, height, rollWidth) {
-            if(width > rollWidth && height > rollWidth) return true;
-            return false;
-      }
-
-      /**
-       * @param {*} width 
-       * @param {*} height 
-       * @param {*} horizontal 
-       * @returns Array of Objects
-       * @example [{qty: qty, width: width, height: height},
-       *           {qty: qty, width: width, height: height}...]
-       */
-      static createJoins(qty = 1, width, height, horizontal = true, evenlyDistributed = true, rollWidth, joinOverlap) {
-            let vertical = !horizontal;
-            if(rollWidth < joinOverlap) return new Error("rollWidth < joinOverlap");
-            if(evenlyDistributed) {
-                  if(horizontal) {
-                        let numberOfPieces = Math.ceil(height / (rollWidth - joinOverlap));
-                        let numberOfJoins = numberOfPieces - 1;
-                        let extraWidthDueToJoins = numberOfJoins * joinOverlap;
-                        let extraEach = extraWidthDueToJoins / numberOfPieces;
-                        let newHeight2 = (height / numberOfPieces) + extraEach;
-
-                        return [{qty: numberOfPieces * qty, width: width, height: newHeight2}];
-                  } else if(vertical) {
-                        let numberOfPieces = Math.ceil(width / (rollWidth - joinOverlap));
-                        let numberOfJoins = numberOfPieces - 1;
-                        let extraWidthDueToJoins = numberOfJoins * joinOverlap;
-                        let extraEach = extraWidthDueToJoins / numberOfPieces;
-                        let newWidth2 = (width / numberOfPieces) + extraEach;
-
-                        return [{qty: numberOfPieces * qty, width: newWidth2, height: height}];
-                  }
-            } else {
-                  return new Error("Not yet implemented");
-            }
-      }
-
-      UpdateOutput() {
-            this.#dataForSubscribers = [];
-            this.#f_outputSizeTable.deleteAllRows();
-
-            let sizeArray = [];
-
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                        if(!dataEntry.QWHD) return/**Only this iteration*/;
 
                         let qtyVal = dataEntry.QWHD.qty;
                         let widthVal = dataEntry.QWHD.width + zeroIfNaNNullBlank(this.#f_bleedLeft[1].value) + zeroIfNaNNullBlank(this.#f_bleedRight[1].value);
                         let heightVal = dataEntry.QWHD.height + zeroIfNaNNullBlank(this.#f_bleedTop[1].value) + zeroIfNaNNullBlank(this.#f_bleedBottom[1].value);
 
-                        if(Vinyl.isSizeBiggerThanRoll(widthVal, heightVal, this.rollWidth)) {
-                              let sizes = Vinyl.createJoins(qtyVal, widthVal, heightVal, this.isJoinHorizontal, true, this.rollWidth, this.joinOverlap);
+                        if(Vinyl.needsJoins(widthVal, heightVal, this.rollWidth)) {
+                              let sizes = Vinyl.getJoins(qtyVal, widthVal, heightVal, this.isJoinHorizontal, true, this.rollWidth, this.joinOverlap);
                               for(let j = 0; j < sizes.length; j++) {
-                                    this.#dataForSubscribers.push({QWHD: new QWHD(sizes[j].qty * this.qty, sizes[j].width, sizes[j].height), finalRollSize: this.#finalRollSize});
+                                    this.#dataForSubscribers.push({QWHD: new QWHD(sizes[j].qty * this.qty, sizes[j].width, sizes[j].height)});
                                     this.#f_outputSizeTable.addRow(sizes[j].qty * this.qty, sizes[j].width, sizes[j].height);
-                                    sizeArray.push(new QWHD(sizes[j].qty * this.qty, sizes[j].width, sizes[j].height));
                               }
                         } else {
-                              this.#dataForSubscribers.push({QWHD: new QWHD(qtyVal * this.qty, widthVal, heightVal), finalRollSize: this.#finalRollSize});
+                              this.#dataForSubscribers.push({QWHD: new QWHD(qtyVal * this.qty, widthVal, heightVal)});
                               this.#f_outputSizeTable.addRow(qtyVal * this.qty, widthVal, heightVal);
-                              sizeArray.push(new QWHD(qtyVal * this.qty, widthVal, heightVal));
                         }
-
                   });
             });
 
-            $(this.#f_materialUsageArea[1]).val(combinedSqm(sizeArray));
+      }
 
+      UpdateVisualizer() {
+            if(this.#f_visualiser) this.#f_visualiser.UpdateFromFields();
+      }
+
+      UpdateMachineTimes() {
+            this.#f_machineLengthToRun[1].value = roundNumber(this.rollLengthUsed, 2);
+            this.#f_machineRunTime[1].value = roundNumber(this.rollLengthUsed / zeroIfNaNNullBlank(this.#f_machineRunSpeed[1].value), 2);
+            this.#f_machineTotalTime[1].value = this.machineSetupTime + this.machineRunTime;
+      }
+
+      UpdateProductionTimes() {
+            this.#f_production.productionTime = this.machineTotalTime;
+      }
+
+      UpdateDataForSubscribers() {
+            this.DATA_FOR_SUBSCRIBERS = {
+                  parent: this,
+                  data: this.#dataForSubscribers
+            };
       }
 
       async Create(productNo, partIndex) {
@@ -396,8 +416,11 @@ class Vinyl extends Material {      /*
                   dataEntries.push(dataEntry);
             });
 
+            console.log(dataEntries);
+
             //Must be done in stages because await doesnt work with foreach
             for(let i = 0; i < dataEntries.length; i++) {
+                  if(dataEntries[i].finalRollSize) continue;
                   partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, dataEntries[i].QWHD.qty, dataEntries[i].QWHD.width, dataEntries[i].QWHD.height, partFullName, "", false);
             }
 

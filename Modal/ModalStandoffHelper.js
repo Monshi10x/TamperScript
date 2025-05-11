@@ -88,7 +88,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
 
             //this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
 
-            this.#dragZoomSVG = new DragZoomSVG(/*this.container.getBoundingClientRect().width*/500, 500, '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1243.89mm" height="988.13mm" viewBox="0 0 3526 2801"></svg>', this.getBodyElement(),
+            this.#dragZoomSVG = new DragZoomSVG(/*this.container.getBoundingClientRect().width*/"calc(100%)", "500px", '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1243.89mm" height="988.13mm" viewBox="0 0 3526 2801"></svg>', this.getBodyElement(),
                   {
                         convertShapesToPaths: true,
                         splitCompoundPaths: false,
@@ -176,7 +176,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
             let xo = 0, yo = 0;
 
             this.#totalNumber = 0;
-
+            console.log(this.#sizeArrays);
             for(let i = 0; i < this.#sizeArrays.length; i++) {//per parent subscriptions matrix (i.e. Sheet or Size Matrix)
                   for(let j = 0; j < this.#sizeArrays[i].length; j++) {//per sheet subscription matrix
                         let matrixSize = this.#sizeArrays[i][j];

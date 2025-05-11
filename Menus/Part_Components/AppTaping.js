@@ -88,7 +88,7 @@ class AppTaping extends Material {
             var materialDropdownElements = [];
             materialParts.forEach(element => materialDropdownElements.push([element.Name, "white"]));
             this.#material = createDropdown_Infield_Icons_Search("App Tape", 0, "width:60%;", 10, true, materialDropdownElements, () => {this.UpdateFromFields();}, f_container_material);
-            $(this.#material).val(AppTapeLookup["Medium Tack"]).change();
+
 
             /*
             OutputSizes*/
@@ -103,7 +103,7 @@ class AppTaping extends Material {
             Machine*/
             let f_container_machine = createDivStyle5(null, "Machine", this.container)[1];
 
-            this.#machineType = createDropdown_Infield_Icons_Search("Machine Type", 0, "width:95%;box-sizing:border-box", 40, true, [["Rollover", "blue"], ["Hand App", "red"]], () => {this.UpdateMachineDefaults();}, f_container_machine, false);
+            this.#machineType = createDropdown_Infield_Icons_Search("Machine Type", 0, "width:95%;box-sizing:border-box", 40, true, [["Rollover", "blue"], ["Hand App", "red"]], () => {this.UpdateMachineDefaults(); this.UpdateMachineTimes();}, f_container_machine, false);
 
             createText("Setup", "width:100%;height:20px", f_container_machine);
             this.#machineSetupTime = createInput_Infield("Setup Time (min)", this.defaultMachineTime.rollover.setup, null, () => {this.UpdateMachineTimes();}, f_container_machine, false, 0.1);
@@ -128,21 +128,23 @@ class AppTaping extends Material {
             this.#production.showRequiredCkb = false;
             this.#production.requiredName = "Required";
 
+            $(this.#material).val(AppTapeLookup["Medium Tack"]).change();
+
             this.UpdateDataForSubscribers();
       }
 
       /*
       Override*/
       UpdateFromFields() {
-            super.UpdateFromFields();
-
             this.UpdateFromInheritedData();
             this.UpdateMachineTimes();
             this.UpdateProductionTimes();
             this.UpdateOutput();
+
             this.UpdateDataForSubscribers();
-            this.UpdateSubscribedLabel();
             this.PushToSubscribers();
+
+            super.UpdateFromFields();
       }
 
       UpdateDataForSubscribers() {
@@ -155,18 +157,19 @@ class AppTaping extends Material {
       UpdateFromInheritedData = () => {
             this.#inheritedSizeTable.deleteAllRows();
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD, finalRollSize: [...]}*/) => {
 
-                        if(!dataEntry.QWHD || !dataEntry.finalRollSize) return/**Only this iteration*/;
+                        if(dataEntry.QWHD || dataEntry.finalRollSize) {
 
-                        if(dataEntry.finalRollSize) {
-                              let recievedInputSizes = dataEntry.finalRollSize;
+                              if(dataEntry.finalRollSize) {
+                                    let recievedInputSizes = dataEntry.finalRollSize;
 
-                              this.#inheritedSizeTable.addRow(recievedInputSizes[0].qty, roundNumber(recievedInputSizes[0].width, 2), roundNumber(recievedInputSizes[0].height, 2));
-                        } else {
-                              this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
+                                    this.#inheritedSizeTable.addRow(recievedInputSizes[0].qty, roundNumber(recievedInputSizes[0].width, 2), roundNumber(recievedInputSizes[0].height, 2));
+                              } else {
+                                    this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
+                              }
                         }
                   });
             });
@@ -193,11 +196,13 @@ class AppTaping extends Material {
             let runSpeed_mMin = zeroIfNaNNullBlank(this.#machineRunSpeed[1].value);
             let setupTime = zeroIfNaNNullBlank(this.#machineSetupTime[1].value);
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD, finalRollSize: [...]}*/) => {
 
-                        totalLength_mm += dataEntry.QWHD.height;
+                        if(dataEntry.QWHD) {
+                              totalLength_mm += Math.max(dataEntry.QWHD.height, dataEntry.QWHD.width);
+                        }
                   });
             });
 
@@ -215,14 +220,16 @@ class AppTaping extends Material {
 
             let sizeArray = [];
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD}*/) => {
 
-                        this.#dataForSubscribers.push({QWHD: new QWHD(dataEntry.QWHD.qty * this.qty, dataEntry.QWHD.width, dataEntry.QWHD.height)});
-                        this.#outputSizeTable.addRow(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
+                        if(dataEntry.QWHD) {
+                              this.#dataForSubscribers.push({QWHD: new QWHD(dataEntry.QWHD.qty * this.qty, dataEntry.QWHD.width, dataEntry.QWHD.height)});
+                              this.#outputSizeTable.addRow(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2));
 
-                        sizeArray.push(new QWHD(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2)));
+                              sizeArray.push(new QWHD(dataEntry.QWHD.qty * this.qty, roundNumber(dataEntry.QWHD.width, 2), roundNumber(dataEntry.QWHD.height, 2)));
+                        }
                   });
             });
 
@@ -235,9 +242,9 @@ class AppTaping extends Material {
             var partFullName = getPredefinedParts_Name_FromLimitedName(name);
 
             for(let i = 0; i < this.#dataForSubscribers.length; i++) {
-                  let partQty = this.#dataForSubscribers[i].qty;
-                  let partWidth = this.#dataForSubscribers[i].width;
-                  let partHeight = this.#dataForSubscribers[i].height;
+                  let partQty = this.#dataForSubscribers[i].QWHD.qty;
+                  let partWidth = this.#dataForSubscribers[i].QWHD.width;
+                  let partHeight = this.#dataForSubscribers[i].QWHD.height;
                   partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, "", false);
             }
             partIndex = await this.#production.Create(productNo, partIndex);

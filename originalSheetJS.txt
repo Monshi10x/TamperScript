@@ -178,14 +178,14 @@ class Sheet extends Material {
 
             this.#filtersHeader = createHeadingStyle1("Filters", null, this.container);
 
-            this.#material = createDropdown_Infield("Material", 0, "width:80px", this.#materialOptions, () => {this.UpdateFilters("Material");}, this.container);
+            this.#material = createDropdown_Infield("Material", 0, "width:80px", this.#materialOptions, () => {this.setFilters("Material");}, this.container);
             this.#searchTerms.push(this.#material[1].value + " - (sqm)");
 
-            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters("Thickness");}, this.container);
+            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.setFilters("Thickness");}, this.container);
 
-            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters("Finish");}, this.container);
+            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.setFilters("Finish");}, this.container);
 
-            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters('Sheet Size');}, this.container);
+            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.setFilters('Sheet Size');}, this.container);
             this.#sheetSize[1].id = "Sheet Size";
 
             this.#updateOrderBtn = createIconButton("https://cdn.gorilladash.com/images/media/6144512/signarama-australia-icons8-numeric-50-635d113e9382c.png", "Set Order", "width: 120px; height: 40px; margin: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;", () => {
@@ -193,7 +193,7 @@ class Sheet extends Material {
                   items.shift();
                   let modal = new ModalSetOrder("Set Order", () => {
                         this.#filterOrder = ['Material', ...modal.getOrder()];
-                        this.UpdateFilters('Material');
+                        this.setFilters('Material');
                   }, ...items);
             }, this.container);
 
@@ -235,8 +235,8 @@ class Sheet extends Material {
             let methodContainer = createDivStyle4("width:40%;margin-right:50%;", this.container);
             let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
             let methodText = createText("Join Method", null, methodContainer);
-            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
-            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
+            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.setJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
+            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.setJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
 
             checkboxesAddToSelectionGroup(true, this.#method1, this.#method2);
 
@@ -289,7 +289,7 @@ class Sheet extends Material {
 
             /*
             Updates*/
-            this.UpdateFilters();
+            this.setFilters();
             this.sheetSize = "2440mm x 1220mm";
             this.thickness = "3x0.21";
             this.finish = "Primer";
@@ -319,7 +319,7 @@ class Sheet extends Material {
             }
       }
 
-      UpdateJoinMethod() {
+      setJoinMethod() {
             if(this.#method1[1].checked) this.#currentJoinMethod = Sheet.joinMethod["Even Joins"];
             else this.#currentJoinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
       }
@@ -742,7 +742,7 @@ class Sheet extends Material {
             return this.getSheetSizeWH()[1];
       }
 
-      UpdateFilters(updateFromFilter) {
+      setFilters(updateFromFilter) {
             this.#filterContainersOrdered[0] = this.#material[0];
 
             for(let i = this.#filterOrder.length - 1; i >= 0; i--) {

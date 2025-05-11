@@ -150,19 +150,19 @@ class Sheet extends Material {
 
       setSheetMaterial(value, triggerChange = true) {
             dropdownSetSelectedText(this.#material[1], value, triggerChange);
-            this.UpdateFilters(triggerChange);
+            this.setFilters(triggerChange);
       }
       setSheetSize(value, triggerChange = true) {
             dropdownSetSelectedText(this.#sheetSize[1], value, triggerChange);
-            this.UpdateFilters(triggerChange);
+            this.setFilters(triggerChange);
       }
       setSheetThickness(value, triggerChange = true) {
             dropdownSetSelectedText(this.#thickness[1], value, triggerChange);
-            this.UpdateFilters(triggerChange);
+            this.setFilters(triggerChange);
       }
       setSheetFinish(value, triggerChange = true) {
             dropdownSetSelectedText(this.#finish[1], value, triggerChange);
-            this.UpdateFilters(triggerChange);
+            this.setFilters(triggerChange);
       }
 
       #sheetPerimeterIsCut = true;
@@ -175,6 +175,139 @@ class Sheet extends Material {
       set useOverallSVGSize(value) {
             this.#useOverallSVGSize = value;
             this.UpdateFromFields();
+      }
+
+      setAllCuttingTypeDisabled = (disabledTF) => {
+            for(let c = 0; c < Object.keys(this.#cuttingOptions).length; c++) {
+                  setFieldDisabled(disabledTF, this.#cuttingOptions[Object.keys(this.#cuttingOptions)[c]], this.#cuttingOptions[Object.keys(this.#cuttingOptions)[c]]);
+            }
+      };
+
+      setJoinMethod() {
+            if(this.#method1[1].checked) this.#currentJoinMethod = Sheet.joinMethod["Even Joins"];
+            else this.#currentJoinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
+      }
+
+      setFilters(triggerChange = true) {
+            let chosenMaterial = this.#material[1].value || null;
+            let chosenSheetSize = this.#sheetSize[1].value || null;
+            let chosenThickness = this.#thickness[1].value || null;
+            let chosenFinish = this.#finish[1].value || null;
+
+            ///Note, the below might seem inefficient, but it is required for the search algorithm among multiple dropdowns
+
+            //Material
+            let materialOptionsArray = new TArray();
+            materialOptionsArray.push("");
+            let foundParts = getPredefinedParts_RefinedSearch("- (sqm) -", chosenThickness, chosenFinish, chosenSheetSize, null);
+            for(let i = 0; i < foundParts.length; i++) {
+                  materialOptionsArray.push(foundParts[i].Material);
+            }
+
+            //sheet size
+            let sheetOptionsArray = new TArray();
+            sheetOptionsArray.push("");
+            foundParts = getPredefinedParts_RefinedSearch("- (sqm) -", chosenThickness, chosenFinish, null, chosenMaterial);
+            for(let i = 0; i < foundParts.length; i++) {
+                  sheetOptionsArray.push(foundParts[i].SheetSize);
+            }
+
+            //Thickness
+            let thicknessOptionsArray = new TArray();
+            thicknessOptionsArray.push("");
+            foundParts = getPredefinedParts_RefinedSearch("- (sqm) -", null, chosenFinish, chosenSheetSize, chosenMaterial);
+            for(let i = 0; i < foundParts.length; i++) {
+                  thicknessOptionsArray.push(foundParts[i].Thickness);
+            }
+
+            //finish
+            let finishOptionsArray = new TArray();
+            finishOptionsArray.push("");
+            foundParts = getPredefinedParts_RefinedSearch("- (sqm) -", chosenThickness, null, chosenSheetSize, chosenMaterial);
+            for(let i = 0; i < foundParts.length; i++) {
+                  finishOptionsArray.push(foundParts[i].Finish);
+            }
+
+            materialOptionsArray = materialOptionsArray.uniqueArrayElements().sort();
+            sheetOptionsArray = sheetOptionsArray.uniqueArrayElements().sort();
+            thicknessOptionsArray = thicknessOptionsArray.uniqueArrayElements().sort();
+            finishOptionsArray = finishOptionsArray.uniqueArrayElements().sort();
+
+            dropdownSetOptions(this.#material[1], ...materialOptionsArray);
+            dropdownSetOptions(this.#sheetSize[1], ...sheetOptionsArray);
+            dropdownSetOptions(this.#thickness[1], ...thicknessOptionsArray);
+            dropdownSetOptions(this.#finish[1], ...finishOptionsArray);
+
+            dropdownSetSelectedText(this.#material[1], chosenMaterial, false);
+            dropdownSetSelectedText(this.#sheetSize[1], chosenSheetSize, false);
+            dropdownSetSelectedText(this.#thickness[1], chosenThickness, false);
+            dropdownSetSelectedText(this.#finish[1], chosenFinish, false);
+
+            if(triggerChange) $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value).change();
+            else $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value);
+
+            this.#sheetMaterial[5]();
+      }
+
+
+      createCuttingOptions = (width, height, foldDepth, sheetWidth, sheetHeight, material) => {
+            let returnArray = [];
+            let sheetIsFolded = this.#isFolded[1].checked && foldDepth > 0;
+            let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet" && !sheetIsFolded;
+            let canUseFactoryEdge = this.#materialsWithUsableFactoryEdge.includes(material) && !sheetIsFolded;
+            let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material) && !sheetIsFolded;
+            let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material);
+            let canLaserSheet = Sheet.canLaserSheet(width, height, sheetWidth, sheetHeight, material);
+            let canHandCutSheet = Sheet.canHandCutSheet(width, height, sheetWidth, sheetHeight, material) && !sheetIsFolded;
+            if(width === null && height === null && sheetWidth === null && sheetHeight === null) {
+                  returnArray = [
+                        createDropdownOption("None - (standard sheet)", "None"),
+                        createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine"),
+                        createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router"),
+                        createDropdownOption("Laser - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Laser"),
+                        createDropdownOption("Cut By Hand - (PVC, Corflute)", "Cut By Hand"),
+                        createDropdownOption("Cut By Supplier", "Cut By Supplier")
+                  ];
+            } else {
+                  returnArray = [
+                        setFieldDisabled(!isStandardSheet || !canUseFactoryEdge, createDropdownOption("None - (standard sheet)", "None")),
+                        setFieldDisabled(!canGuillotineSheet, createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine")),
+                        setFieldDisabled(!canRouterSheet, createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router")),
+                        setFieldDisabled(!canLaserSheet, createDropdownOption("Laser - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Laser")),
+                        setFieldDisabled(!canHandCutSheet, createDropdownOption("Cut By Hand - (PVC, Corflute)", "Cut By Hand")),
+                        createDropdownOption("Cut By Supplier", "Cut By Supplier")
+                  ];
+            }
+            return returnArray;
+      };
+
+      /**
+       * 
+       * @param {*} machine "router" || "laser" || "guillotine"
+       */
+      setCuttingMachine(machine = "router") {
+            switch(machine) {
+                  case "router":
+                        this.#preferredCuttingMachine = "router";
+                        this.UpdateFromFields();
+                        break;
+                  case "laser":
+                        this.#preferredCuttingMachine = "laser";
+                        this.UpdateFromFields();
+                        break;
+                  case "guillotine":
+                        this.#preferredCuttingMachine = "guillotine";
+                        this.UpdateFromFields();
+                        break;
+                  default: break;
+            }
+      }
+      /**
+       * @Sheets
+       */
+      getSheetSizeWH() {
+            var arr = getPredefinedParts(this.#sheetMaterial[1].value)[0].ParentSize.replaceAll("mm", "").replaceAll(" ", "").split("x");
+            return [zeroIfNaNNullBlank(parseFloat(arr[0])), zeroIfNaNNullBlank(parseFloat(arr[1]))];
       }
 
       #updateOrderBtn;
@@ -258,6 +391,23 @@ class Sheet extends Material {
       get DEBUG_SHOW() {return true;}
       get router() {return this.#router;}
 
+      getSheetDropdownOptions() {
+            let materialsToUse = [];
+            this.#materialOptions.forEach((item) => {
+                  materialsToUse.push(item.value);
+            });
+
+            let optionsArray = [];
+            for(let i = 0; i < materialsToUse.length; i++) {
+                  let foundParts = getPredefinedParts_RefinedSearch(materialsToUse[i] + " - ");
+                  for(let j = 0; j < foundParts.length; j++) {
+                        optionsArray.push([foundParts[j].Name, foundParts[j].IsStocked ? GM_getResourceURL("Image_IsStocked") : null]);
+                  }
+            }
+
+            return optionsArray;
+      }
+
 
       static getCutVsSheetType = (width, height, sheetWidth, sheetHeight) => {
             let [w, h] = convertDimensionsToLandscape(width, height);
@@ -273,7 +423,7 @@ class Sheet extends Material {
       /**
        * @returns array [[w,h], [w,h]...]
        */
-      static cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet = false) {
+      static cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet = false, groupBySize = false) {
             let returnArray = [];
 
             if(flipSheet) {
@@ -321,6 +471,7 @@ class Sheet extends Material {
                   }
             }
 
+            if(groupBySize) return uniqueSizeArrayWithOccurenceCount(returnArray);
             return returnArray;
       }
 
@@ -361,14 +512,6 @@ class Sheet extends Material {
 
             return matrixSizes;
       }
-
-      /**
-       * @returns [] i.e. [QWHD(), QWHD(), ...]
-       */
-      static cutResultsByMethodWithOccurenceCount(method, width, height, sheetWidth, sheetHeight, flipSheet) {
-            return uniqueSizeArrayWithOccurenceCount(Sheet.cutResultsByMethod(method, width, height, sheetWidth, sheetHeight, flipSheet));
-      }
-
       /**
        * @Guillotine
        */
@@ -453,14 +596,14 @@ class Sheet extends Material {
 
             let sheetFilterContainer = createDivStyle5("width:calc(100%)", "Filters", f_container_sheetSize[1]);
 
-            this.#material = createDropdown_Infield("Material", 0, "width:80px", [createDropdownOption("", "")].concat(this.#materialOptions), () => {this.UpdateFilters();}, sheetFilterContainer[1]);
+            this.#material = createDropdown_Infield("Material", 0, "width:80px", [createDropdownOption("", "")].concat(this.#materialOptions), () => {this.setFilters();}, sheetFilterContainer[1]);
 
-            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.UpdateFilters();}, sheetFilterContainer[1]);
+            this.#sheetSize = createDropdown_Infield("Sheet Size", 0, "width:130px;", [], () => {this.setFilters();}, sheetFilterContainer[1]);
             this.#sheetSize[1].id = "Sheet Size";
 
-            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.UpdateFilters();}, sheetFilterContainer[1]);
+            this.#thickness = createDropdown_Infield("Thickness", 0, "width:80px", [], () => {this.setFilters();}, sheetFilterContainer[1]);
 
-            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.UpdateFilters();}, sheetFilterContainer[1]);
+            this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.setFilters();}, sheetFilterContainer[1]);
 
             this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 40, false, this.getSheetDropdownOptions(), () => {this.UpdateFromFields();}, f_container_sheetSize[1], false);
 
@@ -524,8 +667,8 @@ class Sheet extends Material {
             let methodContainer = createDivStyle4("width:calc(50% - 20px);", f_container_joins);
             let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
             let methodText = createText("Join Method", null, methodContainer);
-            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
-            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.UpdateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
+            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.setJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
+            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.setJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
 
             checkboxesAddToSelectionGroup(true, this.#method1, this.#method2);
 
@@ -635,17 +778,31 @@ class Sheet extends Material {
             super.UpdateFromFields();
       }
 
-      UpdateVisualizer() {
-            if(this.#visualiser) {
-                  this.#visualiser.setSizeArrays(this.#matrixSizes);
-                  this.#visualiser.UpdateFromFields();
-            }
-      }
+      UpdateFromInheritedData = () => {
+            this.#inheritedSizes = [];
+            this.#inheritedSizeTable.deleteAllRows();
 
-      UpdateJoinMethod() {
-            if(this.#method1[1].checked) this.#currentJoinMethod = Sheet.joinMethod["Even Joins"];
-            else this.#currentJoinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-      }
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                  subscription.data.forEach((dataEntry/**{overallSize: {width, height}, QWHD: QWHD}*/) => {
+                        if(this.#useOverallSVGSize && dataEntry.overallSize) {
+                              this.#inheritedSizes.push(new QWHD(1, dataEntry.overallSize.width, dataEntry.overallSize.height, 0));
+                              this.#inheritedSizeTable.addRow(1, dataEntry.overallSize.width, dataEntry.overallSize.height, 0);
+                              return;
+                        }
+                        else if(dataEntry.QWHD) {
+                              this.#inheritedSizes.push(dataEntry.QWHD);
+                              this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height, dataEntry.QWHD.depth);
+                        }
+                  });
+            });
+
+
+            if(this.SUBSCRIPTION_DATA.length == 0) {
+                  this.#inheritedSizes.push(new QWHD(this.qty, 0, 0, 0));
+                  this.#inheritedSizeTable.addRow(this.qty, 0, 0, 0);
+            }
+      };
 
       UpdateGrainDirection() {
             let hasGrain = false;
@@ -674,43 +831,6 @@ class Sheet extends Material {
             }
       }
 
-      UpdateDataForSubscribers() {
-            this.DATA_FOR_SUBSCRIBERS = {
-                  parent: this,
-                  data: this.#dataForSubscribers
-            };
-      }
-
-      UpdateFromInheritedData = () => {
-            this.#inheritedSizes = [];
-            this.#inheritedSizeTable.deleteAllRows();
-
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
-
-                  subscription.data.forEach((dataEntry/**{overallSize: {width, height}, QWHD: QWHD}*/) => {
-                        if(this.#useOverallSVGSize && dataEntry.overallSize) {
-                              this.#inheritedSizes.push(new QWHD(1, dataEntry.overallSize.width, dataEntry.overallSize.height, 0));
-                              this.#inheritedSizeTable.addRow(1, dataEntry.overallSize.width, dataEntry.overallSize.height, 0);
-                              return;
-                        }
-                        else if(dataEntry.QWHD) {
-                              this.#inheritedSizes.push(dataEntry.QWHD);
-                              this.#inheritedSizeTable.addRow(dataEntry.QWHD.qty, dataEntry.QWHD.width, dataEntry.QWHD.height, dataEntry.QWHD.depth);
-                        }
-                  });
-            });
-
-
-            if(this.INHERITED_DATA.length == 0) {
-                  this.#inheritedSizes.push(new QWHD(this.qty, 0, 0, 0));
-                  this.#inheritedSizeTable.addRow(this.qty, 0, 0, 0);
-            }
-      };
-
-      /**
-       * @Cutting
-       */
-
       UpdateOutput = () => {
             this.#outputSizeTable.deleteAllRows();
             this.#outputSizeTableData = [];
@@ -726,7 +846,7 @@ class Sheet extends Material {
 
             let mustBeRouterCut = false;
             let _this = this;
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{pathQty: {}}*/) => {
 
@@ -739,14 +859,12 @@ class Sheet extends Material {
 
             for(let i = 0; i < this.#inheritedSizes.length; i++) {
 
-                  let suggestedCutQty = 0;
                   setFieldHidden(true, this.#cuttingJoinNote);
                   this.setAllCuttingTypeDisabled(false);
-                  let perimeter = 0;
-                  let cutsEach = 0;
+
                   let currentMaterial = this.#material[1].value;
 
-                  let rowQty = this.#inheritedSizes[i].qty;
+                  let subscriptionQty = this.#inheritedSizes[i].qty;
                   let rowWidth = this.#inheritedSizes[i].width;
                   let rowHeight = this.#inheritedSizes[i].height;
 
@@ -761,23 +879,26 @@ class Sheet extends Material {
                               rowHeight += this.#inheritedSizes[i].depth;
                   }
 
-                  perimeter += rowQty * mmToM(rowWidth) * mmToM(rowHeight);
-                  cutsEach = Sheet.getNumberOfGuillotineCuts(rowWidth, rowHeight, sheetSizeWidth, sheetSizeHeight);
-                  suggestedCutQty += rowQty * cutsEach;
-
-                  let uniqueSizes = Sheet.cutResultsByMethodWithOccurenceCount(this.currentJoinMethod, rowWidth, rowHeight, sheetSizeWidth, sheetSizeHeight, this.#flipSheet);
+                  let uniqueSizes = Sheet.cutResultsByMethod(this.currentJoinMethod, rowWidth, rowHeight, sheetSizeWidth, sheetSizeHeight, this.#flipSheet, true);
 
                   this.#matrixSizes.push(Sheet.getMatrixSizes(this.currentJoinMethod, rowWidth, rowHeight, sheetSizeWidth, sheetSizeHeight, this.#flipSheet));
+                  this.#dataForSubscribers.push({matrixSizes: this.#matrixSizes});
 
+
+                  console.log(uniqueSizes);
                   for(let u = 0; u < uniqueSizes.length; u++) {
                         let w = uniqueSizes[u].width;
                         let h = uniqueSizes[u].height;
                         let q = uniqueSizes[u].qty;
                         let d = uniqueSizes[u].depth;
-                        let qty = q * this.qty;
+                        let qty = q * this.qty * subscriptionQty;
+                        let paintedArea =
+                              mmToM(w) * mmToM(h) * qty +
+                              2 * mmToM(d) * mmToM(w) * qty +
+                              2 * mmToM(d) * mmToM(h) * qty;
 
-                        let cutsEach = Sheet.getNumberOfGuillotineCuts(w, h, sheetSizeWidth, sheetSizeHeight);
-                        let cutsTotal = cutsEach * qty;
+                        let numberCutsPerSheet = Sheet.getNumberOfGuillotineCuts(w, h, sheetSizeWidth, sheetSizeHeight);
+                        let totalNumberCuts = numberCutsPerSheet * qty;
 
                         this.#totalPerimeter = roundNumber((w * 2 + h * 2) * qty, 2);
                         let options = this.createCuttingOptions(w, h, d, sheetSizeWidth, sheetSizeHeight, currentMaterial);
@@ -786,10 +907,10 @@ class Sheet extends Material {
                               this.UpdateOutputTable();
                         }, null);
 
-                        this.#dataForSubscribers.push({QWHD: new QWHD(qty, w, h, d), matrixSizes: this.#matrixSizes, paintedArea: mmToM(width) * mmToM(height) * qty});
+                        this.#dataForSubscribers.push({QWHD: new QWHD(qty, w, h, d), paintedArea: paintedArea});
 
-                        this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[0], cutsTotal, this.#totalPerimeter);
-                        this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), cutsEach, cuttingTypeDropDown[1], cutsTotal, this.#totalPerimeter]);
+                        this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), numberCutsPerSheet, cuttingTypeDropDown[0], totalNumberCuts, this.#totalPerimeter);
+                        this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), numberCutsPerSheet, cuttingTypeDropDown[1], totalNumberCuts, this.#totalPerimeter]);
 
                         if(this.#preferredCuttingMachine == null) dropdownSetSelectedIndexToNextAvailable(cuttingTypeDropDown[1], yes);
                         if(this.#preferredCuttingMachine == "router") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Router.value);
@@ -815,7 +936,7 @@ class Sheet extends Material {
 
             let overallSVGSizes = [];
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{pathLength:{},pathQty: {}}*/) => {
 
@@ -988,156 +1109,18 @@ class Sheet extends Material {
 
       }
 
-      setAllCuttingTypeDisabled = (disabledTF) => {
-            for(let c = 0; c < Object.keys(this.#cuttingOptions).length; c++) {
-                  setFieldDisabled(disabledTF, this.#cuttingOptions[Object.keys(this.#cuttingOptions)[c]], this.#cuttingOptions[Object.keys(this.#cuttingOptions)[c]]);
-            }
-      };
-
-      createCuttingOptions = (width, height, foldDepth, sheetWidth, sheetHeight, material) => {
-            let returnArray = [];
-            let sheetIsFolded = this.#isFolded[1].checked && foldDepth > 0;
-            let isStandardSheet = Sheet.getCutVsSheetType(width, height, sheetWidth, sheetHeight) == "Standard Sheet" && !sheetIsFolded;
-            let canUseFactoryEdge = this.#materialsWithUsableFactoryEdge.includes(material) && !sheetIsFolded;
-            let canGuillotineSheet = Sheet.canGuillotineSheet(width, height, sheetWidth, sheetHeight, material) && !sheetIsFolded;
-            let canRouterSheet = Sheet.canRouterSheet(width, height, sheetWidth, sheetHeight, material);
-            let canLaserSheet = Sheet.canLaserSheet(width, height, sheetWidth, sheetHeight, material);
-            let canHandCutSheet = Sheet.canHandCutSheet(width, height, sheetWidth, sheetHeight, material) && !sheetIsFolded;
-            if(width === null && height === null && sheetWidth === null && sheetHeight === null) {
-                  returnArray = [
-                        createDropdownOption("None - (standard sheet)", "None"),
-                        createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine"),
-                        createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router"),
-                        createDropdownOption("Laser - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Laser"),
-                        createDropdownOption("Cut By Hand - (PVC, Corflute)", "Cut By Hand"),
-                        createDropdownOption("Cut By Supplier", "Cut By Supplier")
-                  ];
-            } else {
-                  returnArray = [
-                        setFieldDisabled(!isStandardSheet || !canUseFactoryEdge, createDropdownOption("None - (standard sheet)", "None")),
-                        setFieldDisabled(!canGuillotineSheet, createDropdownOption("Guillotine - Standard Rectangle (ACM, Signwhite)", "Guillotine")),
-                        setFieldDisabled(!canRouterSheet, createDropdownOption("Router - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Router")),
-                        setFieldDisabled(!canLaserSheet, createDropdownOption("Laser - Custom Contour (Circular, Rounded Corners, Irregular Shape)", "Laser")),
-                        setFieldDisabled(!canHandCutSheet, createDropdownOption("Cut By Hand - (PVC, Corflute)", "Cut By Hand")),
-                        createDropdownOption("Cut By Supplier", "Cut By Supplier")
-                  ];
-            }
-            return returnArray;
-      };
-
-      /**
-       * 
-       * @param {*} machine "router" || "laser" || "guillotine"
-       */
-      setCuttingMachine(machine = "router") {
-            switch(machine) {
-                  case "router":
-                        this.#preferredCuttingMachine = "router";
-                        this.UpdateFromFields();
-                        break;
-                  case "laser":
-                        this.#preferredCuttingMachine = "laser";
-                        this.UpdateFromFields();
-                        break;
-                  case "guillotine":
-                        this.#preferredCuttingMachine = "guillotine";
-                        this.UpdateFromFields();
-                        break;
-                  default: break;
+      UpdateVisualizer() {
+            if(this.#visualiser) {
+                  this.#visualiser.setSizeArrays(this.#matrixSizes);
+                  this.#visualiser.UpdateFromFields();
             }
       }
-      /**
-       * @Sheets
-       */
-      getSheetSizeWH() {
-            var arr = getPredefinedParts(this.#sheetMaterial[1].value)[0].ParentSize.replaceAll("mm", "").replaceAll(" ", "").split("x");
-            return [zeroIfNaNNullBlank(parseFloat(arr[0])), zeroIfNaNNullBlank(parseFloat(arr[1]))];
-      }
 
-      sheetSizeWidth() {
-            return this.getSheetSizeWH()[0];
-      }
-
-      sheetSizeHeight() {
-            return this.getSheetSizeWH()[1];
-      }
-
-      getSheetDropdownOptions() {
-            let materialsToUse = [];
-            this.#materialOptions.forEach((item) => {
-                  materialsToUse.push(item.value);
-            });
-
-            let optionsArray = [];
-            for(let i = 0; i < materialsToUse.length; i++) {
-                  let foundParts = getPredefinedParts_RefinedSearch(materialsToUse[i] + " - ");
-                  for(let j = 0; j < foundParts.length; j++) {
-                        optionsArray.push([foundParts[j].Name, foundParts[j].IsStocked ? GM_getResourceURL("Image_IsStocked") : null]);
-                  }
-            }
-
-            return optionsArray;
-      }
-
-      UpdateFilters(triggerChange = true) {
-            let chosenMaterial = this.#material[1].value || null;
-            let chosenSheetSize = this.#sheetSize[1].value || null;
-            let chosenThickness = this.#thickness[1].value || null;
-            let chosenFinish = this.#finish[1].value || null;
-
-            ///Note, the below might seem inefficient, but it is required for the search algorithm among multiple dropdowns
-
-            //Material
-            let materialOptionsArray = new TArray();
-            materialOptionsArray.push("");
-            let foundParts = getPredefinedParts_RefinedSearch("- (sqm) -", chosenThickness, chosenFinish, chosenSheetSize, null);
-            for(let i = 0; i < foundParts.length; i++) {
-                  materialOptionsArray.push(foundParts[i].Material);
-            }
-
-            //sheet size
-            let sheetOptionsArray = new TArray();
-            sheetOptionsArray.push("");
-            foundParts = getPredefinedParts_RefinedSearch("- (sqm) -", chosenThickness, chosenFinish, null, chosenMaterial);
-            for(let i = 0; i < foundParts.length; i++) {
-                  sheetOptionsArray.push(foundParts[i].SheetSize);
-            }
-
-            //Thickness
-            let thicknessOptionsArray = new TArray();
-            thicknessOptionsArray.push("");
-            foundParts = getPredefinedParts_RefinedSearch("- (sqm) -", null, chosenFinish, chosenSheetSize, chosenMaterial);
-            for(let i = 0; i < foundParts.length; i++) {
-                  thicknessOptionsArray.push(foundParts[i].Thickness);
-            }
-
-            //finish
-            let finishOptionsArray = new TArray();
-            finishOptionsArray.push("");
-            foundParts = getPredefinedParts_RefinedSearch("- (sqm) -", chosenThickness, null, chosenSheetSize, chosenMaterial);
-            for(let i = 0; i < foundParts.length; i++) {
-                  finishOptionsArray.push(foundParts[i].Finish);
-            }
-
-            materialOptionsArray = materialOptionsArray.uniqueArrayElements().sort();
-            sheetOptionsArray = sheetOptionsArray.uniqueArrayElements().sort();
-            thicknessOptionsArray = thicknessOptionsArray.uniqueArrayElements().sort();
-            finishOptionsArray = finishOptionsArray.uniqueArrayElements().sort();
-
-            dropdownSetOptions(this.#material[1], ...materialOptionsArray);
-            dropdownSetOptions(this.#sheetSize[1], ...sheetOptionsArray);
-            dropdownSetOptions(this.#thickness[1], ...thicknessOptionsArray);
-            dropdownSetOptions(this.#finish[1], ...finishOptionsArray);
-
-            dropdownSetSelectedText(this.#material[1], chosenMaterial, false);
-            dropdownSetSelectedText(this.#sheetSize[1], chosenSheetSize, false);
-            dropdownSetSelectedText(this.#thickness[1], chosenThickness, false);
-            dropdownSetSelectedText(this.#finish[1], chosenFinish, false);
-
-            if(triggerChange) $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value).change();
-            else $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value);
-
-            this.#sheetMaterial[5]();
+      UpdateDataForSubscribers() {
+            this.DATA_FOR_SUBSCRIBERS = {
+                  parent: this,
+                  data: this.#dataForSubscribers
+            };
       }
       /**
        * @CorebridgeCreate

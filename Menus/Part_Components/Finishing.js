@@ -123,11 +123,13 @@ class Finishing extends Material {
                   this.#standOffHelper.height = this.getQWHD().height;
 
                   let matrixSizeArrays = [];
-                  this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+                  this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                         subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
 
-                              matrixSizeArrays.push(dataEntry.matrixSizes);
+                              if(dataEntry.matrixSizes) {
+                                    matrixSizeArrays.push(dataEntry.matrixSizes);
+                              }
                         });
                   });
                   this.#standOffHelper.setSizeArrays(...matrixSizeArrays);
@@ -174,9 +176,18 @@ class Finishing extends Material {
                   this.#eyeletsHelper.height = this.getQWHD().height;
 
                   let matrixSizeArrays = [];
-                  for(let i = 0; i < this.INHERITED_DATA.length; i++) {
-                        matrixSizeArrays.push(this.INHERITED_DATA[i].data.matrixSizes);
-                  }
+
+                  this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                        subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                              if(dataEntry.matrixSizes) {
+                                    matrixSizeArrays.push(dataEntry.matrixSizes);
+                              }
+                        });
+                  });
+                  console.log(matrixSizeArrays);
+
                   this.#eyeletsHelper.setSizeArrays(...matrixSizeArrays);
             }, f_container_eyelets, true);
             this.#eyeletsType = createDropdown_Infield("Eyelets Type", 0, "width:30%;display:none;margin-left:40px;",
@@ -241,13 +252,7 @@ class Finishing extends Material {
       /*
       Inherited*/
       UpdateFromFields() {
-            super.UpdateFromFields();
-
             this.UpdateInheritedSizes();
-
-            this.UpdateDataForSubscribers();
-            this.UpdateSubscribedLabel();
-            this.PushToSubscribers();
 
             if(this.#standOffHelper && this.#modalIsOpen) {
                   this.#standOffHelper.UpdateFromFields();
@@ -259,7 +264,28 @@ class Finishing extends Material {
 
             this.UpdateStandoffQty();
             this.UpdateProduction();
+
+            this.UpdateDataForSubscribers();
+            this.PushToSubscribers();
+
+            super.UpdateFromFields();
       }
+
+      UpdateInheritedSizes = () => {
+            this.#inheritedSizes = [];
+            this.#inheritedSizeTable.deleteAllRows();
+
+            //Per Parent Subscription:
+            for(let a = 0; a < this.SUBSCRIPTION_DATA.length; a++) {
+                  let recievedInputSizes = this.SUBSCRIPTION_DATA[a].data;
+                  for(let i = 0; i < recievedInputSizes.length; i++) {
+                        if(recievedInputSizes[i].QWHD) {
+                              this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
+                              this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height);
+                        }
+                  }
+            }
+      };
 
       UpdateDataForSubscribers() {
             this.DATA_FOR_SUBSCRIBERS = {
@@ -273,11 +299,12 @@ class Finishing extends Material {
             let matrixSizeArrays = [];
             let qty = 0;
 
-            this.INHERITED_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+            this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
 
                   subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
-
-                        matrixSizeArrays.push(dataEntry.matrixSizes);
+                        if(dataEntry.matrixSizes) {
+                              matrixSizeArrays.push(dataEntry.matrixSizes);
+                        }
                   });
             });
 
@@ -332,19 +359,7 @@ class Finishing extends Material {
             this.#production.productionTime = productionMins;
       }
 
-      UpdateInheritedSizes = () => {
-            this.#inheritedSizes = [];
-            this.#inheritedSizeTable.deleteAllRows();
 
-            //Per Parent Subscription:
-            for(let a = 0; a < this.INHERITED_DATA.length; a++) {
-                  let recievedInputSizes = this.INHERITED_DATA[a].data;
-                  for(let i = 0; i < recievedInputSizes.length; i++) {
-                        this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
-                        this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height);
-                  }
-            }
-      };
 
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
