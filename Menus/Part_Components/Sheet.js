@@ -183,9 +183,15 @@ class Sheet extends Material {
             }
       };
 
-      setJoinMethod() {
+      updateJoinMethod() {
             if(this.#method1[1].checked) this.#currentJoinMethod = Sheet.joinMethod["Even Joins"];
             else this.#currentJoinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
+      }
+
+      set joinMethod(value) {
+            if(value === Sheet.joinMethod["Even Joins"]) {setCheckboxChecked(true, this.#method1[1]); setCheckboxChecked(false, this.#method2[1]);}
+            if(value === Sheet.joinMethod["Full Sheet + Offcut"]) {setCheckboxChecked(false, this.#method1[1]); setCheckboxChecked(true, this.#method2[1]);}
+            this.updateJoinMethod();
       }
 
       setFilters(triggerChange = true) {
@@ -667,8 +673,8 @@ class Sheet extends Material {
             let methodContainer = createDivStyle4("width:calc(50% - 20px);", f_container_joins);
             let useMethod1 = (this.currentJoinMethod == "Use Full Sheets + End Offcut");
             let methodText = createText("Join Method", null, methodContainer);
-            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.setJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
-            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.setJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
+            this.#method1 = createCheckbox_Infield("Even Joins", !useMethod1, "min-width:250px", () => {this.updateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
+            this.#method2 = createCheckbox_Infield("Use Full Sheets + End Offcut", useMethod1, "min-width:250px", () => {this.updateJoinMethod(); this.UpdateFromFields();}, methodContainer, false);
 
             checkboxesAddToSelectionGroup(true, this.#method1, this.#method2);
 

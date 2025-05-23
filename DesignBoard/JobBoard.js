@@ -129,9 +129,11 @@ class JobBoard {
                   swapThreshold: 1,
                   ghostClass: 'sortable-ghost',
                   direction: 'vertical',
+
                   onEnd: function(event) {
                         _this.OnMoveEnd(event);
-                  }
+                  },
+                  onMove: (evt, originalEvent) => _this.OnMove(evt, originalEvent),
             });
             this.columnContainers.push({title: title, containerObject: container});
 
@@ -141,4 +143,6 @@ class JobBoard {
       }
 
       OnMoveEnd(event) {/*Override*/}
+
+      OnMove(evt, originalEvent) {/*Override*/}
 }

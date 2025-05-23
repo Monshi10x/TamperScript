@@ -277,8 +277,24 @@ class DesignBoard2 extends JobBoard {
       OnMoveEnd(event) {
             super.OnMoveEnd(event);
 
+            console.log(event.to);
+
             this.UpdateJobsInContainer(event.from);//previous container
             this.UpdateJobsInContainer(event.to);//new container
+      }
+
+      //Overriden
+      OnMove(event, originalEvent) {
+            /*console.log("On Move at DesignBoard2");
+            console.log(event.from);
+            const result = confirm("Have you filled out Print Checklist?");
+            if(result) {
+                  // User clicked "Yes" (OK)
+                  //return true;
+            } else {
+                  // User clicked "No" (Cancel)
+                  //return false;
+            }*/
       }
 
       async UpdateJobsInContainer(targetContainer) {
