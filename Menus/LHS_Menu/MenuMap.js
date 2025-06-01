@@ -125,7 +125,6 @@ class MenuMap extends LHSMenuWindow {
 
       async loadOrderAddress() {
             let ko = getKOStorageVariable();
-
             if(!ko) return;
 
             if(ko.travelDistance) $(this.#f_travelDistanceMeters[1]).val(ko.travelDistance);
@@ -133,11 +132,11 @@ class MenuMap extends LHSMenuWindow {
             if(ko.numberOfMobilisations) $(this.#f_numberOfMobilisations[1]).val(ko.numberOfMobilisations);
             if(ko.truckPackingAndSetupTime) $(this.#f_truckPackingAndSetupTime[1]).val(ko.truckPackingAndSetupTime);
 
-            if(!ko.formattedAddressString) return;
+            if(!ko.formattedInstallAddress) return;
 
-            if(this.SHOW_DEBUG) console.log("Install Address: " + ko.formattedAddressString);
+            if(this.SHOW_DEBUG) console.log(ko);
 
-            $(this.#f_searchField[1]).val(ko.formattedAddressString);
+            $(this.#f_searchField[1]).val(ko.formattedInstallAddress);
       }
 
       async onsetOrderInstallAddress() {

@@ -96,9 +96,10 @@ class Menu3D extends LHSMenuWindow {
       quickTemplates = [
             ["3D Non-lit Letters", "https://cdn.gorilladash.com/images/media/3752855/signarama-australia-atco-small-fascia-resized-thumbnail-5f38fe9719f20.jpg"],
             ["3D Front-lit Letters", "https://cdn.gorilladash.com/images/media/12562260/signarama-australia-homeco-cafe-63-lightbox-thumbnail-663186cf397a7.jpg"],
+            ["3D Halo-lit Letters", GM_getResourceURL("Image_FrostyBoyHalo")],
             ["3D 10mm Acrylic Letters", "https://cdn.gorilladash.com/images/media/5077109/signarama-australia-img-1060-2-small-square-61611e488aba9.jpg?auto=webp&width=1600"],
-            ["3D 20mm Acrylic Letters", ""],
-            ["2D Cut ACM Letters", ""]
+            ["3D 20mm Acrylic Letters", GM_getResourceURL("Image_FrostyBoy3D")],
+            ["2D Cut ACM Letters", GM_getResourceURL("Image_DJJCutACM")]
       ];
 
 
@@ -285,6 +286,82 @@ class Menu3D extends LHSMenuWindow {
                         artwork.artworkItem.artworkTime = 60;
                         install = this.#add(InstallSubscribable, this.page1, [Sheet]);
                         break;
+                  case "3D Halo-lit Letters":
+                        productDetails = this.#add(ProductDetails, this.page1, []);
+                        productDetails.productLocation = "";
+                        productDetails.productName = "3D Fabricated Halo-lit Letters";
+
+                        svgCutfile = this.#add(SVGCutfile, this.page1, []);
+
+                        coil = this.#add(Coil, this.page1, [SVGCutfile]);
+
+                        production = this.#add(ProductionSubscribable, this.page1, [Coil]);
+                        production.typeLabel = "LASER WELD PRODUCTION";
+                        production.showRequiresInputTag(true);
+
+                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+                        sheet.UPDATES_PAUSED = true;
+                        sheet.material = "Stainless";
+                        sheet.sheetSize = "2440x1220";
+                        sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
+                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
+                        sheet.sheetPerimeterIsCut = false;
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", thickness: "1.2mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.UPDATES_PAUSED = false;
+                        sheet.typeLabel = "STAINLESS SHEET";
+
+                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
+                        sheet.UPDATES_PAUSED = true;
+                        sheet.material = "Acrylic";
+                        sheet.sheetSize = "2440x1220";
+                        sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
+                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
+                        sheet.sheetPerimeterIsCut = false;
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10mm", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
+                        sheet.UPDATES_PAUSED = false;
+                        sheet.typeLabel = "OPAL BACK SHEET";
+
+                        led = this.#add(LED, this.page1, [SVGCutfile]);
+                        led.UPDATES_PAUSED = true;
+                        led.formula = "3D Letters 100D - 200 per m2";
+                        led.material = "LED Module - 6500K 1.08W 5yr 175deg 12V";
+                        led.UPDATES_PAUSED = false;
+
+                        sheet = this.#add(Sheet, this.page1, [svgCutfile, led]);
+                        sheet.UPDATES_PAUSED = true;
+                        sheet.material = "ACM";
+                        sheet.sheetSize = "2440x1220";
+                        sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
+                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
+                        sheet.sheetPerimeterIsCut = false;
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "2mm", profile: "Cut Through", quality: "Fast"});
+                        sheet.UPDATES_PAUSED = false;
+                        sheet.typeLabel = "ACM for LEDs";
+
+                        transformer = this.#add(Transformer, this.page1, [LED]);
+
+                        sheet = this.#add(Sheet, this.page1, [svgCutfile]);
+                        sheet.UPDATES_PAUSED = true;
+                        sheet.material = "Corflute";
+                        sheet.sheetSize = "2440x1220";
+                        sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
+                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
+                        sheet.useOverallSVGSize = true;
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.UPDATES_PAUSED = false;
+                        sheet.typeLabel = "CORFLUTE POUNCE";
+
+                        painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
+                        painting.UPDATES_PAUSED = true;
+                        painting.formula = "Fabricated BACK-LIT Letters";
+                        painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
+                        painting.UPDATES_PAUSED = false;
+
+                        artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+                        artwork.artworkItem.artworkTime = 60;
+                        install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+                        break;
                   case "3D 10mm Acrylic Letters":
                         productDetails = this.#add(ProductDetails, this.page1, []);
                         productDetails.productLocation = "";
@@ -380,8 +457,8 @@ class Menu3D extends LHSMenuWindow {
                         sheet.UPDATES_PAUSED = true;
                         sheet.material = "ACM";
                         sheet.sheetSize = "2440x1220";
-                        sheet.thickness = "3";
-                        //sheet.sheetMaterial = "";
+                        sheet.thickness = "3x0.21";
+                        sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x3x0.21 White Satin/Gloss (Mulfords)";
                         sheet.setCuttingMachine("router");
                         sheet.sheetPerimeterIsCut = false;
                         sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];

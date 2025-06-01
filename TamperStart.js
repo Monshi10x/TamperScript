@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.51
+// @version      10.601
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -66,6 +66,9 @@
 // @resource     Image_IsStocked https://github.com/Monshi10x/TamperScript/raw/main/Images/IsStockedImage.png
 // @resource     Image_SpiderBoom https://github.com/Monshi10x/TamperScript/raw/main/Images/SpiderBoomImage.png
 // @resource     Image_Scissor https://github.com/Monshi10x/TamperScript/raw/main/Images/ScissorImage.png
+// @resource     Image_FrostyBoyHalo https://github.com/Monshi10x/TamperScript/raw/main/Images/FrostyBoyHalo.jpg
+// @resource     Image_FrostyBoy3D https://github.com/Monshi10x/TamperScript/raw/main/Images/FrostyBoy3D.jpg
+// @resource     Image_DJJCutACM https://github.com/Monshi10x/TamperScript/raw/main/Images/DJJCutACM.JPG
 // @resource     SVGWebWorker https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_WebWorker.js
 // @resource     GoogleScript https://github.com/Monshi10x/TamperScript/raw/main/GoogleMap/GoogleMap.js
 // @require      https://cdn.plot.ly/plotly-3.0.1.min.js
