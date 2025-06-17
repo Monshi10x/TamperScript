@@ -1760,10 +1760,10 @@ var Field = {
     },
     //--------PAINTING-------//
     PaintLitresEach: function(productNo, partNo) {
-        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_521";
+        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_547";
     },
     PaintLitresTotal: function(productNo, partNo) {
-        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_522";
+        return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_548";
     },
     PaintColourMatchTimeEach: function(productNo, partNo) {
         return "#ord_prod_part_" + getRealProductNo(productNo) + "_" + getRealPartNo(productNo, partNo) + " #data_id_491";
