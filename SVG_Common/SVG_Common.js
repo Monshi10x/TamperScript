@@ -940,7 +940,7 @@ function svg_formatCompoundPaths(svgObject) {
                   if(j == 0 && !pathClass.contains("innerPath")) {
                         let outerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
                         outerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                        outerPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
+                        outerPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#eee;";
                         outerPathElement.className.baseVal = "outerPath";
                         outerPathParent_id = generateUniqueID("outerPath-");
                         outerPathElement.id = outerPathParent_id;
@@ -950,7 +950,7 @@ function svg_formatCompoundPaths(svgObject) {
                   else {
                         let innerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
                         innerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                        innerPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:none;";
+                        innerPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#fff;";
                         innerPathElement.className.baseVal = "innerPath";
                         innerPathElement.setAttribute("data-outerPathParent", outerPathParent_id);
                         newPathGroup.appendChild(innerPathElement);
