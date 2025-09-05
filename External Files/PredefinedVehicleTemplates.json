@@ -265,6 +265,270 @@
                   }
             ],
             [
+                  "test",
+                  "https://github.com/Monshi10x/TamperScript/raw/main/Images/Mazda BT50 DC 2020 Scaled-01.svg",
+                  10045.82,
+                  6319.66,
+                  {
+                        "name": "Single Door",
+                        "production_time": 120,
+                        "production_TE": "Each",
+                        "install_TE": "Each",
+                        "install_time": 160,
+                        "install_rate": "Install 1 Person (Min) $135/h",
+                        "template_rects": [
+                              {
+                                    "x": 5260,
+                                    "y": 1310.1136779785156,
+                                    "w": 1050,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Driver Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 4090,
+                                    "y": 3850.1136779785156,
+                                    "w": 1050,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Pass Door",
+                                    "colour": "#FF5A5A"
+                              }
+                        ]
+                  },
+                  {
+                        "name": "Double Door",
+                        "production_time": 120,
+                        "production_TE": "Each",
+                        "install_TE": "Each",
+                        "install_time": 120,
+                        "install_rate": "Install 1 Person (Min) $135/h",
+                        "template_rects": [
+                              {
+                                    "x": 4450,
+                                    "y": 1310.1136779785156,
+                                    "w": 1860,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Driver Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 4090,
+                                    "y": 3850.1136779785156,
+                                    "w": 1870,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Pass Door",
+                                    "colour": "#FF5A5A"
+                              }
+                        ]
+                  },
+                  {
+                        "name": "Single Door + Tray Package",
+                        "production_time": 180,
+                        "production_TE": "Each",
+                        "install_TE": "Each",
+                        "install_time": 240,
+                        "install_rate": "Install 1 Person (Min) $135/h",
+                        "template_rects": [
+                              {
+                                    "x": 5260,
+                                    "y": 1310.1136779785156,
+                                    "w": 1050,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Driver Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 4090,
+                                    "y": 3850.1136779785156,
+                                    "w": 1050,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Pass Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 8105.865222490247,
+                                    "y": 4061.1277163717696,
+                                    "w": 1800,
+                                    "h": 300,
+                                    "qty": 1,
+                                    "isPanel": true,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "None",
+                                    "description": "Tray Back Panel",
+                                    "colour": "#FF5CFF"
+                              },
+                              {
+                                    "x": 6152.058116005365,
+                                    "y": 3630.7737281592413,
+                                    "w": 2500,
+                                    "h": 300,
+                                    "qty": 2,
+                                    "isPanel": true,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "None",
+                                    "description": "Tray Sides Panel",
+                                    "colour": "#FF5CFF"
+                              }
+                        ]
+                  },
+                  {
+                        "name": "Double Door + Tray Package",
+                        "production_time": 180,
+                        "production_TE": "Each",
+                        "install_TE": "Each",
+                        "install_time": 240,
+                        "install_rate": "Install 1 Person (Min) $135/h",
+                        "template_rects": [
+                              {
+                                    "x": 4428.953440464834,
+                                    "y": 1310.1136779785156,
+                                    "w": 1880,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Driver Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 4090,
+                                    "y": 3850.1136779785156,
+                                    "w": 1880,
+                                    "h": 570,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "Tape - Application Low Tack (TransferRite APP656093)",
+                                    "description": "Pass Door",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 8105.865222490247,
+                                    "y": 4061.1277163717696,
+                                    "w": 1800,
+                                    "h": 300,
+                                    "qty": 1,
+                                    "isPanel": true,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "None",
+                                    "description": "Tray Back Panel",
+                                    "colour": "#FF5CFF"
+                              },
+                              {
+                                    "x": 6152.058116005365,
+                                    "y": 3630.7737281592413,
+                                    "w": 2500,
+                                    "h": 300,
+                                    "qty": 2,
+                                    "isPanel": true,
+                                    "vinyl": "Vinyl - Polymeric Blockout Air-Release (Orafol 3651GRA)",
+                                    "laminate": "Laminate - Polymeric Gloss (Oraguard 215G)",
+                                    "appTape": "None",
+                                    "description": "Tray Sides Panel",
+                                    "colour": "#FF5CFF"
+                              }
+                        ]
+                  },
+                  {
+                        "name": "Full Wrap",
+                        "production_time": 180,
+                        "production_TE": "Each",
+                        "install_TE": "Each",
+                        "install_time": 2400,
+                        "install_rate": "Install 1 Person (Min) $135/h",
+                        "template_rects": [
+                              {
+                                    "x": 2750,
+                                    "y": 3070.1136779785156,
+                                    "w": 3450,
+                                    "h": 1510,
+                                    "qty": 2,
+                                    "vinyl": "Vinyl - 3M Vehicle Wrap (3M IJ180MC-10) (8 yrs vert less 70)",
+                                    "laminate": "Laminate - 3M Vehicle Standardterm 8V, 0H (3M 8518)",
+                                    "appTape": "None",
+                                    "description": "Side Doors",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 5730,
+                                    "y": 3438.1817626953125,
+                                    "w": 2158.1817626953125,
+                                    "h": 1241.9319152832031,
+                                    "qty": 2,
+                                    "vinyl": "Vinyl - 3M Vehicle Wrap (3M IJ180MC-10) (8 yrs vert less 70)",
+                                    "laminate": "Laminate - 3M Vehicle Standardterm 8V, 0H (3M 8518)",
+                                    "appTape": "None",
+                                    "description": "Tailgate Side",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 8158.1817626953125,
+                                    "y": 3548.1817626953125,
+                                    "w": 1681.8182373046875,
+                                    "h": 711.9319152832031,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - 3M Vehicle Wrap (3M IJ180MC-10) (8 yrs vert less 70)",
+                                    "laminate": "Laminate - 3M Vehicle Standardterm 8V, 0H (3M 8518)",
+                                    "appTape": "None",
+                                    "description": "Rear Tailgate",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 388.1817626953125,
+                                    "y": 2238.1817626953125,
+                                    "w": 1341.8182373046875,
+                                    "h": 1781.9319152832031,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - 3M Vehicle Wrap (3M IJ180MC-10) (8 yrs vert less 70)",
+                                    "laminate": "Laminate - 3M Vehicle Standardterm 8V, 0H (3M 8518)",
+                                    "appTape": "None",
+                                    "description": "Roof",
+                                    "colour": "#FF5A5A"
+                              },
+                              {
+                                    "x": 138.1817626953125,
+                                    "y": 4628.1817626953125,
+                                    "w": 1821.8182373046875,
+                                    "h": 1291.9319152832031,
+                                    "qty": 1,
+                                    "vinyl": "Vinyl - 3M Vehicle Wrap (3M IJ180MC-10) (8 yrs vert less 70)",
+                                    "laminate": "Laminate - 3M Vehicle Standardterm 8V, 0H (3M 8518)",
+                                    "appTape": "None",
+                                    "description": "Bonnet",
+                                    "colour": "#FF5A5A"
+                              }
+                        ]
+                  }
+            ],
+            [
                   "Ute - Mazda BT50 Double Cab 2020",
                   "https://github.com/Monshi10x/TamperScript/raw/main/Images/MazdaBT502020DoubleCab.svg",
                   14728.16,
