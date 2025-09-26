@@ -1154,6 +1154,6 @@ class Sheet extends Material {
       Description() {
             super.Description();
 
-            return this.#thickness[1].value + "mm " + this.#finish[1].value + " finish " + this.#material[1].value + " panel";
+            return "";//this.#thickness[1].value + "mm " + this.#finish[1].value + " finish " + this.#material[1].value + " panel";
       }
 }

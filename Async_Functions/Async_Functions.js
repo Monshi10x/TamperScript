@@ -411,6 +411,23 @@ function getPredefinedParts_Name_FromContains(searchName, ...args) {
     alert("not ready");
 }
 
+function getPredefinedParts_Sheen(searchName) {
+    let parts = getPredefinedParts(searchName);
+    var sheens = [];
+    for(var i = 0; i < parts.length; i++) {
+        let partWeight = parts[i].Weight;
+        const partWeight_Json = Object.fromEntries(
+            partWeight.split(",").map(pair => {
+                const [key, value] = pair.split(":").map(s => s.trim());
+                return [key, value];
+            })
+        );
+
+        if(!sheens.contains(partWeight_Json.Sheen)) sheens.push(partWeight_Json.Sheen);
+    }
+    return sheens;
+}
+
 async function getPart_HighDetail(partId) {
     const response = await fetch("https://sar10686.corebridge.net/Api/OrderEntryProducts/GetProductPart?partId=" + partId + "", {
         "headers": {

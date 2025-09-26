@@ -157,6 +157,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				productDetails = this.#add(ProductDetails, this.page1, []);
 				productDetails.productLocation = "";
 				productDetails.productName = "ACM Panel";
+				productDetails.description = "3mm ACM Panel with Digitally Printed Vinyl";
 
 				size = this.#add(Size, this.page1, []);
 				size.width = 2440;

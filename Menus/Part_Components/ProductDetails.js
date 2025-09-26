@@ -44,6 +44,10 @@ class ProductDetails extends SubscriptionManager {
       set productName(value) {this.#productNameField[1].value = value;}
       get productName() {return this.#productNameField;}
 
+      #description = "";
+      set description(value) {this.#description = value;}
+      get description() {return this.#description;}
+
       /**
        * @SIZES
        */
@@ -130,6 +134,6 @@ class ProductDetails extends SubscriptionManager {
       }
 
       Description() {
-            return "";
+            return this.description ? this.description : "";
       }
 }

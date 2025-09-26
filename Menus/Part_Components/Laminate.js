@@ -34,6 +34,7 @@ class Laminate extends Material {
       get machineTotalTime() {return zeroIfNaNNullBlank(this.#f_machineTotalTime[1].value);}
       get backgroundColor() {return COLOUR.Purple;}
       get textColor() {return COLOUR.White;}
+      get sheen() {return getPredefinedParts_Sheen(this.#f_material[1].value)[0] || "";}
       /*
                         
       Setter            */
@@ -66,8 +67,7 @@ class Laminate extends Material {
             laminateParts.forEach((element) => {
                   let isStocked = false;
                   if(element.Weight) {
-                        let parsedWeight = JSON.parse(element.Weight);
-                        if(parsedWeight.isStocked) isStocked = parsedWeight.isStocked;
+                        if(element.Weight.includes("Stocked:true")) isStocked = true;
                   }
                   laminateDropdownElements.push([element.Name, isStocked ? "blue" : "white"]);
             });
@@ -75,8 +75,7 @@ class Laminate extends Material {
             vinylParts.forEach((element) => {
                   let isStocked = false;
                   if(element.Weight) {
-                        let parsedWeight = JSON.parse(element.Weight);
-                        if(parsedWeight.isStocked) isStocked = parsedWeight.isStocked;
+                        if(element.Weight.includes("Stocked:true")) isStocked = true;
                   }
                   laminateDropdownElements.push([element.Name, isStocked ? "blue" : "white"]);
             });
@@ -246,8 +245,8 @@ class Laminate extends Material {
 
       Description() {
             super.Description();
-
-            TODO("laminate gloss levels");
-            return "Laminated in " + 'gloss' + " for UV protection and longevity";
+            let sheen = getPredefinedParts_Sheen(this.#f_material[1].value);
+            if(sheen[0]) return "Laminated in " + sheen[0];
+            return ""; //"Sheen: " + sheen[0];//"Laminated in " + 'gloss' + " for UV protection and longevity";
       }
 }
