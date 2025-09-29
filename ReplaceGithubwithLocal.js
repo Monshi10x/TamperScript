@@ -10,8 +10,8 @@ if(!mode || !['work', 'home'].includes(mode)) {
 }
 
 // Paths
-const inputFile = 'LocalIncludes.txt';
-const outputFile = 'TamperStart.js';
+const inputFile = 'TamperStartDesign.js';
+const outputFile = 'TamperStartDesign_Work.js';
 
 const baseGitHubUrl = 'https://github.com/Monshi10x/TamperScript/raw/main/';
 const baseLocalPath_Work = 'file://C:\\Users\\Tristan PC\\Documents\\TamperScript\\';

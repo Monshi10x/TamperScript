@@ -1071,7 +1071,7 @@ class UIContainer_Design2 {
             }
             /*
             Address*/
-            this.#installAddress = "";
+            this.#installAddress = null;
             if(data.OrderInformation.OrderInformation.M1) {
                   let koStorageString = data.OrderInformation.OrderInformation.M1;
                   let koStorageObject = JSON.parse(this.parseKOStorageVariable(koStorageString));
@@ -1083,22 +1083,28 @@ class UIContainer_Design2 {
 
                   googleMapContainer.style.cssText += "width:calc(100%);height:500px;";
 
-                  console.log(GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress));
+                  console.log(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress);
 
-                  await GoogleMap.showDirections(this.#installAddress);
+                  TODO("No Address Set");
+                  if(this.#installAddress != null) {
 
-                  let qrCodeDiv = document.createElement("div");
-                  qrCodeDiv.style = "padding:20px;background-color:white;";
-                  this.addressQRContainer.appendChild(qrCodeDiv);
+                        console.log(GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress));
 
-                  const qrcode = new QRCode(qrCodeDiv, {
-                        text: GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress),
-                        width: 200,
-                        height: 200,
-                        colorDark: '#000',
-                        colorLight: '#fff',
-                        correctLevel: QRCode.CorrectLevel.L
-                  });
+                        await GoogleMap.showDirections(this.#installAddress);
+
+                        let qrCodeDiv = document.createElement("div");
+                        qrCodeDiv.style = "padding:20px;background-color:white;";
+                        this.addressQRContainer.appendChild(qrCodeDiv);
+
+                        const qrcode = new QRCode(qrCodeDiv, {
+                              text: GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress),
+                              width: 200,
+                              height: 200,
+                              colorDark: '#000',
+                              colorLight: '#fff',
+                              correctLevel: QRCode.CorrectLevel.L
+                        });
+                  }
             }
             /*
             Illustrator*/
@@ -1164,8 +1170,9 @@ class UIContainer_Design2 {
 
             googleMapContainer.style.cssText += "width:calc(100%);height:500px;";
 
-            console.log(GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress));
+            //console.log(GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress));
 
+            if(!this.#installAddress) return;
             await GoogleMap.showDirections(this.#installAddress);
       }
 
