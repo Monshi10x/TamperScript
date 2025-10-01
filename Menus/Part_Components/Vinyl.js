@@ -161,10 +161,6 @@ class Vinyl extends Material {      /*
             let f_container_joins = createDivStyle5(null, "Joins", this.container)[1];
 
             this.#f_joinHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 20px);height:40px;background-color:" + COLOUR.Orange + ";", () => {
-                  this.#f_visualiser = new ModalVinylJoins("Join Helper", 100, () => {
-                        this.UpdateFromFields();
-                  }, this);
-
                   this.#f_visualiser.borrowFields(this.#f_joinOverlap[0], this.#f_joinOrientation[0], this.#f_rollWidth[0], this.#f_material[0], this.#f_bleedDropdown[0], this.#f_bleedTop[0], this.#f_bleedBottom[0], this.#f_bleedLeft[0], this.#f_bleedRight[0]);
                   //this.#f_visualiser.borrowFields(...this.#filterContainersOrdered, this.#flip[0], methodContainer);
                   this.#f_visualiser.setBleedFields(this.#f_bleedTop[1], this.#f_bleedBottom[1], this.#f_bleedLeft[1], this.#f_bleedRight[1]);
@@ -183,6 +179,7 @@ class Vinyl extends Material {      /*
                         });
                   });
                   this.#f_visualiser.setSizeArrays(...matrixSizeArrays);
+                  this.#f_visualiser.show();
             }, f_container_joins, true);
             this.#f_joinOverlap = createInput_Infield("Join Overlap", 10, "width:30%;", () => {this.UpdateFromFields();}, f_container_joins, false, 5, {postfix: "mm"});
             this.#f_joinOrientation = createCheckbox_Infield("Join Horizontal", true, "width:30%", () => {this.UpdateFromFields();}, f_container_joins, () => {this.UpdateFromFields();});
@@ -261,6 +258,10 @@ class Vinyl extends Material {      /*
             this.#f_outputSizeTable2.addRow("-", "-", "-");
             this.#f_outputSizeTable2.container.style.cssText += "width:calc(100% - 20px);margin:10px;";
 
+
+            this.#f_visualiser = new ModalVinylJoins("Join Helper", 100, () => {
+                  this.UpdateFromFields();
+            }, this);
             /*
             Update*/
             this.UpdateFromFields();
@@ -282,6 +283,13 @@ class Vinyl extends Material {      /*
             this.PushToSubscribers();
 
             super.UpdateFromFields();
+      }
+
+      UpdateVisualizer() {
+            if(this.#f_visualiser) {
+                  //this.#f_visualiser.setSizeArrays(this.#matrixSizes);
+                  this.#f_visualiser.UpdateFromFields();
+            }
       }
 
       UpdateFromInheritedData = () => {
@@ -382,10 +390,6 @@ class Vinyl extends Material {      /*
                   });
             });
 
-      }
-
-      UpdateVisualizer() {
-            if(this.#f_visualiser) this.#f_visualiser.UpdateFromFields();
       }
 
       UpdateMachineTimes() {
