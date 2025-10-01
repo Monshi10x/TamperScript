@@ -1,8 +1,11 @@
 class ModalVinylJoins extends ModalWidthHeight {
 
       #ID = "ModalVinylJoins " + generateUniqueID();
-      #dragZoomCanvas;
+      dragZoomSVG;
       #borrowedFields = [];
+
+      get svgFile() {return this.dragZoomSVG.svgFile;}
+      get unscaledSVGString() {return this.dragZoomSVG.unscaledSVGString;}
 
       //An array of multiple parents matrixSizes
       sizeArrays = [];
@@ -57,12 +60,19 @@ class ModalVinylJoins extends ModalWidthHeight {
       #gapBetweenY = 100;
       #gapBetweenYField;
 
+      #textSize = 15;
+      #lineWidth = 1;
+      #crossScale = 0.2;
+      #offsetFromShape = 15;
+
       #maintainGapBetweenBleed = true;
       #maintainGapBetweenBleedField;
 
       #gapSettingsContainer;
       #containerBeforeCanvas;
       #containerAfterCanvas;
+
+      /*override*/get shouldShowOnCreation() {return false;};
 
       constructor(headerText, incrementAmount, callback, sheetClass) {
             super(headerText, incrementAmount, callback);
@@ -82,37 +92,101 @@ class ModalVinylJoins extends ModalWidthHeight {
             this.#maintainGapBetweenBleedField = createCheckbox_Infield("maintainGapBetweenBleed", this.#maintainGapBetweenBleed, null, () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.UpdateFromFields();}, this.#gapSettingsContainer, () => {this.#maintainGapBetweenBleed = this.#maintainGapBetweenBleedField[1].checked; this.UpdateFromFields();});
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
+            AddCssStyle("overflow-y:auto;", this.#containerBeforeCanvas);
             this.borrowFieldsContainer = this.#containerBeforeCanvas;
 
-            this.#dragZoomCanvas = new DragZoomCanvas(this.container.getBoundingClientRect().width, 400, () => this.draw(), this.getBodyElement());
+            this.svgContainer = createDiv("width:100%;", null, this.getBodyElement());
+
+            this.dragZoomSVG = new DragZoomSVG(/*this.container.getBoundingClientRect().width*/"calc(100%)", "500px", null, this.svgContainer,
+                  {
+                        convertShapesToPaths: true,
+                        splitCompoundPaths: false,
+                        scaleStrokeOnScroll: true,
+                        scaleFontOnScroll: true,
+                        defaultStrokeWidth: 1,
+                        defaultFontSize: 12
+                  });
+            this.dragZoomSVG.onTransform = () => {this.draw();};
 
             this.#containerAfterCanvas = createDivStyle5(null, "View Settings", this.getBodyElement())[1];
       }
 
-      Close() {
-            //this.returnAllBorrowedFields();
-            this.#dragZoomCanvas.Close();
+      show() {
+            super.show();
+
+            this.modalOpaqueBackground.style.zIndex = "1004";
+
+            if(this.dragZoomSVG) {
+                  setTimeout(() => {
+                        this.dragZoomSVG.centerAndFitSVGContent();
+                  }, 1);
+            }
       }
 
       UpdateFromFields() {
             super.UpdateFromFields();
-            this.#dragZoomCanvas.UpdateFromFields();
+
+            if(this.dragZoomSVG) {
+                  this.draw();
+                  this.dragZoomSVG.UpdateFromFields();
+            }
+      }
+
+      shapes = [];
+      measurements = [];
+      DrawRect(params) {
+            let rect = new TSVGRectangle(this.dragZoomSVG.svgG, {
+                  fill: COLOUR.LightBlue,
+                  strokeWidth: 2 / this.dragZoomSVG.scale,
+                  stroke: "black",
+                  opacity: 1,
+                  usePattern: false,
+                  patternType: 'hatchHorizontal',// Available patternType values: 'hatch45', 'hatchHorizontal', 'hatchVertical', 'soil'
+                  hatchFill: 'none',
+                  hatchLineColor: 'black',
+                  hatchLineWidth: 4,
+                  hatchSpacing: 20,
+                  ...params
+            });
+
+            this.shapes.push(rect);
+
+            return rect.rect;
+      }
+
+      DrawLine(params) {
+            let line = new TSVGLine(this.dragZoomSVG.svgG, {
+                  stroke: 'black',
+                  'stroke-width': 2 / this.dragZoomSVG.scale,
+                  ...params
+            });
+
+            this.shapes.push(line);
+
+            return line.line;
       }
 
       draw() {
-            let canvasCtx = this.#dragZoomCanvas.canvasCtx;
-            let canvasScale = this.#dragZoomCanvas.scale;
+            for(let r = this.shapes.length - 1; r >= 0; r--) {
+                  this.shapes[r].Delete();
+            }
+            this.shapes = [];
 
-            let textSize = 15;
-            let lineWidth = 1;
-            let crossScale = 0.2;
-            let offsetFromShape = 15;
+            for(let r = this.measurements.length - 1; r >= 0; r--) {
+                  this.measurements[r].Delete();
+            }
+            this.measurements = [];
+
+            let xo = 0, yo = 0;
 
             /** @info Draw Each Sheet from matrixSizes, per parent */
             let distanceBetweenParentDraws = 1000;
-            let xo = 0, yo = 0;
 
-            for(let i = 0; i < this.sizeArrays.length; i++) {//per parent subscriptions matrix (i.e. Sheet or Size Matrix)
+            console.log(this.sizeArrays);
+
+            //for(let i = 0; i < this.sizeArrays.length; i++) {//per parent subscriptions matrix (i.e. Sheet or Size Matrix)
+            if(this.sizeArrays.length > 0) {
+                  let i = 0;
                   for(let j = 0; j < this.sizeArrays[i].length; j++) {//per vinyl subscription matrix
                         let matrixSize = this.sizeArrays[i][j];
 
@@ -129,10 +203,70 @@ class ModalVinylJoins extends ModalWidthHeight {
                                     let [rectWidth_Initial, rectHeight_Initial] = matrixSize[r][c];
 
                                     //draw matrixSize
-                                    drawRect(canvasCtx, xo, yo, rectWidth, rectHeight, "TL", COLOUR.Black, 1);
+                                    let rect = this.DrawRect({
+                                          x: xo,
+                                          y: yo,
+                                          width: rectWidth,
+                                          height: rectHeight,
+                                          fill: "none"
+                                    });
 
-                                    if(isFirstRow) drawMeasurement_Verbose(canvasCtx, xo, yo, rectWidth, 0, "T", roundNumber(rectWidth, 2), textSize, COLOUR.Blue, lineWidth, crossScale, offsetFromShape, true, "B", false, canvasScale);
-                                    if(isFirstColumn) drawMeasurement_Verbose(canvasCtx, xo, yo, 0, rectHeight, "L", roundNumber(rectHeight, 2), textSize, COLOUR.Blue, lineWidth, crossScale, offsetFromShape, false, "R", false, canvasScale);
+                                    //if(isFirstRow) drawMeasurement_Verbose(canvasCtx, xo, yo, rectWidth, 0, "T", roundNumber(rectWidth, 2), textSize, COLOUR.Blue, lineWidth, crossScale, offsetFromShape, true, "B", false, canvasScale);
+                                    //if(isFirstColumn) drawMeasurement_Verbose(canvasCtx, xo, yo, 0, rectHeight, "L", roundNumber(rectHeight, 2), textSize, COLOUR.Blue, lineWidth, crossScale, offsetFromShape, false, "R", false, canvasScale);
+
+                                    if(isFirstRow) {
+                                          this.measurements.push(new TSVGMeasurement(this.dragZoomSVG.svgG, {
+                                                direction: "width",
+                                                x1: xo,
+                                                y1: yo,
+                                                x2: xo + rectWidth,
+                                                y2: yo,
+                                                autoLabel: true,
+                                                text: roundNumber(rectWidth, 2) + " mm",
+                                                deletable: true,
+                                                unit: "mm",
+                                                precision: 2,
+                                                scale: 1,
+                                                arrowSize: 10 / this.dragZoomSVG.scale,
+                                                textOffset: 10 / this.dragZoomSVG.scale,
+                                                stroke: "#000",
+                                                sides: ["top"],
+                                                lineWidth: 2 / this.dragZoomSVG.scale,
+                                                fontSize: 12 / this.dragZoomSVG.scale + "px",
+                                                tickLength: 20 / this.dragZoomSVG.scale,
+                                                handleRadius: 8 / this.dragZoomSVG.scale,
+                                                offsetX: 0,
+                                                offsetY: -20 / this.dragZoomSVG.scale
+                                          }));
+                                    }
+
+                                    if(isFirstColumn) {
+                                          this.measurements.push(new TSVGMeasurement(this.dragZoomSVG.svgG, {
+                                                direction: "height",
+                                                x1: xo,
+                                                y1: yo,
+                                                x2: xo,
+                                                y2: yo + rectHeight,
+                                                autoLabel: true,
+                                                text: roundNumber(rectHeight, 2) + " mm",
+                                                deletable: true,
+                                                unit: "mm",
+                                                precision: 2,
+                                                scale: 1,
+                                                arrowSize: 10 / this.dragZoomSVG.scale,
+                                                textOffset: 10 / this.dragZoomSVG.scale,
+                                                stroke: "#000",
+                                                sides: ["left"],
+                                                lineWidth: 2 / this.dragZoomSVG.scale,
+                                                fontSize: 12 / this.dragZoomSVG.scale + "px",
+                                                tickLength: 20 / this.dragZoomSVG.scale,
+                                                handleRadius: 8 / this.dragZoomSVG.scale,
+                                                offsetX: -20 / this.dragZoomSVG.scale,
+                                                offsetY: 0,
+                                                sideHint: "left"
+                                          }));
+                                    }
+
 
                                     rectWidth += this.bleedLeft + this.bleedRight;
                                     rectHeight += this.bleedTop + this.bleedBottom;
@@ -155,8 +289,28 @@ class ModalVinylJoins extends ModalWidthHeight {
                                     }
 
                                     for(let t = 0; t < times; t++) {
-                                          if(this.joinOrientation == "Horizontal") drawFillRect(canvasCtx, xo - this.bleedLeft, yo - this.bleedTop + (t * (rectHeight - joinAmountY)), rectWidth, rectHeight, "TL", COLOUR.Red, 0.4);
-                                          if(this.joinOrientation == "Vertical") drawFillRect(canvasCtx, xo - this.bleedLeft + (t * (rectWidth - joinAmountX)), yo - this.bleedTop, rectWidth, rectHeight, "TL", COLOUR.Red, 0.4);
+                                          if(this.joinOrientation == "Horizontal") {
+                                                //drawFillRect(canvasCtx, xo - this.bleedLeft, yo - this.bleedTop + (t * (rectHeight - joinAmountY)), rectWidth, rectHeight, "TL", COLOUR.Red, 0.4);
+                                                let rect2 = this.DrawRect({
+                                                      x: xo - this.bleedLeft,
+                                                      y: yo - this.bleedTop + (t * (rectHeight - joinAmountY)),
+                                                      width: rectWidth,
+                                                      height: rectHeight,
+                                                      fill: COLOUR.Orange,
+                                                      opacity: 0.5
+                                                });
+                                          }
+                                          if(this.joinOrientation == "Vertical") {
+                                                //drawFillRect(canvasCtx, xo - this.bleedLeft + (t * (rectWidth - joinAmountX)), yo - this.bleedTop, rectWidth, rectHeight, "TL", COLOUR.Red, 0.4);
+                                                let rect2 = this.DrawRect({
+                                                      x: xo - this.bleedLeft + (t * (rectWidth - joinAmountX)),
+                                                      y: yo - this.bleedTop,
+                                                      width: rectWidth,
+                                                      height: rectHeight,
+                                                      fill: COLOUR.Orange,
+                                                      opacity: 0.5
+                                                });
+                                          }
                                     }
 
                                     let bo = this.#maintainGapBetweenBleed ? (this.bleedLeft + this.bleedRight) : 0;
@@ -180,7 +334,7 @@ class ModalVinylJoins extends ModalWidthHeight {
 
       onWindowResize(event) {
             super.onWindowResize(event);
-            this.#dragZoomCanvas.canvasWidth = this.container.getBoundingClientRect().width;
+            if(this.dragZoomSVG) this.dragZoomSVG.canvasWidth = this.container.getBoundingClientRect().width;
             this.UpdateFromFields();
       }
 }
