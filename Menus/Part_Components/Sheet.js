@@ -611,7 +611,7 @@ class Sheet extends Material {
 
             this.#finish = createDropdown_Infield("Finish", 0, "width:100px;", [], () => {this.setFilters();}, sheetFilterContainer[1]);
 
-            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 10px);", 40, false, this.getSheetDropdownOptions(), () => {this.UpdateFromFields();}, f_container_sheetSize[1], false);
+            this.#sheetMaterial = createDropdown_Infield_Icons_Search("Sheet Material", 0, "width:calc(100% - 12px);", 40, false, this.getSheetDropdownOptions(), () => {this.UpdateFromFields();}, f_container_sheetSize[1], false);
 
             /*
             Folded*/

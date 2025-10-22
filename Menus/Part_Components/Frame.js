@@ -100,11 +100,7 @@ class Frame {
                   setFieldHidden(true, this.l_frameHorizontalPartitions[1], this.l_frameHorizontalPartitions[0]);
                   setFieldHidden(true, this.l_frameCornerFinishing[1], this.l_frameCornerFinishing[0]);
                   setFieldHidden(true, this.l_frameSeparateFromLegs[1], this.l_frameSeparateFromLegs[0]);
-                  setFieldHidden(true, this.l_addPowdercoatingBtn, this.l_addPowdercoatingBtn);
-                  this.l_addPowdercoatingBtn.innerText = "Powdercoating +";
-                  setFieldHidden(true, this.l_powdercoatingCost[1], this.l_powdercoatingCost[0]);
-                  setFieldHidden(true, this.l_powdercoatingMarkup[1], this.l_powdercoatingMarkup[0]);
-                  setFieldHidden(true, this.l_powdercoatingTotalEach[1], this.l_powdercoatingTotalEach[0]);
+                  setFieldHidden(true, this.l_addPowdercoatingCkb[1], this.l_addPowdercoatingCkb[0]);
                   setFieldHidden(true, this.l_add2PacBtn, this.l_add2PacBtn);
                   this.l_add2PacBtn.innerText = "2Pac +";
                   setFieldHidden(true, this.l_2PacLitres[1], this.l_2PacLitres[0]);
@@ -140,8 +136,6 @@ class Frame {
                   setFieldHidden(false, this.l_frameHorizontalPartitions[1], this.l_frameHorizontalPartitions[0]);
                   setFieldHidden(false, this.l_frameCornerFinishing[1], this.l_frameCornerFinishing[0]);
                   setFieldHidden(false, this.l_frameSeparateFromLegs[1], this.l_frameSeparateFromLegs[0]);
-                  setFieldHidden(false, this.l_addPowdercoatingBtn, this.l_addPowdercoatingBtn);
-                  this.l_addPowdercoatingBtn.innerText = "Powdercoating +";
                   setFieldHidden(false, this.l_add2PacBtn, this.l_add2PacBtn);
                   this.l_add2PacBtn.innerText = "2Pac +";
                   setFieldHidden(false, this.l_hr1, this.l_hr1);
@@ -412,22 +406,20 @@ class Frame {
             this.callback();
       };
 
-      togglePowdercoating = () => {
+      /*togglePowdercoating = () => {
             if(this.l_powdercoatingCost[0].style.display == "none") {
                   this.l_powdercoatingCost[0].style.display = "block";
-                  this.l_addPowdercoatingBtn.innerText = "Powdercoating -";
                   this.l_powdercoatingMarkup[0].style.display = "block";
                   this.l_powdercoatingTotalEach[0].style.display = "block";
             } else {
                   this.l_powdercoatingCost[0].style.display = "none";
                   this.l_powdercoatingCost[1].value = null;
-                  this.l_addPowdercoatingBtn.innerText = "Powdercoating +";
                   this.l_powdercoatingMarkup[0].style.display = "none";
                   this.l_powdercoatingMarkup[1].value = null;
                   this.l_powdercoatingTotalEach[0].style.display = "none";
             }
             this.callback();
-      };
+      };*/
 
       toggle2Pac = () => {
             if(this.l_2PacLitres[0].style.display == "none") {

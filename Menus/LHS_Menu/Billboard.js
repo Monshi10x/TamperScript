@@ -40,6 +40,9 @@ class BillboardMenu extends LHSMenuWindow {
       #production;
       #install;
       #artwork;
+      #f_showGroundCkb;
+
+      #showGround = true;
 
       constructor(width, height, ID, windowTitle) {
             super(width, height, ID, windowTitle);
@@ -61,6 +64,15 @@ class BillboardMenu extends LHSMenuWindow {
 
       createContent() {
             var page = this.getPage(0);
+
+            let settingsButton = createButton("", "width:30px;height:30px;margin:0px;padding:0;float:right;font-size:20px;min-height:30px;line-height:30px;", () => {
+                  this.openSettingsModal();
+            }, null);
+            this.add;
+            settingsButton.innerHTML = "&#9881";
+            this.header.appendChild(settingsButton);
+
+            this.#f_showGroundCkb = createCheckbox_Infield("Show Ground", true, null, () => {this.#showGround = this.#f_showGroundCkb[1].checked; this.UpdateFromFields();});
 
             this.#dragZoomCanvas = new DragZoomCanvas(page.getBoundingClientRect().width / 2 + 50, this.height, () => {this.draw();}, page,);
             this.#dragZoomCanvas.canvas.style.cssText += "float:right;";
@@ -362,6 +374,10 @@ class BillboardMenu extends LHSMenuWindow {
             }
             this.grounds = [];
 
+            console.log("in drawsvgground", this.#showGround);
+
+            if(!this.#showGround) return;
+
             let signIsFront = attachmentType == "2 Post, Forward Frame, Front Sign" ||
                   attachmentType == "2 Post, Front Frame, Front Sign" ||
                   attachmentType == "3 Post, Forward Frame, Front Sign" ||
@@ -388,9 +404,18 @@ class BillboardMenu extends LHSMenuWindow {
             }));
       }
 
+      openSettingsModal() {
+            let modal = new Modal("Settings", () => { });
+            modal.setContainerSize(500, 500);
+            modal.addBodyElement(this.#f_showGroundCkb[0]);
+            modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {
+                  this.UpdateFromFields();
+                  modal.hide();
+            }));
+      }
+
       UpdateFromFields() {
             this.#dragZoomCanvas.UpdateFromFields();
-
 
             if(this.#totalQuantity.UpdateSVG) this.#totalQuantity.UpdateSVG();
 
@@ -399,9 +424,7 @@ class BillboardMenu extends LHSMenuWindow {
             if(this.#footing.UpdateSVG) this.#footing.UpdateSVG();
             if(this.#baseplate.UpdateSVG) this.#baseplate.UpdateSVG();
             if(this.#leg.UpdateSVG) this.#leg.UpdateSVG();
-
             if(this.#frame.UpdateSVG) this.#frame.UpdateSVG();
-
             if(this.#sign.UpdateSVG) this.#sign.UpdateSVG();
             if(this.#production.UpdateSVG) this.#production.UpdateSVG();
             if(this.#install.UpdateSVG) this.#install.UpdateSVG();
