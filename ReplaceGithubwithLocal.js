@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
+// e.g. node script.js work
 // Command-line argument: 'work' or 'home'
-const mode = process.argv[2]; // e.g. node script.js work
+const mode = process.argv[2];
 
 if(!mode || !['work', 'home'].includes(mode)) {
       console.error("❌ Please specify 'work' or 'home' as an argument.");

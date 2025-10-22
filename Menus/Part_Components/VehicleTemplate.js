@@ -158,8 +158,10 @@ class VehicleTemplate extends SubMenu {
                   let weightField = element.Weight;
                   if(weightField == "") vinylDropdownElements.push([element.Name, "white"]);
                   else {
-                        let weightField_asJSON = JSON.parse(weightField);
-                        if(weightField_asJSON.isStocked == true) vinylDropdownElements.push([element.Name, "blue"]);
+                        let isStocked = false;
+                        if(element.Weight.includes("Stocked:true")) isStocked = true;
+
+                        if(isStocked) vinylDropdownElements.push([element.Name, "blue"]);
                   }
             });
 
@@ -178,8 +180,10 @@ class VehicleTemplate extends SubMenu {
                   let weightField = element.Weight;
                   if(weightField == "") laminateDropdownElements.push([element.Name, "white"]);
                   else {
-                        let weightField_asJSON = JSON.parse(weightField);
-                        if(weightField_asJSON.isStocked == true) laminateDropdownElements.push([element.Name, "blue"]);
+                        let isStocked = false;
+                        if(element.Weight.includes("Stocked:true")) isStocked = true;
+
+                        if(isStocked) laminateDropdownElements.push([element.Name, "blue"]);
                   }
             });
             //laminateParts.forEach(element => laminateDropdownElements.push([element.Name, "white"]));
