@@ -17,6 +17,7 @@ class LHSMenuWindow {
     #previousPageBtn;
     #nextPageBtn;
     #pages = [];
+    #header;
 
     #doesTick = false;
 
@@ -25,6 +26,10 @@ class LHSMenuWindow {
     }
     set doesTick(value) {
         this.#doesTick = value;
+    }
+
+    get header() {
+        return this.#header;
     }
 
     #tickMS = 1000;
@@ -256,6 +261,8 @@ class LHSMenuWindow {
 
         var closeBtn = createButton("X", "background-color:red;width:30px;max-height:30px;min-height:30px;float:right;margin:0px;border:0px;padding:2px;", () => {this.hide();});
         parentContainerHeader.appendChild(closeBtn);
+
+        this.#header = parentContainerHeader;
 
         this.container.appendChild(parentContainerHeader);
         this.dragElement(parentContainerHeader, this.container);

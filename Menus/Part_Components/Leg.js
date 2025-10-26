@@ -64,10 +64,7 @@ class Leg {
 			setFieldHidden(true, this.l_dimensions[1], this.l_dimensions[0]);
 			setFieldHidden(true, this.l_flip[1], this.l_flip[0]);
 			setFieldHidden(true, this.l_cap[1], this.l_cap[0]);
-			setFieldHidden(true, this.l_addPowdercoatingBtn, this.l_addPowdercoatingBtn);
-			setFieldHidden(true, this.l_powdercoatingCost[1], this.l_powdercoatingCost[0]);
-			setFieldHidden(true, this.l_powdercoatingMarkup[1], this.l_powdercoatingMarkup[0]);
-			setFieldHidden(true, this.l_powdercoatingTotalEach[1], this.l_powdercoatingTotalEach[0]);
+			setFieldHidden(true, this.l_addPowdercoatingCkb[1], this.l_addPowdercoatingCkb[0]);
 			setFieldHidden(true, this.l_add2PacBtn, this.l_add2PacBtn);
 			this.l_add2PacBtn.innerText = "2Pac +";
 			setFieldHidden(true, this.l_2PacLitres[1], this.l_2PacLitres[0]);
@@ -92,7 +89,6 @@ class Leg {
 			setFieldHidden(false, this.l_dimensions[1], this.l_dimensions[0]);
 			setFieldHidden(false, this.l_flip[1], this.l_flip[0]);
 			setFieldHidden(false, this.l_cap[1], this.l_cap[0]);
-			setFieldHidden(false, this.l_addPowdercoatingBtn, this.l_addPowdercoatingBtn);
 			setFieldHidden(false, this.l_add2PacBtn, this.l_add2PacBtn);
 			this.l_add2PacBtn.innerText = "2Pac +";
 			setFieldHidden(false, this.l_hr1, this.l_hr1);
@@ -241,7 +237,7 @@ class Leg {
 		this.callback();
 	};
 
-	togglePowdercoating = () => {
+	/*togglePowdercoating = () => {
 		if(this.l_powdercoatingCost[0].style.display == "none") {
 			this.l_powdercoatingCost[0].style.display = "block";
 			this.l_powdercoatingMarkup[0].style.display = "block";
@@ -254,7 +250,7 @@ class Leg {
 			this.l_powdercoatingTotalEach[0].style.display = "none";
 		}
 		this.callback();
-	};
+	};*/
 
 	toggle2Pac = () => {
 		if(this.l_2PacLitres[0].style.display == "none") {
