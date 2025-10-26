@@ -65,7 +65,6 @@ class Leg {
 			setFieldHidden(true, this.l_flip[1], this.l_flip[0]);
 			setFieldHidden(true, this.l_cap[1], this.l_cap[0]);
 			setFieldHidden(true, this.l_addPowdercoatingBtn, this.l_addPowdercoatingBtn);
-			this.l_addPowdercoatingBtn.innerText = "Powdercoating +";
 			setFieldHidden(true, this.l_powdercoatingCost[1], this.l_powdercoatingCost[0]);
 			setFieldHidden(true, this.l_powdercoatingMarkup[1], this.l_powdercoatingMarkup[0]);
 			setFieldHidden(true, this.l_powdercoatingTotalEach[1], this.l_powdercoatingTotalEach[0]);
@@ -94,7 +93,6 @@ class Leg {
 			setFieldHidden(false, this.l_flip[1], this.l_flip[0]);
 			setFieldHidden(false, this.l_cap[1], this.l_cap[0]);
 			setFieldHidden(false, this.l_addPowdercoatingBtn, this.l_addPowdercoatingBtn);
-			this.l_addPowdercoatingBtn.innerText = "Powdercoating +";
 			setFieldHidden(false, this.l_add2PacBtn, this.l_add2PacBtn);
 			this.l_add2PacBtn.innerText = "2Pac +";
 			setFieldHidden(false, this.l_hr1, this.l_hr1);
@@ -246,13 +244,11 @@ class Leg {
 	togglePowdercoating = () => {
 		if(this.l_powdercoatingCost[0].style.display == "none") {
 			this.l_powdercoatingCost[0].style.display = "block";
-			this.l_addPowdercoatingBtn.innerText = "Powdercoating -";
 			this.l_powdercoatingMarkup[0].style.display = "block";
 			this.l_powdercoatingTotalEach[0].style.display = "block";
 		} else {
 			this.l_powdercoatingCost[0].style.display = "none";
 			this.l_powdercoatingCost[1].value = null;
-			this.l_addPowdercoatingBtn.innerText = "Powdercoating +";
 			this.l_powdercoatingMarkup[0].style.display = "none";
 			this.l_powdercoatingMarkup[1].value = null;
 			this.l_powdercoatingTotalEach[0].style.display = "none";

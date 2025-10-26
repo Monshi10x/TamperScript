@@ -13,9 +13,9 @@ class Painting extends Material {
       #defaultLitres = new UOM(0.5, "litres");
       #defaultUseLitresFormula = true;
       /**
-       * Based on Aidan @ 550-600ml/m2 on 10-20mm board letters
+       * Based on Aidan @ 550-600ml/m2 on 10-20mm board letters for 2 coat
        */
-      #defaultLitresPerSquareMetrePerCoat = new UOM(0.3, "litres");
+      #defaultLitresPerSquareMetrePerCoat = new UOM(0.35, "litres");
       /*
                         
       Fields            */
