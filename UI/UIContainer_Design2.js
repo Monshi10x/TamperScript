@@ -9,6 +9,7 @@ class UIContainer_Design2 {
       #customerNameText;
       #isMinimized = false;
       #whenClosedReturnBorrowed = true;
+      #install_qrcode;
       #headingContainer_Height = 30;
       #jobNameHeadingContainer_Height = 30;
       #customerNameHeadingContainer_Height = 30;
@@ -1042,9 +1043,11 @@ class UIContainer_Design2 {
             this.#f_productQtyLoader.Delete();
 
             let partsString = "";
+            let partsStringWithoutNumbering = "";
             for(let a = 0; a < partPreviewsArray.length; a++) {
                   let partName = partPreviewsArray[a].O2;
                   partsString += (a + 1) + ': ' + partName + '\n';
+                  partsStringWithoutNumbering += partName + '\n';
             }
             this.#f_partsText.innerText = partsString;
             this.#f_partsLoader.Delete();
@@ -1096,7 +1099,7 @@ class UIContainer_Design2 {
                         qrCodeDiv.style = "padding:20px;background-color:white;";
                         this.addressQRContainer.appendChild(qrCodeDiv);
 
-                        const qrcode = new QRCode(qrCodeDiv, {
+                        this.#install_qrcode = new QRCode(qrCodeDiv, {
                               text: GoogleMap.createURLString_Directions(GOOGLE_MAP_WORK_ADDRESS_STRING, this.#installAddress),
                               width: 200,
                               height: 200,
@@ -1104,11 +1107,37 @@ class UIContainer_Design2 {
                               colorLight: '#fff',
                               correctLevel: QRCode.CorrectLevel.L
                         });
+
                   }
             }
+
+            function groupByPhrases(items, phrases) {
+                  return items.reduce((acc, item) => {
+                        const match = phrases.find(p => item.trim().toLowerCase().startsWith(p.toLowerCase()));
+                        if(match) {
+                              const after = item.slice(match.length).trim();
+                              if(!acc[match]) acc[match] = [];
+                              acc[match].push(after);
+                        }
+                        return acc;
+                  }, {});
+            }
+
+            console.log(partsStringWithoutNumbering.split("\n"));
+            // Example:
+            const groupedPartTypes = groupByPhrases(partsStringWithoutNumbering.split("\n"), ["Vinyl -", "Laminate -", "ACM -", "Acrylic -", "Corflute -", "Foamed PVC -", "Aluminium -"]);
+            console.log(groupedPartTypes);
+
+            /* Output:
+            {
+              "Vinyl -": ["Polymeric Whiteback (Orajet 3650G)"],
+              "Laminate -": ["Polymeric Gloss (Oraguard 215G)"]
+            }
+            */
             /*
             Illustrator*/
             let button = createIconButton(GM_getResourceURL("Icon_AdobeIllustrator"), "Copy For Illustrator", "width:200px;height:35px;", async () => {
+
                   let x = '<?xml version="1.0" encoding="UTF-8"?>' +
                         '<svg id = "Layer_1" data-name="Layer 1" xmlns = "http://www.w3.org/2000/svg" width = "210mm" height = "297mm" viewBox = "0 0 595.28 841.89">' +
                         '<g>' +
@@ -1131,18 +1160,20 @@ class UIContainer_Design2 {
 
                   let x2 = '<? xml version = "1.0" encoding = "UTF-8" ?> <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="297.35mm" height="210.35mm" viewBox="0 0 842.89 596.28">' +
                         '<text transform="translate(68.44 91.19)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.CompanyName.replace("&", "and") + '</tspan></text>' +
+                        '<text transform="translate(68.44 102.58)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + '' + '</tspan></text>' +
                         '<text transform="translate(68.44 113.97)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderDescription.replace("&", "and") + '</tspan></text>' +
-                        '<text transform="translate(68.44 136.92)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderInvoiceNumber.replace("INV-", "") + '</tspan></text>' +
-                        '<text transform="translate(68.44 149.58)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + lineItemOrder + '</tspan></text>' +
-                        '<text transform="translate(68.44 160.45)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + getDate() + '</tspan></text>' +
-                        '<text transform="translate(68.44 172.70)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 'x' + productQty + '</tspan></text>' +
-                        '<text transform="translate(68.44 184.49)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
-                        '<text transform="translate(68.44 196.73)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
-                        '<text transform="translate(68.44 208.48)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
-                        '<text transform="translate(68.44 220.36)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
-                        '<text transform="translate(68.44 233.96)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
-                        '<text transform="translate(68.44 244.66)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +
-                        '<text transform="translate(68.44 255.59)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#installAddress + '</tspan></text>' +
+                        '<text transform="translate(68.44 125.45)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderInvoiceNumber.replace("INV-", "") + '</tspan></text>' +
+                        '<text transform="translate(68.44 136.92)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + lineItemOrder + '</tspan></text>' +
+                        '<text transform="translate(68.44 149.58)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + getDate() + '</tspan></text>' +
+                        '<text transform="translate(68.44 160.45)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 'x' + productQty + '</tspan></text>' +
+                        '<text transform="translate(68.44 172.70)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +//size
+                        '<text transform="translate(68.44 184.49)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +//substrate
+                        '<text transform="translate(68.44 196.73)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + groupedPartTypes['Vinyl -'] + '</tspan></text>' +//media
+                        '<text transform="translate(68.44 208.48)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + groupedPartTypes['Laminate -'] + '</tspan></text>' +//laminate
+                        '<text transform="translate(68.44 220.36)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +//other
+                        '<text transform="translate(68.44 233.96)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#installAddress + '</tspan></text>' +
+                        '<text transform="translate(68.44 244.66)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' + //addr line 2
+                        '<text transform="translate(68.44 255.59)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + 0 + '</tspan></text>' +//proof #
                         '<text transform="translate(68.62 270.75)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.SalesPersonName + '</tspan></text>' +
                         '<text transform="translate(68.44 281.78)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderContactName.replace("&", "and") + '</tspan></text>' +
                         '<text transform="translate(68.44 293.89)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderContactWorkPhone + " | " + this.#jobObject.OrderContactCellPhone + '</tspan></text>' +
