@@ -1284,7 +1284,7 @@ async function q_AddPart_DimensionWH(productNo, partNo, newOrEdit, partName, par
 //***********************************************************************//
 //          newOrEdit: True if new part, false if edit
 //***********************************************************************//
-async function q_AddPart_Dimensionless(productNo, partNo, newOrEdit, partName, partQty, partDescription, partInnerText, tickSelectedTF) {
+async function q_AddPart_Dimensionless(productNo, partNo, newOrEdit, partName, partQty, partDescription, partInnerText, tickSelectedTF, partInnerNotes) {
     //if new
     if(newOrEdit) {
         await AddPart(partName, productNo);
@@ -1297,6 +1297,7 @@ async function q_AddPart_Dimensionless(productNo, partNo, newOrEdit, partName, p
     if(partQty) await setPartQty(productNo, partNo, partQty);
     if(partDescription) await setPartDescription(productNo, partNo, partDescription);
     if(partInnerText) await setPartText(productNo, partNo, partInnerText);
+    if(partInnerNotes) await setPartNotes(productNo, partNo, partInnerNotes);
     if(tickSelectedTF) await tickSelected(productNo, partNo, tickSelectedTF);
     await savePart(productNo, partNo);
     return partNo;
