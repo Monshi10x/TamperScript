@@ -72,6 +72,7 @@ class Install extends SubMenu {
 		this.#quickLookup = createCheckbox_Infield("Quick Lookup", false, null, () => {
 			$(this.#quickItem[0]).toggle();
 			$(this.#quickInstall_sub[0]).toggle();
+			this.UpdateInstallTimes();
 		}, this.#quickLookupContainer[1]);
 
 		let installTypes = [];
@@ -84,14 +85,14 @@ class Install extends SubMenu {
 		}, this.#quickLookupContainer[1]);
 		$(this.#quickItem[0]).hide();
 
-		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Sub", 0, null, 150, false, [], () => {
+		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Size", 0, null, 150, false, [], () => {
 			this.UpdateInstallTimes();
 		}, this.#quickLookupContainer[1], false);
 		this.UpdateInstallLookup();
 		$(this.#quickInstall_sub[0]).hide();
 
 		///Travel Rate
-		this.#travelContainer = createDivStyle5(null, "Travel", this.contentContainer);
+		this.#travelContainer = createDivStyle5("display:none;", "Travel", this.contentContainer);
 
 		this.#install_TravelRate = createDropdown_Infield("Travel Rate", 1, "display:block;width:63%;margin-right:20%;", [], () => {this.Update();}, this.#travelContainer[1]);
 
@@ -110,50 +111,6 @@ class Install extends SubMenu {
 		this.#install_TravelMinutes = createInput_Infield("Travel Minutes", null, "width:25%;display:block;margin-left:40px", () => {this.Update();}, this.#travelContainer[1], false, 10);
 		this.#install_TravelHours = createInput_Infield("Travel Hours", null, "width:25%;display:block;", () => {this.Update();}, this.#travelContainer[1], false, 1);
 		this.#install_TravelDays = createInput_Infield("Travel Days (8h)", null, "width:25%;display:block;", () => {this.Update();}, this.#travelContainer[1], false, 1);
-
-
-
-		/*
-				makeFieldGroup2("Checkbox", this.requiredField[1],
-					this.#qty[0],
-					this.#installTimeTotalEach[0],
-					this.#install_InstallRate[0],
-					this.#install_InstallMinutes[0],
-					this.#install_InstallHours[0],
-					this.#install_InstallDays[0],
-					this.#install_TravelRate[0],
-					this.#install_TravelMinutes[0],
-					this.#install_TravelHours[0],
-					this.#install_TravelDays[0],
-					this.#quickLookup[0],
-					this.#quickItem[0],
-					this.#quickInstall_sub[0],
-					this.#isOutsourced[0]
-				);
-		
-				makeFieldGroup2Reversed("Checkbox", this.#isOutsourced[1],
-					this.#install_InstallRate[0],
-					this.#install_InstallMinutes[0],
-					this.#install_InstallHours[0],
-					this.#install_InstallDays[0],
-					this.#install_TravelRate[0],
-					this.#install_TravelMinutes[0],
-					this.#install_TravelHours[0],
-					this.#install_TravelDays[0],
-					this.#quickLookup[0],
-					this.#quickItem[0],
-					this.#quickInstall_sub[0],
-				);
-		
-				makeFieldGroup2("Checkbox", this.#isOutsourced[1],
-					this.#outsourceCost[0],
-					this.#outsourceMarkup[0]
-				);
-				makeFieldGroup2("Checkbox", this.#quickLookup[1],
-					this.#quickItem[0],
-					this.#quickInstall_sub[0]
-				);
-		*/
 
 	}
 
@@ -196,9 +153,11 @@ class Install extends SubMenu {
 			array.push([types[i], obj.imageURL == null ? "null" : obj.imageURL]);
 		}
 		deleteElement(this.#quickInstall_sub[0]);
-		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Sub", 0, null, 150, false, array, () => {
+		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Size", 0, null, 150, false, array, () => {
 			this.UpdateInstallTimes();
 		}, this.#quickLookupContainer[1], false);
+		this.UpdateInstallTimes();
+
 	}
 
 	UpdateInstallTimes() {
@@ -249,7 +208,7 @@ class Install extends SubMenu {
 					await AddPart("Install - IH", productNo);
 					partIndex++;
 					await setPartQty(productNo, partIndex, this.qty);
-					await setPartDescription(productNo, partIndex, "[INSTALL (total)]");
+					await setPartDescription(productNo, partIndex, "[INSTALL (total)]" + (this.#quickLookup[1].checked ? " - QL[" + this.#quickItem[1].value + ", " + this.#quickInstall_sub[1].value + "]" : ""));
 					await setInstallTimeMHD(productNo, partIndex, this.installMinutes, this.installHours, this.installDays);
 					await setInstallPartType(productNo, partIndex, this.installRate);
 					await setTravelTimeMHD(productNo, partIndex, this.travelMinutes, this.travelHours, this.travelDays);
@@ -269,7 +228,7 @@ class Install extends SubMenu {
 					await AddPart("Install - IH (ea)", productNo);
 					partIndex++;
 					await setPartQty(productNo, partIndex, this.qty);
-					await setPartDescription(productNo, partIndex, "[INSTALL (ea)]");
+					await setPartDescription(productNo, partIndex, "[INSTALL (ea)]" + (this.#quickLookup[1].checked ? " - QL[" + this.#quickItem[1].value + ", " + this.#quickInstall_sub[1].value + "]" : ""));
 					await setInstallTimeMHDEa(productNo, partIndex, this.installMinutes, this.installHours, this.installDays);
 					await setInstallPartTypeEa(productNo, partIndex, this.installRate);
 					await setTravelTimeMHDEa(productNo, partIndex, this.travelMinutes, this.travelHours, this.travelDays);

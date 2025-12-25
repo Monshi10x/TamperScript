@@ -1,13 +1,13 @@
 /**
  * @see https://github.com/timmywil/panzoom/ - Archive
- * @see https://github.com/anvaka/panzoom/blob/main/README.md
+ * @see https://github.com/anvaka/panzoom/blob/main/README.md - main panzoom library
  * @see https://github.com/thednp/svg-path-commander
  */
 class DragZoomSVG {
       /*
                          
       Variables         */
-      #scale = 1;
+      #scale = 0.3;
       #scrollSpeed = 0.2;
       #measurementOffset_Small = 10;
       #measurementOffset_Large = 50;
@@ -97,7 +97,8 @@ class DragZoomSVG {
                   scaleStrokeOnScroll: true,
                   scaleFontOnScroll: true,
                   defaultStrokeWidth: 1,
-                  defaultFontSize: 12
+                  defaultFontSize: 16,
+                  overrideCssStyles: ""
             };
 
             this.options = {...defaultOptions, ...options};
@@ -107,6 +108,7 @@ class DragZoomSVG {
             this.#f_container = document.createElement("div");
             this.#f_container.innerHTML = svgText || '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)"></g></svg>';
             this.#f_container.style = "display: block;float: left;outline:1px solid black;width:" + svgWidth + ";height:" + svgHeight + ";";
+            this.#f_container.style.cssText += options.overrideCssStyles;
             console.log("width:" + svgWidth + ";height:" + svgHeight + ";");
 
             this.#f_container.className = "svgContainerDiv";
@@ -131,10 +133,9 @@ class DragZoomSVG {
                   this.#f_svg.appendChild(this.#f_svgG);
             }
 
-            console.log(this.#f_svgG);
-
             this.#panZoomInstance = panzoom(this.#f_svgG, {
                   zoomSpeed: this.#scrollSpeed,
+                  initialZoom: _this.#scale,
                   beforeMouseDown: function(e) {
                         return !_this.onBeforeMouseDown(e);
                   },
@@ -143,7 +144,6 @@ class DragZoomSVG {
                   }
             });
             this.#panZoomInstance.on('zoom', (e) => {
-                  console.log("zoom");
                   this.onZoom(e);
             });
 
@@ -152,12 +152,10 @@ class DragZoomSVG {
                   this.onTransform(e);
             });
 
-            console.log(this.#panZoomInstance);
-
             if(options.convertShapesToPaths) svg_convertShapesToPaths(this.#f_svgG);
             if(options.splitCompoundPaths) svg_formatCompoundPaths(this.#f_svg);
 
-            this.#scale = this.#panZoomInstance.getTransform().scale;
+            //this.#scale = this.#panZoomInstance.getTransform().scale;
 
             this.initSVGStyles();
 
@@ -192,7 +190,7 @@ class DragZoomSVG {
        * @param {*} margin 
        * @description arguments are optional and will default otherwise
        */
-      centerAndFitSVGContent(svg, elementToFit, panzoomInstance, margin = 20) {
+      centerAndFitSVGContent(svg, elementToFit, panzoomInstance, margin = 40) {
             //defaults:
             if(svg == null) svg = this.svg;
             if(elementToFit == null) elementToFit = this.#f_svgG;

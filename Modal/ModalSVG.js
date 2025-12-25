@@ -200,15 +200,15 @@ class ModalSVG extends Modal {
                   unit: "mm",
                   scale: svg_pixelToMM(1),
                   precision: 2,
-                  arrowSize: 5,
-                  textOffset: 20,
+                  arrowSize: 10,
+                  textOffset: 30,
                   stroke: "#000",
-                  lineWidth: 20,
+                  lineWidth: 40,
                   fontSize: "240px",
-                  tickLength: 100,
+                  tickLength: 300,
                   handleRadius: 8,
-                  offsetX: 100,
-                  offsetY: 100,
+                  offsetX: 300,
+                  offsetY: 300,
                   sideHint: null
             });
 
@@ -432,8 +432,8 @@ class ModalSVG extends Modal {
                   let scaledBox = {
                         width: element.getBoundingClientRect().width / svgScale,
                         height: element.getBoundingClientRect().height / svgScale,
-                        x: ((element.getBoundingClientRect().x - pathGroup.getBoundingClientRect().x) / svgScale),
-                        y: ((element.getBoundingClientRect().y - pathGroup.getBoundingClientRect().y) / svgScale)
+                        x: ((element.getBoundingClientRect().x - pathGroup?.getBoundingClientRect().x || 0) / svgScale),
+                        y: ((element.getBoundingClientRect().y - pathGroup?.getBoundingClientRect().y || 0) / svgScale)
                   };
 
                   let newGroup = mainGroup.querySelector("#partAreas");

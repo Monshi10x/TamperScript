@@ -105,11 +105,7 @@ class Finishing extends Material {
             this.#standOffQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:400px;", () => {this.UpdateFromFields();}, f_container_standOff, false, 1);
 
             this.#standOffHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;display:none;margin-left:40px;margin-right:400px;", () => {
-                  this.#standOffHelper = new ModalStandoffHelper2("Standoff Helper", 100, () => {
-                        this.UpdateStandoffQty();
-                        this.UpdateFromFields();
-                        this.#modalIsOpen = false;
-                  }, this);
+
                   this.#modalIsOpen = true;
                   this.#standOffHelper.borrowFields(this.#standOffType[0], this.#standoff_offsetFromEdgeField[0],
                         this.#standoff_horizontalSpacingField[0], this.#standoff_verticalSpacingField[0],
@@ -134,6 +130,11 @@ class Finishing extends Material {
                   });
                   this.#standOffHelper.setSizeArrays(...matrixSizeArrays);
             }, f_container_standOff, true);
+            this.#standOffHelper = new ModalStandoffHelper2("Standoff Helper", 100, () => {
+                  this.UpdateStandoffQty();
+                  this.UpdateFromFields();
+                  this.#modalIsOpen = false;
+            }, this);
 
             this.#standOffType = createDropdown_Infield("Stand-off Type", 1, "width:30%;display:none;margin-left:40px;",
                   [createDropdownOption("Standoff - 19x19 Satin Silver", "19,19"),
@@ -266,6 +267,9 @@ class Finishing extends Material {
             this.UpdateProduction();
 
             this.UpdateDataForSubscribers();
+
+            this.UpdateVisualizer();
+
             this.PushToSubscribers();
 
             super.UpdateFromFields();
@@ -292,6 +296,60 @@ class Finishing extends Material {
                   parent: this,
                   data: this.#dataForSubscribers
             };
+      }
+
+      UpdateVisualizer() {
+
+            if(this.#standOffHelper) {
+                  this.#standOffHelper.borrowFields(this.#standOffType[0], this.#standoff_offsetFromEdgeField[0],
+                        this.#standoff_horizontalSpacingField[0], this.#standoff_verticalSpacingField[0],
+                        this.#standoff_spacingAllowanceField[0]);
+                  this.#standOffHelper.setTypeField(this.#standOffType[1]);
+                  this.#standOffHelper.setOffsetFromEdgeField(this.#standoff_offsetFromEdgeField[1]);
+                  this.#standOffHelper.setHorizontalSpacingField(this.#standoff_horizontalSpacingField[1]);
+                  this.#standOffHelper.setVerticalSpacingField(this.#standoff_verticalSpacingField[1]);
+                  this.#standOffHelper.setSpacingAllowanceField(this.#standoff_spacingAllowanceField[1]);
+                  this.#standOffHelper.width = this.getQWHD().width;
+                  this.#standOffHelper.height = this.getQWHD().height;
+
+                  let matrixSizeArrays = [];
+                  this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                        subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                              if(dataEntry.matrixSizes) {
+                                    matrixSizeArrays.push(dataEntry.matrixSizes);
+                              }
+                        });
+                  });
+                  this.#standOffHelper.setSizeArrays(...matrixSizeArrays);
+            }
+
+            if(this.#eyeletsHelper) {
+                  this.#eyeletsHelper.borrowFields(this.#eyeletsType[0], this.#eyelets_offsetFromEdgeField[0],
+                        this.#eyelets_horizontalSpacingField[0], this.#eyelets_verticalSpacingField[0],
+                        this.#eyelets_spacingAllowanceField[0]);
+                  this.#eyeletsHelper.setTypeField(this.#eyeletsType[1]);
+                  this.#eyeletsHelper.setOffsetFromEdgeField(this.#eyelets_offsetFromEdgeField[1]);
+                  this.#eyeletsHelper.setHorizontalSpacingField(this.#eyelets_horizontalSpacingField[1]);
+                  this.#eyeletsHelper.setVerticalSpacingField(this.#eyelets_verticalSpacingField[1]);
+                  this.#eyeletsHelper.setSpacingAllowanceField(this.#eyelets_spacingAllowanceField[1]);
+                  this.#eyeletsHelper.width = this.getQWHD().width;
+                  this.#eyeletsHelper.height = this.getQWHD().height;
+
+                  let matrixSizeArrays = [];
+
+                  this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                        subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                              if(dataEntry.matrixSizes) {
+                                    matrixSizeArrays.push(dataEntry.matrixSizes);
+                              }
+                        });
+                  });
+                  this.#eyeletsHelper.setSizeArrays(...matrixSizeArrays);
+            }
       }
 
       getCalcQty(fieldType) {
@@ -365,7 +423,7 @@ class Finishing extends Material {
             partIndex = await super.Create(productNo, partIndex);
 
             if(this.#eyeletsRequired[1].checked) {
-                  partIndex = await q_AddPart_Dimensionless(productNo, partIndex, true, this.#eyeletsType[1].selectedOptions[0].innerText, this.#eyeletsQty[1].value, this.#eyeletsType[1].selectedOptions[0].innerText, "", false);
+                  partIndex = await q_AddPart_Dimensionless(productNo, partIndex, true, this.#eyeletsType[1].selectedOptions[0].innerText, this.#eyeletsQty[1].value, this.#eyeletsType[1].selectedOptions[0].innerText, this.#eyeletsHelper.unscaledSVGString, false);
             } if(this.#customRequired[1].checked) {
                   await AddPart("Custom Item Cost-Markup (Ea)", productNo);
                   partIndex++;
@@ -375,7 +433,7 @@ class Finishing extends Material {
                   await setPartMarkupEa(productNo, partIndex, this.#customMarkup[1].value);
                   await savePart(productNo, partIndex);
             } if(this.#standOffRequired[1].checked) {
-                  partIndex = await q_AddPart_Dimensionless(productNo, partIndex, true, this.#standOffType[1].selectedOptions[0].innerText, this.#standOffQty[1].value, this.#standOffType[1].selectedOptions[0].innerText, "", false);
+                  partIndex = await q_AddPart_Dimensionless(productNo, partIndex, true, this.#standOffType[1].selectedOptions[0].innerText, this.#standOffQty[1].value, this.#standOffType[1].selectedOptions[0].innerText, null, false, this.#standOffHelper.unscaledSVGString);
             } if(this.#pinsRequired[1].checked) {
                   alert("todo pins");
             }

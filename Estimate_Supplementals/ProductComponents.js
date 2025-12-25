@@ -270,6 +270,8 @@ function partInfoTick() {
 					let modalSVG = new ModalSVG("SVG Modal", 1, () => { }, partText, null, {convertShapesToPaths: false, splitCompoundPaths: false, defaultStrokeWidth: 2, scaleStrokeOnScroll: !partText.includes('data-scaleStrokeOnScroll="false"')});
 				}, partHeader);
 				btn.classList.add('seeSVGButton');
+
+				let svgViewer = new DragZoomSVG("100%", "300px", partText, partHeader, {overrideCssStyles: "outline:none;"});
 			}
 			//}
 
@@ -388,7 +390,7 @@ function partInfoTick() {
 
 		$(classProductTotals).find('tbody tr:nth-child(5)').html("<td></td><td>Total Cost:</td><td>$" + roundNumber(productTotalCost, 2) + "</td>").css("color", COLOUR.Blue).css("font-weight", "bold");
 		var profit = koProductPricePostDiscount - productTotalCost;
-		$(classProductTotals).find('tbody tr:nth-child(6)').html("<td></td><td>Total Profit:</td><td>$" + roundNumber(profit, 2) + "</td>").css("color", COLOUR.Blue).css("font-weight", "bold");
+		$(classProductTotals).find('tbody tr:nth-child(6)').html("<td></td><td>Total Profit:</td><td>$" + roundNumber(profit, 2) + "</td>").css("color", profit > 0 ? COLOUR.Blue : COLOUR.Red).css("font-weight", "bold");
 		$(classProductTotals).find('tbody tr:nth-child(7)').html("<td></td><td>Price/Sqm:</td><td>$" + roundNumber(koProductPricePostDiscount / firstPartSqm, 2) + "</td>").css("color", COLOUR.Blue).css("font-weight", "bold");
 		if(containsAnyInstall) {
 			orderMinimum_Profit_InstallJob += profit;

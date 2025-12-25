@@ -29,6 +29,7 @@ class SVGCutfile extends SubscriptionManager {
                         
       Fields            */
       #f_container;
+      #f_grabHandle;
       #f_productNumberLabel;
       #f_typeLabel;
       #f_subscribedToLabel;
@@ -91,6 +92,22 @@ class SVGCutfile extends SubscriptionManager {
             }, function() {
                   $(this).css("box-shadow", "rgba(0, 0, 0, 0.8) 3px 4px 10px 0px");
             });
+
+            this.#f_grabHandle = document.createElement("div");
+            this.#f_grabHandle.style = `display:block;width:24px;height:40px;background-color:${COLOUR.DarkGrey};padding:0px;margin:0px;float:left;`;
+            this.#f_grabHandle.className = "sortableHandle";
+            // Icon
+            const icon = document.createElement('div');
+            icon.textContent = '⋮⋮'; // vertical grip dots
+            icon.style.fontSize = '20px';
+            icon.style.lineHeight = '40px';
+            icon.style.color = 'white';
+            icon.style.textAlign = 'center';
+            icon.style.marginTop = '0px';
+            icon.style.pointerEvents = 'none'; // important for SortableJS
+
+            this.#f_grabHandle.appendChild(icon);
+            this.#f_container.appendChild(this.#f_grabHandle);
 
             this.#f_productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {

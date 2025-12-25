@@ -488,12 +488,28 @@ class MenuPanelSigns extends LHSMenuWindow {
 					this.DeleteProduct(currentProductNumber);
 				}, null));
 
-				let dropdown = createDropdown("Add", 0, "width:200px;height:30px;margin:0px;border:none;padding:0px;min-height:30px;float:right;", this.#creationOrder.map((item) => {
+				/*let dropdown = createDropdown("Add", 0, "width:200px;height:30px;margin:0px;border:none;padding:0px;min-height:30px;float:right;", this.#creationOrder.map((item) => {
 					return createDropdownOption(item.name, item.name);
 				}), () => {
 					this.#addBlank(this.#creationOrder.filter((item) => item.name == dropdown.value)[0], newProductContainer.contentContainer, {productNumber: uniqueProductNumbers[i]});
 				});
-				newProductContainer.addHeadingButtons(dropdown);
+				newProductContainer.addHeadingButtons(dropdown);*/
+
+				const dropdown = new TDropdown({
+					label: 'Add Component',
+					defaultValue: '',
+					options:
+						this.#creationOrder.map((item) => {
+							return {label: item.name, value: item.name, img: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/refs/heads/main/Images/Icon-Component.svg'};
+						}),
+					parent: null,
+					onChange: (val) => {
+						if(val != "") {
+							this.#addBlank(this.#creationOrder.filter((item) => item.name == val)[0], newProductContainer.contentContainer, {productNumber: uniqueProductNumbers[i]});
+						}
+					}
+				});
+				newProductContainer.addHeadingButtons(dropdown.wrapper);
 
 				//add items to it
 				for(let j = 0; j < this.#allMaterials.length; j++) {
@@ -512,6 +528,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 					swapThreshold: 1,
 					ghostClass: 'sortable-ghost',
 					direction: 'vertical',
+					handle: ".sortableHandle"
 				});
 			}
 		} else if(this.#viewMode[1].value == "Per Type2") {

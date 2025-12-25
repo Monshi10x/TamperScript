@@ -25,6 +25,7 @@ class ProductDetails extends SubscriptionManager {
       #heading;
       #minimizeBtn;
       #deleteBtn;
+      #grabHandle;
       #setting_KeepQty1;
       #setting_IncludeSizeInDescription;
       #includeSizeInDescription = false;
@@ -83,6 +84,22 @@ class ProductDetails extends SubscriptionManager {
                   $(this).css("box-shadow", "rgba(0, 0, 0, 0.8) 3px 4px 10px 0px");
             });
 
+            this.#grabHandle = document.createElement("div");
+            this.#grabHandle.style = `display:block;width:24px;height:40px;background-color:${COLOUR.DarkGrey};padding:0px;margin:0px;float:left;`;
+            this.#grabHandle.className = "sortableHandle";
+            // Icon
+            const icon = document.createElement('div');
+            icon.textContent = '⋮⋮'; // vertical grip dots
+            icon.style.fontSize = '20px';
+            icon.style.lineHeight = '40px';
+            icon.style.color = 'white';
+            icon.style.textAlign = 'center';
+            icon.style.marginTop = '0px';
+            icon.style.pointerEvents = 'none'; // important for SortableJS
+
+            this.#grabHandle.appendChild(icon);
+            this.#container.appendChild(this.#grabHandle);
+
             this.#productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
                         this.productNumber = modal.value;
@@ -129,7 +146,7 @@ class ProductDetails extends SubscriptionManager {
        */
       async Create(productNo, partIndex) {
             await setProductQty(productNo, this.qty);
-            await setProductName(productNo, "[" + this.#productLocationField[1].value + "] " + this.#productNameField[1].value);
+            await setProductName(productNo, this.#productLocationField[1].value ? "[" + this.#productLocationField[1].value + "] " + this.#productNameField[1].value : "" + this.#productNameField[1].value);
             return partIndex;
       }
 

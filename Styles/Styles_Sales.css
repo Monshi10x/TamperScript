@@ -204,3 +204,397 @@
       border-radius: 4px;
       z-index: 999;
     }
+
+
+    .TDropdown-wrapper {
+      position: relative;
+      float:left;
+      display:block;
+      width: 300px;
+      margin: 0px;
+      height:30px;
+      user-select: none;
+    }
+
+    .TDropdown-display {
+      height: 30px;
+      padding: 0 36px 0 10px; /* reduced padding */
+      border: 2px solid #6a0dad;
+      border-radius: 5px;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .TDropdown-label {
+      position: absolute;
+      top: 7px;
+      left: 10px;
+      background: #f9f9f9;
+      padding: 0 6px;
+      font-size: 14px;
+      color: #aaa;
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+
+    .TDropdown-wrapper.open .TDropdown-label,
+    .TDropdown-wrapper.dropdownSelected .TDropdown-label {
+      top: -10px;
+      left: 10px;
+      font-size: 12px;
+      color: #6a0dad;
+      border-top: 2px solid #6a0dad;
+      border-left: 2px solid #6a0dad;
+      border-right: 2px solid #6a0dad;
+
+      padding: 0 6px;
+    }
+
+    .TDropdown-arrow {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      font-size: 14px;
+      color: #6a0dad;
+      pointer-events: none;
+      transition: transform 0.2s ease;
+    }
+
+    .TDropdown-wrapper.open .TDropdown-arrow {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    .TDropdown-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      border: 2px solid #6a0dad;
+      border-top: none;
+      background: white;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 10;
+      box-sizing: border-box;
+    }
+
+    .TDropdown-search {
+      width: 100%;
+      padding: 8px 10px;
+      border: none;
+      border-bottom: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .TDropdown-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      font-size: 14px;
+            color:black;
+      cursor: pointer;
+      transition: background 0.2s;
+      gap: 8px;
+    }
+
+    .TDropdown-item:hover {
+      background: #f0e6ff;
+    }
+
+    .TDropdown-item img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .TDropdown-reset {
+      position: absolute;
+      top: 5px;
+      right: 30px;
+      width: 18px;
+      height: 18px;
+      background: #6a0dad;
+      color: white;
+      text-align: center;
+      line-height: 18px;
+      border-radius: 3px;
+      cursor: pointer;
+      display: none;
+      transition: background 0.2s ease;
+    }
+
+    .TDropdown-reset:hover {
+      background: #4e078c;
+    }
+
+    .TDropdown-text{
+      color:black;
+    }
+
+    .TDropdown-text.noneSelected{
+      color:white;
+    }
+
+
+
+     /* ======================
+     TNode (icon-based)
+  ====================== */
+
+  .TNode {
+    width: 56px;
+    height: 56px;
+    border: 2px solid #333;
+    border-radius: 50%;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+    cursor: grab;
+    user-select: none;
+    margin: 10px;
+    display: inline-block;
+  }
+
+  .TNode:active {
+    cursor: grabbing;
+  }
+
+  /* ======================
+     Accept targets
+  ====================== */
+
+  .TNodeAccept {
+    outline-offset: 2px;
+  }
+
+  .TNodeAccept--hover {
+    outline: 3px solid #4b00ff;
+  }
+
+  .TNodeAccept--snap {
+    outline: 4px solid #00aaff;
+  }
+
+/* ======================
+     TNode (icon-based)
+  ====================== */
+
+  .TNode {
+    width: 56px;
+    height: 56px;
+    border: 2px solid #333;
+    border-radius: 50%;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+    cursor: grab;
+    user-select: none;
+    margin: 10px;
+    display: inline-block;
+  }
+
+  .TNode:active { cursor: grabbing; }
+
+  /* ======================
+     Accept targets (shared)
+  ====================== */
+
+  .TNodeAccept { outline-offset: 2px; }
+  .TNodeAccept--hover { outline: 3px solid #4b00ff; }
+  .TNodeAccept--snap  { outline: 4px solid #00aaff; }
+
+  /* ======================
+     External accept boxes
+  ====================== */
+
+  .ExternalAccept {
+    width: 180px;
+    height: 80px;
+    border: 2px dashed #777;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    background: #f7f7f7;
+  }
+
+  /* ======================
+     Line overlay
+  ====================== */
+
+  .TNodeLineOverlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999999;
+  }
+
+  /* Base line */
+  .TNodeLineBase {
+    stroke: #2b6bff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    opacity: 0.9;
+  }
+
+  /* Pulse line (animated dashes) */
+  .TNodeLinePulse {
+    stroke: #00aaff;
+    stroke-width: 10;              /* slightly thicker so it “rides” the base line */
+    stroke-linecap: round;
+    opacity: 0.95;
+    filter: drop-shadow(0 0 3px rgba(0, 43, 64, 0.828));
+  }
+
+  /* Animate dashoffset to create motion source->dest */
+  @keyframes TNodePulseMove {
+    from { stroke-dashoffset: 0; }
+    to   { stroke-dashoffset: -150; } /* negative makes it travel from x1/y1 -> x2/y2 */
+  }
+
+  /* Applied only while dragging */
+  .TNodePulseActive {
+    animation: TNodePulseMove 2s linear infinite;
+  }
+
+  /* ======================
+     Drag isolation
+  ====================== */
+
+  body.TNode--dragging * { pointer-events: none !important; }
+  body.TNode--dragging .TNodeAccept { pointer-events: auto !important; }
+  body.TNode--dragging { cursor: grabbing !important; }
+
+
+
+
+  .Toast__container{
+        position: fixed;
+        top: var(--toast-y, 18px);
+        display: flex;
+        flex-direction: column;
+        width: min(var(--toast-w, 360px), calc(100vw - 24px));
+        pointer-events: none;
+      }
+      .Toast__container--top-right{ right: var(--toast-x, 18px); align-items: stretch; }
+      .Toast__container--top-left{ left: var(--toast-x, 18px); align-items: stretch; }
+      .Toast__container--top-center{ left: 50%; transform: translateX(-50%); align-items: stretch; }
+
+      .Toast__item{
+        pointer-events: auto;
+        display: grid;
+        grid-template-columns: 34px 1fr auto;
+        align-items: start;
+        gap: 10px;
+        padding: 12px 12px;
+        border-radius: 12px;
+        background: #111214;
+        color: #F2F4F7;
+        border: 1px solid rgba(255,255,255,0.10);
+        box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+        font-size: 14px;
+        line-height: 1.25;
+        position: relative;
+        overflow: hidden;
+        transform: translateY(-8px);
+        opacity: 0;
+        transition: transform 160ms ease, opacity 160ms ease;
+      }
+      .Toast__item::before{
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 12px;
+        background: var(--toast-band, #3B82F6);
+      }
+
+      .Toast__item.is-in{
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .Toast__item.is-out{
+        transform: translateY(-8px);
+        opacity: 0;
+        transition: transform 140ms ease, opacity 140ms ease;
+      }
+
+      .Toast__icon{
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.06);
+        margin-left: 6px; /* clears the left band */
+        user-select: none;
+      }
+
+      .Toast__body{ padding-top: 2px; }
+      .Toast__title{
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .Toast__message{
+        opacity: 0.95;
+        word-break: break-word;
+      }
+      .Toast__actions{
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .Toast__action{
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.06);
+        color: #F2F4F7;
+        border-radius: 10px;
+        padding: 6px 10px;
+        font: inherit;
+        cursor: pointer;
+      }
+      .Toast__action:hover{
+        background: rgba(255,255,255,0.10);
+      }
+
+      .Toast__close{
+        border: none;
+        background: transparent;
+        color: rgba(242,244,247,0.8);
+        font: inherit;
+        cursor: pointer;
+        padding: 6px 8px;
+        border-radius: 10px;
+        margin-top: -2px;
+      }
+      .Toast__close:hover{
+        background: rgba(255,255,255,0.08);
+        color: rgba(242,244,247,1);
+      }
+
+      .Toast__progress{
+        position: absolute;
+        left: 0; right: 0; bottom: 0;
+        height: 3px;
+        transform-origin: left center;
+        background: rgba(255,255,255,0.22);
+      }
+
+      @media (max-width: 420px){
+        .Toast__container{
+          width: calc(100vw - 16px);
+        }
+      }

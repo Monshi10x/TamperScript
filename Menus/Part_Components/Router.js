@@ -29,7 +29,7 @@ class Router extends SubMenu {
 		this.l_setupMultiple = createCheckbox_Infield("Setup Multiple Sheets", false, "width:60%;", () => {this.Update();}, f_container_setup[1], true);
 		checkboxesAddToSelectionGroup(true, this.l_setupOnceOff, this.l_setupMultiple);
 		this.l_setupNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, f_container_setup[1], false, 1);
-		this.l_setupPerSheet = createInput_Infield("Setup per Sheet", 10, "width:30%;display:none", () => {this.Update();}, f_container_setup[1], false, 1, {postfix: "mins"});
+		this.l_setupPerSheet = createInput_Infield("Setup per Sheet", 20, "width:30%;display:none", () => {this.Update();}, f_container_setup[1], false, 10, {postfix: "mins"});
 		this.l_setupTime = createInput_Infield("Total Setup Minutes", 20, "width:30%;", null, f_container_setup[1], false, 10, {postfix: "mins"});
 
 		/*Run Time*/
@@ -50,8 +50,8 @@ class Router extends SubMenu {
 		this.l_cleanMultiple = createCheckbox_Infield("Clean Multiple Sheets", false, "width:60%;", () => {this.Update();}, f_container_clean[1], true);
 		checkboxesAddToSelectionGroup(true, this.l_cleanOnceOff, this.l_cleanMultiple);
 		this.l_cleanNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, f_container_clean[1], false, 1);
-		this.l_cleanPerSheet = createInput_Infield("Clean per Sheet", 10, "width:30%;display:none", () => {this.Update();}, f_container_clean[1], false, 1, {postfix: "mins"});
-		this.l_cleanTime = createInput_Infield("Total Clean Minutes", 10, "width:30%", null, f_container_clean[1], false, 10, {postfix: "mins"});
+		this.l_cleanPerSheet = createInput_Infield("Clean per Sheet", 20, "width:30%;display:none", () => {this.Update();}, f_container_clean[1], false, 1, {postfix: "mins"});
+		this.l_cleanTime = createInput_Infield("Total Clean Minutes", 20, "width:30%", null, f_container_clean[1], false, 10, {postfix: "mins"});
 
 		makeFieldGroup("Checkbox", this.l_setupMultiple[1], true, this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0]);
 		makeFieldGroup("Checkbox", this.l_cleanMultiple[1], true, this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0]);
@@ -75,6 +75,11 @@ class Router extends SubMenu {
 		}
 		return new QWHD(0, 0, 0);
 	};
+
+	/*overrides*/ReceiveSubscriptionData(data) {
+		console.log("from router");
+		console.log(data);
+	}
 
 	get timeTE() {
 		return this.l_timeTE[1].value;

@@ -25,10 +25,10 @@ class ModalVinylJoins extends ModalWidthHeight {
             this.#bleedRightField = right;
       }
 
-      get bleedTop() {return zeroIfNaNNullBlank(this.#bleedTopField.value);};
-      get bleedBottom() {return zeroIfNaNNullBlank(this.#bleedBottomField.value);};
-      get bleedLeft() {return zeroIfNaNNullBlank(this.#bleedLeftField.value);};
-      get bleedRight() {return zeroIfNaNNullBlank(this.#bleedRightField.value);};
+      get bleedTop() {return zeroIfNaNNullBlank(this.#bleedTopField?.value) || 0;};
+      get bleedBottom() {return zeroIfNaNNullBlank(this.#bleedBottomField?.value) || 0;};
+      get bleedLeft() {return zeroIfNaNNullBlank(this.#bleedLeftField?.value) || 0;};
+      get bleedRight() {return zeroIfNaNNullBlank(this.#bleedRightField?.value) || 0;};
 
 
       #joinOrientationField;
@@ -37,7 +37,7 @@ class ModalVinylJoins extends ModalWidthHeight {
       }
 
       get joinOrientation() {
-            if(this.#joinOrientationField.checked) return "Horizontal";
+            if(this.#joinOrientationField?.checked) return "Horizontal";
             return "Vertical";
       }
 
@@ -46,14 +46,14 @@ class ModalVinylJoins extends ModalWidthHeight {
             this.#rollWidthField = field;
       }
 
-      get rollWidth() {return zeroIfNaNNullBlank(this.#rollWidthField.value);};
+      get rollWidth() {return zeroIfNaNNullBlank(this.#rollWidthField?.value) || 1370;};
 
       #joinOverlapField;
       setJoinOverlapField(field) {
             this.#joinOverlapField = field;
       }
 
-      get joinOverlap() {return zeroIfNaNNullBlank(this.#joinOverlapField.value);};
+      get joinOverlap() {return zeroIfNaNNullBlank(this.#joinOverlapField?.value) || 0;};
 
       #gapBetweenX = 100;
       #gapBetweenXField;
@@ -182,8 +182,6 @@ class ModalVinylJoins extends ModalWidthHeight {
             /** @info Draw Each Sheet from matrixSizes, per parent */
             let distanceBetweenParentDraws = 1000;
 
-            console.log(this.sizeArrays);
-
             //for(let i = 0; i < this.sizeArrays.length; i++) {//per parent subscriptions matrix (i.e. Sheet or Size Matrix)
             if(this.sizeArrays.length > 0) {
                   let i = 0;
@@ -202,7 +200,7 @@ class ModalVinylJoins extends ModalWidthHeight {
                                     let [rectWidth, rectHeight] = matrixSize[r][c];
                                     let [rectWidth_Initial, rectHeight_Initial] = matrixSize[r][c];
 
-                                    //draw matrixSize
+                                    //draw matrixSize without bleeds
                                     let rect = this.DrawRect({
                                           x: xo,
                                           y: yo,
@@ -211,15 +209,15 @@ class ModalVinylJoins extends ModalWidthHeight {
                                           fill: "none"
                                     });
 
-                                    //if(isFirstRow) drawMeasurement_Verbose(canvasCtx, xo, yo, rectWidth, 0, "T", roundNumber(rectWidth, 2), textSize, COLOUR.Blue, lineWidth, crossScale, offsetFromShape, true, "B", false, canvasScale);
-                                    //if(isFirstColumn) drawMeasurement_Verbose(canvasCtx, xo, yo, 0, rectHeight, "L", roundNumber(rectHeight, 2), textSize, COLOUR.Blue, lineWidth, crossScale, offsetFromShape, false, "R", false, canvasScale);
+                                    rectWidth += (this.bleedLeft + this.bleedRight);
+                                    rectHeight += (this.bleedTop + this.bleedBottom);
 
                                     if(isFirstRow) {
                                           this.measurements.push(new TSVGMeasurement(this.dragZoomSVG.svgG, {
                                                 direction: "width",
-                                                x1: xo,
+                                                x1: xo - this.bleedLeft,
                                                 y1: yo,
-                                                x2: xo + rectWidth,
+                                                x2: xo - this.bleedLeft + rectWidth,
                                                 y2: yo,
                                                 autoLabel: true,
                                                 text: roundNumber(rectWidth, 2) + " mm",
@@ -244,9 +242,9 @@ class ModalVinylJoins extends ModalWidthHeight {
                                           this.measurements.push(new TSVGMeasurement(this.dragZoomSVG.svgG, {
                                                 direction: "height",
                                                 x1: xo,
-                                                y1: yo,
+                                                y1: yo - this.bleedTop,
                                                 x2: xo,
-                                                y2: yo + rectHeight,
+                                                y2: yo - this.bleedTop + rectHeight,
                                                 autoLabel: true,
                                                 text: roundNumber(rectHeight, 2) + " mm",
                                                 deletable: true,
@@ -266,10 +264,6 @@ class ModalVinylJoins extends ModalWidthHeight {
                                                 sideHint: "left"
                                           }));
                                     }
-
-
-                                    rectWidth += this.bleedLeft + this.bleedRight;
-                                    rectHeight += this.bleedTop + this.bleedBottom;
 
                                     let times = 1;
                                     let joinAmountX = 0;

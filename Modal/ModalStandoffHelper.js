@@ -74,6 +74,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
 
       get svgFile() {return this.#dragZoomSVG.svgFile;}
       get unscaledSVGString() {return this.#dragZoomSVG.unscaledSVGString;}
+      /*override*/get shouldShowOnCreation() {return false;};
 
       constructor(headerText, incrementAmount, callback, sheetClass) {
             super(headerText, incrementAmount, callback);
@@ -105,10 +106,27 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
             this.#gapBetweenYField = createInput_Infield("gapBetweenY", this.#gapBetweenY, null, () => {this.#gapBetweenY = zeroIfNaNNullBlank(this.#gapBetweenYField[1].value); this.UpdateFromFields();}, this.#containerAfterCanvas, true, 10);
       }
 
+
+
+      show() {
+            super.show();
+
+            this.modalOpaqueBackground.style.zIndex = "1004";
+
+            if(this.dragZoomSVG) {
+                  setTimeout(() => {
+                        this.dragZoomSVG.centerAndFitSVGContent();
+                  }, 1);
+            }
+      }
+
       UpdateFromFields() {
             super.UpdateFromFields();
-            this.draw();
-            this.#dragZoomSVG.UpdateFromFields();
+
+            if(this.dragZoomSVG) {
+                  this.draw();
+                  this.dragZoomSVG.UpdateFromFields();
+            }
       }
 
 
@@ -327,14 +345,9 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
             super.hide();
       }
 
-      callback() {
-            super.callback();
-            this.Close();
-      }
-
       onWindowResize(event) {
             super.onWindowResize(event);
-            //this.#dragZoomCanvas.canvasWidth = this.container.getBoundingClientRect().width;
+            if(this.dragZoomSVG) this.dragZoomSVG.canvasWidth = this.container.getBoundingClientRect().width;
             this.UpdateFromFields();
       }
 }
