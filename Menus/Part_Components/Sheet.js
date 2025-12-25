@@ -460,8 +460,14 @@ class Sheet extends Material {
             dropdownSetSelectedText(this.#thickness[1], chosenThickness, false);
             dropdownSetSelectedText(this.#finish[1], chosenFinish, false);
 
-            if(triggerChange) $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " x" + this.#thickness[1].value + " " + this.#finish[1].value).change();
-            else $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " x" + this.#thickness[1].value + " " + this.#finish[1].value);
+            let searchString =
+                  IFELSE(this.#material[1].value != "", this.#material[1].value + " ", "") +
+                  IFELSE(this.#sheetSize[1].value != "", this.#sheetSize[1].value + " ", "") +
+                  IFELSE(this.#thickness[1].value != "", "x" + this.#thickness[1].value + " ", "") +
+                  IFELSE(this.#finish[1].value != "", this.#finish[1].value + " ", "");
+
+            if(triggerChange) $(this.#sheetMaterial[4]).val(searchString).change();
+            else $(this.#sheetMaterial[4]).val(searchString);
 
             this.#sheetMaterial[5]();
       }
@@ -582,28 +588,21 @@ class Sheet extends Material {
             Folded*/
             let f_container_folded = createDivStyle5(null, "Folded", this.container)[1];
             this.#f_foldSideContainer = document.createElement('div');
-            //let alertDiv;
+
             this.#isFolded = createCheckbox_Infield("Is Folded", false, "width:calc(50% - 20px);margin:10px;", () => {
                   if(this.#isFolded[1].checked) {
                         setFieldHidden(false, this.#foldedTop[1], this.#foldedTop[0]);
                         setFieldHidden(false, this.#foldedLeft[1], this.#foldedLeft[0]);
                         setFieldHidden(false, this.#foldedRight[1], this.#foldedRight[0]);
                         setFieldHidden(false, this.#foldedBottom[1], this.#foldedBottom[0]);
-                        //if(this.depth == 0) {
-                        //      $(alertDiv).show();
-                        //}
                   } else {
                         setFieldHidden(true, this.#foldedTop[1], this.#foldedTop[0]);
                         setFieldHidden(true, this.#foldedLeft[1], this.#foldedLeft[0]);
                         setFieldHidden(true, this.#foldedRight[1], this.#foldedRight[0]);
                         setFieldHidden(true, this.#foldedBottom[1], this.#foldedBottom[0]);
-                        $(alertDiv).hide();
                   }
                   this.UpdateFromFields();
             }, this.#f_foldSideContainer);
-            //alertDiv = createFloatingDiv("Depth is 0, has no effect", "width:120px;padding-left:4px;top:10px;", this.#isFolded[0]);
-
-
 
 
             this.#foldedTop = createCheckbox_Infield("Top", false, "margin-left: 20%; width:20%;margin-right: 50%; ", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);

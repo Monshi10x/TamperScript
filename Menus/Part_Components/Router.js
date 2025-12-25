@@ -95,6 +95,9 @@ class Router extends SubMenu {
 
 	/*overrides*/ReceiveSubscriptionData(data) {
 		super.ReceiveSubscriptionData(data);
+
+		if(!this.required) return;
+
 		this.latestSubscriptionData = data;
 		let detectedMaterial = this.extractMaterialFromSubscription(data);
 		if(detectedMaterial == null) {
