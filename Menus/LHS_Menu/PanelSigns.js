@@ -95,6 +95,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 	quickTemplates = [
 		["ACM", "https://d2ngzhadqk6uhe.cloudfront.net/deanssign/images/product/Deans-Aluminum-Composite-Board.jpg"],
+		["Aluminium", "https://github.com/Monshi10x/TamperScript/raw/main/Images/AluminiumPanelWithPrint.png"],
 		["Lightbox Face - Opal Acrylic", "https://cdn.gorilladash.com/images/media/5077257/signarama-australia-img-6911-2-small-thumbnail-61611e9ab2f0f.jpg"],
 		["Clear Acrylic", "https://m.media-amazon.com/images/I/71hK5AoWC-L._AC_UF894,1000_QL80_.jpg"],
 		["Foam PVC", "https://5.imimg.com/data5/RN/UM/MY-14219350/white-pvc-foam-sheet-500x500.jpg"],
@@ -168,6 +169,32 @@ class MenuPanelSigns extends LHSMenuWindow {
 				sheet.sheetSize = "2440x1220";
 				sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)";
 				sheet.typeLabel = "ACM SHEET";
+
+				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
+				laminate = this.#add(Laminate, this.page1, [Vinyl]);
+				appTape = null;
+				handTrimming = this.#add(HandTrimming, this.page1, [Vinyl]);
+				printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
+				production = null;
+				artwork = this.#add(ArtworkSubscribable, this.page1, [Size]);
+				artwork.artworkItem.artworkTime = 60;
+				install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+				break;
+			case "Aluminium":
+				productDetails = this.#add(ProductDetails, this.page1, []);
+				productDetails.productLocation = "";
+				productDetails.productName = "Aluminium";
+				productDetails.description = "3mm Aluminium Panel with Digitally Printed Vinyl";
+
+				size = this.#add(Size, this.page1, []);
+				size.width = 2400;
+				size.height = 1200;
+
+				sheet = this.#add(Sheet, this.page1, [Size]);
+				sheet.material = "Aluminium";
+				sheet.sheetSize = "2400x1200";
+				sheet.sheetMaterial = "Aluminium - (sqm) - 2400x1200x3 Mill (Ullrich)";
+				sheet.typeLabel = "ALUMINIUM SHEET";
 
 				vinyl = this.#add(Vinyl, this.page1, [Sheet]);
 				laminate = this.#add(Laminate, this.page1, [Vinyl]);
@@ -487,13 +514,6 @@ class MenuPanelSigns extends LHSMenuWindow {
 				newProductContainer.addHeadingButtons(createButton("x", "width:30px;height:30px;margin:0px;border:none;padding:2px;min-height:30px;float:right;background-color:" + COLOUR.Red + ";", () => {
 					this.DeleteProduct(currentProductNumber);
 				}, null));
-
-				/*let dropdown = createDropdown("Add", 0, "width:200px;height:30px;margin:0px;border:none;padding:0px;min-height:30px;float:right;", this.#creationOrder.map((item) => {
-					return createDropdownOption(item.name, item.name);
-				}), () => {
-					this.#addBlank(this.#creationOrder.filter((item) => item.name == dropdown.value)[0], newProductContainer.contentContainer, {productNumber: uniqueProductNumbers[i]});
-				});
-				newProductContainer.addHeadingButtons(dropdown);*/
 
 				const dropdown = new TDropdown({
 					label: 'Add Component',
