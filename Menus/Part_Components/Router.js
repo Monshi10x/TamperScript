@@ -4,67 +4,83 @@ class Router extends SubMenu {
 
 	perShapeTime = secondsToMinutes(5);
 	runRows = [];
+	detectedMaterial = null;
+	detectedThickness = null;
+	latestSubscriptionData = null;
 	#showIDInContainer = true;
 
 	constructor(parentContainer, canvasCtx, updateFunction, sizeClass) {
 		super(parentContainer, canvasCtx, updateFunction, "CNC Router");
 
-		/*Qty*/
-		let f_container_qty = createDivStyle5(null, "Qty", this.contentContainer);
-		f_container_qty[3].style.cssText += "width:50px;";
-		f_container_qty[1].style.cssText = "width:calc(100% - 50px)";
-		this.l_qty = createInput_Infield("Qty", 1, "width:30%;min-width:50px;", null, f_container_qty[1], true, 1);
+		this.createQtySection();
+		this.createSetupSection();
+		this.createRunSection();
+		this.createCleanSection();
+		this.createFieldGroups();
 
+		this.Update();
+	}
 
+	createQtySection() {
+		let qtyContainer = createDivStyle5(null, "Qty", this.contentContainer);
+		qtyContainer[3].style.cssText += "width:50px;";
+		qtyContainer[1].style.cssText = "width:calc(100% - 50px)";
+		this.l_qty = createInput_Infield("Qty", 1, "width:30%;min-width:50px;", null, qtyContainer[1], true, 1);
 		this.l_timeTE = createDropdown_Infield("Each or Total", 1, "width:30%;margin-right:30%;", [
 			createDropdownOption("Total", "Total"),
 			createDropdownOption("Each", "Each")
-		], () => {this.Update();}, f_container_qty[1]);
+		], () => {this.Update();}, qtyContainer[1]);
+		this.qtyContainer = qtyContainer;
+	}
 
-		/*Setup*/
-		let f_container_setup = createDivStyle5(null, "Setup", this.contentContainer);
-		f_container_setup[3].style.cssText += "width:50px;";
-		f_container_setup[1].style.cssText = "width:calc(100% - 50px)";
-		this.l_setupOnceOff = createCheckbox_Infield("Setup One Sheet", true, "width:30%;", () => {this.Update();}, f_container_setup[1], true);
-		this.l_setupMultiple = createCheckbox_Infield("Setup Multiple Sheets", false, "width:60%;", () => {this.Update();}, f_container_setup[1], true);
+	createSetupSection() {
+		let setupContainer = createDivStyle5(null, "Setup", this.contentContainer);
+		setupContainer[3].style.cssText += "width:50px;";
+		setupContainer[1].style.cssText = "width:calc(100% - 50px)";
+		this.l_setupOnceOff = createCheckbox_Infield("Setup One Sheet", true, "width:30%;", () => {this.Update();}, setupContainer[1], true);
+		this.l_setupMultiple = createCheckbox_Infield("Setup Multiple Sheets", false, "width:60%;", () => {this.Update();}, setupContainer[1], true);
 		checkboxesAddToSelectionGroup(true, this.l_setupOnceOff, this.l_setupMultiple);
-		this.l_setupNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, f_container_setup[1], false, 1);
-		this.l_setupPerSheet = createInput_Infield("Setup per Sheet", 20, "width:30%;display:none", () => {this.Update();}, f_container_setup[1], false, 10, {postfix: "mins"});
-		this.l_setupTime = createInput_Infield("Total Setup Minutes", 20, "width:30%;", null, f_container_setup[1], false, 10, {postfix: "mins"});
+		this.l_setupNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, setupContainer[1], false, 1);
+		this.l_setupPerSheet = createInput_Infield("Setup per Sheet", 20, "width:30%;display:none", () => {this.Update();}, setupContainer[1], false, 10, {postfix: "mins"});
+		this.l_setupTime = createInput_Infield("Total Setup Minutes", 20, "width:30%;", null, setupContainer[1], false, 10, {postfix: "mins"});
+		this.setupContainer = setupContainer;
+	}
 
-		/*Run Time*/
-		let f_container_run = createDivStyle5(null, "Run", this.contentContainer);
-		f_container_run[3].style.cssText += "width:50px;";
-		f_container_run[1].style.cssText = "width:calc(100% - 50px)";
-		this.l_usePaths = createCheckbox_Infield("Use Path Specs for Times", true, "width:60%;margin-right:30%;", () => {this.UpdateRun();}, f_container_run[1]);
-		this.l_cuttingTable = new Table(f_container_run[1], "100%", 20, 250);
+	createRunSection() {
+		let runContainer = createDivStyle5(null, "Run", this.contentContainer);
+		runContainer[3].style.cssText += "width:50px;";
+		runContainer[1].style.cssText = "width:calc(100% - 50px)";
+		this.l_usePaths = createCheckbox_Infield("Use Path Specs for Times", true, "width:60%;margin-right:30%;", () => {this.UpdateRun();}, runContainer[1]);
+		this.l_cuttingTable = new Table(runContainer[1], "100%", 20, 250);
 		this.l_cuttingTable.setHeading("Path Length", "Number Shapes", "Material", "Thickness", "Profile", "Quality", "Speed", "Total Time", "Delete");
-		this.l_addRowBtn = createButton("+ Row", "width:15%;margin:0px;margin-right:70%;min-width:80px;", () => {this.addRunRow(0, 0, {isCustom: true});}, f_container_run[1]);
-		this.l_runTime = createInput_Infield("Total Run Minutes", 20, "width:30%", null, f_container_run[1], false, 10, {postfix: "mins"});
+		this.l_addRowBtn = createButton("+ Row", "width:15%;margin:0px;margin-right:70%;min-width:80px;", () => {this.addRunRow(0, 0, {isCustom: true});}, runContainer[1]);
+		this.l_runTime = createInput_Infield("Total Run Minutes", 20, "width:30%", null, runContainer[1], false, 10, {postfix: "mins"});
+		this.runContainer = runContainer;
+	}
 
-		/*Clean Time*/
-		let f_container_clean = createDivStyle5(null, "Clean", this.contentContainer);
-		f_container_clean[3].style.cssText += "width:50px;";
-		f_container_clean[1].style.cssText = "width:calc(100% - 50px)";
-		this.l_cleanOnceOff = createCheckbox_Infield("Clean One Sheet", true, "width:30%;", () => {this.Update();}, f_container_clean[1], true);
-		this.l_cleanMultiple = createCheckbox_Infield("Clean Multiple Sheets", false, "width:60%;", () => {this.Update();}, f_container_clean[1], true);
+	createCleanSection() {
+		let cleanContainer = createDivStyle5(null, "Clean", this.contentContainer);
+		cleanContainer[3].style.cssText += "width:50px;";
+		cleanContainer[1].style.cssText = "width:calc(100% - 50px)";
+		this.l_cleanOnceOff = createCheckbox_Infield("Clean One Sheet", true, "width:30%;", () => {this.Update();}, cleanContainer[1], true);
+		this.l_cleanMultiple = createCheckbox_Infield("Clean Multiple Sheets", false, "width:60%;", () => {this.Update();}, cleanContainer[1], true);
 		checkboxesAddToSelectionGroup(true, this.l_cleanOnceOff, this.l_cleanMultiple);
-		this.l_cleanNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, f_container_clean[1], false, 1);
-		this.l_cleanPerSheet = createInput_Infield("Clean per Sheet", 20, "width:30%;display:none", () => {this.Update();}, f_container_clean[1], false, 1, {postfix: "mins"});
-		this.l_cleanTime = createInput_Infield("Total Clean Minutes", 20, "width:30%", null, f_container_clean[1], false, 10, {postfix: "mins"});
+		this.l_cleanNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, cleanContainer[1], false, 1);
+		this.l_cleanPerSheet = createInput_Infield("Clean per Sheet", 20, "width:30%;display:none", () => {this.Update();}, cleanContainer[1], false, 1, {postfix: "mins"});
+		this.l_cleanTime = createInput_Infield("Total Clean Minutes", 20, "width:30%", null, cleanContainer[1], false, 10, {postfix: "mins"});
+		this.cleanContainer = cleanContainer;
+	}
 
+	createFieldGroups() {
 		makeFieldGroup("Checkbox", this.l_setupMultiple[1], true, this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0]);
 		makeFieldGroup("Checkbox", this.l_cleanMultiple[1], true, this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0]);
 		makeFieldGroup("Checkbox", this.l_usePaths[1], true, this.l_cuttingTable.container, this.l_addRowBtn);
-
 		makeFieldGroup("Checkbox",
 			this.requiredField[1], false, this.l_qty[0], this.l_timeTE[0], this.l_setupOnceOff[0], this.l_setupTime[0], this.l_runTime[0], this.l_addRowBtn,
 			this.l_cleanTime[0], this.l_usePaths[0], this.l_cuttingTable.container, this.l_setupMultiple[0], this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0],
-			this.l_cleanMultiple[0], this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0], this.l_cleanOnceOff[0], f_container_qty[0], f_container_setup[0],
-			f_container_run[0], f_container_clean[0]
+			this.l_cleanMultiple[0], this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0], this.l_cleanOnceOff[0], this.qtyContainer[0], this.setupContainer[0],
+			this.runContainer[0], this.cleanContainer[0]
 		);
-
-		this.Update();
 	}
 
 	getQWHD() {
@@ -77,8 +93,101 @@ class Router extends SubMenu {
 	};
 
 	/*overrides*/ReceiveSubscriptionData(data) {
-		console.log("from router");
-		console.log(data);
+		super.ReceiveSubscriptionData(data);
+		this.latestSubscriptionData = data;
+		let detectedMaterial = this.extractMaterialFromSubscription(data);
+		if(detectedMaterial == null) return;
+		let detectedThickness = this.extractThicknessFromSubscription(data, detectedMaterial);
+
+		let materialChanged = this.detectedMaterial !== detectedMaterial;
+		let thicknessChanged = this.detectedThickness !== detectedThickness;
+
+		this.detectedMaterial = detectedMaterial;
+		this.detectedThickness = detectedThickness;
+
+		if(materialChanged || thicknessChanged) {
+			this.applyDetectedMaterialToRows(detectedMaterial, data, detectedThickness);
+			this.UpdateRun();
+		}
+	}
+
+	extractMaterialFromSubscription(data) {
+		if(typeof RouterToolpathTimeLookup !== "object" || RouterToolpathTimeLookup == null) return null;
+		if(!data || !data.data || !Array.isArray(data.data)) return null;
+		let materialKeys = Object.keys(RouterToolpathTimeLookup);
+		for(let i = 0; i < data.data.length; i++) {
+			let sheetMaterial = data.data[i].sheetMaterial;
+			if(sheetMaterial == null) continue;
+			for(let k = 0; k < materialKeys.length; k++) {
+				if(sheetMaterial.toLowerCase().includes(materialKeys[k].toLowerCase())) {
+					return materialKeys[k];
+				}
+			}
+		}
+		return null;
+	}
+
+	extractThicknessFromSubscription(data, materialKey) {
+		if(typeof RouterToolpathTimeLookup !== "object" || RouterToolpathTimeLookup == null) return null;
+		if(!data || !data.data || !Array.isArray(data.data) || materialKey == null) return null;
+		let availableThicknesses = Object.keys(RouterToolpathTimeLookup[materialKey] || {});
+		for(let i = 0; i < data.data.length; i++) {
+			let sheetMaterial = data.data[i].sheetMaterial;
+			if(sheetMaterial == null) continue;
+			for(let t = 0; t < availableThicknesses.length; t++) {
+				if(sheetMaterial.includes(availableThicknesses[t])) {
+					return availableThicknesses[t];
+				}
+			}
+		}
+		return null;
+	}
+
+	applyDetectedMaterialToRows(material, subscriptionData = null, thicknessOverride = null) {
+		let thickness = thicknessOverride ?? this.extractThicknessFromSubscription(subscriptionData, material);
+
+		for(let i = 0; i < this.runRows.length; i++) {
+			let currentRow = this.runRows[i];
+			if(currentRow.rowElement && currentRow.rowElement.id == "customRow") continue;
+			if(currentRow.allowAutoDetection === false) continue;
+			this.applyMaterialToRow(currentRow, material, thickness);
+		}
+	}
+
+	applyMaterialToRow(row, material, thickness) {
+		let materialField = row.items[2][1];
+		let thicknessField = row.items[3][1];
+		let profileField = row.items[4][1];
+		let qualityField = row.items[5][1];
+		let speedField = row.items[6][1];
+
+		if(row.suppressAutoDetectionFlag) return;
+		row.suppressAutoDetectionFlag = true;
+
+		dropdownSetSelectedValue(materialField, material);
+		this.updateCutProfile("Material", materialField, thicknessField, profileField, qualityField, speedField);
+
+		if(thickness != null && this.fieldHasOption(thicknessField, thickness)) {
+			dropdownSetSelectedValue(thicknessField, thickness);
+		} else if(thicknessField.options.length > 0) {
+			thicknessField.selectedIndex = 0;
+		}
+		this.updateCutProfile("Thickness", materialField, thicknessField, profileField, qualityField, speedField);
+
+		if(profileField.options.length > 0 && profileField.value == "") profileField.selectedIndex = 0;
+		this.updateCutProfile("Profile", materialField, thicknessField, profileField, qualityField, speedField);
+
+		if(qualityField.options.length > 0 && qualityField.value == "") qualityField.selectedIndex = 0;
+		this.updateCutProfile("Quality", materialField, thicknessField, profileField, qualityField, speedField);
+
+		row.suppressAutoDetectionFlag = false;
+	}
+
+	fieldHasOption(field, value) {
+		for(let i = 0; i < field.options.length; i++) {
+			if(field.options[i].value == value) return true;
+		}
+		return false;
 	}
 
 	get timeTE() {
@@ -193,13 +302,6 @@ class Router extends SubMenu {
 		l_speed = createInput_Infield("Speed", 1000, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " mm/min"});
 		l_totalTime = createInput_Infield("Total Time", 0, "width:80px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " min"});
 
-		if(options.material != null) dropdownSetSelectedValue(l_material[1], options.material);
-		if(options.thickness != null) dropdownSetSelectedValue(l_thickness[1], options.thickness);
-		if(options.profile != null) dropdownSetSelectedValue(l_profile[1], options.profile);
-		if(options.quality != null) dropdownSetSelectedValue(l_quality[1], options.quality);
-		if(options.speed != null) $(l_speed[1]).val(options.speed);
-		if(options.material == null && options.profile != null && options.quality != null && options.speed != null) this.updateCutProfile("Material", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
-
 		let l_deleteRowBtn = createButton("X", "background-color:red;width:30px;margin:0px;", () => {
 			for(let i = 0; i < this.runRows.length; i++) {
 				if(this.runRows[i].index === internalIndex) {
@@ -209,13 +311,55 @@ class Router extends SubMenu {
 			}
 		}, this.contentContainer);
 
-		this.runRows.push(
-			{
-				index: this.runRowIndex,
-				items: [l_pathLength, l_numberShapes, l_material, l_thickness, l_profile, l_quality, l_speed, l_totalTime, l_deleteRowBtn]
-			}
-		);
 		let addedRow = this.l_cuttingTable.addRow(l_pathLength[0], l_numberShapes[0], l_material[0], l_thickness[0], l_profile[0], l_quality[0], l_speed[0], l_totalTime[0], l_deleteRowBtn);
+		let rowMeta = {
+			index: this.runRowIndex,
+			items: [l_pathLength, l_numberShapes, l_material, l_thickness, l_profile, l_quality, l_speed, l_totalTime, l_deleteRowBtn],
+			rowElement: addedRow,
+			allowAutoDetection: true,
+			suppressAutoDetectionFlag: false
+		};
+		let markManualOverride = () => {
+			if(rowMeta.suppressAutoDetectionFlag) return;
+			rowMeta.allowAutoDetection = false;
+		};
+		l_material[1].addEventListener("change", markManualOverride);
+		l_thickness[1].addEventListener("change", markManualOverride);
+		l_profile[1].addEventListener("change", markManualOverride);
+		l_quality[1].addEventListener("change", markManualOverride);
+		l_speed[1].addEventListener("change", markManualOverride);
+		this.runRows.push(rowMeta);
+
+		rowMeta.suppressAutoDetectionFlag = true;
+
+		if(options.material != null) {
+			dropdownSetSelectedValue(l_material[1], options.material);
+			this.updateCutProfile("Material", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+		}
+		if(options.thickness != null && this.fieldHasOption(l_thickness[1], options.thickness)) {
+			dropdownSetSelectedValue(l_thickness[1], options.thickness);
+			this.updateCutProfile("Thickness", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+		}
+		if(options.profile != null && this.fieldHasOption(l_profile[1], options.profile)) {
+			dropdownSetSelectedValue(l_profile[1], options.profile);
+			this.updateCutProfile("Profile", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+		}
+		if(options.quality != null && this.fieldHasOption(l_quality[1], options.quality)) {
+			dropdownSetSelectedValue(l_quality[1], options.quality);
+			this.updateCutProfile("Quality", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+		}
+		if(options.speed != null) $(l_speed[1]).val(options.speed);
+		if(options.material == null && options.profile != null && options.quality != null && options.speed != null) this.updateCutProfile("Material", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+
+		rowMeta.suppressAutoDetectionFlag = false;
+
+		if(this.detectedMaterial != null && options.material == null) {
+			this.applyMaterialToRow(
+				this.runRows[this.runRows.length - 1],
+				this.detectedMaterial,
+				this.detectedThickness ?? this.extractThicknessFromSubscription(this.latestSubscriptionData, this.detectedMaterial)
+			);
+		}
 
 		if(options.isCustom === true) {
 			addedRow.id = "customRow";
@@ -318,7 +462,7 @@ class Router extends SubMenu {
 		if(totalPathLength) $(row[0][1]).val(totalPathLength).change();
 		if(numberOfShapes) $(row[1][1]).val(numberOfShapes).change();
 		if(material) dropdownSetSelectedText(row[2][1], material);
-		if(thickness) dropdownSetSelectedText(row[3][1], material);
+		if(thickness) dropdownSetSelectedText(row[3][1], thickness);
 		if(profile) dropdownSetSelectedText(row[4][1], profile);
 		if(quality) dropdownSetSelectedText(row[5][1], quality);
 		if(speed) $(row[6][1]).val(speed).change();
