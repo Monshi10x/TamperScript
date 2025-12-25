@@ -460,8 +460,8 @@ class Sheet extends Material {
             dropdownSetSelectedText(this.#thickness[1], chosenThickness, false);
             dropdownSetSelectedText(this.#finish[1], chosenFinish, false);
 
-            if(triggerChange) $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value).change();
-            else $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " " + this.#thickness[1].value + " " + this.#finish[1].value);
+            if(triggerChange) $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " x" + this.#thickness[1].value + " " + this.#finish[1].value).change();
+            else $(this.#sheetMaterial[4]).val(this.#material[1].value + " " + this.#sheetSize[1].value + " x" + this.#thickness[1].value + " " + this.#finish[1].value);
 
             this.#sheetMaterial[5]();
       }
