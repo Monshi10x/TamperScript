@@ -7,6 +7,7 @@ class Router extends SubMenu {
 	detectedMaterial = null;
 	detectedThickness = null;
 	latestSubscriptionData = null;
+	profileWarningId = null;
 	#showIDInContainer = true;
 
 	constructor(parentContainer, canvasCtx, updateFunction, sizeClass) {
@@ -96,19 +97,21 @@ class Router extends SubMenu {
 		super.ReceiveSubscriptionData(data);
 		this.latestSubscriptionData = data;
 		let detectedMaterial = this.extractMaterialFromSubscription(data);
-		if(detectedMaterial == null) return;
+		if(detectedMaterial == null) {
+			this.notifyProfileMissing("Router material not found for current sheet selection.");
+			return;
+		}
 		let detectedThickness = this.extractThicknessFromSubscription(data, detectedMaterial);
-
-		let materialChanged = this.detectedMaterial !== detectedMaterial;
-		let thicknessChanged = this.detectedThickness !== detectedThickness;
 
 		this.detectedMaterial = detectedMaterial;
 		this.detectedThickness = detectedThickness;
 
-		if(materialChanged || thicknessChanged) {
-			this.applyDetectedMaterialToRows(detectedMaterial, data, detectedThickness);
-			this.UpdateRun();
+		if(detectedThickness == null) {
+			this.notifyProfileMissing(`Router thickness not found for ${detectedMaterial}.`);
 		}
+
+		this.applyDetectedMaterialToRows(detectedMaterial, data, detectedThickness);
+		this.UpdateRun();
 	}
 
 	extractMaterialFromSubscription(data) {
@@ -169,8 +172,12 @@ class Router extends SubMenu {
 
 		if(thickness != null && this.fieldHasOption(thicknessField, thickness)) {
 			dropdownSetSelectedValue(thicknessField, thickness);
-		} else if(thicknessField.options.length > 0) {
-			thicknessField.selectedIndex = 0;
+		} else {
+			if(thickness == null) this.notifyProfileMissing(`Router thickness not found for ${material}.`);
+			// populate thickness options but avoid forcing a default when unknown
+			thicknessField.selectedIndex = -1;
+			row.suppressAutoDetectionFlag = false;
+			return;
 		}
 		this.updateCutProfile("Thickness", materialField, thicknessField, profileField, qualityField, speedField);
 
@@ -188,6 +195,14 @@ class Router extends SubMenu {
 			if(field.options[i].value == value) return true;
 		}
 		return false;
+	}
+
+	notifyProfileMissing(message) {
+		if(typeof Toast !== "undefined" && Toast.notify) {
+			this.profileWarningId = Toast.notify(message, 4000, {id: this.profileWarningId, position: "top-right"});
+		} else {
+			console.warn(message);
+		}
 	}
 
 	get timeTE() {
@@ -359,6 +374,11 @@ class Router extends SubMenu {
 				this.detectedMaterial,
 				this.detectedThickness ?? this.extractThicknessFromSubscription(this.latestSubscriptionData, this.detectedMaterial)
 			);
+		} else if(options.material == null) {
+			l_material[1].selectedIndex = -1;
+			l_thickness[1].selectedIndex = -1;
+			l_profile[1].selectedIndex = -1;
+			l_quality[1].selectedIndex = -1;
 		}
 
 		if(options.isCustom === true) {
