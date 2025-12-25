@@ -98,7 +98,7 @@ class Router extends SubMenu {
 		this.latestSubscriptionData = data;
 		let detectedMaterial = this.extractMaterialFromSubscription(data);
 		if(detectedMaterial == null) {
-			this.notifyProfileMissing("Router material not found for current sheet selection.");
+			this.notifyProfileMissing(`Router material profile missing for ${detectedMaterial}.`);
 			return;
 		}
 		let detectedThickness = this.extractThicknessFromSubscription(data, detectedMaterial);
@@ -107,7 +107,7 @@ class Router extends SubMenu {
 		this.detectedThickness = detectedThickness;
 
 		if(detectedThickness == null) {
-			this.notifyProfileMissing(`Router thickness not found for ${detectedMaterial}.`);
+			this.notifyProfileMissing(`Router thickness profile missing for ${detectedMaterial}.`);
 		}
 
 		this.applyDetectedMaterialToRows(detectedMaterial, data, detectedThickness);
@@ -176,7 +176,7 @@ class Router extends SubMenu {
 		if(thickness != null && this.fieldHasOption(thicknessField, thickness)) {
 			dropdownSetSelectedValue(thicknessField, thickness);
 		} else {
-			if(thickness == null) this.notifyProfileMissing(`Router thickness not found for ${material}.`);
+			//if(thickness == null) this.notifyProfileMissing(`Router thickness not found for ${material}. Default being used`);
 			// populate thickness options but avoid forcing a default when unknown
 			thicknessField.selectedIndex = -1;
 			row.suppressAutoDetectionFlag = false;
