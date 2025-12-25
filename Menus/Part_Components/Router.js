@@ -302,13 +302,6 @@ class Router extends SubMenu {
 		l_speed = createInput_Infield("Speed", 1000, "width:120px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " mm/min"});
 		l_totalTime = createInput_Infield("Total Time", 0, "width:80px;margin:0px;", () => {this.updateCutProfile("Speed", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]); this.UpdateRun();}, this.contentContainer, false, 10, {postfix: " min"});
 
-		if(options.material != null) dropdownSetSelectedValue(l_material[1], options.material);
-		if(options.thickness != null) dropdownSetSelectedValue(l_thickness[1], options.thickness);
-		if(options.profile != null) dropdownSetSelectedValue(l_profile[1], options.profile);
-		if(options.quality != null) dropdownSetSelectedValue(l_quality[1], options.quality);
-		if(options.speed != null) $(l_speed[1]).val(options.speed);
-		if(options.material == null && options.profile != null && options.quality != null && options.speed != null) this.updateCutProfile("Material", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
-
 		let l_deleteRowBtn = createButton("X", "background-color:red;width:30px;margin:0px;", () => {
 			for(let i = 0; i < this.runRows.length; i++) {
 				if(this.runRows[i].index === internalIndex) {
@@ -336,6 +329,29 @@ class Router extends SubMenu {
 		l_quality[1].addEventListener("change", markManualOverride);
 		l_speed[1].addEventListener("change", markManualOverride);
 		this.runRows.push(rowMeta);
+
+		rowMeta.suppressAutoDetectionFlag = true;
+
+		if(options.material != null) {
+			dropdownSetSelectedValue(l_material[1], options.material);
+			this.updateCutProfile("Material", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+		}
+		if(options.thickness != null && this.fieldHasOption(l_thickness[1], options.thickness)) {
+			dropdownSetSelectedValue(l_thickness[1], options.thickness);
+			this.updateCutProfile("Thickness", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+		}
+		if(options.profile != null && this.fieldHasOption(l_profile[1], options.profile)) {
+			dropdownSetSelectedValue(l_profile[1], options.profile);
+			this.updateCutProfile("Profile", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+		}
+		if(options.quality != null && this.fieldHasOption(l_quality[1], options.quality)) {
+			dropdownSetSelectedValue(l_quality[1], options.quality);
+			this.updateCutProfile("Quality", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+		}
+		if(options.speed != null) $(l_speed[1]).val(options.speed);
+		if(options.material == null && options.profile != null && options.quality != null && options.speed != null) this.updateCutProfile("Material", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
+
+		rowMeta.suppressAutoDetectionFlag = false;
 
 		if(this.detectedMaterial != null && options.material == null) {
 			this.applyMaterialToRow(
