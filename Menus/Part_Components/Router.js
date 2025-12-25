@@ -118,6 +118,9 @@ class Router extends SubMenu {
 		if(typeof RouterToolpathTimeLookup !== "object" || RouterToolpathTimeLookup == null) return null;
 		if(!data || !data.data || !Array.isArray(data.data)) return null;
 		let materialKeys = Object.keys(RouterToolpathTimeLookup);
+		let parsedMaterialFromSheet = this.getMaterialFromSheetMaterial(data);
+		if(parsedMaterialFromSheet) return parsedMaterialFromSheet;
+
 		for(let i = 0; i < data.data.length; i++) {
 			let sheetMaterial = data.data[i].sheetMaterial;
 			if(sheetMaterial == null) continue;
@@ -133,16 +136,16 @@ class Router extends SubMenu {
 	extractThicknessFromSubscription(data, materialKey) {
 		if(typeof RouterToolpathTimeLookup !== "object" || RouterToolpathTimeLookup == null) return null;
 		if(!data || !data.data || !Array.isArray(data.data) || materialKey == null) return null;
-		let availableThicknesses = Object.keys(RouterToolpathTimeLookup[materialKey] || {});
-		for(let i = 0; i < data.data.length; i++) {
-			let sheetMaterial = data.data[i].sheetMaterial;
-			if(sheetMaterial == null) continue;
-			for(let t = 0; t < availableThicknesses.length; t++) {
-				if(sheetMaterial.includes(availableThicknesses[t])) {
-					return availableThicknesses[t];
-				}
-			}
+		let sheetMaterials = this.getSheetMaterialsFromData(data);
+
+		for(let i = 0; i < sheetMaterials.length; i++) {
+			let predefinedThickness = this.getThicknessFromPredefined(sheetMaterials[i], materialKey);
+			if(predefinedThickness != null) return predefinedThickness;
+
+			let matchedThickness = this.matchThicknessToProfiles(sheetMaterials[i], materialKey);
+			if(matchedThickness != null) return matchedThickness;
 		}
+
 		return null;
 	}
 
@@ -197,9 +200,60 @@ class Router extends SubMenu {
 		return false;
 	}
 
+	getSheetMaterialsFromData(data) {
+		let sheetMaterials = [];
+		if(data && data.data && Array.isArray(data.data)) {
+			for(let i = 0; i < data.data.length; i++) {
+				if(data.data[i].sheetMaterial) sheetMaterials.push(data.data[i].sheetMaterial);
+			}
+		}
+		return sheetMaterials;
+	}
+
+	getMaterialFromSheetMaterial(data) {
+		if(typeof RouterToolpathTimeLookup !== "object" || RouterToolpathTimeLookup == null) return null;
+		let materialKeys = Object.keys(RouterToolpathTimeLookup);
+		let sheetMaterials = this.getSheetMaterialsFromData(data);
+
+		for(let i = 0; i < sheetMaterials.length; i++) {
+			let baseMaterialName = sheetMaterials[i].split(" - ")[0].trim();
+			if(baseMaterialName.length === 0) continue;
+			for(let k = 0; k < materialKeys.length; k++) {
+				let key = materialKeys[k];
+				if(baseMaterialName.toLowerCase() === key.toLowerCase()) return key;
+				if(baseMaterialName.toLowerCase().includes(key.toLowerCase())) return key;
+			}
+		}
+		return null;
+	}
+
+	getThicknessFromPredefined(sheetMaterial, materialKey) {
+		if(typeof predefinedParts_obj === "undefined" || predefinedParts_obj == null) return null;
+		let matchedPart = predefinedParts_obj.find(p => p.Name === sheetMaterial) || predefinedParts_obj.find(p => p.Name && p.Name.includes(sheetMaterial));
+		if(!matchedPart || !matchedPart.Thickness) return null;
+		return this.matchThicknessToProfiles(matchedPart.Thickness, materialKey);
+	}
+
+	matchThicknessToProfiles(thicknessCandidate, materialKey) {
+		let availableThicknesses = Object.keys(RouterToolpathTimeLookup[materialKey] || {});
+		if(availableThicknesses.length === 0) return null;
+		if(thicknessCandidate) {
+			for(let i = 0; i < availableThicknesses.length; i++) {
+				let profileThickness = availableThicknesses[i];
+				let profileThicknessLower = profileThickness.toLowerCase();
+				let candidateLower = thicknessCandidate.toLowerCase();
+				if(candidateLower === profileThicknessLower) return profileThickness;
+				if(candidateLower.includes(profileThicknessLower)) return profileThickness;
+				let numberMatch = candidateLower.match(/[0-9.]+/);
+				if(numberMatch && profileThicknessLower.includes(numberMatch[0])) return profileThickness;
+			}
+		}
+		return null;
+	}
+
 	notifyProfileMissing(message) {
 		if(typeof Toast !== "undefined" && Toast.notify) {
-			this.profileWarningId = Toast.notify(message, 6000, {id: this.profileWarningId, position: "top-right"});
+			this.profileWarningId = Toast.notify(message, 4000, {id: this.profileWarningId, position: "top-right"});
 		} else {
 			console.warn(message);
 		}
