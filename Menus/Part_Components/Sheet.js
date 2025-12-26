@@ -26,7 +26,7 @@ class Sheet extends Material {
       #foldedRight;
       #updateOrderBtn;
       #flipSheet = false;
-      #preferredCuttingMachine = null;
+      preferredCuttingMachine = null;
       #totalPerimeter = 0;
       #flip;
       #supplierCuts;
@@ -48,7 +48,7 @@ class Sheet extends Material {
       #method1;
       #method2;
       #currentJoinMethod = "Even Joins";
-      UPDATES_PAUSED = false;
+
       #sheetPerimeterIsCut = true;
       #useOverallSVGSize = false;
       #finalOutputSizesHeader;
@@ -508,15 +508,15 @@ class Sheet extends Material {
       setCuttingMachine(machine = "router") {
             switch(machine) {
                   case "router":
-                        this.#preferredCuttingMachine = "router";
+                        this.preferredCuttingMachine = "router";
                         this.UpdateFromFields();
                         break;
                   case "laser":
-                        this.#preferredCuttingMachine = "laser";
+                        this.preferredCuttingMachine = "laser";
                         this.UpdateFromFields();
                         break;
                   case "guillotine":
-                        this.#preferredCuttingMachine = "guillotine";
+                        this.preferredCuttingMachine = "guillotine";
                         this.UpdateFromFields();
                         break;
                   default: break;
@@ -555,8 +555,8 @@ class Sheet extends Material {
       }
 
 
-      constructor(parentContainer, LHSMenuWindow, type) {
-            super(parentContainer, LHSMenuWindow, type);
+      constructor(parentContainer, LHSMenuWindow, options = {UPDATES_PAUSED: false}) {
+            super(parentContainer, LHSMenuWindow, options);
 
             /*
             InheritedParentSizeSplits*/
@@ -692,17 +692,20 @@ class Sheet extends Material {
             this.#guillotineProduction.SubscribeTo(this);
 
             //Router
-            this.#router = new Router(f_container_cutting, null, null, null);
+            this.#router = new Router(f_container_cutting, null, null, null, {required: false});
             this.#router.showContainer = false;
+            this.#router.required = false;
             this.#router.SubscribeTo(this);
 
             //Laser
             this.#laser = new Laser(f_container_cutting, null, null, null);
             this.#laser.showContainer = false;
+            this.#laser.required = false;
             this.#laser.SubscribeTo(this);
 
             //Supplier
             this.#supplierCuts = new Supplier(f_container_cutting, null, () => { });
+            this.#supplierCuts.required = false;
             this.#supplierCuts.SubscribeTo(this);
 
             //HandCutting
@@ -715,18 +718,11 @@ class Sheet extends Material {
             this.#cutByHandProduction.requiredName = "Required";
             this.#cutByHandProduction.SubscribeTo(this);
 
-            /*
-            Updates*/
-            // this.setSheetMaterial("ACM", false);
-            //this.setSheetSize("2440x1220", false);
-            // this.setSheetThickness("3x0.21", false);
-            //this.setSheetFinish("Primer", false);
-
-
-
             this.#visualiser = new ModalSheetJoins("Join Helper", 100, () => {
                   this.UpdateFromFields();
             }, this);
+
+            this.container.appendChild(this.#visualiser.dragZoomSVG.container);
 
             this.UpdateFromFields();
       }
@@ -820,7 +816,7 @@ class Sheet extends Material {
 
                         if(subscription.parent instanceof LED) {
                               mustBeRouterCut = true;
-                              _this.#preferredCuttingMachine = "router";
+                              _this.preferredCuttingMachine = "router";
                         }
                   });
             });
@@ -856,7 +852,7 @@ class Sheet extends Material {
                   });
 
 
-                  console.log(uniqueSizes);
+                  //console.log(uniqueSizes);
                   for(let u = 0; u < uniqueSizes.length; u++) {
                         let w = uniqueSizes[u].width;
                         let h = uniqueSizes[u].height;
@@ -883,10 +879,10 @@ class Sheet extends Material {
                         this.#outputSizeTable.addRow(qty, roundNumber(w, 2), roundNumber(h, 2), numberCutsPerSheet, cuttingTypeDropDown[0], totalNumberCuts, this.#totalPerimeter);
                         this.#outputSizeTableData.push([qty, roundNumber(w, 2), roundNumber(h, 2), numberCutsPerSheet, cuttingTypeDropDown[1], totalNumberCuts, this.#totalPerimeter]);
 
-                        if(this.#preferredCuttingMachine == null) dropdownSetSelectedIndexToNextAvailable(cuttingTypeDropDown[1], yes);
-                        if(this.#preferredCuttingMachine == "router") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Router.value);
-                        if(this.#preferredCuttingMachine == "laser") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Laser.value);
-                        if(this.#preferredCuttingMachine == "guillotine") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Guillotine.value);
+                        if(this.preferredCuttingMachine == null) dropdownSetSelectedIndexToNextAvailable(cuttingTypeDropDown[1], yes);
+                        if(this.preferredCuttingMachine == "router") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Router.value);
+                        if(this.preferredCuttingMachine == "laser") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Laser.value);
+                        if(this.preferredCuttingMachine == "guillotine") dropdownSetSelectedValue(cuttingTypeDropDown[1], this.#cuttingOptions.Guillotine.value);
                   }
             }
       };
@@ -926,6 +922,7 @@ class Sheet extends Material {
             for(let i = 0; i < this.#outputSizeTableData.length; i++) {
                   this.#outputSizeTable.getCell(i + 1, 6).style.backgroundColor = "white";
                   this.#outputSizeTable.getCell(i + 1, 7).style.backgroundColor = "white";
+                  //alert(this.#outputSizeTableData[i][4].value);
                   switch(this.#outputSizeTableData[i][4].value) {
                         case "Router":
                               this.#totalRouterPerimeter += this.#outputSizeTableData[i][6];
@@ -1029,37 +1026,15 @@ class Sheet extends Material {
                   this.#router.addRunRow(foldPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", thickness: "3mm", profile: "Groove", quality: "Good Quality", speed: null});
                   TODO("Laser folding");
             }
-            if(this.#totalRouterNumberOfShapes > 1) {
-                  this.#router.setupMultiple = true;
-                  this.#router.setupNumberOfSheets = this.#totalRouterNumberOfShapes;
-                  //this.#router.setupPerSheet = 20;
 
-                  this.#router.cleanMultiple = true;
-                  this.#router.cleanNumberOfSheets = this.#totalRouterNumberOfShapes;
-                  //this.#router.cleanPerSheet = 20;
-            } else {
-                  this.#router.setupOnceOff = true;
-                  //this.#router.setupTime = 20;
+            this.#router.setupNumberOfSheets = this.#totalRouterNumberOfShapes;
 
-                  this.#router.cleanOnceOff = true;
-                  //this.#router.cleanTime = 20;
-            }
+            this.#router.cleanNumberOfSheets = this.#totalRouterNumberOfShapes;
 
-            if(this.#totalLaserNumberOfShapes > 1) {
-                  this.#laser.setupMultiple = true;
-                  this.#laser.setupNumberOfSheets = this.#totalLaserNumberOfShapes;
-                  //this.#laser.setupPerSheet = 20;
+            this.#laser.setupNumberOfSheets = this.#totalLaserNumberOfShapes;
 
-                  this.#laser.cleanMultiple = true;
-                  this.#laser.cleanNumberOfSheets = this.#totalLaserNumberOfShapes;
-                  //this.#laser.cleanPerSheet = 20;
-            } else {
-                  this.#laser.setupOnceOff = true;
-                  //this.#laser.setupTime = 20;
+            this.#laser.cleanNumberOfSheets = this.#totalLaserNumberOfShapes;
 
-                  this.#laser.cleanOnceOff = true;
-                  //this.#laser.cleanTime = 20;
-            }
 
             if(this.#totalNumberSupplierCuts === 0) {
                   this.#supplierCuts.required = false;

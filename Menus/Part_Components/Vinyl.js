@@ -121,8 +121,8 @@ class Vinyl extends Material {      /*
       /*
                         
       Start             */
-      constructor(parentObject, sizeClass, type) {
-            super(parentObject, sizeClass, type);
+      constructor(parentObject, sizeClass, options = {UPDATES_PAUSED: false}) {
+            super(parentObject, sizeClass, options);
 
             /*
             InheritedParentSizeSplits*/

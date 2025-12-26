@@ -71,6 +71,7 @@ class DragZoomSVG {
       get relativeMouseXY() {return this.#relativeMouseXY;}
       get isHolding() {return this.#holding;}
       get svgFile() {return this.#f_svg.outerHTML;}
+      get container() {return this.#f_container;}
 
       get unscaledSVGString() {
             let svgClone = this.svg.cloneNode(true);
@@ -107,7 +108,7 @@ class DragZoomSVG {
 
             this.#f_container = document.createElement("div");
             this.#f_container.innerHTML = svgText || '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)"></g></svg>';
-            this.#f_container.style = "display: block;float: left;outline:1px solid black;width:" + svgWidth + ";height:" + svgHeight + ";";
+            this.#f_container.style = "display: block;float: left;;overflow:hidden;width:" + svgWidth + ";height:" + svgHeight + ";";//outline:1px solid black
             this.#f_container.style.cssText += options.overrideCssStyles;
             console.log("width:" + svgWidth + ";height:" + svgHeight + ";");
 
@@ -231,11 +232,11 @@ class DragZoomSVG {
       }
 
       onHoverEnter(e) {
-            this.#f_container.style.outlineColor = COLOUR.Blue;
+            //this.#f_container.style.outlineColor = COLOUR.Blue;
       }
 
       onHoverExit(e) {
-            this.#f_container.style.outlineColor = COLOUR.Black;
+            //this.#f_container.style.outlineColor = COLOUR.Black;
       }
 
       onMouseDown(e) {

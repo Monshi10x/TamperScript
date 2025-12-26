@@ -201,10 +201,12 @@ class Size extends SubscriptionManager {
       #dataForSubscribers = [];
       #matrixSizes = [];
 
-      constructor(parentContainer, lhsMenuWindow) {
+      constructor(parentContainer, lhsMenuWindow, options = {UPDATES_PAUSED: false}) {
             super();
             if(!lhsMenuWindow instanceof LHSMenuWindow) throw new Error('Parameter 2 must be an instance of LHSMenuWindow');
             this.#lhsMenuWindow = lhsMenuWindow;
+
+            this.UPDATES_PAUSED = options.UPDATES_PAUSED;
 
             this.#container = document.createElement("div");
             this.#container.style =
@@ -276,7 +278,9 @@ class Size extends SubscriptionManager {
             this.UpdateDataForSubscribers();
       }
 
-      UpdateFromFields() {
+      /*overrides*/UpdateFromFields() {
+            if(this.UPDATES_PAUSED) return;
+
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();
       }
@@ -304,8 +308,11 @@ class Size extends SubscriptionManager {
                   let returnedSizes = arg1_returnedSizes[0];
                   for(let i = 0; i < Object.keys(returnedSizes).length; i++) {
                         if(returnedSizes[Object.keys(returnedSizes)[i]]["show"] === true) {
+                              this.UPDATES_PAUSED = true;
                               $(this.#width[1]).val(parseFloat(returnedSizes[Object.keys(returnedSizes)[i]]["width"])).change();
                               $(this.#height[1]).val(parseFloat(returnedSizes[Object.keys(returnedSizes)[i]]["height"])).change();
+                              this.UPDATES_PAUSED = false;
+                              this.UpdateFromFields();
                               break;
                         }
                   }

@@ -44,17 +44,17 @@ class LHSMenuWindow {
 
         this.#container = document.createElement('div');
         this.#container.id = ID;
-        this.#container.style = "z-index:100;background-color:" + COLOUR.MediumGrey + ";color:" + COLOUR.White + ";width:" + this.#width + "px;min-height:" + this.#height + "px;position:fixed;top:" + this.#yOffset + "px;left:" + this.#xOffset + "px;display: none;flex-direction: column;flex: 1;overflow:none;box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
+        this.#container.style = "z-index:100;background-color:" + COLOUR.MediumGrey + ";color:" + COLOUR.White + ";width:" + this.#width + ";height:" + this.#height + ";position:fixed;top:" + this.#yOffset + "px;left:" + this.#xOffset + "px;display: none;flex-direction: column;overflow: hidden; box-shadow: rgb(0 0 0) 6px 1px 20px -2px;";
 
         this.createDragableHeaderAndClose();
 
         this.#body = document.createElement('div');
         this.#body.id = ID + "body";
-        this.#body.style = "margin: 0px; min-height: 700px; max-height: 1000px; width: 100%; padding: 0px; float: left; display: block; color: white; cursor: pointer; border-style: none;overflow-y:auto;";
+        this.#body.style = "margin: 0px; min-height: 700px; max-height: 1000px; width: 100%; padding: 0px; color: white; cursor: pointer; border-style: none;flex: 1 1 auto;min-height: 0;overflow: auto; ";
 
         this.#pageButtonContainer = document.createElement('div');
         this.#pageButtonContainer.id = ID + "pageButtonContainer";
-        this.#pageButtonContainer.style = "margin: 0px; min-height: 0px; max-height: 50px; width: 100%; padding: 0px; float: left; display: block; color: white; cursor: pointer; border-style: none; overflow-y: none; background-color:white;margin-top: auto;";
+        this.#pageButtonContainer.style = "margin: 0px; min-height: 0px; max-height: 50px; width: 100%; padding: 0px; float: left; color: white; cursor: pointer; border-style: none; overflow-y: none; background-color:white;flex: 0 0 auto;";
 
         this.#previousPageBtn = createButton("< Back", "width:100px;float:left;margin:0;", this.previousPage);
         setFieldHidden(true, this.#previousPageBtn);
@@ -63,7 +63,7 @@ class LHSMenuWindow {
 
         this.#footer = document.createElement('div');
         this.#footer.id = ID + "footer";
-        this.#footer.style = "margin: 0px; min-height: 35px; max-height: 100px; width: 100%; padding: 0px; float: left; display: block; color: white; cursor: pointer; border-style: none; overflow-y: auto; background-color:#fff;border-top: 1px solid black;margin-top: auto;";
+        this.#footer.style = "margin: 0px; min-height: 35px;max-height: 100px; width: 100%; padding: 0px; float: left; display: block; color: white; cursor: pointer; border-style: none; overflow-y: auto; background-color:#fff;border-top: 1px solid black;flex: 0 0 auto;";
 
         this.#pageButtonContainer.appendChild(this.#nextPageBtn);
         this.#pageButtonContainer.appendChild(this.#previousPageBtn);
@@ -105,7 +105,7 @@ class LHSMenuWindow {
             this.#numPages++;
             let newPage = document.createElement('div');
             newPage.id = this.#ID + "body";
-            newPage.style = "margin: 0px;height:100%; min-height:400px;max-height:900px;width: 100%; padding: 0px; float: left; display: none; color: white; cursor: pointer; border-style: none; overflow-y: auto; overflow-x:none;background-color:" + COLOUR.MediumGrey + ";";
+            newPage.style = "margin: 0px;height:100%; min-height:400px;max-height:100%;width: 100%; padding: 0px; float: left; display: none; color: white; cursor: pointer; border-style: none; overflow-y: auto; overflow-x:none;background-color:" + COLOUR.MediumGrey + ";";
             if(this.#numPages == 1) setFieldHidden(false, newPage);
             this.#pages.push(newPage);
             this.body.appendChild(newPage);
@@ -340,24 +340,24 @@ async function initLHSMenu() {
     headerIcon.classList.add("CPUChipIcon");
     header.appendChild(headerIcon);
 
-    menu_Admin = new AdminPanel(300, 300, "Admin", "Admin");
-    menu_Find = new ProductFinder(400, 600, "ProductFinder", "Product Finder");
-    menu_Area = new AreaMenu(400, 600, "Area", "Area");
-    menu_Lnm = new LnmMenu(400, 600, "Lnm", "Linear Metre");
-    menu_LED = new LEDMenu(800, 600, "LED", "LEDs");
-    menu_Lightbox = new LightboxMenu(800, 600, "Lightbox", "Lightbox");
-    menu_Billboard = new BillboardMenu(1200, 800, "Billboard", "Billboard");
-    menu_ProductCompare = new ProductCompareMenu(800, 600, "Compare", "Compare");
-    menu_Router = new RouterMenu(800, 600, "Router", "Router");
-    menu_Window = new WindowMenu(800, 600, "Window", "Window");
-    menu_Vehicle = new VehicleMenu(1500, 600, "Vehicle", "Vehicle");
-    menu_creditCardSurcharge = new CreditSurchargeMenu(400, 600, "CreditSurchargeMenu", "Credit Card Surcharge");
-    menu_3D = new Menu3D(900, 700, "3DLetterMenu", "3D Letters");
-    menu_PanelSigns = new MenuPanelSigns(900, 700, "PanelSignsMenu", "Panel Signs");
-    menu_Charts = new ChartMenu(900, 700, "ChartsMenu", "Charts");
-    menu_POS = new MenuPOS(900, 700, "MenuPOS", "POS");
-    menu_Travel = new MenuMap(900, 900, "MenuMap", "Map");
-    menu_OrderedVinyls = new OrderedVinyls(900, 700, "OrderedVinyls", "Ordered Vinyls");
+    menu_Admin = new AdminPanel("300px", "300px", "Admin", "Admin");
+    menu_Find = new ProductFinder("400px", "600px", "ProductFinder", "Product Finder");
+    menu_Area = new AreaMenu("400px", "600px", "Area", "Area");
+    menu_Lnm = new LnmMenu("400px", "600px", "Lnm", "Linear Metre");
+    menu_LED = new LEDMenu("800px", "600px", "LED", "LEDs");
+    menu_Lightbox = new LightboxMenu("800px", "calc(100% - 85px)", "Lightbox", "Lightbox");
+    menu_Billboard = new BillboardMenu("1200px", "calc(100% - 85px)", "Billboard", "Billboard");
+    menu_ProductCompare = new ProductCompareMenu("800px", "calc(100% - 85px)", "Compare", "Compare");
+    menu_Router = new RouterMenu("800px", "600px", "Router", "Router");
+    menu_Window = new WindowMenu("800px", "calc(100% - 85px)", "Window", "Window");
+    menu_Vehicle = new VehicleMenu("1200px", "calc(100% - 85px)", "Vehicle", "Vehicle");
+    menu_creditCardSurcharge = new CreditSurchargeMenu("400px", "600px", "CreditSurchargeMenu", "Credit Card Surcharge");
+    menu_3D = new Menu3D("900px", "calc(100% - 85px)", "3DLetterMenu", "3D Letters");
+    menu_PanelSigns = new MenuPanelSigns("900px", "calc(100% - 85px)", "PanelSignsMenu", "Panel Signs");
+    menu_Charts = new ChartMenu("900px", "700px", "ChartsMenu", "Charts");
+    menu_POS = new MenuPOS("900px", "calc(100% - 85px)", "MenuPOS", "POS");
+    menu_Travel = new MenuMap("900px", "calc(100% - 85px)", "MenuMap", "Map");
+    menu_OrderedVinyls = new OrderedVinyls("900px", "calc(100% - 85px)", "OrderedVinyls", "Ordered Vinyls");
 
     addItem(GM_getResourceURL("Icon_Find"), "Find", "finder");
     addItem(GM_getResourceURL("Icon_M2"), "Area", "m2");

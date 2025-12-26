@@ -10,8 +10,14 @@ class Router extends SubMenu {
 	profileWarningId = null;
 	#showIDInContainer = true;
 
-	constructor(parentContainer, canvasCtx, updateFunction, sizeClass) {
-		super(parentContainer, canvasCtx, updateFunction, "CNC Router");
+	constructor(parentContainer, canvasCtx, updateFunction, sizeClass, options = {
+		isRequired: false
+	}) {
+
+		super(parentContainer, canvasCtx, updateFunction, "CNC Router", {isRequired: options.isRequired});
+
+
+		console.log("router required in constructor: " + this.required);
 
 		this.createQtySection();
 		this.createSetupSection();
@@ -38,12 +44,13 @@ class Router extends SubMenu {
 		let setupContainer = createDivStyle5(null, "Setup", this.contentContainer);
 		setupContainer[3].style.cssText += "width:50px;";
 		setupContainer[1].style.cssText = "width:calc(100% - 50px)";
-		this.l_setupOnceOff = createCheckbox_Infield("Setup One Sheet", true, "width:30%;", () => {this.Update();}, setupContainer[1], true);
-		this.l_setupMultiple = createCheckbox_Infield("Setup Multiple Sheets", false, "width:60%;", () => {this.Update();}, setupContainer[1], true);
-		checkboxesAddToSelectionGroup(true, this.l_setupOnceOff, this.l_setupMultiple);
-		this.l_setupNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, setupContainer[1], false, 1);
-		this.l_setupPerSheet = createInput_Infield("Setup per Sheet", 20, "width:30%;display:none", () => {this.Update();}, setupContainer[1], false, 10, {postfix: "mins"});
+		//this.l_setupOnceOff = createCheckbox_Infield("Setup One Sheet", true, "width:30%;", () => {this.Update();}, setupContainer[1], true);
+		//this.l_setupMultiple = createCheckbox_Infield("Setup Multiple Sheets", false, "width:60%;", () => {this.Update();}, setupContainer[1], true);
+		//checkboxesAddToSelectionGroup(true, this.l_setupOnceOff, this.l_setupMultiple);
+		this.l_setupNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;", () => {this.Update();}, setupContainer[1], false, 1);
+		this.l_setupPerSheet = createInput_Infield("Setup per Sheet", 20, "width:30%;", () => {this.Update();}, setupContainer[1], false, 10, {postfix: "mins"});
 		this.l_setupTime = createInput_Infield("Total Setup Minutes", 20, "width:30%;", null, setupContainer[1], false, 10, {postfix: "mins"});
+		setFieldDisabled(true, this.l_setupTime[1], this.l_setupTime[0]);
 		this.setupContainer = setupContainer;
 	}
 
@@ -63,23 +70,21 @@ class Router extends SubMenu {
 		let cleanContainer = createDivStyle5(null, "Clean", this.contentContainer);
 		cleanContainer[3].style.cssText += "width:50px;";
 		cleanContainer[1].style.cssText = "width:calc(100% - 50px)";
-		this.l_cleanOnceOff = createCheckbox_Infield("Clean One Sheet", true, "width:30%;", () => {this.Update();}, cleanContainer[1], true);
-		this.l_cleanMultiple = createCheckbox_Infield("Clean Multiple Sheets", false, "width:60%;", () => {this.Update();}, cleanContainer[1], true);
-		checkboxesAddToSelectionGroup(true, this.l_cleanOnceOff, this.l_cleanMultiple);
-		this.l_cleanNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;display:none", () => {this.Update();}, cleanContainer[1], false, 1);
-		this.l_cleanPerSheet = createInput_Infield("Clean per Sheet", 20, "width:30%;display:none", () => {this.Update();}, cleanContainer[1], false, 1, {postfix: "mins"});
+		this.l_cleanNumberOfSheets = createInput_Infield("Number of Sheets", 1, "width:30%;", () => {this.Update();}, cleanContainer[1], false, 1);
+		this.l_cleanPerSheet = createInput_Infield("Clean per Sheet", 20, "width:30%;", () => {this.Update();}, cleanContainer[1], false, 1, {postfix: "mins"});
 		this.l_cleanTime = createInput_Infield("Total Clean Minutes", 20, "width:30%", null, cleanContainer[1], false, 10, {postfix: "mins"});
+		setFieldDisabled(true, this.l_cleanTime[1], this.l_cleanTime[0]);
 		this.cleanContainer = cleanContainer;
 	}
 
 	createFieldGroups() {
-		makeFieldGroup("Checkbox", this.l_setupMultiple[1], true, this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0]);
-		makeFieldGroup("Checkbox", this.l_cleanMultiple[1], true, this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0]);
+		//makeFieldGroup("Checkbox", this.l_setupMultiple[1], true, this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0]);
+		//makeFieldGroup("Checkbox", this.l_cleanMultiple[1], true, this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0]);
 		makeFieldGroup("Checkbox", this.l_usePaths[1], true, this.l_cuttingTable.container, this.l_addRowBtn);
 		makeFieldGroup("Checkbox",
-			this.requiredField[1], false, this.l_qty[0], this.l_timeTE[0], this.l_setupOnceOff[0], this.l_setupTime[0], this.l_runTime[0], this.l_addRowBtn,
-			this.l_cleanTime[0], this.l_usePaths[0], this.l_cuttingTable.container, this.l_setupMultiple[0], this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0],
-			this.l_cleanMultiple[0], this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0], this.l_cleanOnceOff[0], this.qtyContainer[0], this.setupContainer[0],
+			this.requiredField[1], false, this.l_qty[0], this.l_timeTE[0], this.l_setupTime[0], this.l_runTime[0], this.l_addRowBtn,
+			this.l_cleanTime[0], this.l_usePaths[0], this.l_cuttingTable.container, this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0],
+			this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0], this.qtyContainer[0], this.setupContainer[0],
 			this.runContainer[0], this.cleanContainer[0]
 		);
 	}
@@ -96,7 +101,7 @@ class Router extends SubMenu {
 	/*overrides*/ReceiveSubscriptionData(data) {
 		super.ReceiveSubscriptionData(data);
 
-		if(!this.required) return;
+		if(this.required == false) return;
 
 		this.latestSubscriptionData = data;
 		let detectedMaterial = this.extractMaterialFromSubscription(data);
@@ -293,21 +298,21 @@ class Router extends SubMenu {
 		$(this.l_cleanTime[1]).val(value).change();
 	}
 
-	get setupOnceOff() {
+	/*get setupOnceOff() {
 		return this.l_setupOnceOff[1].checked;
-	}
-	set setupOnceOff(value) {
+	}*/
+	/*set setupOnceOff(value) {
 		setCheckboxChecked(value, this.l_setupOnceOff[1]);
-	}
+	}*/
 
-	get setupMultiple() {
+	/*get setupMultiple() {
 		return this.l_setupMultiple[1].checked;
 	}
 	set setupMultiple(value) {
 		setCheckboxChecked(value, this.l_setupMultiple[1]);
-	}
+	}*/
 
-	get cleanOnceOff() {
+	/*get cleanOnceOff() {
 		return this.l_cleanOnceOff[1].checked;
 	}
 	set cleanOnceOff(value) {
@@ -319,7 +324,7 @@ class Router extends SubMenu {
 	}
 	set cleanMultiple(value) {
 		setCheckboxChecked(value, this.l_cleanMultiple[1]);
-	}
+	}*/
 
 	get qty() {
 		if(this.l_qty[1].value == null) return 0;
@@ -487,11 +492,11 @@ class Router extends SubMenu {
 	}
 
 	UpdateSetup = () => {
-		setFieldDisabled(this.l_setupMultiple[1].checked, this.l_setupTime[1], this.l_setupTime[0]);
+		//setFieldDisabled(this.l_setupMultiple[1].checked, this.l_setupTime[1], this.l_setupTime[0]);
 
-		if(this.setupMultiple) {
-			this.setupTime = this.setupNumberOfSheets * this.setupPerSheet;
-		}
+		//if(this.setupMultiple) {
+		this.setupTime = this.setupNumberOfSheets * this.setupPerSheet;
+		//}
 	};
 
 	UpdateRun() {
@@ -522,11 +527,11 @@ class Router extends SubMenu {
 	}
 
 	UpdateClean() {
-		setFieldDisabled(this.l_cleanMultiple[1].checked, this.l_cleanTime[1], this.l_cleanTime[0]);
+		//setFieldDisabled(this.l_cleanMultiple[1].checked, this.l_cleanTime[1], this.l_cleanTime[0]);
 
-		if(this.cleanMultiple) {
-			this.cleanTime = this.cleanNumberOfSheets * this.cleanPerSheet;
-		}
+		//if(this.cleanMultiple) {
+		this.cleanTime = this.cleanNumberOfSheets * this.cleanPerSheet;
+		//}
 	}
 
 	requiredToggle = () => {

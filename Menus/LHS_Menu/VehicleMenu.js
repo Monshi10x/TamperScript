@@ -98,7 +98,7 @@ class VehicleMenu extends LHSMenuWindow {
 		let thisClass = this;
 
 		canvasContainer = document.createElement("div");
-		canvasContainer.style = "width:100%;height:650px;display:block;background-color:white;position: relative;";
+		canvasContainer.style = "width:100%;height:100%;display:block;background-color:white;position: relative;";
 
 		let createCanvasContainer = () => {
 			canvas_Vehicle = document.createElement('canvas');
@@ -847,7 +847,6 @@ function update(e) {
 	drawRects(e);
 	for(var n = 0; n < rects.length; n++) {
 		if(!VehicleMenu_Template.contentContainer.querySelectorAll("#rowContainer")[n]) {
-			console.trace("here quest");
 			continue;
 		}
 		VehicleMenu_Template.contentContainer.querySelectorAll("#rowContainer")[n].querySelector("#description").value = rects[n].description;

@@ -47,7 +47,7 @@ class Install extends SubMenu {
 
 		///Install Rate
 		this.#timeContainer = createDivStyle5(null, "Time", this.contentContainer);
-		this.#install_InstallRate = createDropdown_Infield("Install Rate", 1, "display:block;width:63%;margin-right:20%;", [], () => {this.Update();}, this.#timeContainer[1]);
+		this.#install_InstallRate = createDropdown_Infield("Install Rate", 1, "display:block;width:63%;margin-right:20%;", [], () => {/*this.Update();*/}, this.#timeContainer[1]);
 
 		let dropdownOptions = [];
 		let modifierOptions = getModifierDropdown_Name_Price_Cost("Install IH (ea)");
@@ -61,9 +61,9 @@ class Install extends SubMenu {
 		}
 
 		///Install Times
-		this.#install_InstallMinutes = createInput_Infield("Install Minutes", null, "width:25%;display:block;margin-left:40px;", () => {this.Update();}, this.#timeContainer[1], false, 10);
-		this.#install_InstallHours = createInput_Infield("Install Hours", null, "width:25%;display:block", () => {this.Update();}, this.#timeContainer[1], false, 1);
-		this.#install_InstallDays = createInput_Infield("Install Days (8h)", null, "width:25%;display:block", () => {this.Update();}, this.#timeContainer[1], false, 1);
+		this.#install_InstallMinutes = createInput_Infield("Install Minutes", null, "width:25%;display:block;margin-left:40px;", () => {/*this.Update();*/}, this.#timeContainer[1], false, 10);
+		this.#install_InstallHours = createInput_Infield("Install Hours", null, "width:25%;display:block", () => {/*this.Update();*/}, this.#timeContainer[1], false, 1);
+		this.#install_InstallDays = createInput_Infield("Install Days (8h)", null, "width:25%;display:block", () => {/*this.Update();*/}, this.#timeContainer[1], false, 1);
 
 
 		///Quick Lookup

@@ -65,10 +65,12 @@ class Material extends SubscriptionManager {
       /*
                         
       START             */
-      constructor(parentContainer, lhsMenuWindow) {
+      constructor(parentContainer, lhsMenuWindow, options = {UPDATES_PAUSED: false}) {
             super();
             if(!lhsMenuWindow instanceof LHSMenuWindow) throw new Error('Parameter 2 must be an instance of LHSMenuWindow');
             this.#f_lhsMenuWindow = lhsMenuWindow;
+
+            this.UPDATES_PAUSED = options.UPDATES_PAUSED;
 
             this.#f_container = document.createElement("div");
             this.#f_container.style =
@@ -181,10 +183,8 @@ class Material extends SubscriptionManager {
             this.Minimize();
       }
 
-      /*
-      Override */
-      UpdateFromFields() {
-            super.UpdateFromFields();
+      /*overrides*/UpdateFromFields() {
+            if(this.UPDATES_PAUSED) return;
 
             this.UpdateSubscribedLabel();
             this.UpdateDebug();

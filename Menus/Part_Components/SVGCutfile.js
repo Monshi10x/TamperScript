@@ -76,10 +76,12 @@ class SVGCutfile extends SubscriptionManager {
       /*
                         
       Start             */
-      constructor(parentContainer, lhsMenuWindow) {
+      constructor(parentContainer, lhsMenuWindow, options = {UPDATES_PAUSED: false}) {
             super();
             if(!lhsMenuWindow instanceof LHSMenuWindow) throw new Error('Parameter 2 must be an instance of LHSMenuWindow');
             this.#f_lhsMenuWindow = lhsMenuWindow;
+
+            this.UPDATES_PAUSED = options.UPDATES_PAUSED;
 
             this.#f_container = document.createElement("div");
             this.#f_container.style =
@@ -235,7 +237,9 @@ class SVGCutfile extends SubscriptionManager {
             this.UpdateFromFields();
       }
 
-      UpdateFromFields() {
+      /*overrides*/UpdateFromFields() {
+            super.UpdateFromFields();
+
             this.UpdateWH();
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();

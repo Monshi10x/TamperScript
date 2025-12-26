@@ -422,7 +422,7 @@ class Leg {
 			this.legWidth +
 			(attachmentType == "3 Post, Front Frame, Front Sign" ? -this.legWidth : 0);
 
-		let signIsDoubleSided = this.signClass.signSides == "Double-sided";
+		let signIsDoubleSided = signClass.signSides == "Double-sided";
 
 		if(this.legHeight > 0) {
 			if(attachmentType == "1 Post, Front Frame, Front Sign") {

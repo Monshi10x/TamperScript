@@ -15,7 +15,7 @@ class LightboxMenu extends LHSMenuWindow {
         while(this.footer.hasChildNodes()) {this.footer.removeChild(this.footer.lastChild);}
 
         var lightboxContentContainer = document.createElement('div');
-        lightboxContentContainer.style = "z-index: 100; background-color: " + COLOUR.MediumGrey + "; color: white; width: 100%;min-height: 400px; max-height: 700px; overflow-y: scroll;";
+        lightboxContentContainer.style = "z-index: 100; background-color: " + COLOUR.MediumGrey + "; color: white; width: 100%;min-height: 400px; max-height: 100%; overflow-y: scroll;";
         page.appendChild(lightboxContentContainer);
 
         var distanceToOutsideBox = 0;
