@@ -76,6 +76,7 @@ class VehicleMenu extends LHSMenuWindow {
       #leftPane;
       #rightPane;
       #rowFieldCache = [];
+      #isDraggingRect = false;
       #state = {
             activeRectIndex: null,
             activeRectHandle: null,
@@ -750,12 +751,12 @@ class VehicleMenu extends LHSMenuWindow {
             this.#state.activeRectHandle = handleType;
             this.#state.dragStartMouse = {...this.#dragZoomSVG.relativeMouseXY};
             this.#state.dragStartRect = vehicle_cloneRect(this.rects[rectIndex]);
+            this.#isDraggingRect = true;
             this.#dragZoomSVG.svg.style.cursor = 'grabbing';
 
             const onMove = (e) => {
                   this.#dragZoomSVG.updateMouseXY(e);
                   this.#updateRectFromDrag(rectIndex);
-                  this.#syncRowFromRect(rectIndex);
                   this.refresh();
             };
             const onUp = () => {
@@ -765,7 +766,8 @@ class VehicleMenu extends LHSMenuWindow {
                   this.#state.activeRectHandle = null;
                   this.#state.dragStartMouse = null;
                   this.#state.dragStartRect = null;
-                  this.updateRectsFromFields();
+                  this.#syncRowFromRect(rectIndex);
+                  this.#isDraggingRect = false;
                   this.refresh();
                   this.#dragZoomSVG.svg.style.cursor = 'auto';
             };
@@ -813,7 +815,6 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       #updateRectFromDrag(index) {
-            console.time("updateRectFromDrag-total");
             const rect = this.rects[index];
             const startRect = this.#state.dragStartRect;
             const mouse = this.#dragZoomSVG.relativeMouseXY;
@@ -862,7 +863,6 @@ class VehicleMenu extends LHSMenuWindow {
             }
             rect.w = Math.max(rect.w, 1);
             rect.h = Math.max(rect.h, 1);
-            console.timeEnd("updateRectFromDrag-total");
       }
 
       #updateImageFromDrag(index) {
@@ -956,9 +956,9 @@ class VehicleMenu extends LHSMenuWindow {
                   const cache = this.#rowFieldCache[n];
                   if(!cache) continue;
                   this.rects[n].description = cache.description.value;
-                  this.rects[n].w = cache.width.valueAsNumber || parseFloat(cache.width.value) || this.rects[n].w;
-                  this.rects[n].h = cache.height.valueAsNumber || parseFloat(cache.height.value) || this.rects[n].h;
-                  this.rects[n].qty = cache.quantity.valueAsNumber || parseFloat(cache.quantity.value) || this.rects[n].qty;
+                  this.rects[n].w = cache.width.valueAsNumber || this.rects[n].w;
+                  this.rects[n].h = cache.height.valueAsNumber || this.rects[n].h;
+                  this.rects[n].qty = cache.quantity.valueAsNumber || this.rects[n].qty;
                   this.rects[n].appTape = cache.tape.value;
                   this.rects[n].vinyl = cache.vinyl.value;
                   this.rects[n].laminate = cache.laminate.value;
@@ -1066,7 +1066,6 @@ class VehicleMenu extends LHSMenuWindow {
             this.#ensureRowCache();
             const cache = this.#rowFieldCache[index];
             if(!cache) return;
-            console.time("syncRowFromRect");
             cache.description.value = this.rects[index].description;
             cache.quantity.value = this.rects[index].qty;
             cache.width.value = this.rects[index].w;
@@ -1074,7 +1073,6 @@ class VehicleMenu extends LHSMenuWindow {
             cache.tape.value = this.rects[index].appTape;
             cache.vinyl.value = this.rects[index].vinyl;
             cache.laminate.value = this.rects[index].laminate;
-            console.timeEnd("syncRowFromRect");
       }
 
       #handleContextMenu(event) {
