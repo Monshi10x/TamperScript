@@ -72,7 +72,7 @@ class VehicleMenu extends LHSMenuWindow {
       #svgLayers = {};
       #defs;
       #toastPosition = "top-right";
-      #layoutOrientation = "vertical";
+      #layoutOrientation = "horizontal";
       #leftPane;
       #rightPane;
       #rowFieldCache = [];
@@ -1068,8 +1068,8 @@ class VehicleMenu extends LHSMenuWindow {
             if(!cache) return;
             cache.description.value = this.rects[index].description;
             cache.quantity.value = this.rects[index].qty;
-            cache.width.value = this.rects[index].w;
-            cache.height.value = this.rects[index].h;
+            cache.width.value = roundNumber(this.rects[index].w, 1);
+            cache.height.value = roundNumber(this.rects[index].h, 1);
             cache.tape.value = this.rects[index].appTape;
             cache.vinyl.value = this.rects[index].vinyl;
             cache.laminate.value = this.rects[index].laminate;
@@ -1178,9 +1178,7 @@ class VehicleMenu extends LHSMenuWindow {
                   });
 
                   const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;margin:0;", () => {
-                        this.deleteRect(rectIndex);
                         VehicleMenu_Template.deleteRow(rectIndex);
-                        this.refresh();
                         closeCustomContextMenu();
                   });
 
