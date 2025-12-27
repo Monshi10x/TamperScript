@@ -430,6 +430,7 @@ class VehicleMenu extends LHSMenuWindow {
                   }));
                   VehicleMenu_Template.clearRows();
                   this.rects.forEach((item) => VehicleMenu_Template.addRow(vehicle_cloneRect(item)));
+                  this.updateFromTemplateFields();
 
                   VehicleMenu_Production.required = true;
                   VehicleMenu_Production.productionTime = VehicleMenu_Template.selectedTemplateData.production_time;
@@ -602,7 +603,7 @@ class VehicleMenu extends LHSMenuWindow {
                               height: imageObj.height,
                               'preserveAspectRatio': 'none',
                               transform: `matrix(${m11} ${m12} ${m21} ${m22} ${dx} ${dy})`,
-                              'clip-path': `url(#${clipId})`
+                              'clip-path': `url(${this.#dragZoomSVG.svg.baseURI}#${clipId})`
                         });
                         imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imageObj.src);
                         triGroup.appendChild(imgEl);
