@@ -987,6 +987,15 @@ class VehicleMenu extends LHSMenuWindow {
             this.refresh();
       }
 
+      #deleteRectAndRow(rowNumber) {
+            if(rowNumber === false || rowNumber === null || rowNumber === undefined) return;
+            this.rects.splice(rowNumber, 1);
+            const rows = VehicleMenu_Template?.l_itemsContainer ? VehicleMenu_Template.l_itemsContainer.querySelectorAll("#rowContainer") : [];
+            if(rows[rowNumber]) rows[rowNumber].remove();
+            this.#buildRowCache();
+            this.refresh();
+      }
+
       async addSkewableImages(xOffset, yOffset, srcArray, c1, c2, c3, c4) {
             for(let y = 0; y < srcArray.length; y++) {
                   const image = new Image();
@@ -1178,7 +1187,7 @@ class VehicleMenu extends LHSMenuWindow {
                   });
 
                   const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;margin:0;", () => {
-                        VehicleMenu_Template.deleteRow(rectIndex);
+                        this.#deleteRectAndRow(rectIndex);
                         closeCustomContextMenu();
                   });
 
