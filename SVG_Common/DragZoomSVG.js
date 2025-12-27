@@ -82,6 +82,7 @@ class DragZoomSVG {
 
             return svgClone.outerHTML;
       }
+      get panZoomInstance() {return this.#panZoomInstance;}
       /*
                         
       Setter            */
