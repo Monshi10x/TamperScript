@@ -75,6 +75,7 @@ class VehicleMenu extends LHSMenuWindow {
       #layoutOrientation = "vertical";
       #leftPane;
       #rightPane;
+      #rowFieldCache = [];
       #state = {
             activeRectIndex: null,
             activeRectHandle: null,
@@ -493,6 +494,7 @@ class VehicleMenu extends LHSMenuWindow {
                   VehicleMenu_Install.installRate = VehicleMenu_Template.selectedTemplateData.install_rate;
                   VehicleMenu_Install.installTotalEach = VehicleMenu_Template.selectedTemplateData.install_TE;
             }
+            this.#buildRowCache();
       }
 
       initBackground() {
@@ -741,7 +743,7 @@ class VehicleMenu extends LHSMenuWindow {
             const onMove = (e) => {
                   this.#dragZoomSVG.updateMouseXY(e);
                   this.#updateRectFromDrag(rectIndex);
-                  this.updateFromTemplateFields();
+                  this.#syncRowFromRect(rectIndex);
                   this.refresh();
             };
             const onUp = () => {
@@ -935,36 +937,39 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       updateRectsFromFields() {
+            this.#ensureRowCache();
             for(let n = 0; n < this.rects.length; n++) {
-                  const row = VehicleMenu_Template.contentContainer.querySelectorAll('#rowContainer')[n];
-                  if(!row) continue;
-                  this.rects[n].description = row.querySelector('#description').value;
-                  this.rects[n].w = roundNumber(parseFloat(row.querySelector('#width').value), 2);
-                  this.rects[n].h = roundNumber(parseFloat(row.querySelector('#height').value), 2);
-                  this.rects[n].qty = parseFloat(row.querySelector('#quantity').value);
-                  this.rects[n].appTape = row.querySelector('#tape').value;
-                  this.rects[n].vinyl = row.querySelector('#vinyl').value;
-                  this.rects[n].laminate = row.querySelector('#laminate').value;
+                  const cache = this.#rowFieldCache[n];
+                  if(!cache) continue;
+                  this.rects[n].description = cache.description.value;
+                  this.rects[n].w = roundNumber(parseFloat(cache.width.value), 2);
+                  this.rects[n].h = roundNumber(parseFloat(cache.height.value), 2);
+                  this.rects[n].qty = parseFloat(cache.quantity.value);
+                  this.rects[n].appTape = cache.tape.value;
+                  this.rects[n].vinyl = cache.vinyl.value;
+                  this.rects[n].laminate = cache.laminate.value;
             }
             this.refresh();
       }
 
       updateFromTemplateFields() {
+            this.#ensureRowCache();
             for(let n = 0; n < this.rects.length; n++) {
-                  const row = VehicleMenu_Template.contentContainer.querySelectorAll('#rowContainer')[n];
-                  if(!row) continue;
-                  row.querySelector('#description').value = this.rects[n].description;
-                  row.querySelector('#quantity').value = parseFloat(this.rects[n].qty);
-                  row.querySelector('#width').value = roundNumber(parseFloat(this.rects[n].w), 2);
-                  row.querySelector('#height').value = roundNumber(parseFloat(this.rects[n].h), 2);
-                  row.querySelector('#tape').value = this.rects[n].appTape;
-                  row.querySelector('#vinyl').value = this.rects[n].vinyl;
-                  row.querySelector('#laminate').value = this.rects[n].laminate;
+                  const cache = this.#rowFieldCache[n];
+                  if(!cache) continue;
+                  cache.description.value = this.rects[n].description;
+                  cache.quantity.value = parseFloat(this.rects[n].qty);
+                  cache.width.value = roundNumber(parseFloat(this.rects[n].w), 2);
+                  cache.height.value = roundNumber(parseFloat(this.rects[n].h), 2);
+                  cache.tape.value = this.rects[n].appTape;
+                  cache.vinyl.value = this.rects[n].vinyl;
+                  cache.laminate.value = this.rects[n].laminate;
             }
       }
 
       deleteRect(rowNumber) {
             this.rects.splice(rowNumber, 1);
+            this.#buildRowCache();
             this.refresh();
       }
 
@@ -1020,6 +1025,40 @@ class VehicleMenu extends LHSMenuWindow {
             item.qty = item.qty || 1;
             item.description = item.description || "";
             item.colour = item.colour || COLOUR.Blue;
+      }
+
+      #buildRowCache() {
+            this.#rowFieldCache = [];
+            const rows = VehicleMenu_Template.contentContainer ? VehicleMenu_Template.contentContainer.querySelectorAll("#rowContainer") : [];
+            rows.forEach((row) => {
+                  this.#rowFieldCache.push({
+                        description: row.querySelector('#description'),
+                        quantity: row.querySelector('#quantity'),
+                        width: row.querySelector('#width'),
+                        height: row.querySelector('#height'),
+                        tape: row.querySelector('#tape'),
+                        vinyl: row.querySelector('#vinyl'),
+                        laminate: row.querySelector('#laminate')
+                  });
+            });
+      }
+
+      #ensureRowCache() {
+            const rows = VehicleMenu_Template.contentContainer ? VehicleMenu_Template.contentContainer.querySelectorAll("#rowContainer") : [];
+            if(rows.length !== this.#rowFieldCache.length) this.#buildRowCache();
+      }
+
+      #syncRowFromRect(index) {
+            this.#ensureRowCache();
+            const cache = this.#rowFieldCache[index];
+            if(!cache) return;
+            cache.description.value = this.rects[index].description;
+            cache.quantity.value = parseFloat(this.rects[index].qty);
+            cache.width.value = roundNumber(parseFloat(this.rects[index].w), 2);
+            cache.height.value = roundNumber(parseFloat(this.rects[index].h), 2);
+            cache.tape.value = this.rects[index].appTape;
+            cache.vinyl.value = this.rects[index].vinyl;
+            cache.laminate.value = this.rects[index].laminate;
       }
 
       #handleContextMenu(event) {
