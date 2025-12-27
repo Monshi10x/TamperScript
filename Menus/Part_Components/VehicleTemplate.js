@@ -416,8 +416,8 @@ class VehicleMenu extends LHSMenuWindow {
                   VehicleMenu_Template.clearRows();
             } else {
                   this.rects = VehicleMenu_Template.selectedTemplateData.template_rects.map((rect) => ({
-                        x: 6152.058116005365,
-                        y: 3630.7737281592413,
+                        x: parseFloat(rect.x),
+                        y: parseFloat(rect.y),
                         w: roundNumber(parseFloat(rect.w), 2),
                         h: roundNumber(parseFloat(rect.h), 2),
                         qty: parseFloat(rect.qty),
@@ -496,6 +496,8 @@ class VehicleMenu extends LHSMenuWindow {
                   });
                   rectEl.addEventListener('mousedown', (e) => this.#startRectDrag(e, index, 'center'));
                   rectEl.addEventListener('click', (e) => {e.stopPropagation(); this.#selectRect(index);});
+                  rectEl.addEventListener('mouseenter', () => {this.#dragZoomSVG.svg.style.cursor = 'grab';});
+                  rectEl.addEventListener('mouseleave', () => {this.#dragZoomSVG.svg.style.cursor = 'auto';});
                   this.#svgLayers.rects.appendChild(rectEl);
 
                   if(this.#showDescription && rect.description) {
@@ -505,7 +507,8 @@ class VehicleMenu extends LHSMenuWindow {
                               'text-anchor': 'middle',
                               'alignment-baseline': 'middle',
                               'font-size': `${textSize}px`,
-                              fill: COLOUR.Black
+                              fill: COLOUR.Black,
+                              'pointer-events': 'none'
                         });
                         text.textContent = rect.description;
                         this.#svgLayers.labels.appendChild(text);
@@ -518,7 +521,8 @@ class VehicleMenu extends LHSMenuWindow {
                               'text-anchor': 'middle',
                               'alignment-baseline': 'hanging',
                               'font-size': `${textSize}px`,
-                              fill: COLOUR.Black
+                              fill: COLOUR.Black,
+                              'pointer-events': 'none'
                         });
                         qtyText.textContent = `x${rect.qty}`;
                         this.#svgLayers.labels.appendChild(qtyText);
@@ -528,6 +532,9 @@ class VehicleMenu extends LHSMenuWindow {
                         new TSVGMeasurement(this.#svgLayers.measures, {
                               target: rectEl,
                               direction: 'both',
+                              sides: ['top', 'left'],
+                              autoLabel: true,
+                              unit: 'mm',
                               scale: 1,
                               precision: 1,
                               arrowSize: 10 / scale,
@@ -544,16 +551,29 @@ class VehicleMenu extends LHSMenuWindow {
                   if(this.#state.activeRectIndex === index) {
                         VEHICLE_HANDLE_TYPES.forEach((handleType) => {
                               const pos = this.#getHandlePosition(rect, handleType);
+                              const isActive = this.#state.activeRectHandle === handleType;
+                              const baseFill = isActive ? (COLOUR.DarkBlue || '#00008b') : COLOUR.Blue;
+                              const baseRadius = isActive ? handleRadius * 1.3 : handleRadius;
                               const handle = vehicle_createSvgElement('circle', {
                                     cx: pos.x,
                                     cy: pos.y,
-                                    r: handleRadius,
-                                    fill: COLOUR.Blue,
+                                    r: baseRadius,
+                                    fill: baseFill,
                                     'fill-opacity': 0.8,
                                     stroke: COLOUR.Black,
                                     'stroke-width': 1 / scale
                               });
                               handle.addEventListener('mousedown', (e) => this.#startRectDrag(e, index, handleType));
+                              handle.addEventListener('mouseenter', () => {
+                                    handle.setAttribute('fill', COLOUR.DarkBlue || '#0000aa');
+                                    handle.setAttribute('r', handleRadius * 1.2);
+                                    this.#dragZoomSVG.svg.style.cursor = 'grab';
+                              });
+                              handle.addEventListener('mouseleave', () => {
+                                    handle.setAttribute('fill', baseFill);
+                                    handle.setAttribute('r', baseRadius);
+                                    this.#dragZoomSVG.svg.style.cursor = 'auto';
+                              });
                               this.#svgLayers.handles.appendChild(handle);
                         });
                   }
@@ -564,26 +584,27 @@ class VehicleMenu extends LHSMenuWindow {
             const scale = this.#dragZoomSVG.scale || 1;
             const handleRadius = 8 / scale;
 
-            this.#images.forEach((imageObj, imgIndex) => {
-                  const triGroup = vehicle_createSvgElement('g');
-                  const clipIds = [];
-                  this.#triangles[imgIndex].forEach((tri, idx) => {
-                        const clipId = `vehicle-img-${imgIndex}-tri-${idx}-${this.#dragZoomSVG.svg.id}-${Math.random().toString(36).substr(2, 5)}`;
-                        clipIds.push(clipId);
-                        const clip = vehicle_createSvgElement('clipPath', {id: clipId});
-                        const poly = vehicle_createSvgElement('polygon', {points: `${tri.p0.x},${tri.p0.y} ${tri.p1.x},${tri.p1.y} ${tri.p2.x},${tri.p2.y}`});
-                        clip.appendChild(poly);
-                        this.#defs.appendChild(clip);
+                  this.#images.forEach((imageObj, imgIndex) => {
+                        const triGroup = vehicle_createSvgElement('g');
+                        const clipIds = [];
+                        this.#triangles[imgIndex].forEach((tri, idx) => {
+                              const clipId = `vehicle-img-${imgIndex}-tri-${idx}-${this.#dragZoomSVG.svg.id}-${Math.random().toString(36).substr(2, 5)}`;
+                              clipIds.push(clipId);
+                              const clip = vehicle_createSvgElement('clipPath', {id: clipId});
+                              const poly = vehicle_createSvgElement('polygon', {points: `${tri.p0.x},${tri.p0.y} ${tri.p1.x},${tri.p1.y} ${tri.p2.x},${tri.p2.y}`});
+                              clip.setAttribute('clipPathUnits', 'userSpaceOnUse');
+                              clip.appendChild(poly);
+                              this.#defs.appendChild(clip);
 
                         const {m11, m12, m21, m22, dx, dy} = this.#getTriangleTransform(tri);
                         const imgEl = vehicle_createSvgElement('image', {
-                              href: imageObj.src,
                               width: imageObj.width,
                               height: imageObj.height,
                               'preserveAspectRatio': 'none',
                               transform: `matrix(${m11} ${m12} ${m21} ${m22} ${dx} ${dy})`,
                               'clip-path': `url(#${clipId})`
                         });
+                        imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imageObj.src);
                         triGroup.appendChild(imgEl);
                   });
                   this.#svgLayers.images.appendChild(triGroup);
@@ -596,19 +617,34 @@ class VehicleMenu extends LHSMenuWindow {
                         'stroke-dasharray': '6 4'
                   });
                   outline.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, 'center'));
+                  outline.addEventListener('mouseenter', () => {this.#dragZoomSVG.svg.style.cursor = 'grab';});
+                  outline.addEventListener('mouseleave', () => {this.#dragZoomSVG.svg.style.cursor = 'auto';});
                   this.#svgLayers.images.appendChild(outline);
 
                   if(this.#state.activeImageIndex === imgIndex) {
                         imageObj.corners.forEach((corner, cornerIndex) => {
+                              const isActive = this.#state.activeImageHandle === cornerIndex;
+                              const baseFill = isActive ? (COLOUR.DarkBlue || '#00008b') : COLOUR.Blue;
+                              const baseRadius = isActive ? handleRadius * 1.3 : handleRadius;
                               const handle = vehicle_createSvgElement('circle', {
                                     cx: corner.x,
                                     cy: corner.y,
-                                    r: handleRadius,
-                                    fill: COLOUR.Blue,
+                                    r: baseRadius,
+                                    fill: baseFill,
                                     stroke: COLOUR.Black,
                                     'stroke-width': 1 / scale
                               });
                               handle.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, cornerIndex));
+                              handle.addEventListener('mouseenter', () => {
+                                    handle.setAttribute('fill', COLOUR.DarkBlue || '#0000aa');
+                                    handle.setAttribute('r', handleRadius * 1.2);
+                                    this.#dragZoomSVG.svg.style.cursor = 'grab';
+                              });
+                              handle.addEventListener('mouseleave', () => {
+                                    handle.setAttribute('fill', baseFill);
+                                    handle.setAttribute('r', baseRadius);
+                                    this.#dragZoomSVG.svg.style.cursor = 'auto';
+                              });
                               this.#svgLayers.handles.appendChild(handle);
                         });
                   }
@@ -625,6 +661,7 @@ class VehicleMenu extends LHSMenuWindow {
             this.#state.activeRectHandle = handleType;
             this.#state.dragStartMouse = {...this.#dragZoomSVG.relativeMouseXY};
             this.#state.dragStartRect = vehicle_cloneRect(this.rects[rectIndex]);
+            this.#dragZoomSVG.svg.style.cursor = 'grabbing';
 
             const onMove = (e) => {
                   this.#dragZoomSVG.updateMouseXY(e);
@@ -641,6 +678,7 @@ class VehicleMenu extends LHSMenuWindow {
                   this.#state.dragStartRect = null;
                   this.updateRectsFromFields();
                   this.refresh();
+                  this.#dragZoomSVG.svg.style.cursor = 'auto';
             };
 
             window.addEventListener('mousemove', onMove);
@@ -657,6 +695,7 @@ class VehicleMenu extends LHSMenuWindow {
             this.#state.activeImageHandle = cornerIndex;
             this.#state.dragStartMouse = {...this.#dragZoomSVG.relativeMouseXY};
             this.#state.dragStartCorners = this.#images[imageIndex].corners.map(c => ({...c}));
+            this.#dragZoomSVG.svg.style.cursor = 'grabbing';
 
             const onMove = (e) => {
                   this.#dragZoomSVG.updateMouseXY(e);
@@ -671,6 +710,7 @@ class VehicleMenu extends LHSMenuWindow {
                   this.#state.dragStartMouse = null;
                   this.#state.dragStartCorners = null;
                   this.refresh();
+                  this.#dragZoomSVG.svg.style.cursor = 'auto';
             };
 
             window.addEventListener('mousemove', onMove);
@@ -817,8 +857,8 @@ class VehicleMenu extends LHSMenuWindow {
                   const height = isSVG ? heightMM : image.height;
 
                   const center = this.#getCenterPosReal();
-                  const defaultX = xOffset || center.x - width / 2;
-                  const defaultY = yOffset || center.y - height / 2;
+                  const defaultX = (xOffset ?? center.x - width / 2);
+                  const defaultY = (yOffset ?? center.y - height / 2);
 
                   const corners = c1 && c2 && c3 && c4 ? [c1, c2, c3, c4] : [
                         {x: defaultX, y: defaultY},
