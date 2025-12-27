@@ -98,6 +98,12 @@ class VehicleMenu extends LHSMenuWindow {
       #showMeasures = false;
       #showQuantity = true;
       #showDescription = true;
+      #showBackground = true;
+      #showImages = true;
+      #showRectangles = true;
+      #showHandles = true;
+
+      #onKeyDownHandler = (event) => {this.#handleKeyDown(event);};
 
       constructor(width, height, ID, windowTitle) {
             super(width, height, ID, windowTitle);
@@ -109,6 +115,7 @@ class VehicleMenu extends LHSMenuWindow {
             super.show();
             super.clearPages();
             super.clearFooter();
+            document.addEventListener('keydown', this.#onKeyDownHandler);
             this.createContent();
       }
 
@@ -124,6 +131,8 @@ class VehicleMenu extends LHSMenuWindow {
                   dragStartImage: null,
                   dragStartImageOffset: null
             };
+
+            document.removeEventListener('keydown', this.#onKeyDownHandler);
 
             super.hide();
       }
@@ -374,6 +383,10 @@ class VehicleMenu extends LHSMenuWindow {
             const measuresCkb = createCheckbox_Infield("Show Measurements", this.#showMeasures, "width: 200px;", () => {this.#showMeasures = measuresCkb[1].checked; this.refresh();}, footer);
             const qtyCkb = createCheckbox_Infield("Show Quantity", this.#showQuantity, "width: 200px;", () => {this.#showQuantity = qtyCkb[1].checked; this.refresh();}, footer);
             const descriptionCkb = createCheckbox_Infield("Show Description", this.#showDescription, "width: 200px;", () => {this.#showDescription = descriptionCkb[1].checked; this.refresh();}, footer);
+            const backgroundCkb = createCheckbox_Infield("Show Background", this.#showBackground, "width: 200px;", () => {this.#showBackground = backgroundCkb[1].checked; this.refresh();}, footer);
+            const imagesCkb = createCheckbox_Infield("Show Images", this.#showImages, "width: 200px;", () => {this.#showImages = imagesCkb[1].checked; this.refresh();}, footer);
+            const rectanglesCkb = createCheckbox_Infield("Show Rectangles", this.#showRectangles, "width: 200px;", () => {this.#showRectangles = rectanglesCkb[1].checked; this.refresh();}, footer);
+            const handlesCkb = createCheckbox_Infield("Show Handles", this.#showHandles, "width: 200px;", () => {this.#showHandles = handlesCkb[1].checked; this.refresh();}, footer);
             const layoutToggle = createDropdown_Infield("Layout", 0, "width: 200px;", [createDropdownOption("Vertical Split", "vertical"), createDropdownOption("Horizontal Split", "horizontal")], () => {
                   this.#layoutOrientation = layoutToggle[1].value === "horizontal" ? "horizontal" : "vertical";
                   this.#applyLayout();
@@ -541,8 +554,23 @@ class VehicleMenu extends LHSMenuWindow {
             this.#svgLayers.labels.innerHTML = "";
             this.#svgLayers.measures.innerHTML = "";
 
-            this.#renderImages();
-            this.#renderRects();
+            this.#applyLayerVisibility();
+
+            if(this.#showImages) this.#renderImages();
+            if(this.#showRectangles) this.#renderRects();
+      }
+
+      #applyLayerVisibility() {
+            const setDisplay = (layer, isVisible) => {
+                  if(layer) layer.setAttribute('display', isVisible ? 'inline' : 'none');
+            };
+
+            setDisplay(this.#svgLayers.background, this.#showBackground);
+            setDisplay(this.#svgLayers.images, this.#showImages);
+            setDisplay(this.#svgLayers.rects, this.#showRectangles);
+            setDisplay(this.#svgLayers.labels, this.#showRectangles && (this.#showDescription || this.#showQuantity));
+            setDisplay(this.#svgLayers.handles, this.#showHandles);
+            setDisplay(this.#svgLayers.measures, this.#showMeasures);
       }
 
       #renderRects() {
@@ -621,7 +649,7 @@ class VehicleMenu extends LHSMenuWindow {
                         });
                   }
 
-                  if(this.#state.activeRectIndex === index) {
+                  if(this.#state.activeRectIndex === index && this.#showHandles) {
                         VEHICLE_HANDLE_TYPES.forEach((handleType) => {
                               const pos = this.#getHandlePosition(rect, handleType);
                               const isActive = this.#state.activeRectHandle === handleType;
@@ -709,7 +737,7 @@ class VehicleMenu extends LHSMenuWindow {
                   overlay.addEventListener('mouseleave', () => {this.#dragZoomSVG.svg.style.cursor = 'auto';});
                   this.#svgLayers.images.appendChild(overlay);
 
-                  if(this.#state.activeImageIndex === imgIndex) {
+                  if(this.#state.activeImageIndex === imgIndex && this.#showHandles) {
                         VEHICLE_HANDLE_TYPES.forEach((handleType) => {
                               const pos = this.#getImageHandlePosition(imageObj, handleType);
                               const isActive = this.#state.activeImageHandle === handleType;
@@ -992,6 +1020,8 @@ class VehicleMenu extends LHSMenuWindow {
             this.rects.splice(rowNumber, 1);
             const rows = VehicleMenu_Template?.l_itemsContainer ? VehicleMenu_Template.l_itemsContainer.querySelectorAll("#rowContainer") : [];
             if(rows[rowNumber]) rows[rowNumber].remove();
+            this.#state.activeRectIndex = null;
+            this.#state.activeRectHandle = null;
             this.#buildRowCache();
             this.refresh();
       }
@@ -1319,6 +1349,18 @@ class VehicleMenu extends LHSMenuWindow {
                   if(xPos >= img.x && xPos <= img.x + img.w && yPos >= img.y && yPos <= img.y + img.h) return s;
             }
             return false;
+      }
+
+      #handleKeyDown(event) {
+            if(event.key !== "Delete" && event.key !== "Backspace") return;
+
+            const targetTag = (event.target && event.target.tagName) ? event.target.tagName.toLowerCase() : "";
+            if(["input", "textarea", "select"].includes(targetTag) || event.target?.isContentEditable) return;
+
+            if(this.#state.activeRectIndex !== null && this.#state.activeRectIndex !== undefined) {
+                  event.preventDefault();
+                  this.#deleteRectAndRow(this.#state.activeRectIndex);
+            }
       }
 
       #setQtyRect(shapeIndex) {
