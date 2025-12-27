@@ -72,7 +72,7 @@ class VehicleMenu extends LHSMenuWindow {
       #svgLayers = {};
       #defs;
       #toastPosition = "top-right";
-      #layoutOrientation = "horizontal";
+      #layoutOrientation = "vertical";
       #leftPane;
       #rightPane;
       #rowFieldCache = [];
