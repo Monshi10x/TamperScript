@@ -68,7 +68,8 @@ class VehicleMenu extends LHSMenuWindow {
             activeImageHandle: null,
             dragStartMouse: null,
             dragStartRect: null,
-            dragStartImage: null
+            dragStartImage: null,
+            dragStartImageOffset: null
       };
       #images = [];
       #copiedImage = null;
@@ -102,7 +103,8 @@ class VehicleMenu extends LHSMenuWindow {
                   activeImageHandle: null,
                   dragStartMouse: null,
                   dragStartRect: null,
-                  dragStartImage: null
+                  dragStartImage: null,
+                  dragStartImageOffset: null
             };
 
             super.hide();
@@ -494,8 +496,14 @@ class VehicleMenu extends LHSMenuWindow {
                   });
                   rectEl.addEventListener('mousedown', (e) => this.#startRectDrag(e, index, 'center'));
                   rectEl.addEventListener('click', (e) => {e.stopPropagation(); this.#selectRect(index);});
-                  rectEl.addEventListener('mouseenter', () => {this.#dragZoomSVG.svg.style.cursor = 'grab';});
-                  rectEl.addEventListener('mouseleave', () => {this.#dragZoomSVG.svg.style.cursor = 'auto';});
+                  rectEl.addEventListener('mouseenter', () => {
+                        rectEl.setAttribute('stroke-width', 2 / scale);
+                        this.#dragZoomSVG.svg.style.cursor = 'grab';
+                  });
+                  rectEl.addEventListener('mouseleave', () => {
+                        rectEl.setAttribute('stroke-width', 1 / scale);
+                        this.#dragZoomSVG.svg.style.cursor = 'auto';
+                  });
                   this.#svgLayers.rects.appendChild(rectEl);
 
                   if(this.#showDescription && rect.description) {
@@ -615,6 +623,25 @@ class VehicleMenu extends LHSMenuWindow {
                   outline.addEventListener('mouseleave', () => {this.#dragZoomSVG.svg.style.cursor = 'auto';});
                   this.#svgLayers.images.appendChild(outline);
 
+                  const overlay = vehicle_createSvgElement('rect', {
+                        x: imageObj.x,
+                        y: imageObj.y,
+                        width: imageObj.w,
+                        height: imageObj.h,
+                        fill: 'transparent'
+                  });
+                  overlay.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, 'grabbable'));
+                  overlay.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.#state.activeImageIndex = imgIndex;
+                        this.#state.activeImageHandle = null;
+                        this.#state.activeRectIndex = null;
+                        this.refresh();
+                  });
+                  overlay.addEventListener('mouseenter', () => {this.#dragZoomSVG.svg.style.cursor = 'grab';});
+                  overlay.addEventListener('mouseleave', () => {this.#dragZoomSVG.svg.style.cursor = 'auto';});
+                  this.#svgLayers.images.appendChild(overlay);
+
                   if(this.#state.activeImageIndex === imgIndex) {
                         VEHICLE_HANDLE_TYPES.forEach((handleType) => {
                               const pos = this.#getImageHandlePosition(imageObj, handleType);
@@ -692,6 +719,10 @@ class VehicleMenu extends LHSMenuWindow {
             this.#state.activeImageHandle = cornerIndex;
             this.#state.dragStartMouse = {...this.#dragZoomSVG.relativeMouseXY};
             this.#state.dragStartImage = vehicle_cloneRect(this.#images[imageIndex]);
+            this.#state.dragStartImageOffset = {
+                  dx: this.#dragZoomSVG.relativeMouseXY.x - this.#images[imageIndex].x,
+                  dy: this.#dragZoomSVG.relativeMouseXY.y - this.#images[imageIndex].y
+            };
             this.#dragZoomSVG.svg.style.cursor = 'grabbing';
 
             const onMove = (e) => {
@@ -706,6 +737,7 @@ class VehicleMenu extends LHSMenuWindow {
                   this.#state.activeImageHandle = null;
                   this.#state.dragStartMouse = null;
                   this.#state.dragStartImage = null;
+                  this.#state.dragStartImageOffset = null;
                   this.refresh();
                   this.#dragZoomSVG.svg.style.cursor = 'auto';
             };
@@ -773,6 +805,10 @@ class VehicleMenu extends LHSMenuWindow {
             const dy = mouse.y - this.#state.dragStartMouse.y;
 
             switch(this.#state.activeImageHandle) {
+                  case 'grabbable':
+                        image.x = mouse.x - this.#state.dragStartImageOffset.dx;
+                        image.y = mouse.y - this.#state.dragStartImageOffset.dy;
+                        break;
                   case 'topleft':
                         image.x = start.x + dx;
                         image.y = start.y + dy;
@@ -942,33 +978,7 @@ class VehicleMenu extends LHSMenuWindow {
             const rectIndex = this.#getRectAtPosition(pos.x, pos.y);
             const imageIndex = this.#getSkewRectAtPosition(pos.x, pos.y);
 
-            const items = [];
-            if(rectIndex !== false && rectIndex !== null) {
-                  items.push(
-                        newContextItem("Delete", () => {this.deleteRect(rectIndex); VehicleMenu_Template.deleteRow(rectIndex); this.refresh();}),
-                        newContextItem("Set Qty", () => this.#setQtyRect(rectIndex)),
-                        newContextItem("Set Size", () => this.#setSizeRect(rectIndex)),
-                        newContextItem("Set Description", () => this.#setDescriptionRect(rectIndex)),
-                        newContextItem("Set is RTA", () => this.#setIsRTARect(rectIndex)),
-                        newContextSubdivision(),
-                        newContextItem("Reverse Engineer Scale", () => this.#getScaleRect(rectIndex))
-                  );
-            } else if(imageIndex !== false && imageIndex !== null) {
-                  items.push(
-                        newContextItem("Delete", () => this.#deleteSkewableRect(imageIndex)),
-                        newContextItem("Scale", () => this.#scaleSkewableRect(imageIndex)),
-                        newContextItem("Copy", () => this.#copySkewableRect(imageIndex)),
-                        newContextItem("Paste", () => this.#pasteSkewableRect(pos.x, pos.y)),
-                        newContextSubdivision(),
-                        newContextItem("Reset Skew and Scale", () => this.#resetSkewableRect(imageIndex)),
-                        newContextItem("Reset View and Origin", () => this.resetView()),
-                        newContextSubdivision(),
-                        newContextItem("Save To File", () => this.#saveSkewableImageToFile(imageIndex)),
-                        newContextItemFile("Open From File", (e) => this.#openSkewableImageFromFile(e, pos.x, pos.y))
-                  );
-            }
-
-            if(items.length === 0) return;
+            if(rectIndex === false && imageIndex === false) return;
 
             if(!customContextMenuContainer) initCustomContextMenu();
             setFieldHidden(false, customContextMenuContainer);
@@ -978,7 +988,110 @@ class VehicleMenu extends LHSMenuWindow {
             removeAllChildrenFromParent(customContextMenuContainer);
             const closeBtn = createButton("X", "background-color:red;width:20px;height:20px;position:absolute;top:-21px;right:0;margin:0px;min-height:20px;border:0px;", closeCustomContextMenu);
             customContextMenuContainer.appendChild(closeBtn);
-            items.forEach((i) => customContextMenuContainer.appendChild(i));
+
+            const panel = document.createElement('div');
+            panel.style = "padding:10px;display:flex;flex-direction:column;gap:6px;color:white;background-color:" + COLOUR.DarkGrey + ";min-width:260px;";
+
+            if(rectIndex !== false && rectIndex !== null) {
+                  const rect = this.rects[rectIndex];
+                  const title = createText("Rectangle Options", "color:white;font-weight:bold;margin:0;");
+                  panel.appendChild(title);
+
+                  const desc = createInput_Infield("Description", rect.description, null, null, null, false)[1];
+                  const qty = createInput_Infield("Qty", rect.qty, null, null, null, false, 1)[1];
+                  const width = createInput_Infield("Width", rect.w, null, null, null, false, 1)[1];
+                  const height = createInput_Infield("Height", rect.h, null, null, null, false, 1)[1];
+                  const rta = createCheckbox_Infield("Is RTA", rect.appTape !== "None", null, null, null)[1];
+
+                  [desc, qty, width, height, rta].forEach(el => {el.style.width = "100%";});
+
+                  const scaleW = createInput_Infield("Target Width", rect.w, null, null, null, false, 1)[1];
+                  const scaleH = createInput_Infield("Target Height", rect.h, null, null, null, false, 1)[1];
+                  scaleW.style.width = "100%";
+                  scaleH.style.width = "100%";
+
+                  const applyBtn = createButton("Apply", "width:100%;", () => {
+                        rect.description = desc.value;
+                        rect.qty = parseFloat(qty.value || rect.qty);
+                        rect.w = parseFloat(width.value || rect.w);
+                        rect.h = parseFloat(height.value || rect.h);
+                        rect.appTape = rta.checked ? AppTapeLookup["Medium Tack"] : "None";
+                        this.refresh();
+                        this.updateFromTemplateFields();
+                  });
+
+                  const scaleBtn = createButton("Calc Scale", "width:100%;", () => {
+                        const targetW = parseFloat(scaleW.value || rect.w);
+                        const targetH = parseFloat(scaleH.value || rect.h);
+                        const scaleResultW = targetW / rect.w;
+                        const scaleResultH = targetH / rect.h;
+                        scaleW.value = targetW;
+                        scaleH.value = targetH;
+                        alert(`Width scale: ${scaleResultW.toFixed(3)} | Height scale: ${scaleResultH.toFixed(3)}`);
+                  });
+
+                  const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;", () => {
+                        this.deleteRect(rectIndex);
+                        VehicleMenu_Template.deleteRow(rectIndex);
+                        this.refresh();
+                        closeCustomContextMenu();
+                  });
+
+                  panel.appendChild(desc.parentElement);
+                  panel.appendChild(qty.parentElement);
+                  panel.appendChild(width.parentElement);
+                  panel.appendChild(height.parentElement);
+                  panel.appendChild(rta.parentElement);
+                  panel.appendChild(scaleW.parentElement);
+                  panel.appendChild(scaleH.parentElement);
+                  panel.appendChild(applyBtn);
+                  panel.appendChild(scaleBtn);
+                  panel.appendChild(deleteBtn);
+            } else if(imageIndex !== false && imageIndex !== null) {
+                  const img = this.#images[imageIndex];
+                  const title = createText("Image Options", "color:white;font-weight:bold;margin:0;");
+                  panel.appendChild(title);
+
+                  const width = createInput_Infield("Width", img.w, null, null, null, false, 1)[1];
+                  const height = createInput_Infield("Height", img.h, null, null, null, false, 1)[1];
+                  [width, height].forEach(el => {el.style.width = "100%";});
+
+                  const applyBtn = createButton("Apply Size", "width:100%;", () => {
+                        img.w = parseFloat(width.value || img.w);
+                        img.h = parseFloat(height.value || img.h);
+                        this.refresh();
+                  });
+
+                  const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;", () => {
+                        this.#deleteSkewableRect(imageIndex);
+                        closeCustomContextMenu();
+                  });
+
+                  const copyBtn = createButton("Copy", "width:100%;", () => {this.#copySkewableRect(imageIndex);});
+                  const pasteBtn = createButton("Paste", "width:100%;", () => {this.#pasteSkewableRect(pos.x, pos.y); this.refresh();});
+                  const resetBtn = createButton("Reset Size", "width:100%;", () => {this.#resetSkewableRect(imageIndex);});
+                  const saveBtn = createButton("Save To File", "width:100%;", () => {this.#saveSkewableImageToFile(imageIndex);});
+
+                  const fileInput = document.createElement('input');
+                  fileInput.type = "file";
+                  fileInput.accept = ".txt,text/plain";
+                  fileInput.style.display = "none";
+                  fileInput.addEventListener('change', (e) => {this.#openSkewableImageFromFile(e, pos.x, pos.y);});
+                  const loadBtn = createButton("Open From File", "width:100%;", () => {fileInput.click();});
+
+                  panel.appendChild(width.parentElement);
+                  panel.appendChild(height.parentElement);
+                  panel.appendChild(applyBtn);
+                  panel.appendChild(copyBtn);
+                  panel.appendChild(pasteBtn);
+                  panel.appendChild(resetBtn);
+                  panel.appendChild(saveBtn);
+                  panel.appendChild(loadBtn);
+                  panel.appendChild(fileInput);
+                  panel.appendChild(deleteBtn);
+            }
+
+            customContextMenuContainer.appendChild(panel);
       }
 
       resetView() {
