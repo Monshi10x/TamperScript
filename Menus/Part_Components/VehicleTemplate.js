@@ -68,10 +68,9 @@ class VehicleMenu extends LHSMenuWindow {
             activeImageHandle: null,
             dragStartMouse: null,
             dragStartRect: null,
-            dragStartCorners: null
+            dragStartImage: null
       };
       #images = [];
-      #triangles = [];
       #copiedImage = null;
 
       #canvasWidth = 1000;
@@ -430,6 +429,7 @@ class VehicleMenu extends LHSMenuWindow {
                   }));
                   VehicleMenu_Template.clearRows();
                   this.rects.forEach((item) => VehicleMenu_Template.addRow(vehicle_cloneRect(item)));
+                  this.updateFromTemplateFields();
 
                   VehicleMenu_Production.required = true;
                   VehicleMenu_Production.productionTime = VehicleMenu_Template.selectedTemplateData.production_time;
@@ -584,33 +584,22 @@ class VehicleMenu extends LHSMenuWindow {
             const scale = this.#dragZoomSVG.scale || 1;
             const handleRadius = 8 / scale;
 
-                  this.#images.forEach((imageObj, imgIndex) => {
-                        const triGroup = vehicle_createSvgElement('g');
-                        const clipIds = [];
-                        this.#triangles[imgIndex].forEach((tri, idx) => {
-                              const clipId = `vehicle-img-${imgIndex}-tri-${idx}-${this.#dragZoomSVG.svg.id}-${Math.random().toString(36).substr(2, 5)}`;
-                              clipIds.push(clipId);
-                              const clip = vehicle_createSvgElement('clipPath', {id: clipId});
-                              const poly = vehicle_createSvgElement('polygon', {points: `${tri.p0.x},${tri.p0.y} ${tri.p1.x},${tri.p1.y} ${tri.p2.x},${tri.p2.y}`});
-                              clip.setAttribute('clipPathUnits', 'userSpaceOnUse');
-                              clip.appendChild(poly);
-                              this.#defs.appendChild(clip);
-
-                        const {m11, m12, m21, m22, dx, dy} = this.#getTriangleTransform(tri);
-                        const imgEl = vehicle_createSvgElement('image', {
-                              width: imageObj.width,
-                              height: imageObj.height,
-                              'preserveAspectRatio': 'none',
-                              transform: `matrix(${m11} ${m12} ${m21} ${m22} ${dx} ${dy})`,
-                              'clip-path': `url(#${clipId})`
-                        });
-                        imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imageObj.src);
-                        triGroup.appendChild(imgEl);
+            this.#images.forEach((imageObj, imgIndex) => {
+                  const imgEl = vehicle_createSvgElement('image', {
+                        x: imageObj.x,
+                        y: imageObj.y,
+                        width: imageObj.w,
+                        height: imageObj.h,
+                        'preserveAspectRatio': 'none'
                   });
-                  this.#svgLayers.images.appendChild(triGroup);
+                  imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imageObj.src);
+                  this.#svgLayers.images.appendChild(imgEl);
 
-                  const outline = vehicle_createSvgElement('polygon', {
-                        points: imageObj.corners.map(c => `${c.x},${c.y}`).join(' '),
+                  const outline = vehicle_createSvgElement('rect', {
+                        x: imageObj.x,
+                        y: imageObj.y,
+                        width: imageObj.w,
+                        height: imageObj.h,
                         fill: 'none',
                         stroke: COLOUR.Black,
                         'stroke-width': 1 / scale,
@@ -622,19 +611,20 @@ class VehicleMenu extends LHSMenuWindow {
                   this.#svgLayers.images.appendChild(outline);
 
                   if(this.#state.activeImageIndex === imgIndex) {
-                        imageObj.corners.forEach((corner, cornerIndex) => {
-                              const isActive = this.#state.activeImageHandle === cornerIndex;
+                        VEHICLE_HANDLE_TYPES.forEach((handleType) => {
+                              const pos = this.#getImageHandlePosition(imageObj, handleType);
+                              const isActive = this.#state.activeImageHandle === handleType;
                               const baseFill = isActive ? (COLOUR.DarkBlue || '#00008b') : COLOUR.Blue;
                               const baseRadius = isActive ? handleRadius * 1.3 : handleRadius;
                               const handle = vehicle_createSvgElement('circle', {
-                                    cx: corner.x,
-                                    cy: corner.y,
+                                    cx: pos.x,
+                                    cy: pos.y,
                                     r: baseRadius,
                                     fill: baseFill,
                                     stroke: COLOUR.Black,
                                     'stroke-width': 1 / scale
                               });
-                              handle.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, cornerIndex));
+                              handle.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, handleType));
                               handle.addEventListener('mouseenter', () => {
                                     handle.setAttribute('fill', COLOUR.DarkBlue || '#0000aa');
                                     handle.setAttribute('r', handleRadius * 1.2);
@@ -694,7 +684,7 @@ class VehicleMenu extends LHSMenuWindow {
             this.#state.activeImageIndex = imageIndex;
             this.#state.activeImageHandle = cornerIndex;
             this.#state.dragStartMouse = {...this.#dragZoomSVG.relativeMouseXY};
-            this.#state.dragStartCorners = this.#images[imageIndex].corners.map(c => ({...c}));
+            this.#state.dragStartImage = vehicle_cloneRect(this.#images[imageIndex]);
             this.#dragZoomSVG.svg.style.cursor = 'grabbing';
 
             const onMove = (e) => {
@@ -708,7 +698,7 @@ class VehicleMenu extends LHSMenuWindow {
                   this.#dragZoomSVG.allowPanning = true;
                   this.#state.activeImageHandle = null;
                   this.#state.dragStartMouse = null;
-                  this.#state.dragStartCorners = null;
+                  this.#state.dragStartImage = null;
                   this.refresh();
                   this.#dragZoomSVG.svg.style.cursor = 'auto';
             };
@@ -770,15 +760,53 @@ class VehicleMenu extends LHSMenuWindow {
 
       #updateImageFromDrag(index) {
             const image = this.#images[index];
+            const start = this.#state.dragStartImage;
             const mouse = this.#dragZoomSVG.relativeMouseXY;
-            if(this.#state.activeImageHandle === 'center') {
-                  const dx = mouse.x - this.#state.dragStartMouse.x;
-                  const dy = mouse.y - this.#state.dragStartMouse.y;
-                  image.corners = this.#state.dragStartCorners.map(c => ({x: c.x + dx, y: c.y + dy}));
-            } else {
-                  image.corners[this.#state.activeImageHandle] = {x: mouse.x, y: mouse.y};
+            const dx = mouse.x - this.#state.dragStartMouse.x;
+            const dy = mouse.y - this.#state.dragStartMouse.y;
+
+            switch(this.#state.activeImageHandle) {
+                  case 'topleft':
+                        image.x = start.x + dx;
+                        image.y = start.y + dy;
+                        image.w = start.w - dx;
+                        image.h = start.h - dy;
+                        break;
+                  case 'top':
+                        image.y = start.y + dy;
+                        image.h = start.h - dy;
+                        break;
+                  case 'topright':
+                        image.y = start.y + dy;
+                        image.w = start.w + dx;
+                        image.h = start.h - dy;
+                        break;
+                  case 'right':
+                        image.w = start.w + dx;
+                        break;
+                  case 'bottomright':
+                        image.w = start.w + dx;
+                        image.h = start.h + dy;
+                        break;
+                  case 'bottom':
+                        image.h = start.h + dy;
+                        break;
+                  case 'bottomleft':
+                        image.x = start.x + dx;
+                        image.w = start.w - dx;
+                        image.h = start.h + dy;
+                        break;
+                  case 'left':
+                        image.x = start.x + dx;
+                        image.w = start.w - dx;
+                        break;
+                  default:
+                        image.x = start.x + dx;
+                        image.y = start.y + dy;
+                        break;
             }
-            this.#rebuildImageMesh(index);
+            image.w = Math.max(image.w, 1);
+            image.h = Math.max(image.h, 1);
       }
 
       #selectRect(index) {
@@ -805,6 +833,10 @@ class VehicleMenu extends LHSMenuWindow {
                   case 'left': return {x: rect.x, y: rect.y + rect.h / 2};
                   default: return {x: rect.x + rect.w / 2, y: rect.y + rect.h / 2};
             }
+      }
+
+      #getImageHandlePosition(img, handleType) {
+            return this.#getHandlePosition({x: img.x, y: img.y, w: img.w, h: img.h}, handleType);
       }
 
       updateRectsFromFields() {
@@ -860,125 +892,19 @@ class VehicleMenu extends LHSMenuWindow {
                   const defaultX = (xOffset ?? center.x - width / 2);
                   const defaultY = (yOffset ?? center.y - height / 2);
 
-                  const corners = c1 && c2 && c3 && c4 ? [c1, c2, c3, c4] : [
-                        {x: defaultX, y: defaultY},
-                        {x: defaultX + width, y: defaultY},
-                        {x: defaultX + width, y: defaultY + height},
-                        {x: defaultX, y: defaultY + height}
-                  ];
-
                   this.#images.push({
                         image,
                         src: srcArray[y],
                         width,
                         height,
-                        corners
+                        x: c1?.x ?? defaultX,
+                        y: c1?.y ?? defaultY,
+                        w: c2?.x ? (c2.x - (c1?.x ?? defaultX)) : width,
+                        h: c4?.y ? (c4.y - (c1?.y ?? defaultY)) : height,
+                        naturalW: width,
+                        naturalH: height
                   });
-                  this.#rebuildImageMesh(this.#images.length - 1);
             }
-      }
-
-      #rebuildImageMesh(index) {
-            const imageObj = this.#images[index];
-            const subs = 7;
-            const divs = 7;
-            this.#triangles[index] = [];
-
-            const [p1, p2, p3, p4] = imageObj.corners.map(c => new Point(c.x, c.y));
-            const dx1 = p4.x - p1.x;
-            const dy1 = p4.y - p1.y;
-            const dx2 = p3.x - p2.x;
-            const dy2 = p3.y - p2.y;
-
-            const imgW = imageObj.width;
-            const imgH = imageObj.height;
-
-            for(let sub = 0; sub < subs; ++sub) {
-                  const curRow = sub / subs;
-                  const nextRow = (sub + 1) / subs;
-
-                  const curRowX1 = p1.x + dx1 * curRow;
-                  const curRowY1 = p1.y + dy1 * curRow;
-
-                  const curRowX2 = p2.x + dx2 * curRow;
-                  const curRowY2 = p2.y + dy2 * curRow;
-
-                  const nextRowX1 = p1.x + dx1 * nextRow;
-                  const nextRowY1 = p1.y + dy1 * nextRow;
-
-                  const nextRowX2 = p2.x + dx2 * nextRow;
-                  const nextRowY2 = p2.y + dy2 * nextRow;
-
-                  for(let div = 0; div < divs; ++div) {
-                        const curCol = div / divs;
-                        const nextCol = (div + 1) / divs;
-
-                        const dCurX = curRowX2 - curRowX1;
-                        const dCurY = curRowY2 - curRowY1;
-                        const dNextX = nextRowX2 - nextRowX1;
-                        const dNextY = nextRowY2 - nextRowY1;
-
-                        const p1x = curRowX1 + dCurX * curCol;
-                        const p1y = curRowY1 + dCurY * curCol;
-
-                        const p2x = curRowX1 + (curRowX2 - curRowX1) * nextCol;
-                        const p2y = curRowY1 + (curRowY2 - curRowY1) * nextCol;
-
-                        const p3x = nextRowX1 + dNextX * nextCol;
-                        const p3y = nextRowY1 + dNextY * nextCol;
-
-                        const p4x = nextRowX1 + dNextX * curCol;
-                        const p4y = nextRowY1 + dNextY * curCol;
-
-                        const u1 = curCol * imgW;
-                        const u2 = nextCol * imgW;
-                        const v1 = curRow * imgH;
-                        const v2 = nextRow * imgH;
-
-                        const triangle1 = new Triangle(
-                              new Point(p1x, p1y),
-                              new Point(p3x, p3y),
-                              new Point(p4x, p4y),
-                              new TextCoord(u1, v1),
-                              new TextCoord(u2, v2),
-                              new TextCoord(u1, v2)
-                        );
-
-                        const triangle2 = new Triangle(
-                              new Point(p1x, p1y),
-                              new Point(p2x, p2y),
-                              new Point(p3x, p3y),
-                              new TextCoord(u1, v1),
-                              new TextCoord(u2, v1),
-                              new TextCoord(u2, v2)
-                        );
-
-                        this.#triangles[index].push(triangle1);
-                        this.#triangles[index].push(triangle2);
-                  }
-            }
-      }
-
-      #getTriangleTransform(tri) {
-            const sx0 = tri.t0.u, sy0 = tri.t0.v;
-            const sx1 = tri.t1.u, sy1 = tri.t1.v;
-            const sx2 = tri.t2.u, sy2 = tri.t2.v;
-
-            const x0 = tri.p0.x, y0 = tri.p0.y;
-            const x1 = tri.p1.x, y1 = tri.p1.y;
-            const x2 = tri.p2.x, y2 = tri.p2.y;
-
-            const denom = sx0 * (sy2 - sy1) - sx1 * sy2 + sx2 * sy1 + (sx1 - sx2) * sy0;
-            if(denom === 0) {
-                  return {m11: 1, m12: 0, m21: 0, m22: 1, dx: 0, dy: 0};
-            }
-            const m11 = -(sy0 * (x2 - x1) - sy1 * x2 + sy2 * x1 + (sy1 - sy2) * x0) / denom;
-            const m12 = (sy1 * y2 + sy0 * (y1 - y2) - sy2 * y1 + (sy2 - sy1) * y0) / denom;
-            const m21 = (sx0 * (x2 - x1) - sx1 * x2 + sx2 * x1 + (sx1 - sx2) * x0) / denom;
-            const m22 = -(sx1 * y2 + sx0 * (y1 - y2) - sx2 * y1 + (sx2 - sx1) * y0) / denom;
-            const dx = (sx0 * (sy2 * x1 - sy1 * x2) + sy0 * (sx1 * x2 - sx2 * x1) + (sx2 * sy1 - sx1 * sy2) * x0) / denom;
-            const dy = (sx0 * (sy2 * y1 - sy1 * y2) + sy0 * (sx1 * y2 - sx2 * y1) + (sx2 * sy1 - sx1 * sy2) * y0) / denom;
-            return {m11, m12, m21, m22, dx, dy};
       }
 
       #getCenterPosReal() {
@@ -1067,14 +993,8 @@ class VehicleMenu extends LHSMenuWindow {
 
       #getSkewRectAtPosition(xPos, yPos) {
             for(let s = 0; s < this.#images.length; s++) {
-                  const searchArrayX = [];
-                  const searchArrayY = [];
-                  for(let c = 0; c < this.#images[s].corners.length; c++) {
-                        searchArrayX.push(this.#images[s].corners[c].x);
-                        searchArrayY.push(this.#images[s].corners[c].y);
-                  }
-                  const inShape = vehicle_pointInPolygon(4, searchArrayX, searchArrayY, xPos, yPos);
-                  if(inShape) return s;
+                  const img = this.#images[s];
+                  if(xPos >= img.x && xPos <= img.x + img.w && yPos >= img.y && yPos <= img.y + img.h) return s;
             }
             return false;
       }
@@ -1142,23 +1062,12 @@ class VehicleMenu extends LHSMenuWindow {
             const modal = new ModalWidthHeight("Apply Scale", 1, () => {
                   const scaleW = (modal.width || modal.width !== 0) ? modal.width - 1 : 0;
                   const scaleH = (modal.height || modal.height !== 0) ? modal.height - 1 : 0;
-
-                  const centerCoord = {
-                        x: (this.#images[shapeIndex].corners[1].x + this.#images[shapeIndex].corners[0].x) / 2,
-                        y: (this.#images[shapeIndex].corners[2].y + this.#images[shapeIndex].corners[0].y) / 2
-                  };
-                  for(let c = 0; c < this.#images[shapeIndex].corners.length; c++) {
-                        const x = this.#images[shapeIndex].corners[c].x;
-                        const y = this.#images[shapeIndex].corners[c].y;
-                        const dx = x - centerCoord.x;
-                        const dy = y - centerCoord.y;
-                        const newXPos = x + dx * scaleW;
-                        const newYPos = y + dy * scaleH;
-
-                        this.#images[shapeIndex].corners[c].x = newXPos;
-                        this.#images[shapeIndex].corners[c].y = newYPos;
-                  }
-                  this.#rebuildImageMesh(shapeIndex);
+                  const img = this.#images[shapeIndex];
+                  const centerCoord = {x: img.x + img.w / 2, y: img.y + img.h / 2};
+                  img.x = centerCoord.x + (img.x - centerCoord.x) * (1 + scaleW);
+                  img.y = centerCoord.y + (img.y - centerCoord.y) * (1 + scaleH);
+                  img.w = img.w * (1 + scaleW);
+                  img.h = img.h * (1 + scaleH);
                   this.refresh();
             });
             modal.setContainerSize(300, 300);
@@ -1166,24 +1075,17 @@ class VehicleMenu extends LHSMenuWindow {
 
       #copySkewableRect(shapeIndex) {
             const image = this.#images[shapeIndex];
-            this.#copiedImage = {
-                  src: image.src,
-                  corners: image.corners.map((c) => ({...c}))
-            };
+            this.#copiedImage = vehicle_cloneRect(image);
       }
 
       async #pasteSkewableRect(xPos, yPos) {
             if(this.#copiedImage != null) {
                   await this.addSkewableImages(xPos, yPos, [this.#copiedImage.src]);
                   const newImage = this.#images[this.#images.length - 1];
-                  const offset = {x: this.#copiedImage.corners[0].x - xPos, y: this.#copiedImage.corners[0].y - yPos};
-                  for(let c = 0; c < 4; c++) {
-                        newImage.corners[c] = {
-                              x: this.#copiedImage.corners[c].x - offset.x,
-                              y: this.#copiedImage.corners[c].y - offset.y
-                        };
-                  }
-                  this.#rebuildImageMesh(this.#images.length - 1);
+                  newImage.x = this.#copiedImage.x;
+                  newImage.y = this.#copiedImage.y;
+                  newImage.w = this.#copiedImage.w;
+                  newImage.h = this.#copiedImage.h;
                   this.refresh();
             }
       }
@@ -1196,20 +1098,14 @@ class VehicleMenu extends LHSMenuWindow {
             const width = isSVG ? widthMM : image.image.width;
             const height = isSVG ? heightMM : image.image.height;
 
-            const offset = {x: image.corners[0].x, y: image.corners[0].y};
-            image.corners = [
-                  {x: offset.x, y: offset.y},
-                  {x: offset.x + width, y: offset.y},
-                  {x: offset.x + width, y: offset.y + height},
-                  {x: offset.x, y: offset.y + height}
-            ];
-            this.#rebuildImageMesh(shapeIndex);
+            image.w = width;
+            image.h = height;
             this.refresh();
       }
 
       async #saveSkewableImageToFile(shapeIndex) {
             const content = JSON.stringify([
-                  ...this.#images[shapeIndex].corners,
+                  {x: this.#images[shapeIndex].x, y: this.#images[shapeIndex].y, w: this.#images[shapeIndex].w, h: this.#images[shapeIndex].h},
                   this.#images[shapeIndex].src
             ]);
             await downloadFileContent_Text_SingleFile(content);
@@ -1218,12 +1114,8 @@ class VehicleMenu extends LHSMenuWindow {
       async #openSkewableImageFromFile(event, xPos, yPos) {
             const content = await getFileContent_Text_SingleFile(event);
             const parsedContent = JSON.parse(content);
-            const offset = {x: xPos - parsedContent[0].x, y: yPos - parsedContent[0].y};
-            await this.addSkewableImages(null, null, [parsedContent[4]],
-                  {x: parsedContent[0].x + offset.x, y: parsedContent[0].y + offset.y},
-                  {x: parsedContent[1].x + offset.x, y: parsedContent[1].y + offset.y},
-                  {x: parsedContent[2].x + offset.x, y: parsedContent[2].y + offset.y},
-                  {x: parsedContent[3].x + offset.x, y: parsedContent[3].y + offset.y});
+            const rect = parsedContent[0];
+            await this.addSkewableImages(rect.x, rect.y, [parsedContent[1]]);
             this.refresh();
       }
 }
