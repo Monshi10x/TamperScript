@@ -72,6 +72,9 @@ class VehicleMenu extends LHSMenuWindow {
       #svgLayers = {};
       #defs;
       #toastPosition = "top-right";
+      #layoutOrientation = "vertical";
+      #leftPane;
+      #rightPane;
       #state = {
             activeRectIndex: null,
             activeRectHandle: null,
@@ -135,9 +138,11 @@ class VehicleMenu extends LHSMenuWindow {
             page.style.height = "100%";
 
             const leftPane = document.createElement('div');
-            leftPane.style = "width:50%;height:100%;position:relative;overflow:hidden;";
+            leftPane.style = "width:50%;height:100%;overflow:auto;padding:10px;box-sizing:border-box;";
             const rightPane = document.createElement('div');
-            rightPane.style = "width:50%;height:100%;overflow:auto;padding:10px;box-sizing:border-box;";
+            rightPane.style = "width:50%;height:100%;position:relative;overflow:hidden;";
+            this.#leftPane = leftPane;
+            this.#rightPane = rightPane;
 
             const container = document.createElement('div');
             container.style = "width:100%;height:100%;display:block;background-color:white;position: relative;";
@@ -367,17 +372,22 @@ class VehicleMenu extends LHSMenuWindow {
             const measuresCkb = createCheckbox_Infield("Show Measurements", this.#showMeasures, "width: 200px;", () => {this.#showMeasures = measuresCkb[1].checked; this.refresh();}, footer);
             const qtyCkb = createCheckbox_Infield("Show Quantity", this.#showQuantity, "width: 200px;", () => {this.#showQuantity = qtyCkb[1].checked; this.refresh();}, footer);
             const descriptionCkb = createCheckbox_Infield("Show Description", this.#showDescription, "width: 200px;", () => {this.#showDescription = descriptionCkb[1].checked; this.refresh();}, footer);
+            const layoutToggle = createDropdown_Infield("Layout", 0, "width: 200px;", [createDropdownOption("Vertical Split", "vertical"), createDropdownOption("Horizontal Split", "horizontal")], () => {
+                  this.#layoutOrientation = layoutToggle[1].value === "horizontal" ? "horizontal" : "vertical";
+                  this.#applyLayout();
+            }, footer);
 
-            VehicleMenu_TotalQuantity = new TotalQuantity(rightPane, this.#dragZoomSVG?.svgG, () => {this.updateFromTemplateFields();}, this.#dragZoomSVG);
-            VehicleMenu_Template = new VehicleTemplate(rightPane, this.#dragZoomSVG?.svgG, () => {this.initRects(); this.refresh(); this.initBackground();}, () => {this.updateRectsFromFields();}, (rowNumber) => {this.deleteRect(rowNumber);});
-            VehicleMenu_Production = new Production(rightPane, this.#dragZoomSVG?.svgG, () => { });
+            VehicleMenu_TotalQuantity = new TotalQuantity(leftPane, this.#dragZoomSVG?.svgG, () => {this.updateFromTemplateFields();}, this.#dragZoomSVG);
+            VehicleMenu_Template = new VehicleTemplate(leftPane, this.#dragZoomSVG?.svgG, () => {this.initRects(); this.refresh(); this.initBackground();}, () => {this.updateRectsFromFields();}, (rowNumber) => {this.deleteRect(rowNumber);});
+            VehicleMenu_Production = new Production(leftPane, this.#dragZoomSVG?.svgG, () => { });
             VehicleMenu_Production.requiredName = "Production";
-            VehicleMenu_Install = new Install(rightPane, this.#dragZoomSVG?.svgG, () => { });
-            VehicleMenu_Artwork = new Artwork(rightPane, this.#dragZoomSVG?.svgG, () => { });
+            VehicleMenu_Install = new Install(leftPane, this.#dragZoomSVG?.svgG, () => { });
+            VehicleMenu_Artwork = new Artwork(leftPane, this.#dragZoomSVG?.svgG, () => { });
 
-            leftPane.appendChild(container);
+            rightPane.appendChild(container);
             page.appendChild(leftPane);
             page.appendChild(rightPane);
+            this.#applyLayout();
 
             const fieldCreateProduct = createButton('Create Product', 'width:300px;height:35px;margin:0px;display:block;float:right', createVehicleProduct);
             footer.appendChild(fieldCreateProduct);
@@ -408,6 +418,23 @@ class VehicleMenu extends LHSMenuWindow {
 
             this.#dragZoomSVG.container.addEventListener('contextmenu', (event) => this.#handleContextMenu(event));
             this.#dragZoomSVG.container.addEventListener('click', () => {this.#clearSelections(); this.refresh();});
+      }
+
+      #applyLayout() {
+            const page = this.getPage(0);
+            if(this.#layoutOrientation === "horizontal") {
+                  page.style.flexDirection = "column";
+                  this.#leftPane.style.width = "100%";
+                  this.#rightPane.style.width = "100%";
+                  this.#leftPane.style.height = "50%";
+                  this.#rightPane.style.height = "50%";
+            } else {
+                  page.style.flexDirection = "row";
+                  this.#leftPane.style.width = "50%";
+                  this.#rightPane.style.width = "50%";
+                  this.#leftPane.style.height = "100%";
+                  this.#rightPane.style.height = "100%";
+            }
       }
 
       #initLayers() {
@@ -1055,22 +1082,32 @@ class VehicleMenu extends LHSMenuWindow {
                         rect.description = descField[1].value;
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false);
+                  descField[1].id = `rect-desc-${rectIndex}`;
+                  descField[0].htmlFor = descField[1].id;
                   const qtyField = createInput_Infield("Qty", rect.qty, null, () => {
                         rect.qty = parseFloat(qtyField[1].value || rect.qty);
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false, 1);
+                  qtyField[1].id = `rect-qty-${rectIndex}`;
+                  qtyField[0].htmlFor = qtyField[1].id;
                   const widthField = createInput_Infield("Width", rect.w, null, () => {
                         rect.w = parseFloat(widthField[1].value || rect.w);
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false, 1);
+                  widthField[1].id = `rect-width-${rectIndex}`;
+                  widthField[0].htmlFor = widthField[1].id;
                   const heightField = createInput_Infield("Height", rect.h, null, () => {
                         rect.h = parseFloat(heightField[1].value || rect.h);
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false, 1);
+                  heightField[1].id = `rect-height-${rectIndex}`;
+                  heightField[0].htmlFor = heightField[1].id;
                   const rtaField = createCheckbox_Infield("Is RTA", rect.appTape !== "None", null, () => {
                         rect.appTape = rtaField[1].checked ? AppTapeLookup["Medium Tack"] : "None";
                         this.refresh(); this.updateFromTemplateFields();
                   }, null);
+                  rtaField[1].id = `rect-rta-${rectIndex}`;
+                  rtaField[0].htmlFor = rtaField[1].id;
 
                   [descField[1], qtyField[1], widthField[1], heightField[1], rtaField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
 
@@ -1128,6 +1165,10 @@ class VehicleMenu extends LHSMenuWindow {
                         img.h = parseFloat(heightField[1].value || img.h);
                         this.refresh();
                   }, null, false, 1);
+                  widthField[1].id = `img-width-${imageIndex}`;
+                  widthField[0].htmlFor = widthField[1].id;
+                  heightField[1].id = `img-height-${imageIndex}`;
+                  heightField[0].htmlFor = heightField[1].id;
                   [widthField[1], heightField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
 
                   const copyBtn = createButton("Copy", "width:100%;", () => {this.#copySkewableRect(imageIndex); vehicleToast('Image copied', "success");});
