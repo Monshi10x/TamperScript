@@ -722,7 +722,8 @@ class Sheet extends Material {
                   this.UpdateFromFields();
             }, this);
 
-            this.container.appendChild(this.#visualiser.dragZoomSVG.container);
+            // this.container.appendChild(this.#visualiser.dragZoomSVG.container);
+            //TODO: Borrow DragZoom
 
             this.UpdateFromFields();
       }
