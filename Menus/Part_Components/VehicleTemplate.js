@@ -95,7 +95,6 @@ class VehicleMenu extends LHSMenuWindow {
 
       hide() {
             this.#images = [];
-            this.#triangles = [];
             this.#state = {
                   activeRectIndex: null,
                   activeRectHandle: null,
@@ -103,7 +102,7 @@ class VehicleMenu extends LHSMenuWindow {
                   activeImageHandle: null,
                   dragStartMouse: null,
                   dragStartRect: null,
-                  dragStartCorners: null
+                  dragStartImage: null
             };
 
             super.hide();
@@ -445,7 +444,6 @@ class VehicleMenu extends LHSMenuWindow {
       initBackground() {
             this.#svgLayers.background.innerHTML = "";
             this.#images = [];
-            this.#triangles = [];
 
             if(VehicleMenu_Template.isStandardTemplate) {
                   const img = new Image();
@@ -606,6 +604,13 @@ class VehicleMenu extends LHSMenuWindow {
                         'stroke-dasharray': '6 4'
                   });
                   outline.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, 'center'));
+                  outline.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.#state.activeImageIndex = imgIndex;
+                        this.#state.activeImageHandle = null;
+                        this.#state.activeRectIndex = null;
+                        this.refresh();
+                  });
                   outline.addEventListener('mouseenter', () => {this.#dragZoomSVG.svg.style.cursor = 'grab';});
                   outline.addEventListener('mouseleave', () => {this.#dragZoomSVG.svg.style.cursor = 'auto';});
                   this.#svgLayers.images.appendChild(outline);
@@ -648,6 +653,7 @@ class VehicleMenu extends LHSMenuWindow {
             this.#dragZoomSVG.updateMouseXY(event);
 
             this.#selectRect(rectIndex);
+            this.#state.activeImageIndex = null;
             this.#state.activeRectHandle = handleType;
             this.#state.dragStartMouse = {...this.#dragZoomSVG.relativeMouseXY};
             this.#state.dragStartRect = vehicle_cloneRect(this.rects[rectIndex]);
@@ -681,6 +687,7 @@ class VehicleMenu extends LHSMenuWindow {
             this.#dragZoomSVG.allowPanning = false;
             this.#dragZoomSVG.updateMouseXY(event);
 
+            this.#state.activeRectIndex = null;
             this.#state.activeImageIndex = imageIndex;
             this.#state.activeImageHandle = cornerIndex;
             this.#state.dragStartMouse = {...this.#dragZoomSVG.relativeMouseXY};
@@ -1051,7 +1058,6 @@ class VehicleMenu extends LHSMenuWindow {
       #deleteSkewableRect(shapeIndex) {
             if(shapeIndex !== null && shapeIndex !== false) {
                   this.#images.splice(shapeIndex, 1);
-                  this.#triangles.splice(shapeIndex, 1);
                   this.refresh();
             } else {
                   alert("cant delete SkewableRects");
