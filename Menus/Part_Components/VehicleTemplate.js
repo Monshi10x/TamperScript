@@ -74,6 +74,7 @@ class VehicleMenu extends LHSMenuWindow {
       #images = [];
       #copiedImage = null;
       #copiedImageScale = null;
+      #copiedRectScale = null;
 
       #canvasWidth = 1000;
       #canvasHeight = 600;
@@ -987,11 +988,35 @@ class VehicleMenu extends LHSMenuWindow {
             customContextMenuContainer.style.top = event.pageY + "px";
 
             removeAllChildrenFromParent(customContextMenuContainer);
-            const closeBtn = createButton("X", "background-color:red;width:20px;height:20px;position:absolute;top:-21px;right:0;margin:0px;min-height:20px;border:0px;", closeCustomContextMenu);
-            customContextMenuContainer.appendChild(closeBtn);
+            const containerPanel = document.createElement('div');
+            containerPanel.style = "padding:10px;display:flex;flex-direction:column;gap:6px;color:white;background-color:" + COLOUR.DarkGrey + ";width:300px;box-shadow:0 4px 12px rgba(0,0,0,0.8);position:relative;cursor:default;user-select:none;";
+            let dragOffset = {x: 0, y: 0};
+            const dragHandle = document.createElement('div');
+            dragHandle.innerText = "☰";
+            dragHandle.style = "position:absolute;left:10px;top:10px;cursor:grab;color:white;font-size:16px;";
+            dragHandle.onmousedown = (e) => {
+                  e.preventDefault();
+                  dragHandle.style.cursor = "grabbing";
+                  dragOffset = {x: e.clientX - customContextMenuContainer.offsetLeft, y: e.clientY - customContextMenuContainer.offsetTop};
+                  const move = (ev) => {
+                        customContextMenuContainer.style.left = (ev.clientX - dragOffset.x) + "px";
+                        customContextMenuContainer.style.top = (ev.clientY - dragOffset.y) + "px";
+                  };
+                  const up = () => {
+                        document.removeEventListener('mousemove', move);
+                        document.removeEventListener('mouseup', up);
+                        dragHandle.style.cursor = "grab";
+                  };
+                  document.addEventListener('mousemove', move);
+                  document.addEventListener('mouseup', up);
+            };
+            containerPanel.appendChild(dragHandle);
+
+            const closeBtn = createButton("X", "background-color:red;width:26px;height:26px;position:absolute;top:6px;right:6px;margin:0px;min-height:26px;border:0px;font-weight:bold;font-size:14px;", () => {closeCustomContextMenu(); Ordui.Alert('Closed');});
+            containerPanel.appendChild(closeBtn);
 
             const panel = document.createElement('div');
-            panel.style = "padding:10px;display:flex;flex-direction:column;gap:6px;color:white;background-color:" + COLOUR.DarkGrey + ";min-width:260px;";
+            panel.style = "padding:10px;display:flex;flex-direction:column;gap:6px;color:white;";
 
             if(rectIndex !== false && rectIndex !== null) {
                   const rect = this.rects[rectIndex];
@@ -1019,18 +1044,19 @@ class VehicleMenu extends LHSMenuWindow {
                         this.refresh(); this.updateFromTemplateFields();
                   }, null);
 
-                  [descField[1], qtyField[1], widthField[1], heightField[1], rtaField[1]].forEach(el => {el.style.width = "100%";});
+                  [descField[1], qtyField[1], widthField[1], heightField[1], rtaField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
 
                   const scaleW = createInput_Infield("Target Width", rect.w, null, null, null, false, 1)[1];
                   const scaleH = createInput_Infield("Target Height", rect.h, null, null, null, false, 1)[1];
-                  scaleW.style.width = "100%";
-                  scaleH.style.width = "100%";
-                  const scaleBtn = createButton("Calc Scale", "width:100%;", () => {
+                  scaleW.style.width = "calc(100% - 0px)";
+                  scaleH.style.width = "calc(100% - 0px)";
+                  const scaleBtn = createButton("Calc Scale", "width:100%;margin:0;", () => {
                         const targetW = parseFloat(scaleW.value || rect.w);
                         const targetH = parseFloat(scaleH.value || rect.h);
                         const scaleResultW = targetW / rect.w;
                         const scaleResultH = targetH / rect.h;
-                        alert(`Width scale: ${scaleResultW.toFixed(3)} | Height scale: ${scaleResultH.toFixed(3)}`);
+                        this.#copiedRectScale = {w: scaleResultW, h: scaleResultH};
+                        Ordui.Alert(`Saved scale W:${scaleResultW.toFixed(3)} H:${scaleResultH.toFixed(3)}`);
                   });
 
                   const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;", () => {
@@ -1047,7 +1073,19 @@ class VehicleMenu extends LHSMenuWindow {
                   panel.appendChild(rtaField[0]);
                   panel.appendChild(scaleW.parentElement);
                   panel.appendChild(scaleH.parentElement);
+                  const applySavedScaleBtn = createButton("Apply Saved Scale", "width:100%;margin:0;", () => {
+                        if(this.#copiedRectScale) {
+                              rect.w = rect.w * this.#copiedRectScale.w;
+                              rect.h = rect.h * this.#copiedRectScale.h;
+                              this.refresh(); this.updateFromTemplateFields();
+                              Ordui.Alert('Applied saved scale');
+                        } else {
+                              Ordui.Alert('No saved scale found');
+                        }
+                  });
+
                   panel.appendChild(scaleBtn);
+                  panel.appendChild(applySavedScaleBtn);
                   panel.appendChild(deleteBtn);
             } else if(imageIndex !== false && imageIndex !== null) {
                   const img = this.#images[imageIndex];
@@ -1062,26 +1100,37 @@ class VehicleMenu extends LHSMenuWindow {
                         img.h = parseFloat(heightField[1].value || img.h);
                         this.refresh();
                   }, null, false, 1);
-                  [widthField[1], heightField[1]].forEach(el => {el.style.width = "100%";});
+                  [widthField[1], heightField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
 
-                  const copyBtn = createButton("Copy", "width:100%;", () => {this.#copySkewableRect(imageIndex);});
-                  const pasteBtn = createButton("Paste", "width:100%;", () => {this.#pasteSkewableRect(pos.x, pos.y); this.refresh();});
-                  const resetBtn = createButton("Reset Size", "width:100%;", () => {this.#resetSkewableRect(imageIndex);});
+                  const copyBtn = createButton("Copy", "width:100%;", () => {this.#copySkewableRect(imageIndex); Ordui.Alert('Image copied');});
+                  const pasteBtn = createButton("Paste", "width:100%;", () => {this.#pasteSkewableRect(pos.x, pos.y); this.refresh(); Ordui.Alert('Image pasted');});
+                  const resetBtn = createButton("Reset Size", "width:100%;", () => {this.#resetSkewableRect(imageIndex); Ordui.Alert('Image reset');});
 
                   const copyScaleBtn = createButton("Copy Target Scale", "width:100%;", () => {
                         this.#copiedImageScale = {w: img.w, h: img.h};
+                        this.#copiedRectScale = {w: img.w / img.naturalW, h: img.h / img.naturalH};
+                        Ordui.Alert('Image scale copied');
                   });
                   const applyScaleBtn = createButton("Apply Copied Scale", "width:100%;", () => {
-                        if(this.#copiedImageScale) {
+                        if(this.#copiedRectScale) {
+                              img.w = img.w * this.#copiedRectScale.w;
+                              img.h = img.h * this.#copiedRectScale.h;
+                              this.refresh();
+                              Ordui.Alert('Saved scale applied');
+                        } else if(this.#copiedImageScale) {
                               img.w = this.#copiedImageScale.w;
                               img.h = this.#copiedImageScale.h;
                               this.refresh();
+                              Ordui.Alert('Copied image scale applied');
+                        } else {
+                              Ordui.Alert('No saved scale found');
                         }
                   });
 
                   const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;", () => {
                         this.#deleteSkewableRect(imageIndex);
                         closeCustomContextMenu();
+                        Ordui.Alert('Image deleted');
                   });
 
                   panel.appendChild(widthField[0]);
@@ -1094,7 +1143,8 @@ class VehicleMenu extends LHSMenuWindow {
                   panel.appendChild(deleteBtn);
             }
 
-            customContextMenuContainer.appendChild(panel);
+            containerPanel.appendChild(panel);
+            customContextMenuContainer.appendChild(containerPanel);
 
             const rectBounds = customContextMenuContainer.getBoundingClientRect();
             let top = rectBounds.top;
