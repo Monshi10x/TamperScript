@@ -384,6 +384,18 @@ class VehicleMenu extends LHSMenuWindow {
             VehicleMenu_Production.requiredName = "Production";
             VehicleMenu_Install = new Install(leftPane, this.#dragZoomSVG?.svgG, () => { });
             VehicleMenu_Artwork = new Artwork(leftPane, this.#dragZoomSVG?.svgG, () => { });
+            const originalAddRow = VehicleMenu_Template.addRow.bind(VehicleMenu_Template);
+            VehicleMenu_Template.addRow = (item) => {
+                  const res = originalAddRow(item);
+                  this.#buildRowCache();
+                  return res;
+            };
+            const originalDeleteRow = VehicleMenu_Template.deleteRow.bind(VehicleMenu_Template);
+            VehicleMenu_Template.deleteRow = (rowN) => {
+                  const res = originalDeleteRow(rowN);
+                  this.#buildRowCache();
+                  return res;
+            };
 
             rightPane.appendChild(container);
             page.appendChild(leftPane);
@@ -942,9 +954,9 @@ class VehicleMenu extends LHSMenuWindow {
                   const cache = this.#rowFieldCache[n];
                   if(!cache) continue;
                   this.rects[n].description = cache.description.value;
-                  this.rects[n].w = roundNumber(parseFloat(cache.width.value), 2);
-                  this.rects[n].h = roundNumber(parseFloat(cache.height.value), 2);
-                  this.rects[n].qty = parseFloat(cache.quantity.value);
+                  this.rects[n].w = cache.width.valueAsNumber || parseFloat(cache.width.value) || this.rects[n].w;
+                  this.rects[n].h = cache.height.valueAsNumber || parseFloat(cache.height.value) || this.rects[n].h;
+                  this.rects[n].qty = cache.quantity.valueAsNumber || parseFloat(cache.quantity.value) || this.rects[n].qty;
                   this.rects[n].appTape = cache.tape.value;
                   this.rects[n].vinyl = cache.vinyl.value;
                   this.rects[n].laminate = cache.laminate.value;
@@ -958,9 +970,9 @@ class VehicleMenu extends LHSMenuWindow {
                   const cache = this.#rowFieldCache[n];
                   if(!cache) continue;
                   cache.description.value = this.rects[n].description;
-                  cache.quantity.value = parseFloat(this.rects[n].qty);
-                  cache.width.value = roundNumber(parseFloat(this.rects[n].w), 2);
-                  cache.height.value = roundNumber(parseFloat(this.rects[n].h), 2);
+                  cache.quantity.value = this.rects[n].qty;
+                  cache.width.value = this.rects[n].w;
+                  cache.height.value = this.rects[n].h;
                   cache.tape.value = this.rects[n].appTape;
                   cache.vinyl.value = this.rects[n].vinyl;
                   cache.laminate.value = this.rects[n].laminate;
@@ -1053,9 +1065,9 @@ class VehicleMenu extends LHSMenuWindow {
             const cache = this.#rowFieldCache[index];
             if(!cache) return;
             cache.description.value = this.rects[index].description;
-            cache.quantity.value = parseFloat(this.rects[index].qty);
-            cache.width.value = roundNumber(parseFloat(this.rects[index].w), 2);
-            cache.height.value = roundNumber(parseFloat(this.rects[index].h), 2);
+            cache.quantity.value = this.rects[index].qty;
+            cache.width.value = this.rects[index].w;
+            cache.height.value = this.rects[index].h;
             cache.tape.value = this.rects[index].appTape;
             cache.vinyl.value = this.rects[index].vinyl;
             cache.laminate.value = this.rects[index].laminate;
