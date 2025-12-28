@@ -366,6 +366,9 @@ class VehicleMenu extends LHSMenuWindow {
                   await AddBlankProduct();
                   const productNo = getNumProducts();
                   let partNo = 0;
+                  this.#showMeasures = true;
+                  try {measuresCkb[1].checked = true;} catch(e) {}
+                  this.refresh();
                   await AddPart("No Cost Part", productNo);
                   partNo++;
                   await setPartDescription(productNo, partNo, "CODE [Automatic]");
@@ -1767,8 +1770,6 @@ class VehicleTemplate extends SubMenu {
                   }
             }
 
-
-
             var tapeParts = getPredefinedParts("Tape - ");
             var tapeDropdownElements = [];
             tapeDropdownElements.push(["None", "white"]);
@@ -1804,7 +1805,7 @@ class VehicleTemplate extends SubMenu {
             this.callback();
       };
 
-      Update() { }
+      Update() {}
 
       rowObjects = [];
       uniqueGroupsByKeys = [];
