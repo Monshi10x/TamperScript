@@ -18,8 +18,9 @@ class OrderHome {
       #emailTemplates = {};
 
       constructor() {
+            const defaultTemplateBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/";
             this.#templateBaseUrl = window.ORDER_HOME_TEMPLATE_BASE_URL
-                  || new URL("./OrderHome/EmailTemplates/", document.currentScript?.src || window.location.href).href;
+                  || defaultTemplateBaseUrl;
 
             this.start();
             setInterval(() => this.tick(), 100);
