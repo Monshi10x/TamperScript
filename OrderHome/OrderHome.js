@@ -287,6 +287,15 @@ class OrderHome {
                         return formData;
                   };
             }
+
+            const span = document.createElement("span");
+            Object.assign(span.style, style);
+
+            const contents = range.extractContents();
+            span.appendChild(contents);
+            range.insertNode(span);
+            selection.removeAllRanges();
+            selection.selectAllChildren(span);
       }
 
       addRemoteAttachment(name, blob, index) {
