@@ -1682,19 +1682,10 @@ class VehicleTemplate extends SubMenu {
             rowContainer.id = "rowContainer";
             rowContainer.className = this.rowID;
 
-            const descriptionOptions = ["fender", "bonnet", "back", "tub", "roof", "front door left", "front door right", "rear door left", "rear door right", "tailgate", "front bumper", "rear bumper", "front quarter left", "front quarter right", "rear quarter left", "rear quarter right", "side skirt left", "side skirt right"];
+            //const descriptionOptions = ["fender", "bonnet", "back", "tub", "roof", "front door left", "front door right", "rear door left", "rear door right", "tailgate", "front bumper", "rear bumper", "front quarter left", "front quarter right", "rear quarter left", "rear quarter right", "side skirt left", "side skirt right"];
             var description = createInput_Infield("Description", null, "width:140px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false);
-            const descListId = `vehicle-desc-${this.rowID}`;
             description[1].id = "description";
-            description[1].setAttribute("list", descListId);
-            const descDatalist = document.createElement("datalist");
-            descDatalist.id = descListId;
-            descriptionOptions.forEach(opt => {
-                  const o = document.createElement("option");
-                  o.value = opt;
-                  descDatalist.appendChild(o);
-            });
-            rowContainer.appendChild(descDatalist);
+
 
             var quantity = createInput_Infield("Qty", 1, "width:60px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 1);
             quantity[1].id = "quantity";
@@ -1705,6 +1696,17 @@ class VehicleTemplate extends SubMenu {
             var height = createInput_Infield("Height", 0, "width:120px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 50, {postfix: "mm"});
             height[1].id = "height";
             height[1].setAttribute("min", "0");
+
+            const combo_3M = createButton("3M", "width:40px;height:45px;margin:5px;", () => {
+                  dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
+                  dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
+            });
+            const combo_Poly = createButton("Py", "width:40px;height:45px;margin:5px;", () => {
+                  dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
+                  dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
+            });
+            rowContainer.appendChild(combo_3M);
+            rowContainer.appendChild(combo_Poly);
 
             var tempThis = this;
             var deleteBtn = createButton("X", "width:40px;height:40px;margin:0px;background-color:red;border-color:red;position:absolute;top:5px;right:5px;", () => {
@@ -1765,16 +1767,7 @@ class VehicleTemplate extends SubMenu {
                   }
             }
 
-            const combo_3M = createButton("3M", "width:40px;height:45px;margin:5px;", () => {
-                  dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
-                  dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
-            });
-            const combo_Poly = createButton("Py", "width:40px;height:45px;margin:5px;", () => {
-                  dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
-                  dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
-            });
-            rowContainer.appendChild(combo_3M);
-            rowContainer.appendChild(combo_Poly);
+
 
             var tapeParts = getPredefinedParts("Tape - ");
             var tapeDropdownElements = [];
@@ -1811,7 +1804,7 @@ class VehicleTemplate extends SubMenu {
             this.callback();
       };
 
-      Update() {}
+      Update() { }
 
       rowObjects = [];
       uniqueGroupsByKeys = [];
