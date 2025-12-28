@@ -287,6 +287,33 @@ class OrderHome {
                         return formData;
                   };
             }
+
+            if (!cbEmailAttachment._originalGetAttachments) {
+                  cbEmailAttachment._originalGetAttachments = cbEmailAttachment.GetAttachments.bind(cbEmailAttachment);
+                  cbEmailAttachment.GetAttachments = function () {
+                        const existing = cbEmailAttachment._originalGetAttachments();
+                        const formData = existing || new FormData();
+
+                        cbEmailAttachment.remoteAttachments.forEach((attachment, idx) => {
+                              formData.append(`remote_file_${idx}`, attachment.blob, attachment.name);
+                        });
+
+                        if (!existing && cbEmailAttachment.remoteAttachments.length === 0) {
+                              return null;
+                        }
+
+                        return formData;
+                  };
+            }
+
+            const span = document.createElement("span");
+            Object.assign(span.style, style);
+
+            const contents = range.extractContents();
+            span.appendChild(contents);
+            range.insertNode(span);
+            selection.removeAllRanges();
+            selection.selectAllChildren(span);
       }
 
       addRemoteAttachment(name, blob, index) {
