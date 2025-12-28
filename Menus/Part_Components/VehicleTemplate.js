@@ -1,3 +1,1557 @@
+const VEHICLE_HANDLE_TYPES = ['topleft', 'top', 'topright', 'right', 'bottomright', 'bottom', 'bottomleft', 'left', 'center'];
+
+function vehicle_createSvgElement(type, attributes = {}) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', type);
+      Object.entries(attributes).forEach(([key, value]) => {
+            if(value !== undefined && value !== null) {
+                  el.setAttribute(key, value);
+            }
+      });
+      return el;
+}
+
+function vehicle_pointInPolygon(numCorners, vertsX, vertsY, x, y) {
+      let i, j = 0;
+      let c = false;
+      for(i = 0, j = numCorners - 1; i < numCorners; j = i++) {
+            if(((vertsY[i] > y) !== (vertsY[j] > y)) && (x < (vertsX[j] - vertsX[i]) * (y - vertsY[i]) / (vertsY[j] - vertsY[i]) + vertsX[i])) {
+                  c = !c;
+            }
+      }
+      return c;
+}
+
+function vehicle_cloneRect(rect) {
+      return JSON.parse(JSON.stringify(rect));
+}
+
+var VehicleMenu_Template;
+var VehicleMenu_MenuContainer;
+let VehicleMenu_Production;
+let VehicleMenu_TotalQuantity;
+let VehicleMenu_Install;
+let VehicleMenu_Artwork;
+
+function vehicleToast(message, type = "info") {
+      if(typeof Toast !== "undefined" && Toast.notify) {
+            Toast.notify(message, 3000, {position: "top-right", type});
+      } else if(typeof Ordui !== "undefined" && Ordui.Alert) {
+            Ordui.Alert(message);
+      } else {
+            alert(message);
+      }
+}
+
+class Point {
+      constructor(x = 0, y = 0) {
+            this.x = x;
+            this.y = y;
+      }
+}
+
+class TextCoord {
+      constructor(u = 0, v = 0) {
+            this.u = u;
+            this.v = v;
+      }
+}
+
+class Triangle {
+      constructor(p0, p1, p2, t0, t1, t2) {
+            this.p0 = p0;
+            this.p1 = p1;
+            this.p2 = p2;
+            this.t0 = t0;
+            this.t1 = t1;
+            this.t2 = t2;
+      }
+}
+
+class VehicleMenu extends LHSMenuWindow {
+      #dragZoomSVG;
+      #svgLayers = {};
+      #defs;
+      #toastPosition = "top-right";
+      #layoutOrientation = "vertical";
+      #leftPane;
+      #rightPane;
+      #rowFieldCache = [];
+      #isDraggingRect = false;
+      #state = {
+            activeRectIndex: null,
+            activeRectHandle: null,
+            activeImageIndex: null,
+            activeImageHandle: null,
+            dragStartMouse: null,
+            dragStartRect: null,
+            dragStartImage: null,
+            dragStartImageOffset: null
+      };
+      #images = [];
+      #copiedImage = null;
+      #copiedImageScale = null;
+      #copiedRectScale = null;
+
+      #canvasWidth = 1000;
+      #canvasHeight = 600;
+
+      #showMeasures = false;
+      #showQuantity = true;
+      #showDescription = true;
+      #showBackground = true;
+      #showImages = true;
+      #showRectangles = true;
+      #showHandles = true;
+
+      #onKeyDownHandler = (event) => {this.#handleKeyDown(event);};
+
+      constructor(width, height, ID, windowTitle) {
+            super(width, height, ID, windowTitle);
+            this.addPages(1);
+            this.doesTick = false;
+      }
+
+      show() {
+            super.show();
+            super.clearPages();
+            super.clearFooter();
+            document.addEventListener('keydown', this.#onKeyDownHandler);
+            this.createContent();
+      }
+
+      hide() {
+            this.#images = [];
+            this.#state = {
+                  activeRectIndex: null,
+                  activeRectHandle: null,
+                  activeImageIndex: null,
+                  activeImageHandle: null,
+                  dragStartMouse: null,
+                  dragStartRect: null,
+                  dragStartImage: null,
+                  dragStartImageOffset: null
+            };
+
+            document.removeEventListener('keydown', this.#onKeyDownHandler);
+
+            super.hide();
+      }
+
+      createContent() {
+            const page = this.getPage(0);
+            const footer = this.footer;
+            let thisClass = this;
+
+            page.innerHTML = "";
+            page.style.display = "flex";
+            page.style.flexDirection = "row";
+            page.style.width = "100%";
+            page.style.height = "100%";
+
+            const leftPane = document.createElement('div');
+            leftPane.style = "width:50%;height:100%;overflow:auto;padding:10px;box-sizing:border-box;";
+            const rightPane = document.createElement('div');
+            rightPane.style = "width:50%;height:100%;position:relative;overflow:hidden;";
+            this.#leftPane = leftPane;
+            this.#rightPane = rightPane;
+
+            const container = document.createElement('div');
+            container.style = "width:100%;height:100%;display:block;background-color:white;position: relative;";
+
+            const menuContainer = document.createElement('div');
+            menuContainer.style = "display:block; width:60px;background-color:" + COLOUR.Blue + ";height:100%;position:absolute;top:0px;right:0px;";
+            menuContainer.onwheel = function(event) {event.preventDefault();};
+            container.appendChild(menuContainer);
+            VehicleMenu_MenuContainer = menuContainer;
+
+            this.#initDragZoom(container);
+            this.#initLayers();
+
+            const imageSrcs = [];
+            const addDefaultRect = (item) => {
+                  this.#ensureRectDefaults(item);
+                  thisClass.rects.push(item);
+                  VehicleMenu_Template.addRow(item);
+                  this.updateFromTemplateFields();
+                  this.refresh();
+            };
+
+            const addItem = (imageSrc, text, overrideCss, overrideImageCss, callback) => {
+                  const itemContainer = document.createElement('div');
+                  itemContainer.style = "display:block;float:left;width:100%;height:70px;margin:0px;cursor:pointer;background-color:" + COLOUR.Blue + ";padding:0px;border-bottom:1px solid #00b;";
+                  itemContainer.style.cssText += overrideCss || "";
+                  itemContainer.onmouseover = function() {itemContainer.style.backgroundColor = "#333";};
+                  itemContainer.onmouseout = function() {itemContainer.style.backgroundColor = COLOUR.Blue;};
+                  itemContainer.onclick = function() {
+                        if(callback) callback();
+                        deselectSelectorBars(true);
+                        selectorBar.style.backgroundColor = "red";
+                  };
+
+                  const selectorBar = document.createElement('div');
+                  selectorBar.style = "display:block;float:left;width:5px;height:100%;";
+                  selectorBar.id = "selectorBar2";
+                  itemContainer.appendChild(selectorBar);
+
+                  const image = document.createElement('img');
+                  image.src = imageSrc;
+                  image.style = "display:block;float:left;width:35px;height:25px;padding:7.5px 10px;filter:invert(100%);background-size:cover;";
+                  image.style.cssText += overrideImageCss || "";
+                  itemContainer.appendChild(image);
+
+                  const itemText = document.createElement('p');
+                  itemText.innerText = text;
+                  itemText.style = "display:block;float:left;width:90%;height:15px;margin:0px;padding:0px;color:white;font-weight:bold;font-size:12px;text-align: center;";
+                  itemContainer.appendChild(itemText);
+
+                  menuContainer.appendChild(itemContainer);
+            };
+
+            const addFileItem = (imageSrc, text, overrideCss, callback) => {
+                  const itemContainer = document.createElement('div');
+                  itemContainer.style = "display:block;float:left;width:100%;height:70px;margin:0px;cursor:pointer;background-color:" + COLOUR.Blue + ";padding:0px;border-bottom:1px solid #00b;position:relative;";
+                  itemContainer.style.cssText += overrideCss || "";
+                  itemContainer.onmouseover = function() {itemContainer.style.backgroundColor = "#333";};
+                  itemContainer.onmouseout = function() {itemContainer.style.backgroundColor = COLOUR.Blue;};
+                  itemContainer.onclick = function(e) {
+                        e.stopPropagation();
+                        deselectSelectorBars(true);
+                        selectorBar.style.backgroundColor = "red";
+                        $(itemChooseBtn)[0].click();
+                  };
+
+                  const selectorBar = document.createElement('div');
+                  selectorBar.style = "display:block;float:left;width:5px;height:100%;";
+                  selectorBar.id = "selectorBar2";
+                  itemContainer.appendChild(selectorBar);
+
+                  const image = document.createElement('img');
+                  image.src = imageSrc;
+                  image.style = "display:block;float:left;width:35px;height:25px;padding:7.5px 10px;filter:invert(100%);background-size:cover;";
+                  itemContainer.appendChild(image);
+
+                  const itemText = document.createElement('div');
+                  itemText.innerText = text;
+                  itemText.style = "display:block;float:left;width:90%;height:15px;padding:0px;color:white;font-weight:bold;font-size:12px;text-align: center;";
+                  itemContainer.appendChild(itemText);
+
+                  const itemChooseBtn = document.createElement('input');
+                  itemChooseBtn.style = "z-index:1000";
+                  itemChooseBtn.type = "file";
+                  itemChooseBtn.id = "itemChooseBtn";
+                  itemChooseBtn.multiple = true;
+                  itemChooseBtn.style = "display:none";
+                  itemChooseBtn.accept = "image/jpeg, image/png, image/jpg, image/svg+xml";
+                  itemContainer.appendChild(itemChooseBtn);
+
+                  const itemChooseLabel = document.createElement('label');
+                  itemChooseLabel.htmlFor = "itemChooseBtn";
+                  itemChooseLabel.innerText = "Choose";
+                  itemChooseLabel.style = "display:none;background-color: indigo;color: white;padding: 0.5rem;font - family: sans - serif;border - radius: 0.3rem;cursor: pointer;position:absolute;top:0px;left:0px";
+                  itemContainer.appendChild(itemChooseLabel);
+
+                  itemContainer.addEventListener("change", async (e) => {
+                        imageSrcs.length = 0;
+                        if(window.File && window.FileReader && window.FileList && window.Blob) {
+                              const files = e.target.files;
+                              for(let i = 0; i < files.length; i++) {
+                                    if(!files[i].type.match("image")) {
+                                          alert("Not supported format");
+                                          continue;
+                                    }
+                                    const picReader = new FileReader();
+                                    picReader.addEventListener("load", function(event) {
+                                          const picFile = event.target;
+                                          imageSrcs.push("" + picFile.result);
+                                          if(i === files.length - 1 && callback) callback();
+                                    });
+                                    picReader.readAsDataURL(files[i]);
+                              }
+                        } else {
+                              alert("Your browser does not support File API");
+                        }
+                  });
+
+                  menuContainer.appendChild(itemContainer);
+            };
+
+            addItem(ICON.add, "Vinyl", null, null, function() {
+                  addDefaultRect({
+                        x: thisClass.#getCenterPosReal().x - 300,
+                        y: thisClass.#getCenterPosReal().y - 300,
+                        w: 600,
+                        h: 600,
+                        qty: 1,
+                        vinyl: VinylLookup["Air Release"],
+                        laminate: LaminateLookup["Gloss"],
+                        appTape: AppTapeLookup["Medium Tack"],
+                        description: "Vinyl",
+                        colour: "#FF5A5A"
+                  });
+            });
+            addItem(ICON.add, "Oneway", null, null, function() {
+                  addDefaultRect({
+                        x: thisClass.#getCenterPosReal().x - 300,
+                        y: thisClass.#getCenterPosReal().y - 300,
+                        w: 600,
+                        h: 600,
+                        qty: 1,
+                        vinyl: VinylLookup["Oneway Vehicle"],
+                        laminate: LaminateLookup["3m Gloss (Standard)"],
+                        appTape: "None",
+                        description: "Oneway",
+                        colour: "#5EEF7D"
+                  });
+            });
+            addItem(ICON.add, "Panel", null, null, function() {
+                  addDefaultRect({
+                        x: thisClass.#getCenterPosReal().x - 300,
+                        y: thisClass.#getCenterPosReal().y - 300,
+                        w: 600,
+                        h: 600,
+                        qty: 1,
+                        isPanel: true,
+                        vinyl: VinylLookup["Air Release"],
+                        laminate: LaminateLookup["Gloss"],
+                        appTape: "None",
+                        description: "Panel",
+                        colour: "#FF5CFF"
+                  });
+            });
+            addItem(ICON.add, "Tray Back", null, null, function() {
+                  addDefaultRect({
+                        x: thisClass.#getCenterPosReal().x - 300,
+                        y: thisClass.#getCenterPosReal().y - 300,
+                        w: 1800,
+                        h: 300,
+                        qty: 1,
+                        isPanel: true,
+                        vinyl: VinylLookup["Air Release"],
+                        laminate: LaminateLookup["Gloss"],
+                        appTape: "None",
+                        description: "Tray Back Panel",
+                        colour: "#FF5CFF"
+                  });
+            });
+            addItem(ICON.add, "Tray Sides", null, null, function() {
+                  addDefaultRect({
+                        x: thisClass.#getCenterPosReal().x - 300,
+                        y: thisClass.#getCenterPosReal().y - 300,
+                        w: 2500,
+                        h: 300,
+                        qty: 2,
+                        isPanel: true,
+                        vinyl: VinylLookup["Air Release"],
+                        laminate: LaminateLookup["Gloss"],
+                        appTape: "None",
+                        description: "Tray Sides Panel",
+                        colour: "#FF5CFF"
+                  });
+            });
+
+            addFileItem(ICON.add, "Images", null, async () => {
+                  await this.addSkewableImages(null, null, imageSrcs);
+                  this.refresh();
+            });
+
+            addItem(ICON.convert, "SVG Convert", null, null, function() {window.open("https://cloudconvert.com/eps-to-svg", "_blank");});
+
+            addItem(ICON.add, "Copy Template", null, null, function() {
+                  vehicleToast("Template Copied to Clipboard", "success");
+                  saveToClipboard(JSON.stringify(thisClass.rects));
+            });
+
+            const createVehicleProduct = async () => {
+                  thisClass.minimize();
+                  await AddBlankProduct();
+                  const productNo = getNumProducts();
+                  let partNo = 0;
+                  await AddPart("No Cost Part", productNo);
+                  partNo++;
+                  await setPartDescription(productNo, partNo, "CODE [Automatic]");
+                  partNo = await setPartNotes(productNo, partNo, this.#dragZoomSVG.unscaledSVGString);
+                  await savePart(productNo, partNo);
+                  await setProductName(productNo, "Vehicle Graphics");
+                  partNo = await VehicleMenu_Template.Create(productNo, partNo);
+                  partNo = await VehicleMenu_Production.Create(productNo, partNo);
+                  partNo = await VehicleMenu_Install.Create(productNo, partNo);
+                  partNo = await VehicleMenu_Artwork.Create(productNo, partNo);
+                  const pSummary = VehicleMenu_Template.Description() +
+                        VehicleMenu_Production.Description() +
+                        VehicleMenu_Artwork.Description() +
+                        VehicleMenu_Install.Description();
+
+                  await setProductSummary(productNo, pSummary);
+                  vehicleToast("Done.", "success");
+            };
+
+            const measuresCkb = createCheckbox_Infield("Show Measurements", this.#showMeasures, "width: 200px;", () => {this.#showMeasures = measuresCkb[1].checked; this.refresh();}, footer);
+            const qtyCkb = createCheckbox_Infield("Show Quantity", this.#showQuantity, "width: 200px;", () => {this.#showQuantity = qtyCkb[1].checked; this.refresh();}, footer);
+            const descriptionCkb = createCheckbox_Infield("Show Description", this.#showDescription, "width: 200px;", () => {this.#showDescription = descriptionCkb[1].checked; this.refresh();}, footer);
+            const backgroundCkb = createCheckbox_Infield("Show Background", this.#showBackground, "width: 200px;", () => {this.#showBackground = backgroundCkb[1].checked; this.refresh();}, footer);
+            const imagesCkb = createCheckbox_Infield("Show Images", this.#showImages, "width: 200px;", () => {this.#showImages = imagesCkb[1].checked; this.refresh();}, footer);
+            const rectanglesCkb = createCheckbox_Infield("Show Rectangles", this.#showRectangles, "width: 200px;", () => {this.#showRectangles = rectanglesCkb[1].checked; this.refresh();}, footer);
+            const handlesCkb = createCheckbox_Infield("Show Handles", this.#showHandles, "width: 200px;", () => {this.#showHandles = handlesCkb[1].checked; this.refresh();}, footer);
+            const layoutToggle = createDropdown_Infield("Layout", 0, "width: 200px;", [createDropdownOption("Vertical Split", "vertical"), createDropdownOption("Horizontal Split", "horizontal")], () => {
+                  this.#layoutOrientation = layoutToggle[1].value === "horizontal" ? "horizontal" : "vertical";
+                  this.#applyLayout();
+            }, footer);
+
+            VehicleMenu_TotalQuantity = new TotalQuantity(leftPane, this.#dragZoomSVG?.svgG, () => {this.updateFromTemplateFields();}, this.#dragZoomSVG);
+            VehicleMenu_Template = new VehicleTemplate(leftPane, this.#dragZoomSVG?.svgG, () => {this.initRects(); this.refresh(); this.initBackground();}, () => {this.updateRectsFromFields();}, (rowNumber) => {this.deleteRect(rowNumber);});
+            VehicleMenu_Production = new Production(leftPane, this.#dragZoomSVG?.svgG, () => { });
+            VehicleMenu_Production.requiredName = "Production";
+            VehicleMenu_Install = new Install(leftPane, this.#dragZoomSVG?.svgG, () => { });
+            VehicleMenu_Artwork = new Artwork(leftPane, this.#dragZoomSVG?.svgG, () => { });
+            const originalAddRow = VehicleMenu_Template.addRow.bind(VehicleMenu_Template);
+            VehicleMenu_Template.addRow = (item) => {
+                  const res = originalAddRow(item);
+                  this.#buildRowCache();
+                  return res;
+            };
+            const originalDeleteRow = VehicleMenu_Template.deleteRow.bind(VehicleMenu_Template);
+            VehicleMenu_Template.deleteRow = (rowN) => {
+                  const res = originalDeleteRow(rowN);
+                  this.#buildRowCache();
+                  return res;
+            };
+
+            rightPane.appendChild(container);
+            page.appendChild(leftPane);
+            page.appendChild(rightPane);
+            this.#applyLayout();
+
+            const fieldCreateProduct = createButton('Create Product', 'width:300px;height:35px;margin:0px;display:block;float:right', createVehicleProduct);
+            footer.appendChild(fieldCreateProduct);
+
+            this.initBackground();
+            this.initRects();
+            this.refresh();
+      }
+
+      #initDragZoom(container) {
+            const svgTemplate = '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="8000mm" height="6000mm" viewBox="0 0 8000 6000"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)"></g></svg>';
+            this.#dragZoomSVG = new DragZoomSVG("calc(100% - 60px)", "100%", svgTemplate, container, {
+                  convertShapesToPaths: false,
+                  scaleStrokeOnScroll: false,
+                  scaleFontOnScroll: true,
+                  defaultStrokeWidth: 1,
+                  defaultFontSize: 12,
+                  overrideCssStyles: "float:left;"
+            });
+
+            const baseOnZoom = this.#dragZoomSVG.onZoom.bind(this.#dragZoomSVG);
+            this.#dragZoomSVG.onZoom = () => {
+                  baseOnZoom();
+                  this.refresh();
+            };
+
+            this.#dragZoomSVG.onMouseUpdate = () => { };
+
+            this.#dragZoomSVG.container.addEventListener('contextmenu', (event) => this.#handleContextMenu(event));
+            this.#dragZoomSVG.container.addEventListener('click', () => {this.#clearSelections(); this.refresh();});
+      }
+
+      #applyLayout() {
+            const page = this.getPage(0);
+            if(this.#layoutOrientation === "horizontal") {
+                  page.style.flexDirection = "column";
+                  this.#leftPane.style.width = "100%";
+                  this.#rightPane.style.width = "100%";
+                  this.#leftPane.style.height = "50%";
+                  this.#rightPane.style.height = "50%";
+            } else {
+                  page.style.flexDirection = "row";
+                  this.#leftPane.style.width = "50%";
+                  this.#rightPane.style.width = "50%";
+                  this.#leftPane.style.height = "100%";
+                  this.#rightPane.style.height = "100%";
+            }
+      }
+
+      #initLayers() {
+            this.#defs = vehicle_createSvgElement('defs');
+            this.#dragZoomSVG.svg.insertBefore(this.#defs, this.#dragZoomSVG.svg.firstChild);
+            this.#svgLayers.background = vehicle_createSvgElement('g', {id: 'vehicle-background-layer'});
+            this.#svgLayers.images = vehicle_createSvgElement('g', {id: 'vehicle-images-layer'});
+            this.#svgLayers.rects = vehicle_createSvgElement('g', {id: 'vehicle-rect-layer'});
+            this.#svgLayers.handles = vehicle_createSvgElement('g', {id: 'vehicle-handle-layer'});
+            this.#svgLayers.labels = vehicle_createSvgElement('g', {id: 'vehicle-label-layer'});
+            this.#svgLayers.measures = vehicle_createSvgElement('g', {id: 'vehicle-measure-layer'});
+
+            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.background);
+            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.images);
+            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.rects);
+            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.measures);
+            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.labels);
+            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.handles);
+      }
+
+      get rects() {
+            if(!this._rects) this._rects = [];
+            return this._rects;
+      }
+
+      set rects(val) {this._rects = val;}
+
+      initRects() {
+            if(!VehicleMenu_Template.isStandardTemplate) {
+                  this.rects = [];
+                  VehicleMenu_Template.clearRows();
+            } else {
+                  this.rects = VehicleMenu_Template.selectedTemplateData.template_rects.map((rect) => ({
+                        x: parseFloat(rect.x),
+                        y: parseFloat(rect.y),
+                        w: roundNumber(parseFloat(rect.w), 2),
+                        h: roundNumber(parseFloat(rect.h), 2),
+                        qty: parseFloat(rect.qty),
+                        isPanel: rect.isPanel,
+                        vinyl: rect.vinyl,
+                        laminate: rect.laminate,
+                        appTape: rect.appTape,
+                        description: rect.description,
+                        colour: rect.colour
+                  }));
+                  VehicleMenu_Template.clearRows();
+                  this.rects.forEach((item) => VehicleMenu_Template.addRow(vehicle_cloneRect(item)));
+                  this.updateFromTemplateFields();
+
+                  VehicleMenu_Production.required = true;
+                  VehicleMenu_Production.productionTime = VehicleMenu_Template.selectedTemplateData.production_time;
+                  VehicleMenu_Production.productionTotalEach = VehicleMenu_Template.selectedTemplateData.production_TE;
+
+                  VehicleMenu_Install.installRequired = true;
+                  VehicleMenu_Install.installMinutes = VehicleMenu_Template.selectedTemplateData.install_time;
+                  VehicleMenu_Install.installRate = VehicleMenu_Template.selectedTemplateData.install_rate;
+                  VehicleMenu_Install.installTotalEach = VehicleMenu_Template.selectedTemplateData.install_TE;
+            }
+            this.#buildRowCache();
+      }
+
+      initBackground() {
+            this.#svgLayers.background.innerHTML = "";
+            this.#images = [];
+
+            if(VehicleMenu_Template.isStandardTemplate) {
+                  const img = new Image();
+                  const tem = VehicleMenu_Template.templateData;
+                  img.src = tem[1];
+                  img.onload = () => {
+                        const imageEl = vehicle_createSvgElement('image', {
+                              href: img.src,
+                              width: tem[2],
+                              height: tem[3],
+                              x: 0,
+                              y: 0,
+                              preserveAspectRatio: 'none'
+                        });
+                        this.#svgLayers.background.appendChild(imageEl);
+                        this.#dragZoomSVG.centerAndFitSVGContent();
+                  };
+            }
+      }
+
+      refresh() {
+            this.#defs.innerHTML = "";
+            this.#svgLayers.images.innerHTML = "";
+            this.#svgLayers.rects.innerHTML = "";
+            this.#svgLayers.handles.innerHTML = "";
+            this.#svgLayers.labels.innerHTML = "";
+            this.#svgLayers.measures.innerHTML = "";
+
+            this.#applyLayerVisibility();
+
+            if(this.#showImages) this.#renderImages();
+            if(this.#showRectangles) this.#renderRects();
+      }
+
+      #applyBackgroundScale(scaleW = 1, scaleH = 1) {
+            const bgImage = this.#svgLayers.background?.querySelector('image');
+            if(!bgImage) {
+                  vehicleToast('No background image found to scale', 'error');
+                  return;
+            }
+            const currentW = parseFloat(bgImage.getAttribute('width')) || bgImage.width?.baseVal?.value || 0;
+            const currentH = parseFloat(bgImage.getAttribute('height')) || bgImage.height?.baseVal?.value || 0;
+            if(!currentW || !currentH) {
+                  vehicleToast('Unable to determine background size', 'error');
+                  return;
+            }
+            const newW = currentW * scaleW;
+            const newH = currentH * scaleH;
+            bgImage.setAttribute('width', newW);
+            bgImage.setAttribute('height', newH);
+            this.refresh();
+            vehicleToast(`Background scaled to ${newW.toFixed(1)} x ${newH.toFixed(1)}`, 'success');
+      }
+
+      #applyLayerVisibility() {
+            const setDisplay = (layer, isVisible) => {
+                  if(layer) layer.setAttribute('display', isVisible ? 'inline' : 'none');
+            };
+
+            setDisplay(this.#svgLayers.background, this.#showBackground);
+            setDisplay(this.#svgLayers.images, this.#showImages);
+            setDisplay(this.#svgLayers.rects, this.#showRectangles);
+            setDisplay(this.#svgLayers.labels, this.#showRectangles && (this.#showDescription || this.#showQuantity));
+            setDisplay(this.#svgLayers.handles, this.#showHandles);
+            setDisplay(this.#svgLayers.measures, this.#showMeasures);
+      }
+
+      #renderRects() {
+            const scale = this.#dragZoomSVG.scale || 1;
+            const handleRadius = 8 / scale;
+            const textSize = 14 / scale;
+
+            this.rects.forEach((rect, index) => {
+                  const rectEl = vehicle_createSvgElement('rect', {
+                        x: rect.x,
+                        y: rect.y,
+                        width: rect.w,
+                        height: rect.h,
+                        fill: rect.colour,
+                        'fill-opacity': 0.65,
+                        stroke: COLOUR.Black,
+                        'stroke-width': 1 / scale
+                  });
+                  rectEl.addEventListener('mousedown', (e) => this.#startRectDrag(e, index, 'center'));
+                  rectEl.addEventListener('click', (e) => {e.stopPropagation(); this.#selectRect(index);});
+                  rectEl.addEventListener('mouseenter', () => {
+                        rectEl.setAttribute('stroke-width', 2 / scale);
+                        this.#dragZoomSVG.svg.style.cursor = 'grab';
+                  });
+                  rectEl.addEventListener('mouseleave', () => {
+                        rectEl.setAttribute('stroke-width', 1 / scale);
+                        this.#dragZoomSVG.svg.style.cursor = 'auto';
+                  });
+                  this.#svgLayers.rects.appendChild(rectEl);
+
+                  if(this.#showDescription && rect.description) {
+                        const text = vehicle_createSvgElement('text', {
+                              x: rect.x + rect.w / 2,
+                              y: rect.y + rect.h / 2,
+                              'text-anchor': 'middle',
+                              'alignment-baseline': 'middle',
+                              'font-size': `${textSize}px`,
+                              fill: COLOUR.Black,
+                              'pointer-events': 'none'
+                        });
+                        text.textContent = rect.description;
+                        this.#svgLayers.labels.appendChild(text);
+                  }
+
+                  if(this.#showQuantity) {
+                        const qtyText = vehicle_createSvgElement('text', {
+                              x: rect.x + rect.w / 2,
+                              y: rect.y,
+                              'text-anchor': 'middle',
+                              'alignment-baseline': 'hanging',
+                              'font-size': `${textSize}px`,
+                              fill: COLOUR.Black,
+                              'pointer-events': 'none'
+                        });
+                        qtyText.textContent = `x${rect.qty}`;
+                        this.#svgLayers.labels.appendChild(qtyText);
+                  }
+
+                  if(this.#showMeasures) {
+                        new TSVGMeasurement(this.#svgLayers.measures, {
+                              target: rectEl,
+                              direction: 'both',
+                              sides: ['top', 'left'],
+                              autoLabel: true,
+                              unit: 'mm',
+                              scale: 1,
+                              precision: 1,
+                              arrowSize: 10 / scale,
+                              textOffset: 15 / scale,
+                              lineWidth: 0.5 / scale,
+                              fontSize: `${14 / scale}px`,
+                              tickLength: 15 / scale,
+                              handleRadius: 6 / scale,
+                              offsetY: 20 / scale,
+                              offsetX: 20 / scale,
+                              textBackgroundColor: "yellow"
+                        });
+                  }
+
+                  if(this.#state.activeRectIndex === index && this.#showHandles) {
+                        VEHICLE_HANDLE_TYPES.forEach((handleType) => {
+                              const pos = this.#getHandlePosition(rect, handleType);
+                              const isActive = this.#state.activeRectHandle === handleType;
+                              const baseFill = isActive ? (COLOUR.DarkBlue || '#00008b') : COLOUR.Blue;
+                              const baseRadius = isActive ? handleRadius * 1.3 : handleRadius;
+                              const handle = vehicle_createSvgElement('circle', {
+                                    cx: pos.x,
+                                    cy: pos.y,
+                                    r: baseRadius,
+                                    fill: baseFill,
+                                    'fill-opacity': 0.8,
+                                    stroke: COLOUR.Black,
+                                    'stroke-width': 1 / scale
+                              });
+                              handle.addEventListener('mousedown', (e) => this.#startRectDrag(e, index, handleType));
+                              handle.addEventListener('mouseenter', () => {
+                                    handle.setAttribute('fill', COLOUR.DarkBlue || '#0000aa');
+                                    handle.setAttribute('r', handleRadius * 1.2);
+                                    this.#dragZoomSVG.svg.style.cursor = 'grab';
+                              });
+                              handle.addEventListener('mouseleave', () => {
+                                    handle.setAttribute('fill', baseFill);
+                                    handle.setAttribute('r', baseRadius);
+                                    this.#dragZoomSVG.svg.style.cursor = 'auto';
+                              });
+                              this.#svgLayers.handles.appendChild(handle);
+                        });
+                  }
+            });
+      }
+
+      #renderImages() {
+            const scale = this.#dragZoomSVG.scale || 1;
+            const handleRadius = 8 / scale;
+
+            this.#images.forEach((imageObj, imgIndex) => {
+                  const imgEl = vehicle_createSvgElement('image', {
+                        x: imageObj.x,
+                        y: imageObj.y,
+                        width: imageObj.w,
+                        height: imageObj.h,
+                        'preserveAspectRatio': 'none'
+                  });
+                  imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', imageObj.src);
+                  this.#svgLayers.images.appendChild(imgEl);
+
+                  const outline = vehicle_createSvgElement('rect', {
+                        x: imageObj.x,
+                        y: imageObj.y,
+                        width: imageObj.w,
+                        height: imageObj.h,
+                        fill: 'none',
+                        stroke: COLOUR.Black,
+                        'stroke-width': 1 / scale,
+                        'stroke-dasharray': '6 4'
+                  });
+                  outline.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, 'center'));
+                  outline.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.#state.activeImageIndex = imgIndex;
+                        this.#state.activeImageHandle = null;
+                        this.#state.activeRectIndex = null;
+                        this.refresh();
+                  });
+                  outline.addEventListener('mouseenter', () => {this.#dragZoomSVG.svg.style.cursor = 'grab';});
+                  outline.addEventListener('mouseleave', () => {this.#dragZoomSVG.svg.style.cursor = 'auto';});
+                  this.#svgLayers.images.appendChild(outline);
+
+                  const overlay = vehicle_createSvgElement('rect', {
+                        x: imageObj.x,
+                        y: imageObj.y,
+                        width: imageObj.w,
+                        height: imageObj.h,
+                        fill: 'transparent'
+                  });
+                  overlay.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, 'grabbable'));
+                  overlay.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.#state.activeImageIndex = imgIndex;
+                        this.#state.activeImageHandle = null;
+                        this.#state.activeRectIndex = null;
+                        this.refresh();
+                  });
+                  overlay.addEventListener('mouseenter', () => {this.#dragZoomSVG.svg.style.cursor = 'grab';});
+                  overlay.addEventListener('mouseleave', () => {this.#dragZoomSVG.svg.style.cursor = 'auto';});
+                  this.#svgLayers.images.appendChild(overlay);
+
+                  if(this.#state.activeImageIndex === imgIndex && this.#showHandles) {
+                        VEHICLE_HANDLE_TYPES.forEach((handleType) => {
+                              const pos = this.#getImageHandlePosition(imageObj, handleType);
+                              const isActive = this.#state.activeImageHandle === handleType;
+                              const baseFill = isActive ? (COLOUR.DarkBlue || '#00008b') : COLOUR.Blue;
+                              const baseRadius = isActive ? handleRadius * 1.3 : handleRadius;
+                              const handle = vehicle_createSvgElement('circle', {
+                                    cx: pos.x,
+                                    cy: pos.y,
+                                    r: baseRadius,
+                                    fill: baseFill,
+                                    stroke: COLOUR.Black,
+                                    'stroke-width': 1 / scale
+                              });
+                              handle.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, handleType));
+                              handle.addEventListener('mouseenter', () => {
+                                    handle.setAttribute('fill', COLOUR.DarkBlue || '#0000aa');
+                                    handle.setAttribute('r', handleRadius * 1.2);
+                                    this.#dragZoomSVG.svg.style.cursor = 'grab';
+                              });
+                              handle.addEventListener('mouseleave', () => {
+                                    handle.setAttribute('fill', baseFill);
+                                    handle.setAttribute('r', baseRadius);
+                                    this.#dragZoomSVG.svg.style.cursor = 'auto';
+                              });
+                              this.#svgLayers.handles.appendChild(handle);
+                        });
+                  }
+            });
+      }
+
+      #startRectDrag(event, rectIndex, handleType) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.#dragZoomSVG.allowPanning = false;
+            this.#dragZoomSVG.updateMouseXY(event);
+
+            this.#selectRect(rectIndex);
+            this.#state.activeImageIndex = null;
+            this.#state.activeRectHandle = handleType;
+            this.#state.dragStartMouse = {...this.#dragZoomSVG.relativeMouseXY};
+            this.#state.dragStartRect = vehicle_cloneRect(this.rects[rectIndex]);
+            this.#isDraggingRect = true;
+            this.#dragZoomSVG.svg.style.cursor = 'grabbing';
+
+            const onMove = (e) => {
+                  this.#dragZoomSVG.updateMouseXY(e);
+                  this.#updateRectFromDrag(rectIndex);
+                  this.refresh();
+            };
+            const onUp = () => {
+                  window.removeEventListener('mousemove', onMove);
+                  window.removeEventListener('mouseup', onUp);
+                  this.#dragZoomSVG.allowPanning = true;
+                  this.#state.activeRectHandle = null;
+                  this.#state.dragStartMouse = null;
+                  this.#state.dragStartRect = null;
+                  this.#syncRowFromRect(rectIndex);
+                  this.#isDraggingRect = false;
+                  this.refresh();
+                  this.#dragZoomSVG.svg.style.cursor = 'auto';
+            };
+
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+      }
+
+      #startImageDrag(event, imageIndex, cornerIndex) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.#dragZoomSVG.allowPanning = false;
+            this.#dragZoomSVG.updateMouseXY(event);
+
+            this.#state.activeRectIndex = null;
+            this.#state.activeImageIndex = imageIndex;
+            this.#state.activeImageHandle = cornerIndex;
+            this.#state.dragStartMouse = {...this.#dragZoomSVG.relativeMouseXY};
+            this.#state.dragStartImage = vehicle_cloneRect(this.#images[imageIndex]);
+            this.#state.dragStartImageOffset = {
+                  dx: this.#dragZoomSVG.relativeMouseXY.x - this.#images[imageIndex].x,
+                  dy: this.#dragZoomSVG.relativeMouseXY.y - this.#images[imageIndex].y
+            };
+            this.#dragZoomSVG.svg.style.cursor = 'grabbing';
+
+            const onMove = (e) => {
+                  this.#dragZoomSVG.updateMouseXY(e);
+                  this.#updateImageFromDrag(imageIndex);
+                  this.refresh();
+            };
+            const onUp = () => {
+                  window.removeEventListener('mousemove', onMove);
+                  window.removeEventListener('mouseup', onUp);
+                  this.#dragZoomSVG.allowPanning = true;
+                  this.#state.activeImageHandle = null;
+                  this.#state.dragStartMouse = null;
+                  this.#state.dragStartImage = null;
+                  this.#state.dragStartImageOffset = null;
+                  this.refresh();
+                  this.#dragZoomSVG.svg.style.cursor = 'auto';
+            };
+
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onUp);
+      }
+
+      #updateRectFromDrag(index) {
+            const rect = this.rects[index];
+            const startRect = this.#state.dragStartRect;
+            const mouse = this.#dragZoomSVG.relativeMouseXY;
+            const dx = mouse.x - this.#state.dragStartMouse.x;
+            const dy = mouse.y - this.#state.dragStartMouse.y;
+
+            switch(this.#state.activeRectHandle) {
+                  case 'topleft':
+                        rect.x = startRect.x + dx;
+                        rect.y = startRect.y + dy;
+                        rect.w = startRect.w - dx;
+                        rect.h = startRect.h - dy;
+                        break;
+                  case 'top':
+                        rect.y = startRect.y + dy;
+                        rect.h = startRect.h - dy;
+                        break;
+                  case 'topright':
+                        rect.y = startRect.y + dy;
+                        rect.w = startRect.w + dx;
+                        rect.h = startRect.h - dy;
+                        break;
+                  case 'right':
+                        rect.w = startRect.w + dx;
+                        break;
+                  case 'bottomright':
+                        rect.w = startRect.w + dx;
+                        rect.h = startRect.h + dy;
+                        break;
+                  case 'bottom':
+                        rect.h = startRect.h + dy;
+                        break;
+                  case 'bottomleft':
+                        rect.x = startRect.x + dx;
+                        rect.w = startRect.w - dx;
+                        rect.h = startRect.h + dy;
+                        break;
+                  case 'left':
+                        rect.x = startRect.x + dx;
+                        rect.w = startRect.w - dx;
+                        break;
+                  default:
+                        rect.x = startRect.x + dx;
+                        rect.y = startRect.y + dy;
+                        break;
+            }
+            rect.w = Math.max(rect.w, 1);
+            rect.h = Math.max(rect.h, 1);
+      }
+
+      #updateImageFromDrag(index) {
+            const image = this.#images[index];
+            const start = this.#state.dragStartImage;
+            const mouse = this.#dragZoomSVG.relativeMouseXY;
+            const dx = mouse.x - this.#state.dragStartMouse.x;
+            const dy = mouse.y - this.#state.dragStartMouse.y;
+
+            switch(this.#state.activeImageHandle) {
+                  case 'grabbable':
+                        image.x = mouse.x - this.#state.dragStartImageOffset.dx;
+                        image.y = mouse.y - this.#state.dragStartImageOffset.dy;
+                        break;
+                  case 'topleft':
+                        image.x = start.x + dx;
+                        image.y = start.y + dy;
+                        image.w = start.w - dx;
+                        image.h = start.h - dy;
+                        break;
+                  case 'top':
+                        image.y = start.y + dy;
+                        image.h = start.h - dy;
+                        break;
+                  case 'topright':
+                        image.y = start.y + dy;
+                        image.w = start.w + dx;
+                        image.h = start.h - dy;
+                        break;
+                  case 'right':
+                        image.w = start.w + dx;
+                        break;
+                  case 'bottomright':
+                        image.w = start.w + dx;
+                        image.h = start.h + dy;
+                        break;
+                  case 'bottom':
+                        image.h = start.h + dy;
+                        break;
+                  case 'bottomleft':
+                        image.x = start.x + dx;
+                        image.w = start.w - dx;
+                        image.h = start.h + dy;
+                        break;
+                  case 'left':
+                        image.x = start.x + dx;
+                        image.w = start.w - dx;
+                        break;
+                  default:
+                        image.x = start.x + dx;
+                        image.y = start.y + dy;
+                        break;
+            }
+            image.w = Math.max(image.w, 1);
+            image.h = Math.max(image.h, 1);
+      }
+
+      #selectRect(index) {
+            this.#state.activeRectIndex = index;
+            this.#state.activeImageIndex = null;
+      }
+
+      #clearSelections() {
+            this.#state.activeRectIndex = null;
+            this.#state.activeRectHandle = null;
+            this.#state.activeImageIndex = null;
+            this.#state.activeImageHandle = null;
+      }
+
+      #getHandlePosition(rect, handleType) {
+            switch(handleType) {
+                  case 'topleft': return {x: rect.x, y: rect.y};
+                  case 'top': return {x: rect.x + rect.w / 2, y: rect.y};
+                  case 'topright': return {x: rect.x + rect.w, y: rect.y};
+                  case 'right': return {x: rect.x + rect.w, y: rect.y + rect.h / 2};
+                  case 'bottomright': return {x: rect.x + rect.w, y: rect.y + rect.h};
+                  case 'bottom': return {x: rect.x + rect.w / 2, y: rect.y + rect.h};
+                  case 'bottomleft': return {x: rect.x, y: rect.y + rect.h};
+                  case 'left': return {x: rect.x, y: rect.y + rect.h / 2};
+                  default: return {x: rect.x + rect.w / 2, y: rect.y + rect.h / 2};
+            }
+      }
+
+      #getImageHandlePosition(img, handleType) {
+            return this.#getHandlePosition({x: img.x, y: img.y, w: img.w, h: img.h}, handleType);
+      }
+
+      updateRectsFromFields() {
+            this.#ensureRowCache();
+            for(let n = 0; n < this.rects.length; n++) {
+                  const cache = this.#rowFieldCache[n];
+                  if(!cache) continue;
+                  this.rects[n].description = cache.description.value;
+                  const parsedW = parseFloat(cache.width.value);
+                  const parsedH = parseFloat(cache.height.value);
+                  const parsedQty = parseFloat(cache.quantity.value);
+                  this.rects[n].w = isNaN(parsedW) ? this.rects[n].w : parsedW;
+                  this.rects[n].h = isNaN(parsedH) ? this.rects[n].h : parsedH;
+                  this.rects[n].qty = isNaN(parsedQty) ? this.rects[n].qty : parsedQty;
+                  this.rects[n].appTape = cache.tape.value;
+                  this.rects[n].vinyl = cache.vinyl.value;
+                  this.rects[n].laminate = cache.laminate.value;
+            }
+            this.refresh();
+      }
+
+      updateFromTemplateFields() {
+            this.#ensureRowCache();
+            for(let n = 0; n < this.rects.length; n++) {
+                  const cache = this.#rowFieldCache[n];
+                  if(!cache) continue;
+                  cache.description.value = this.rects[n].description;
+                  cache.quantity.value = this.rects[n].qty;
+                  cache.width.value = this.rects[n].w;
+                  cache.height.value = this.rects[n].h;
+                  cache.tape.value = this.rects[n].appTape;
+                  cache.vinyl.value = this.rects[n].vinyl;
+                  cache.laminate.value = this.rects[n].laminate;
+            }
+      }
+
+      deleteRect(rowNumber) {
+            this.rects.splice(rowNumber, 1);
+            this.#buildRowCache();
+            this.refresh();
+      }
+
+      #deleteRectAndRow(rowNumber) {
+            if(rowNumber === false || rowNumber === null || rowNumber === undefined) return;
+            this.rects.splice(rowNumber, 1);
+            const rows = VehicleMenu_Template?.l_itemsContainer ? VehicleMenu_Template.l_itemsContainer.querySelectorAll("#rowContainer") : [];
+            if(rows[rowNumber]) rows[rowNumber].remove();
+            this.#state.activeRectIndex = null;
+            this.#state.activeRectHandle = null;
+            this.#buildRowCache();
+            this.refresh();
+      }
+
+      async addSkewableImages(xOffset, yOffset, srcArray, c1, c2, c3, c4) {
+            for(let y = 0; y < srcArray.length; y++) {
+                  const image = new Image();
+                  image.src = srcArray[y];
+                  await new Promise((resolve, reject) => {
+                        image.onload = resolve;
+                        image.onerror = reject;
+                  });
+
+                  const isSVG = srcArray[y].includes('image/svg+xml') || srcArray[y].includes('.svg');
+                  const widthMM = pixelToMM(image.width);
+                  const heightMM = pixelToMM(image.height);
+                  const width = isSVG ? widthMM : image.width;
+                  const height = isSVG ? heightMM : image.height;
+
+                  const center = this.#getCenterPosReal();
+                  const defaultX = (xOffset ?? center.x - width / 2);
+                  const defaultY = (yOffset ?? center.y - height / 2);
+
+                  this.#images.push({
+                        image,
+                        src: srcArray[y],
+                        width,
+                        height,
+                        x: c1?.x ?? defaultX,
+                        y: c1?.y ?? defaultY,
+                        w: c2?.x ? (c2.x - (c1?.x ?? defaultX)) : width,
+                        h: c4?.y ? (c4.y - (c1?.y ?? defaultY)) : height,
+                        naturalW: width,
+                        naturalH: height
+                  });
+            }
+      }
+
+      #getCenterPosReal() {
+            const boundingRect = this.#dragZoomSVG.container.getBoundingClientRect();
+            const width = boundingRect.right - boundingRect.left;
+            const height = boundingRect.bottom - boundingRect.top;
+            const transform = this.#dragZoomSVG.panZoomInstance ? this.#dragZoomSVG.panZoomInstance.getTransform() : {x: 0, y: 0, scale: this.#dragZoomSVG.scale || 1};
+            const scale = transform.scale || this.#dragZoomSVG.scale || 1;
+            return {
+                  x: (width / 2 - transform.x) / scale,
+                  y: (height / 2 - transform.y) / scale
+            };
+      }
+
+      #ensureRectDefaults(item) {
+            item.w = item.w || 100;
+            item.h = item.h || 100;
+            item.qty = item.qty || 1;
+            item.description = item.description || "";
+            item.colour = item.colour || COLOUR.Blue;
+      }
+
+      #buildRowCache() {
+            this.#rowFieldCache = [];
+            const rows = VehicleMenu_Template.contentContainer ? VehicleMenu_Template.contentContainer.querySelectorAll("#rowContainer") : [];
+            rows.forEach((row) => {
+                  this.#rowFieldCache.push({
+                        description: row.querySelector('#description'),
+                        quantity: row.querySelector('#quantity'),
+                        width: row.querySelector('#width'),
+                        height: row.querySelector('#height'),
+                        tape: row.querySelector('#tape'),
+                        vinyl: row.querySelector('#vinyl'),
+                        laminate: row.querySelector('#laminate')
+                  });
+            });
+      }
+
+      #ensureRowCache() {
+            const rows = VehicleMenu_Template.contentContainer ? VehicleMenu_Template.contentContainer.querySelectorAll("#rowContainer") : [];
+            if(rows.length !== this.#rowFieldCache.length) this.#buildRowCache();
+      }
+
+      #syncRowFromRect(index) {
+            this.#ensureRowCache();
+            const cache = this.#rowFieldCache[index];
+            if(!cache) return;
+            cache.description.value = this.rects[index].description;
+            cache.quantity.value = this.rects[index].qty;
+            cache.width.value = roundNumber(this.rects[index].w, 1);
+            cache.height.value = roundNumber(this.rects[index].h, 1);
+            cache.tape.value = this.rects[index].appTape;
+            cache.vinyl.value = this.rects[index].vinyl;
+            cache.laminate.value = this.rects[index].laminate;
+      }
+
+      #handleContextMenu(event) {
+            event.preventDefault();
+            this.#dragZoomSVG.updateMouseXY(event);
+            const pos = this.#dragZoomSVG.relativeMouseXY;
+
+            const rectIndex = this.#getRectAtPosition(pos.x, pos.y);
+            const imageIndex = this.#getSkewRectAtPosition(pos.x, pos.y);
+
+            const isBackgroundTarget = rectIndex === false && imageIndex === false;
+
+            if(!customContextMenuContainer) initCustomContextMenu();
+            setFieldHidden(false, customContextMenuContainer);
+            customContextMenuContainer.style.left = event.pageX + "px";
+            customContextMenuContainer.style.top = event.pageY + "px";
+
+            removeAllChildrenFromParent(customContextMenuContainer);
+            const containerPanel = document.createElement('div');
+            containerPanel.style = "padding:10px;display:flex;flex-direction:column;gap:6px;color:white;background-color:" + COLOUR.DarkGrey + ";width:300px;box-shadow:0 4px 12px rgba(0,0,0,0.8);position:relative;cursor:default;user-select:none;";
+            let dragOffset = {x: 0, y: 0};
+            const dragHandle = document.createElement('div');
+            dragHandle.innerText = "☰";
+            dragHandle.style = "position:absolute;left:10px;top:10px;cursor:grab;color:white;font-size:16px;";
+            dragHandle.onmousedown = (e) => {
+                  e.preventDefault();
+                  dragHandle.style.cursor = "grabbing";
+                  dragOffset = {x: e.clientX - customContextMenuContainer.offsetLeft, y: e.clientY - customContextMenuContainer.offsetTop};
+                  const move = (ev) => {
+                        customContextMenuContainer.style.left = (ev.clientX - dragOffset.x) + "px";
+                        customContextMenuContainer.style.top = (ev.clientY - dragOffset.y) + "px";
+                  };
+                  const up = () => {
+                        document.removeEventListener('mousemove', move);
+                        document.removeEventListener('mouseup', up);
+                        dragHandle.style.cursor = "grab";
+                  };
+                  document.addEventListener('mousemove', move);
+                  document.addEventListener('mouseup', up);
+            };
+            containerPanel.appendChild(dragHandle);
+
+            let outsideHandler;
+            const closeBtn = createButton("X", "background-color:red;width:26px;height:26px;position:absolute;top:6px;right:6px;margin:0px;min-height:26px;border:0px;font-weight:bold;font-size:14px;", () => {
+                  if(outsideHandler) document.removeEventListener('mousedown', outsideHandler, true);
+                  closeCustomContextMenu();
+                  vehicleToast('Closed');
+            });
+            containerPanel.appendChild(closeBtn);
+
+            const panel = document.createElement('div');
+            panel.style = "padding:10px;display:flex;flex-direction:column;gap:6px;color:white;";
+
+            if(rectIndex !== false && rectIndex !== null) {
+                  const rect = this.rects[rectIndex];
+                  const title = createText("Rectangle Options", "color:white;font-weight:bold;margin:0;");
+                  panel.appendChild(title);
+
+                  const descField = createInput_Infield("Description", rect.description, null, () => {
+                        rect.description = descField[1].value;
+                        this.refresh(); this.updateFromTemplateFields();
+                  }, null, false);
+                  descField[1].id = `rect-desc-${rectIndex}`;
+                  descField[0].htmlFor = descField[1].id;
+                  const qtyField = createInput_Infield("Qty", roundNumber(rect.qty, 1), null, () => {
+                        rect.qty = parseFloat(qtyField[1].value || rect.qty);
+                        this.refresh(); this.updateFromTemplateFields();
+                  }, null, false, 1);
+                  qtyField[1].id = `rect-qty-${rectIndex}`;
+                  qtyField[0].htmlFor = qtyField[1].id;
+                  qtyField[1].setAttribute("min", "0");
+                  const widthField = createInput_Infield("Width", roundNumber(rect.w, 1), null, () => {
+                        rect.w = parseFloat(widthField[1].value || rect.w);
+                        this.refresh(); this.updateFromTemplateFields();
+                  }, null, false, 1);
+                  widthField[1].id = `rect-width-${rectIndex}`;
+                  widthField[0].htmlFor = widthField[1].id;
+                  const heightField = createInput_Infield("Height", roundNumber(rect.h, 1), null, () => {
+                        rect.h = parseFloat(heightField[1].value || rect.h);
+                        this.refresh(); this.updateFromTemplateFields();
+                  }, null, false, 1);
+                  heightField[1].id = `rect-height-${rectIndex}`;
+                  heightField[0].htmlFor = heightField[1].id;
+                  widthField[1].setAttribute("min", "0");
+                  heightField[1].setAttribute("min", "0");
+                  const rtaField = createCheckbox_Infield("Is RTA", rect.appTape !== "None", null, () => {
+                        rect.appTape = rtaField[1].checked ? AppTapeLookup["Medium Tack"] : "None";
+                        this.refresh(); this.updateFromTemplateFields();
+                  }, null);
+                  rtaField[1].id = `rect-rta-${rectIndex}`;
+                  rtaField[0].htmlFor = rtaField[1].id;
+
+                  [descField[1], qtyField[1], widthField[1], heightField[1], rtaField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
+
+                  const scaleW = createInput_Infield("Target Width", roundNumber(rect.w, 1), null, null, null, false, 1)[1];
+                  const scaleH = createInput_Infield("Target Height", roundNumber(rect.h, 1), null, null, null, false, 1)[1];
+                  scaleW.setAttribute("min", "0");
+                  scaleH.setAttribute("min", "0");
+                  scaleW.style.width = "calc(100% - 0px)";
+                  scaleH.style.width = "calc(100% - 0px)";
+                  const scaleBtn = createButton("Calc Scale", "width:100%;margin:0;", () => {
+                        const targetW = parseFloat(scaleW.value || rect.w);
+                        const targetH = parseFloat(scaleH.value || rect.h);
+                        const scaleResultW = targetW / rect.w;
+                        const scaleResultH = targetH / rect.h;
+                        this.#copiedRectScale = {w: scaleResultW, h: scaleResultH};
+                        vehicleToast(`Saved scale W:${scaleResultW.toFixed(3)} H:${scaleResultH.toFixed(3)}`, "success");
+                  });
+
+                  const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;margin:0;", () => {
+                        this.#deleteRectAndRow(rectIndex);
+                        closeCustomContextMenu();
+                  });
+
+                  panel.appendChild(descField[0]);
+                  panel.appendChild(qtyField[0]);
+                  panel.appendChild(widthField[0]);
+                  panel.appendChild(heightField[0]);
+                  panel.appendChild(rtaField[0]);
+                  panel.appendChild(scaleW.parentElement);
+                  panel.appendChild(scaleH.parentElement);
+                  const applySavedScaleBtn = createButton("Apply Saved Scale", "width:100%;margin:0;", () => {
+                        if(this.#copiedRectScale) {
+                              rect.w = rect.w * this.#copiedRectScale.w;
+                              rect.h = rect.h * this.#copiedRectScale.h;
+                              this.refresh(); this.updateFromTemplateFields();
+                              vehicleToast('Applied saved scale', "success");
+                        } else {
+                              vehicleToast('No saved scale found', "error");
+                        }
+                  });
+
+                  panel.appendChild(scaleBtn);
+                  panel.appendChild(applySavedScaleBtn);
+                  panel.appendChild(deleteBtn);
+            } else if(imageIndex !== false && imageIndex !== null) {
+                  const img = this.#images[imageIndex];
+                  const title = createText("Image Options", "color:white;font-weight:bold;margin:0;");
+                  panel.appendChild(title);
+
+                  const widthField = createInput_Infield("Width", roundNumber(img.w, 1), null, () => {
+                        img.w = parseFloat(widthField[1].value || img.w);
+                        this.refresh();
+                  }, null, false, 1);
+                  const heightField = createInput_Infield("Height", roundNumber(img.h, 1), null, () => {
+                        img.h = parseFloat(heightField[1].value || img.h);
+                        this.refresh();
+                  }, null, false, 1);
+                  widthField[1].setAttribute("min", "0");
+                  heightField[1].setAttribute("min", "0");
+                  widthField[1].id = `img-width-${imageIndex}`;
+                  widthField[0].htmlFor = widthField[1].id;
+                  heightField[1].id = `img-height-${imageIndex}`;
+                  heightField[0].htmlFor = heightField[1].id;
+                  [widthField[1], heightField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
+
+                  const copyBtn = createButton("Copy", "width:100%;", () => {this.#copySkewableRect(imageIndex); vehicleToast('Image copied', "success");});
+                  const pasteBtn = createButton("Paste", "width:100%;", () => {this.#pasteSkewableRect(pos.x, pos.y); this.refresh(); vehicleToast('Image pasted', "success");});
+                  const resetBtn = createButton("Reset Size", "width:100%;", () => {this.#resetSkewableRect(imageIndex); vehicleToast('Image reset', "info");});
+
+                  const copyScaleBtn = createButton("Copy Target Scale", "width:100%;", () => {
+                        this.#copiedImageScale = {w: img.w, h: img.h};
+                        this.#copiedRectScale = {w: img.w / img.naturalW, h: img.h / img.naturalH};
+                        vehicleToast('Image scale copied', "success");
+                  });
+                  const applyScaleBtn = createButton("Apply Copied Scale", "width:100%;", () => {
+                        if(this.#copiedRectScale) {
+                              img.w = img.w * this.#copiedRectScale.w;
+                              img.h = img.h * this.#copiedRectScale.h;
+                              this.refresh();
+                              vehicleToast('Saved scale applied', "success");
+                        } else if(this.#copiedImageScale) {
+                              img.w = this.#copiedImageScale.w;
+                              img.h = this.#copiedImageScale.h;
+                              this.refresh();
+                              vehicleToast('Copied image scale applied', "success");
+                        } else {
+                              vehicleToast('No saved scale found', "error");
+                        }
+                  });
+
+                  const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;margin:0;", () => {
+                        this.#deleteSkewableRect(imageIndex);
+                        closeCustomContextMenu();
+                        vehicleToast('Image deleted', "info");
+                  });
+
+                  panel.appendChild(widthField[0]);
+                  panel.appendChild(heightField[0]);
+                  panel.appendChild(copyBtn);
+                  panel.appendChild(pasteBtn);
+                  panel.appendChild(copyScaleBtn);
+                  panel.appendChild(applyScaleBtn);
+                  panel.appendChild(resetBtn);
+                  panel.appendChild(deleteBtn);
+            } else if(isBackgroundTarget) {
+                  const title = createText("Background Options", "color:white;font-weight:bold;margin:0;");
+                  panel.appendChild(title);
+
+                  const scaleWField = createInput_Infield("Width Scale", 1, null, null, null, false, 0.01)[1];
+                  const scaleHField = createInput_Infield("Height Scale", 1, null, null, null, false, 0.01)[1];
+                  scaleWField.style.width = "calc(100% - 0px)";
+                  scaleHField.style.width = "calc(100% - 0px)";
+
+                  const applyScaleBtn = createButton("Apply Scale", "width:100%;", () => {
+                        const scaleW = parseFloat(scaleWField.value || "1") || 1;
+                        const scaleH = parseFloat(scaleHField.value || "1") || 1;
+                        this.#applyBackgroundScale(scaleW, scaleH);
+                  });
+
+                  const applyCopiedScaleBtn = createButton("Apply Copied Scale", "width:100%;", () => {
+                        if(this.#copiedRectScale) {
+                              this.#applyBackgroundScale(this.#copiedRectScale.w, this.#copiedRectScale.h);
+                        } else {
+                              vehicleToast('No copied scale found', 'error');
+                        }
+                  });
+
+                  panel.appendChild(scaleWField.parentElement);
+                  panel.appendChild(scaleHField.parentElement);
+                  panel.appendChild(applyScaleBtn);
+                  panel.appendChild(applyCopiedScaleBtn);
+            }
+
+            containerPanel.appendChild(panel);
+            customContextMenuContainer.appendChild(containerPanel);
+
+            const rectBounds = customContextMenuContainer.getBoundingClientRect();
+            let top = rectBounds.top;
+            let left = rectBounds.left;
+            if(rectBounds.bottom > window.innerHeight) {
+                  top = Math.max(0, window.innerHeight - rectBounds.height - 10);
+            }
+            if(rectBounds.right > window.innerWidth) {
+                  left = Math.max(0, window.innerWidth - rectBounds.width - 10);
+            }
+            customContextMenuContainer.style.top = `${top}px`;
+            customContextMenuContainer.style.left = `${left}px`;
+
+            outsideHandler = (ev) => {
+                  if(customContextMenuContainer && !customContextMenuContainer.contains(ev.target)) {
+                        closeCustomContextMenu();
+                        document.removeEventListener('mousedown', outsideHandler, true);
+                  }
+            };
+            document.addEventListener('mousedown', outsideHandler, true);
+      }
+
+      resetView() {
+            const instance = this.#dragZoomSVG.panZoomInstance;
+            if(instance) {
+                  instance.moveTo(0, 0);
+                  instance.zoomAbs(0, 0, 0.3);
+            }
+            this.#dragZoomSVG.onZoom();
+            this.refresh();
+      }
+
+      #getRectAtPosition(xPos, yPos) {
+            for(let s = 0; s < this.rects.length; s++) {
+                  if(xPos >= this.rects[s].x && xPos <= this.rects[s].x + this.rects[s].w && yPos >= this.rects[s].y && yPos <= this.rects[s].y + this.rects[s].h) return s;
+            }
+            return false;
+      }
+
+      #getSkewRectAtPosition(xPos, yPos) {
+            for(let s = 0; s < this.#images.length; s++) {
+                  const img = this.#images[s];
+                  if(xPos >= img.x && xPos <= img.x + img.w && yPos >= img.y && yPos <= img.y + img.h) return s;
+            }
+            return false;
+      }
+
+      #handleKeyDown(event) {
+            if(event.key !== "Delete" && event.key !== "Backspace") return;
+
+            const targetTag = (event.target && event.target.tagName) ? event.target.tagName.toLowerCase() : "";
+            if(["input", "textarea", "select"].includes(targetTag) || event.target?.isContentEditable) return;
+
+            if(this.#state.activeRectIndex !== null && this.#state.activeRectIndex !== undefined) {
+                  event.preventDefault();
+                  this.#deleteRectAndRow(this.#state.activeRectIndex);
+            }
+      }
+
+      #setQtyRect(shapeIndex) {
+            const modal = new ModalSingleInput("Enter New Quantity", () => {
+                  this.rects[shapeIndex].qty = parseFloat(modal.value);
+                  this.refresh();
+            });
+            modal.setContainerSize(300, 300);
+            $(modal.valField[1]).val(this.rects[shapeIndex].qty).change();
+      }
+
+      #setSizeRect(shapeIndex) {
+            const modal = new ModalWidthHeight("Change Size", 100, () => {
+                  this.rects[shapeIndex].w = parseFloat(modal.width);
+                  this.rects[shapeIndex].h = parseFloat(modal.height);
+                  this.refresh();
+            });
+            modal.setContainerSize(300, 300);
+            $(modal.widthField[1]).val(this.rects[shapeIndex].w).change();
+            $(modal.heightField[1]).val(this.rects[shapeIndex].h).change();
+      }
+
+      #setDescriptionRect(shapeIndex) {
+            const modal = new ModalSingleInputText("Enter Description", () => {
+                  this.rects[shapeIndex].description = modal.value;
+                  this.refresh();
+            });
+            modal.setContainerSize(300, 300);
+            $(modal.valField[1]).val(this.rects[shapeIndex].description).change();
+      }
+
+      #setIsRTARect(shapeIndex) {
+            const modal = new ModalSingleInputCheckbox("Set Is RTA", () => {
+                  modal.value === true ? this.rects[shapeIndex].appTape = AppTapeLookup["Medium Tack"] : this.rects[shapeIndex].appTape = "None";
+                  this.refresh();
+            });
+            modal.setContainerSize(300, 300);
+            $(modal.valField[1]).prop("checked", this.rects[shapeIndex].appTape === "None" ? false : true).change();
+      }
+
+      #getScaleRect(shapeIndex) {
+            const rectWidth = this.rects[shapeIndex].w;
+            const rectHeight = this.rects[shapeIndex].h;
+            const modal = new ModalWidthHeightWithCalcResult("Reverse Engineer Scale", "Width should be", "Height should be", "New Width Scale", "New Height Scale", function() {
+                  $(modal.calcWidthField[1]).val(modal.width / rectWidth).change();
+            }, function() {
+                  $(modal.calcHeightField[1]).val(modal.height / rectHeight).change();
+            }, null);
+            modal.setContainerSize(300, 300);
+      }
+
+      #deleteSkewableRect(shapeIndex) {
+            if(shapeIndex !== null && shapeIndex !== false) {
+                  this.#images.splice(shapeIndex, 1);
+                  this.refresh();
+            } else {
+                  alert("cant delete SkewableRects");
+            }
+      }
+
+      #scaleSkewableRect(shapeIndex) {
+            const modal = new ModalWidthHeight("Apply Scale", 1, () => {
+                  const scaleW = (modal.width || modal.width !== 0) ? modal.width - 1 : 0;
+                  const scaleH = (modal.height || modal.height !== 0) ? modal.height - 1 : 0;
+                  const img = this.#images[shapeIndex];
+                  const centerCoord = {x: img.x + img.w / 2, y: img.y + img.h / 2};
+                  img.x = centerCoord.x + (img.x - centerCoord.x) * (1 + scaleW);
+                  img.y = centerCoord.y + (img.y - centerCoord.y) * (1 + scaleH);
+                  img.w = img.w * (1 + scaleW);
+                  img.h = img.h * (1 + scaleH);
+                  this.refresh();
+            });
+            modal.setContainerSize(300, 300);
+      }
+
+      #copySkewableRect(shapeIndex) {
+            const image = this.#images[shapeIndex];
+            this.#copiedImage = {
+                  src: image.src,
+                  x: image.x,
+                  y: image.y,
+                  w: image.w,
+                  h: image.h
+            };
+      }
+
+      async #pasteSkewableRect(xPos, yPos) {
+            if(this.#copiedImage != null) {
+                  await this.addSkewableImages(xPos, yPos, [this.#copiedImage.src]);
+                  const newImage = this.#images[this.#images.length - 1];
+                  newImage.x = this.#copiedImage.x;
+                  newImage.y = this.#copiedImage.y;
+                  newImage.w = this.#copiedImage.w;
+                  newImage.h = this.#copiedImage.h;
+                  this.refresh();
+            }
+      }
+
+      #resetSkewableRect(shapeIndex) {
+            const image = this.#images[shapeIndex];
+            const isSVG = image.src.includes('image/svg+xml') || image.src.includes('.svg');
+            const widthMM = pixelToMM(image.image.width);
+            const heightMM = pixelToMM(image.image.height);
+            const width = isSVG ? widthMM : image.image.width;
+            const height = isSVG ? heightMM : image.image.height;
+
+            image.w = width;
+            image.h = height;
+            this.refresh();
+      }
+
+      async #saveSkewableImageToFile(shapeIndex) {
+            const content = JSON.stringify([
+                  {x: this.#images[shapeIndex].x, y: this.#images[shapeIndex].y, w: this.#images[shapeIndex].w, h: this.#images[shapeIndex].h},
+                  this.#images[shapeIndex].src
+            ]);
+            await downloadFileContent_Text_SingleFile(content);
+      }
+
+      async #openSkewableImageFromFile(event, xPos, yPos) {
+            const content = await getFileContent_Text_SingleFile(event);
+            const parsedContent = JSON.parse(content);
+            const rect = parsedContent[0];
+            await this.addSkewableImages(rect.x, rect.y, [parsedContent[1]]);
+            this.refresh();
+      }
+}
+
 class VehicleTemplate extends SubMenu {
       UNIQUEID = "VEHICLE_TEMPLATE-" + generateUniqueID();
       uniqueKeys = ["panel", "vinyl", "laminate"];
@@ -115,7 +1669,6 @@ class VehicleTemplate extends SubMenu {
             if(this.isStandardTemplate) {
                   var vehicleTypeIndex = this.l_vehicleTypes[1].selectedIndex;
                   var chosenTemplateIndex = this.l_predefinedTemplate[1].selectedIndex;
-                  //must return clone of predefinedTemplates using...
                   return JSON.parse(JSON.stringify(this.predefinedTemplates[vehicleTypeIndex][chosenTemplateIndex + 4]));
             } else {
                   return false;
@@ -125,21 +1678,39 @@ class VehicleTemplate extends SubMenu {
       addRow = (item) => {
             this.rowID++;
             var rowContainer = document.createElement('div');
-            rowContainer.style = "width:100%;height:55px;display:block;float:left;background-color:#aaa;margin-top:10px;";
+            rowContainer.style = "width:100%;display:block;float:left;background-color:#aaa;margin-top:10px;max-height:150px;overflow-y:auto;position:relative;padding:5px 50px 5px 5px;box-sizing:border-box;";
             rowContainer.id = "rowContainer";
             rowContainer.className = this.rowID;
 
-            var description = createInput_Infield("Description", null, "width:100px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false);
+            const descriptionOptions = ["fender", "bonnet", "back", "tub", "roof", "front door left", "front door right", "rear door left", "rear door right", "tailgate", "front bumper", "rear bumper", "front quarter left", "front quarter right", "rear quarter left", "rear quarter right", "side skirt left", "side skirt right"];
+            var description = createInput_Infield("Description", null, "width:140px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false);
+            const descListId = `vehicle-desc-${this.rowID}`;
             description[1].id = "description";
-            var quantity = createInput_Infield("Qty", 1, "width:50px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 1);
+            description[1].setAttribute("list", descListId);
+            const descDatalist = document.createElement("datalist");
+            descDatalist.id = descListId;
+            descriptionOptions.forEach(opt => {
+                  const o = document.createElement("option");
+                  o.value = opt;
+                  descDatalist.appendChild(o);
+            });
+            rowContainer.appendChild(descDatalist);
+            description[1].addEventListener("click", () => {
+                  if(typeof description[1].showPicker === "function") description[1].showPicker();
+            });
+
+            var quantity = createInput_Infield("Qty", 1, "width:60px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 1);
             quantity[1].id = "quantity";
+            quantity[1].setAttribute("min", "0");
             var width = createInput_Infield("Width", 0, "width:120px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 50, {postfix: "mm"});
             width[1].id = "width";
+            width[1].setAttribute("min", "0");
             var height = createInput_Infield("Height", 0, "width:120px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 50, {postfix: "mm"});
             height[1].id = "height";
+            height[1].setAttribute("min", "0");
 
             var tempThis = this;
-            var deleteBtn = createButton("X", "width:40px;height:100%;margin:0px;margin-left:5px;margin-right:0px;background-color:red;border-color:red;float:right", () => {
+            var deleteBtn = createButton("X", "width:40px;height:40px;margin:0px;background-color:red;border-color:red;position:absolute;top:5px;right:5px;", () => {
                   var rows = tempThis.parentObject.querySelectorAll("#rowContainer");
                   var rowN = parseFloat(deleteBtn.id);
                   var actualIndex = 0;
@@ -165,13 +1736,11 @@ class VehicleTemplate extends SubMenu {
                   }
             });
 
-            //console.log(vinylParts);
-            //vinylParts.forEach(element => vinylDropdownElements.push([element.Name, "white"]));
-            var vinyl = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:200px;margin:5px;", 10, true, vinylDropdownElements, () => {this.fieldChangeFunction(); console.log("in vinyl change");}, rowContainer);
+            var vinyl = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:200px;margin:5px;", 10, true, vinylDropdownElements, () => {this.fieldChangeFunction();}, rowContainer);
             vinyl[1].id = "vinyl";
-            vinyl[6]();//pauseCallback
+            vinyl[6]();
             $(vinyl[1]).val(item ? item.vinyl : VinylLookup["Air Release"]).change();
-            vinyl[7]();//resumeCallback
+            vinyl[7]();
 
             var laminateParts = getPredefinedParts("Laminate - ");
             var laminateDropdownElements = [];
@@ -186,42 +1755,29 @@ class VehicleTemplate extends SubMenu {
                         if(isStocked) laminateDropdownElements.push([element.Name, "blue"]);
                   }
             });
-            //laminateParts.forEach(element => laminateDropdownElements.push([element.Name, "white"]));
             var laminate = createDropdown_Infield_Icons_Search("Laminate", 0, "width:200px;margin:5px;", 10, true, laminateDropdownElements, () => {this.fieldChangeFunction();}, rowContainer);
             laminate[1].id = "laminate";
-            laminate[6]();//pauseCallback
+            laminate[6]();
             $(laminate[1]).val(item ? item.laminate : LaminateLookup["Gloss"]).change();
-            laminate[7]();//resumeCallback
+            laminate[7]();
 
             if(item) {
                   if(item.isPanel == true) {
                         var panel = createCheckbox_Infield("Panel", true, "width:100px", () => {this.fieldChangeFunction();}, rowContainer);
                         panel[1].id = "panel";
                   }
-                  if(item.description != "Oneway") {
-                        var combo_3M = createButton("3M", "width:40px;height:45px;margin:5px;", () => {
-                              dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
-                              dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
-                        });
-                        rowContainer.appendChild(combo_3M);
-                        var combo_Poly = createButton("Py", "width:40px;height:45px;margin:5px;", () => {
-                              dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
-                              dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
-                        });
-                        rowContainer.appendChild(combo_Poly);
-                  }
-            } else {
-                  var combo_3M_2 = createButton("3M", "width:30px;height:45px;margin:5px;", () => {
-                        dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
-                        dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
-                  });
-                  rowContainer.appendChild(combo_3M_2);
-                  var combo_Poly_2 = createButton("Py", "width:30px;height:45px;margin:5px;", () => {
-                        dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
-                        dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
-                  });
-                  rowContainer.appendChild(combo_Poly_2);
             }
+
+            const combo_3M = createButton("3M", "width:40px;height:45px;margin:5px;", () => {
+                  dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
+                  dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
+            });
+            const combo_Poly = createButton("Py", "width:40px;height:45px;margin:5px;", () => {
+                  dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
+                  dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
+            });
+            rowContainer.appendChild(combo_3M);
+            rowContainer.appendChild(combo_Poly);
 
             var tapeParts = getPredefinedParts("Tape - ");
             var tapeDropdownElements = [];
@@ -229,9 +1785,9 @@ class VehicleTemplate extends SubMenu {
             tapeParts.forEach(element => tapeDropdownElements.push([element.Name, "white"]));
             var tape = createDropdown_Infield_Icons_Search("App Tape", 0, "width:200px;margin:5px;", 0, true, tapeDropdownElements, () => {this.fieldChangeFunction();}, rowContainer);
             tape[1].id = "tape";
-            tape[6]();//pauseCallback
+            tape[6]();
             $(tape[1]).val(item ? item.appTape : AppTapeLookup["Medium Tack"]).change();
-            tape[7]();//resumeCallback
+            tape[7]();
 
             this.l_itemsContainer.appendChild(rowContainer);
       };
@@ -245,21 +1801,20 @@ class VehicleTemplate extends SubMenu {
       };
 
       clearRows = () => {
-            while(this.l_itemsContainer.childElementCount > 0) {this.l_itemsContainer.removeChild(this.l_itemsContainer.lastChild);}
+            while(this.l_itemsContainer.childElementCount > 0) {
+                  this.l_itemsContainer.removeChild(this.l_itemsContainer.lastChild);
+            }
       };
 
       toggle = () => {
             if(!this.required) {
-                  //TODO
             } else {
 
             }
             this.callback();
       };
 
-      Update() {
-
-      }
+      Update() {}
 
       rowObjects = [];
       uniqueGroupsByKeys = [];
