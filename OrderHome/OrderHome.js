@@ -22,7 +22,6 @@ class OrderHome {
 
       async Start() {
             this.FetchEmailTemplates();
-            this.InitEvents();
             this.InitPaymentModal();
       }
 
@@ -32,20 +31,7 @@ class OrderHome {
 
       FetchEmailTemplates() {
             this.#emailTemplate_QuoteWording = GM_getResourceText("EmailTemplate_QuoteWording");
-            this.#emailTemplate_OrderAcknowledgement = GM_getResourceText("EmailTemplate_OrderAcknowledgementWording");
-      }
-
-      InitEvents() {
-            console.log("in init events");
-            /*let emailBtn = document.getElementById("hlEmailInvoiceOrEstimate");
-            emailBtn.addEventListener("click", () => {
-                  this.OnEmailBtnClicked();
-            });*/
-
-            /*let sendBtn = document.getElementById("btnClientEmailFormOne");
-            sendBtn.addEventListener("click", () => {
-                  this.OnSendBtnClicked();
-            });*/
+            this.#emailTemplate_OrderAcknowledgement = GM_getResourceText("EmailTemplate_OrderAcknowledgement");
       }
 
       TickEmailModal() {
@@ -77,10 +63,6 @@ class OrderHome {
 
                               contentArea.innerHTML = this.#emailTemplate_OrderAcknowledgement;
                         }, this.#emailTemplateContainer);
-
-
-
-
 
                         insertAfter(this.#emailTemplateContainer, overlay);
                   }
