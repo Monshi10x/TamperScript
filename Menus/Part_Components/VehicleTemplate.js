@@ -1695,6 +1695,9 @@ class VehicleTemplate extends SubMenu {
                   descDatalist.appendChild(o);
             });
             rowContainer.appendChild(descDatalist);
+            description[1].addEventListener("click", () => {
+                  if(typeof description[1].showPicker === "function") description[1].showPicker();
+            });
 
             var quantity = createInput_Infield("Qty", 1, "width:60px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 1);
             quantity[1].id = "quantity";
@@ -1785,14 +1788,6 @@ class VehicleTemplate extends SubMenu {
             tape[6]();
             $(tape[1]).val(item ? item.appTape : AppTapeLookup["Medium Tack"]).change();
             tape[7]();
-
-            const rtaToggle = createCheckbox_Infield("Is RTA", (item ? item.appTape : AppTapeLookup["Medium Tack"]) !== "None", "width:120px;margin:5px;", () => {
-                  const isChecked = rtaToggle[1].checked;
-                  const targetTape = isChecked ? (AppTapeLookup["Medium Tack"] || "Tape - App Medium Tack") : "None";
-                  dropdownInfieldIconsSearchSetSelected(tape, targetTape, false, true);
-                  this.fieldChangeFunction();
-            }, rowContainer);
-            rtaToggle[1].id = "rta-toggle";
 
             this.l_itemsContainer.appendChild(rowContainer);
       };
