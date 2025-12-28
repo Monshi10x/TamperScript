@@ -1130,6 +1130,12 @@ class VehicleMenu extends LHSMenuWindow {
             if(rows.length !== this.#rowFieldCache.length) this.#buildRowCache();
       }
 
+      #setRowTape(index, value) {
+            this.#ensureRowCache();
+            const cache = this.#rowFieldCache[index];
+            if(cache?.tape) cache.tape.value = value;
+      }
+
       #syncRowFromRect(index) {
             this.#ensureRowCache();
             const cache = this.#rowFieldCache[index];
@@ -1229,7 +1235,9 @@ class VehicleMenu extends LHSMenuWindow {
                   const rtaField = createCheckbox_Infield("Is RTA", rect.appTape !== "None", null, () => {
                         const mediumTape = AppTapeLookup["Medium Tack"] || "Tape - App Medium Tack";
                         rect.appTape = rtaField[1].checked ? mediumTape : "None";
-                        this.refresh(); this.updateFromTemplateFields();
+                        this.#setRowTape(rectIndex, rect.appTape);
+                        this.refresh();
+                        this.updateFromTemplateFields();
                   }, null);
                   rtaField[1].id = `rect-rta-${rectIndex}`;
                   rtaField[0].htmlFor = rtaField[1].id;
@@ -1696,14 +1704,6 @@ class VehicleTemplate extends SubMenu {
                   descDatalist.appendChild(o);
             });
             rowContainer.appendChild(descDatalist);
-            description[1].addEventListener("click", () => {
-                  if(typeof description[1].showPicker === "function") description[1].showPicker();
-            });
-            description[1].addEventListener("mousedown", (e) => {
-                  e.preventDefault();
-                  description[1].focus();
-                  if(typeof description[1].showPicker === "function") description[1].showPicker();
-            });
 
             var quantity = createInput_Infield("Qty", 1, "width:60px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 1);
             quantity[1].id = "quantity";
