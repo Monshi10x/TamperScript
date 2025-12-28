@@ -1133,7 +1133,7 @@ class VehicleMenu extends LHSMenuWindow {
       #setRowTape(index, value) {
             this.#ensureRowCache();
             const cache = this.#rowFieldCache[index];
-            if(cache?.tape) cache.tape.value = value;
+            if(cache?.tape) dropdownSetSelectedText(cache.tape, value, false, true);
       }
 
       #syncRowFromRect(index) {
