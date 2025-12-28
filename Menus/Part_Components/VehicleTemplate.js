@@ -1232,17 +1232,7 @@ class VehicleMenu extends LHSMenuWindow {
                   heightField[0].htmlFor = heightField[1].id;
                   widthField[1].setAttribute("min", "0");
                   heightField[1].setAttribute("min", "0");
-                  const rtaField = createCheckbox_Infield("Is RTA", rect.appTape !== "None", null, () => {
-                        const mediumTape = AppTapeLookup["Medium Tack"] || "Tape - App Medium Tack";
-                        rect.appTape = rtaField[1].checked ? mediumTape : "None";
-                        this.#setRowTape(rectIndex, rect.appTape);
-                        this.refresh();
-                        this.updateFromTemplateFields();
-                  }, null);
-                  rtaField[1].id = `rect-rta-${rectIndex}`;
-                  rtaField[0].htmlFor = rtaField[1].id;
-
-                  [descField[1], qtyField[1], widthField[1], heightField[1], rtaField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
+                  [descField[1], qtyField[1], widthField[1], heightField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
 
                   const scaleW = createInput_Infield("Target Width", roundNumber(rect.w, 1), null, null, null, false, 1)[1];
                   const scaleH = createInput_Infield("Target Height", roundNumber(rect.h, 1), null, null, null, false, 1)[1];
@@ -1268,7 +1258,8 @@ class VehicleMenu extends LHSMenuWindow {
                   panel.appendChild(qtyField[0]);
                   panel.appendChild(widthField[0]);
                   panel.appendChild(heightField[0]);
-                  panel.appendChild(rtaField[0]);
+                  const scaleHeading = createText("Scale", "color:white;font-weight:bold;margin:6px 0 0 0;");
+                  panel.appendChild(scaleHeading);
                   panel.appendChild(scaleW.parentElement);
                   panel.appendChild(scaleH.parentElement);
                   const applySavedScaleBtn = createButton("Apply Saved Scale", "width:100%;margin:0;", () => {
