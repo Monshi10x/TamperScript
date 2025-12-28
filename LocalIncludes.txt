@@ -100,7 +100,6 @@
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\SVG_Common\DragZoomCanvas.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\SVG_Common\DragZoomSVG.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Menus\LHS_Menu\LHSMenu.js
-// @require      file://C:\Users\Tristan PC\Documents\TamperScript\Menus\LHS_Menu\VehicleMenu.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Menus\LHS_Menu\Windows.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Menus\LHS_Menu\Billboard.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Menus\LHS_Menu\Admin.js
