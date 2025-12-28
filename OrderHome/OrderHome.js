@@ -16,6 +16,9 @@ class OrderHome {
             { key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt" }
       ];
       #emailTemplates = {};
+      #attachmentsLoaded = false;
+      #defaultAttachmentFiles = ["OrderDepositPaidThanks.txt", "OrderFinalPaymentRequest.txt"];
+      #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/";
 
       constructor() {
             const defaultTemplateBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/";
@@ -124,6 +127,8 @@ class OrderHome {
             this.#emailTemplateContainer.appendChild(effectsContainer);
 
             overlayContainer.appendChild(this.#emailTemplateContainer);
+
+            this.ensureDefaultAttachments();
       }
 
       createTemplateButton(template, customerFirstName, contentArea, parent) {
@@ -233,5 +238,99 @@ class OrderHome {
             if (lastFourInput) {
                   lastFourInput.value = "0000";
             }
+      }
+
+      async ensureDefaultAttachments() {
+            if (this.#attachmentsLoaded || typeof cbEmailAttachment === "undefined") {
+                  return;
+            }
+
+            this.#attachmentsLoaded = true;
+            this.patchAttachmentHandling();
+
+            const attachmentFiles = window.ORDER_HOME_ATTACHMENT_FILES || this.#defaultAttachmentFiles;
+            const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
+
+            await Promise.all(attachmentFiles.map(async (fileName, index) => {
+                  try {
+                        const response = await fetch(`${attachmentBaseUrl}${fileName}`);
+                        if (!response.ok) {
+                              throw new Error(`Failed to load attachment ${fileName}`);
+                        }
+                        const blob = await response.blob();
+                        this.addRemoteAttachment(fileName, blob, index);
+                  } catch (error) {
+                        console.error("OrderHome attachment load error:", error);
+                  }
+            }));
+      }
+
+      patchAttachmentHandling() {
+            if (!cbEmailAttachment.remoteAttachments) {
+                  cbEmailAttachment.remoteAttachments = [];
+            }
+
+            if (!cbEmailAttachment._originalGetAttachments) {
+                  cbEmailAttachment._originalGetAttachments = cbEmailAttachment.GetAttachments.bind(cbEmailAttachment);
+                  cbEmailAttachment.GetAttachments = function () {
+                        const existing = cbEmailAttachment._originalGetAttachments();
+                        const formData = existing || new FormData();
+
+                        cbEmailAttachment.remoteAttachments.forEach((attachment, idx) => {
+                              formData.append(`remote_file_${idx}`, attachment.blob, attachment.name);
+                        });
+
+                        if (!existing && cbEmailAttachment.remoteAttachments.length === 0) {
+                              return null;
+                        }
+
+                        return formData;
+                  };
+            }
+
+            const span = document.createElement("span");
+            Object.assign(span.style, style);
+
+            const contents = range.extractContents();
+            span.appendChild(contents);
+            range.insertNode(span);
+            selection.removeAllRanges();
+            selection.selectAllChildren(span);
+      }
+
+      addRemoteAttachment(name, blob, index) {
+            if (!cbEmailAttachment.remoteAttachments) {
+                  cbEmailAttachment.remoteAttachments = [];
+            }
+
+            cbEmailAttachment.remoteAttachments.push({ name, blob });
+            cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + blob.size;
+
+            const attachmentsContainer = document.getElementById("divClientEmailAttachments");
+            if (!attachmentsContainer) {
+                  return;
+            }
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "eItem";
+            wrapper.id = `docsObjId_remote_${index}`;
+
+            const nameSpan = document.createElement("span");
+            nameSpan.className = "attachName";
+            nameSpan.innerText = name;
+
+            const removeSpan = document.createElement("span");
+            removeSpan.className = "eClose";
+            removeSpan.title = "Remove";
+            removeSpan.innerHTML = "&times;";
+            removeSpan.addEventListener("click", () => {
+                  cbEmailAttachment.remoteAttachments = cbEmailAttachment.remoteAttachments.filter((item) => item.name !== name);
+                  cbEmailAttachment.attachmentSize = Math.max(0, (cbEmailAttachment.attachmentSize || 0) - blob.size);
+                  wrapper.remove();
+            });
+
+            wrapper.appendChild(nameSpan);
+            wrapper.appendChild(removeSpan);
+            attachmentsContainer.appendChild(wrapper);
       }
 }
