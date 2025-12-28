@@ -366,6 +366,11 @@ class VehicleMenu extends LHSMenuWindow {
                   await AddBlankProduct();
                   const productNo = getNumProducts();
                   let partNo = 0;
+                  await AddPart("No Cost Part", productNo);
+                  partNo++;
+                  await setPartDescription(productNo, partNo, "CODE [Automatic]");
+                  partNo = await setPartNotes(productNo, partNo, this.#dragZoomSVG.unscaledSVGString);
+                  await savePart(productNo, partNo);
                   await setProductName(productNo, "Vehicle Graphics");
                   partNo = await VehicleMenu_Template.Create(productNo, partNo);
                   partNo = await VehicleMenu_Production.Create(productNo, partNo);
@@ -1200,19 +1205,19 @@ class VehicleMenu extends LHSMenuWindow {
                   }, null, false);
                   descField[1].id = `rect-desc-${rectIndex}`;
                   descField[0].htmlFor = descField[1].id;
-                  const qtyField = createInput_Infield("Qty", rect.qty, null, () => {
+                  const qtyField = createInput_Infield("Qty", roundNumber(rect.qty, 1), null, () => {
                         rect.qty = parseFloat(qtyField[1].value || rect.qty);
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false, 1);
                   qtyField[1].id = `rect-qty-${rectIndex}`;
                   qtyField[0].htmlFor = qtyField[1].id;
-                  const widthField = createInput_Infield("Width", rect.w, null, () => {
+                  const widthField = createInput_Infield("Width", roundNumber(rect.w, 1), null, () => {
                         rect.w = parseFloat(widthField[1].value || rect.w);
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false, 1);
                   widthField[1].id = `rect-width-${rectIndex}`;
                   widthField[0].htmlFor = widthField[1].id;
-                  const heightField = createInput_Infield("Height", rect.h, null, () => {
+                  const heightField = createInput_Infield("Height", roundNumber(rect.h, 1), null, () => {
                         rect.h = parseFloat(heightField[1].value || rect.h);
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false, 1);
@@ -1227,8 +1232,8 @@ class VehicleMenu extends LHSMenuWindow {
 
                   [descField[1], qtyField[1], widthField[1], heightField[1], rtaField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
 
-                  const scaleW = createInput_Infield("Target Width", rect.w, null, null, null, false, 1)[1];
-                  const scaleH = createInput_Infield("Target Height", rect.h, null, null, null, false, 1)[1];
+                  const scaleW = createInput_Infield("Target Width", roundNumber(rect.w, 1), null, null, null, false, 1)[1];
+                  const scaleH = createInput_Infield("Target Height", roundNumber(rect.h, 1), null, null, null, false, 1)[1];
                   scaleW.style.width = "calc(100% - 0px)";
                   scaleH.style.width = "calc(100% - 0px)";
                   const scaleBtn = createButton("Calc Scale", "width:100%;margin:0;", () => {
@@ -1271,11 +1276,11 @@ class VehicleMenu extends LHSMenuWindow {
                   const title = createText("Image Options", "color:white;font-weight:bold;margin:0;");
                   panel.appendChild(title);
 
-                  const widthField = createInput_Infield("Width", img.w, null, () => {
+                  const widthField = createInput_Infield("Width", roundNumber(img.w, 1), null, () => {
                         img.w = parseFloat(widthField[1].value || img.w);
                         this.refresh();
                   }, null, false, 1);
-                  const heightField = createInput_Infield("Height", img.h, null, () => {
+                  const heightField = createInput_Infield("Height", roundNumber(img.h, 1), null, () => {
                         img.h = parseFloat(heightField[1].value || img.h);
                         this.refresh();
                   }, null, false, 1);
