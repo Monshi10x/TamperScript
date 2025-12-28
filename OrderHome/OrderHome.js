@@ -266,25 +266,31 @@ class OrderHome {
       }
 
       patchAttachmentHandling() {
-            if (!cbEmailAttachment.remoteAttachments) {
-                  cbEmailAttachment.remoteAttachments = [];
+            const attachmentManager = cbEmailAttachment;
+            if (!attachmentManager.remoteAttachments) {
+                  attachmentManager.remoteAttachments = [];
             }
 
-            if (!cbEmailAttachment._originalGetAttachments) {
-                  cbEmailAttachment._originalGetAttachments = cbEmailAttachment.GetAttachments.bind(cbEmailAttachment);
-                  cbEmailAttachment.GetAttachments = function () {
-                        const existing = cbEmailAttachment._originalGetAttachments();
-                        const formData = existing || new FormData();
+            if (!attachmentManager._originalGetAttachments && typeof attachmentManager.GetAttachments === "function") {
+                  attachmentManager._originalGetAttachments = attachmentManager.GetAttachments.bind(attachmentManager);
+                  attachmentManager.GetAttachments = function () {
+                        try {
+                              const existing = attachmentManager._originalGetAttachments();
+                              const formData = existing || new FormData();
 
-                        cbEmailAttachment.remoteAttachments.forEach((attachment, idx) => {
-                              formData.append(`remote_file_${idx}`, attachment.blob, attachment.name);
-                        });
+                              attachmentManager.remoteAttachments.forEach((attachment, idx) => {
+                                    formData.append(`remote_file_${idx}`, attachment.blob, attachment.name);
+                              });
 
-                        if (!existing && cbEmailAttachment.remoteAttachments.length === 0) {
+                              if (!existing && attachmentManager.remoteAttachments.length === 0) {
+                                    return null;
+                              }
+
+                              return formData;
+                        } catch (error) {
+                              console.error("OrderHome attachment pipeline error:", error);
                               return null;
                         }
-
-                        return formData;
                   };
             }
 
