@@ -1,84 +1,236 @@
-(function() {
+(function () {
       'use strict';
 })();
 
-window.addEventListener("load", async (event) => {
-      new OrderHome();
-});
-
+window.addEventListener("load", () => new OrderHome());
 
 class OrderHome {
-
       #emailTemplateContainer;
-      #emailTemplate_QuoteWording;
-      #emailTemplate_OrderAcknowledgement;
       #emailModalIsOpen = false;
+      #templateBaseUrl;
+      #templateDefinitions = [
+            { key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt" },
+            { key: "OrderAcknowledgement", label: "Order Acknowledgement", file: "OrderAcknowledgementWording.txt" },
+            { key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt" },
+            { key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt" },
+            { key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt" }
+      ];
+      #emailTemplates = {};
 
       constructor() {
-            this.Start();
+            this.#templateBaseUrl = window.ORDER_HOME_TEMPLATE_BASE_URL
+                  || new URL("./OrderHome/EmailTemplates/", document.currentScript?.src || window.location.href).href;
 
-            setInterval(() => {this.Tick();}, 100);
+            this.start();
+            setInterval(() => this.tick(), 100);
       }
 
-      async Start() {
-            this.FetchEmailTemplates();
-            this.InitPaymentModal();
+      async start() {
+            await this.fetchEmailTemplates();
+            this.initPaymentModal();
       }
 
-      Tick() {
-            this.TickEmailModal();
+      tick() {
+            this.tickEmailModal();
       }
 
-      FetchEmailTemplates() {
-            this.#emailTemplate_QuoteWording = GM_getResourceText("EmailTemplate_QuoteWording");
-            this.#emailTemplate_OrderAcknowledgement = GM_getResourceText("EmailTemplate_OrderAcknowledgement");
-      }
-
-      TickEmailModal() {
-            if(document.getElementById("simplemodal-overlay")) {
-                  if(this.#emailModalIsOpen == false) {
-                        let overlayContainer = document.getElementById("simplemodal-container");
-                        let overlay = document.getElementById("simplemodal-overlay");
-                        let overlayBounding = overlayContainer.getBoundingClientRect();
-                        console.log(overlayBounding);
-                        let contentArea = document.getElementsByClassName("trumbowyg-editor notranslate")[0];
-                        let customerFullName = document.querySelectorAll(".eItem")[0].childNodes[0];
-                        let customerFirstName = customerFullName.nodeValue.split(" ")[0];
-
-                        this.#emailTemplateContainer = document.createElement("div");
-                        this.#emailTemplateContainer.style = "position:absolute;top:" + overlayBounding.top + "px;left:" + (overlayBounding.left - 250) + "px;width:200px;height:" + overlayBounding.height + "px;background-color:white;display:block;z-index: 2010 !important;";
-
-                        createButton("Quote Wording", "width:calc(100% - 20px);", (e) => {
-                              e.preventDefault();
-
-                              this.#emailTemplate_QuoteWording = this.#emailTemplate_QuoteWording.replaceAll("<%CustomerName%>", customerFirstName);
-
-                              contentArea.innerHTML = this.#emailTemplate_QuoteWording;
-                        }, this.#emailTemplateContainer);
-
-                        createButton("Order Acknowledgement", "width:calc(100% - 20px);", (e) => {
-                              e.preventDefault();
-
-                              this.#emailTemplate_OrderAcknowledgement = this.#emailTemplate_OrderAcknowledgement.replaceAll("<%CustomerName%>", customerFirstName);
-
-                              contentArea.innerHTML = this.#emailTemplate_OrderAcknowledgement;
-                        }, this.#emailTemplateContainer);
-
-                        insertAfter(this.#emailTemplateContainer, overlay);
+      async fetchEmailTemplates() {
+            await Promise.all(this.#templateDefinitions.map(async (template) => {
+                  try {
+                        const response = await fetch(`${this.#templateBaseUrl}${template.file}`);
+                        if (!response.ok) {
+                              throw new Error(`Failed to load ${template.file}`);
+                        }
+                        const content = await response.text();
+                        this.#emailTemplates[template.key] = content;
+                  } catch (error) {
+                        console.error("OrderHome template load error:", error);
+                        this.#emailTemplates[template.key] = "";
                   }
+            }));
+      }
 
-                  this.#emailModalIsOpen = true;
+      tickEmailModal() {
+            const overlayContainer = document.getElementById("simplemodal-container");
+            const overlay = document.getElementById("simplemodal-overlay");
+
+            if (overlayContainer && overlay) {
+                  if (!this.#emailModalIsOpen) {
+                        this.#emailModalIsOpen = true;
+                        this.renderTemplatePanel(overlayContainer);
+                  }
             } else {
                   this.#emailModalIsOpen = false;
-
-                  if(this.#emailTemplateContainer != null) {
+                  if (this.#emailTemplateContainer) {
                         deleteElement(this.#emailTemplateContainer);
-                        this.#emailTemplateContainer == null;
+                        this.#emailTemplateContainer = null;
                   }
             }
       }
 
-      InitPaymentModal() {
-            document.querySelector("#txtOfflineCcLast4Digits").value = "0000";
+      renderTemplatePanel(overlayContainer) {
+            const contentArea = document.querySelector(".trumbowyg-editor.notranslate");
+            const customerFullNameNode = document.querySelectorAll(".eItem")?.[0]?.childNodes?.[0];
+
+            if (!contentArea || !customerFullNameNode) {
+                  return;
+            }
+
+            const customerFirstName = customerFullNameNode.nodeValue.split(" ")[0];
+
+            if (getComputedStyle(overlayContainer).position === "static") {
+                  overlayContainer.style.position = "relative";
+            }
+
+            this.#emailTemplateContainer = document.createElement("div");
+            this.#emailTemplateContainer.id = "order-home-template-panel";
+            this.#emailTemplateContainer.style = [
+                  "position:absolute",
+                  "top:0",
+                  "right:-260px",
+                  "width:240px",
+                  "height:100%",
+                  "background-color:#111827",
+                  "color:#e5e7eb",
+                  "display:flex",
+                  "flex-direction:column",
+                  "gap:12px",
+                  "padding:12px",
+                  "box-shadow:0 10px 30px rgba(0,0,0,0.35)",
+                  "border-radius:8px",
+                  "z-index:2010"
+            ].join(";");
+
+            const header = document.createElement("div");
+            header.innerText = "Email Templates";
+            header.style.fontWeight = "700";
+            header.style.fontSize = "16px";
+            header.style.letterSpacing = "0.2px";
+
+            const buttonContainer = document.createElement("div");
+            buttonContainer.style.display = "flex";
+            buttonContainer.style.flexDirection = "column";
+            buttonContainer.style.gap = "8px";
+
+            this.#templateDefinitions.forEach((template) => {
+                  this.createTemplateButton(template, customerFirstName, contentArea, buttonContainer);
+            });
+
+            const effectsContainer = this.buildTextEffects(contentArea);
+
+            this.#emailTemplateContainer.appendChild(header);
+            this.#emailTemplateContainer.appendChild(buttonContainer);
+            this.#emailTemplateContainer.appendChild(effectsContainer);
+
+            overlayContainer.appendChild(this.#emailTemplateContainer);
+      }
+
+      createTemplateButton(template, customerFirstName, contentArea, parent) {
+            createButton(template.label, "width:calc(100% - 20px);", (e) => {
+                  e.preventDefault();
+
+                  const templateContent = this.#emailTemplates[template.key];
+                  if (!templateContent) {
+                        return;
+                  }
+
+                  const personalizedContent = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
+                  contentArea.innerHTML = personalizedContent;
+            }, parent);
+      }
+
+      buildTextEffects(contentArea) {
+            const effectsContainer = document.createElement("div");
+            effectsContainer.style.display = "flex";
+            effectsContainer.style.flexDirection = "column";
+            effectsContainer.style.gap = "6px";
+            effectsContainer.style.borderTop = "1px solid #1f2937";
+            effectsContainer.style.paddingTop = "10px";
+
+            const title = document.createElement("div");
+            title.innerText = "Text Effects";
+            title.style.fontWeight = "600";
+            title.style.fontSize = "14px";
+            effectsContainer.appendChild(title);
+
+            const textColorRow = this.createEffectRow("Text Colour", (color) => {
+                  this.applyStyleToSelection(contentArea, { color });
+            });
+            const highlightRow = this.createEffectRow("Highlight", (color) => {
+                  this.applyStyleToSelection(contentArea, { backgroundColor: color });
+            });
+
+            effectsContainer.appendChild(textColorRow);
+            effectsContainer.appendChild(highlightRow);
+
+            return effectsContainer;
+      }
+
+      createEffectRow(labelText, applyCallback) {
+            const row = document.createElement("div");
+            row.style.display = "flex";
+            row.style.alignItems = "center";
+            row.style.justifyContent = "space-between";
+            row.style.gap = "8px";
+
+            const label = document.createElement("span");
+            label.innerText = labelText;
+            label.style.fontSize = "12px";
+            label.style.flex = "1";
+
+            const input = document.createElement("input");
+            input.type = "color";
+            input.value = "#fbbf24";
+            input.style.flex = "0 0 40px";
+            input.style.border = "1px solid #1f2937";
+            input.style.backgroundColor = "#0f172a";
+
+            const applyButton = document.createElement("button");
+            applyButton.innerText = "Apply";
+            applyButton.style.flex = "0 0 60px";
+            applyButton.style.backgroundColor = "#2563eb";
+            applyButton.style.color = "#e5e7eb";
+            applyButton.style.border = "none";
+            applyButton.style.padding = "6px";
+            applyButton.style.borderRadius = "4px";
+            applyButton.style.cursor = "pointer";
+            applyButton.addEventListener("click", (e) => {
+                  e.preventDefault();
+                  applyCallback(input.value);
+            });
+
+            row.appendChild(label);
+            row.appendChild(input);
+            row.appendChild(applyButton);
+
+            return row;
+      }
+
+      applyStyleToSelection(contentArea, style) {
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+                  return;
+            }
+
+            const range = selection.getRangeAt(0);
+            if (!contentArea.contains(range.commonAncestorContainer)) {
+                  return;
+            }
+
+            const span = document.createElement("span");
+            Object.assign(span.style, style);
+
+            const contents = range.extractContents();
+            span.appendChild(contents);
+            range.insertNode(span);
+            selection.removeAllRanges();
+            selection.selectAllChildren(span);
+      }
+
+      initPaymentModal() {
+            const lastFourInput = document.querySelector("#txtOfflineCcLast4Digits");
+            if (lastFourInput) {
+                  lastFourInput.value = "0000";
+            }
       }
 }
