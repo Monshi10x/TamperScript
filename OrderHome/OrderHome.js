@@ -18,10 +18,10 @@ class OrderHome {
       #emailTemplates = {};
       #attachmentsLoaded = false;
       #defaultAttachmentFiles = ["OrderDepositPaidThanks.txt", "OrderFinalPaymentRequest.txt"];
-      #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/";
+      #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/";
 
       constructor() {
-            const defaultTemplateBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/";
+            const defaultTemplateBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/";
             this.#templateBaseUrl = window.ORDER_HOME_TEMPLATE_BASE_URL
                   || defaultTemplateBaseUrl;
 
