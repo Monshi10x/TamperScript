@@ -1822,7 +1822,8 @@ class TSVGMeasurement {
                                     autoLabel, unit, scale, precision,
                                     arrowSize, textOffset, stroke, fontSize,
                                     tickLength, handleRadius, lineWidth,
-                                    sideHint
+                                    sideHint,
+                                    textBackgroundColor
                               }));
                         }
                   };
