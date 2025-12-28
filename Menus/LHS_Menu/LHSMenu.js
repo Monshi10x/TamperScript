@@ -350,7 +350,7 @@ async function initLHSMenu() {
     menu_ProductCompare = new ProductCompareMenu("800px", "calc(100% - 85px)", "Compare", "Compare");
     menu_Router = new RouterMenu("800px", "600px", "Router", "Router");
     menu_Window = new WindowMenu("800px", "calc(100% - 85px)", "Window", "Window");
-    menu_Vehicle = new VehicleMenu("1200px", "calc(100% - 85px)", "Vehicle", "Vehicle");
+    menu_Vehicle = new VehicleMenu("1600px", "calc(100% - 85px)", "Vehicle", "Vehicle");
     menu_creditCardSurcharge = new CreditSurchargeMenu("400px", "600px", "CreditSurchargeMenu", "Credit Card Surcharge");
     menu_3D = new Menu3D("900px", "calc(100% - 85px)", "3DLetterMenu", "3D Letters");
     menu_PanelSigns = new MenuPanelSigns("900px", "calc(100% - 85px)", "PanelSignsMenu", "Panel Signs");
