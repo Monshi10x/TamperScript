@@ -266,60 +266,43 @@ class OrderHome {
       }
 
       patchAttachmentHandling() {
+            if (typeof cbEmailAttachment !== "object" || typeof cbEmailAttachment.GetAttachments !== "function") {
+                  return;
+            }
+
             const attachmentManager = cbEmailAttachment;
-            if (!attachmentManager.remoteAttachments) {
+            if (!Array.isArray(attachmentManager.remoteAttachments)) {
                   attachmentManager.remoteAttachments = [];
             }
 
-            if (!attachmentManager._originalGetAttachments && typeof attachmentManager.GetAttachments === "function") {
-                  attachmentManager._originalGetAttachments = attachmentManager.GetAttachments.bind(attachmentManager);
-                  attachmentManager.GetAttachments = function () {
-                        try {
-                              const existing = attachmentManager._originalGetAttachments();
-                              const formData = existing || new FormData();
-
-                              attachmentManager.remoteAttachments.forEach((attachment, idx) => {
-                                    formData.append(`remote_file_${idx}`, attachment.blob, attachment.name);
-                              });
-
-                              if (!existing && attachmentManager.remoteAttachments.length === 0) {
-                                    return null;
-                              }
-
-                              return formData;
-                        } catch (error) {
-                              console.error("OrderHome attachment pipeline error:", error);
-                              return null;
-                        }
-                  };
+            if (attachmentManager._remotePatched) {
+                  return;
             }
 
-            if (!cbEmailAttachment._originalGetAttachments) {
-                  cbEmailAttachment._originalGetAttachments = cbEmailAttachment.GetAttachments.bind(cbEmailAttachment);
-                  cbEmailAttachment.GetAttachments = function () {
-                        const existing = cbEmailAttachment._originalGetAttachments();
+            attachmentManager._remotePatched = true;
+            attachmentManager._originalGetAttachments = attachmentManager.GetAttachments.bind(attachmentManager);
+
+            attachmentManager.GetAttachments = function () {
+                  try {
+                        const existing = attachmentManager._originalGetAttachments();
                         const formData = existing || new FormData();
 
-                        cbEmailAttachment.remoteAttachments.forEach((attachment, idx) => {
-                              formData.append(`remote_file_${idx}`, attachment.blob, attachment.name);
+                        attachmentManager.remoteAttachments.forEach((attachment, idx) => {
+                              if (attachment?.blob && attachment?.name) {
+                                    formData.append(`remote_file_${idx}`, attachment.blob, attachment.name);
+                              }
                         });
 
-                        if (!existing && cbEmailAttachment.remoteAttachments.length === 0) {
+                        if (existing === null && attachmentManager.remoteAttachments.length === 0) {
                               return null;
                         }
 
                         return formData;
-                  };
-            }
-
-            const span = document.createElement("span");
-            Object.assign(span.style, style);
-
-            const contents = range.extractContents();
-            span.appendChild(contents);
-            range.insertNode(span);
-            selection.removeAllRanges();
-            selection.selectAllChildren(span);
+                  } catch (error) {
+                        console.error("OrderHome attachment pipeline error:", error);
+                        return null;
+                  }
+            };
       }
 
       addRemoteAttachment(name, blob, index) {
