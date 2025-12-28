@@ -16,7 +16,6 @@ class OrderHome {
             { key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt" }
       ];
       #emailTemplates = {};
-      #attachmentsLoaded = false;
       #defaultAttachmentFiles = ["OrderDepositPaidThanks.txt", "OrderFinalPaymentRequest.txt"];
       #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/";
 
@@ -241,28 +240,34 @@ class OrderHome {
       }
 
       async ensureDefaultAttachments() {
-            if (this.#attachmentsLoaded || typeof cbEmailAttachment === "undefined") {
+            if (typeof cbEmailAttachment === "undefined") {
                   return;
             }
 
-            this.#attachmentsLoaded = true;
             this.patchAttachmentHandling();
 
             const attachmentFiles = window.ORDER_HOME_ATTACHMENT_FILES || this.#defaultAttachmentFiles;
             const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
 
-            await Promise.all(attachmentFiles.map(async (fileName, index) => {
-                  try {
-                        const response = await fetch(`${attachmentBaseUrl}${fileName}`);
-                        if (!response.ok) {
-                              throw new Error(`Failed to load attachment ${fileName}`);
+            const existingRemote = Array.isArray(cbEmailAttachment.remoteAttachments) ? cbEmailAttachment.remoteAttachments : [];
+            const missingFiles = attachmentFiles.filter((fileName) => !existingRemote.some((item) => item.name === fileName));
+
+            if (missingFiles.length > 0) {
+                  await Promise.all(missingFiles.map(async (fileName, index) => {
+                        try {
+                              const response = await fetch(`${attachmentBaseUrl}${fileName}`);
+                              if (!response.ok) {
+                                    throw new Error(`Failed to load attachment ${fileName}`);
+                              }
+                              const blob = await response.blob();
+                              this.addRemoteAttachment(fileName, blob);
+                        } catch (error) {
+                              console.error("OrderHome attachment load error:", error);
                         }
-                        const blob = await response.blob();
-                        this.addRemoteAttachment(fileName, blob, index);
-                  } catch (error) {
-                        console.error("OrderHome attachment load error:", error);
-                  }
-            }));
+                  }));
+            }
+
+            this.renderRemoteAttachments();
       }
 
       patchAttachmentHandling() {
@@ -310,34 +315,50 @@ class OrderHome {
                   cbEmailAttachment.remoteAttachments = [];
             }
 
-            cbEmailAttachment.remoteAttachments.push({ name, blob });
-            cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + blob.size;
+            const size = blob?.size || 0;
+            const existing = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
+            if (!existing) {
+                  cbEmailAttachment.remoteAttachments.push({ name, blob, size });
+                  cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + size;
+            }
 
+            this.renderRemoteAttachments();
+      }
+
+      renderRemoteAttachments() {
             const attachmentsContainer = document.getElementById("divClientEmailAttachments");
-            if (!attachmentsContainer) {
+            if (!attachmentsContainer || !Array.isArray(cbEmailAttachment.remoteAttachments)) {
                   return;
             }
 
-            const wrapper = document.createElement("div");
-            wrapper.className = "eItem";
-            wrapper.id = `docsObjId_remote_${index}`;
+            cbEmailAttachment.remoteAttachments.forEach((attachment, idx) => {
+                  const alreadyRendered = attachmentsContainer.querySelector(`.attachName[data-remote-name=\"${attachment.name}\"]`);
+                  if (alreadyRendered) {
+                        return;
+                  }
 
-            const nameSpan = document.createElement("span");
-            nameSpan.className = "attachName";
-            nameSpan.innerText = name;
+                  const wrapper = document.createElement("div");
+                  wrapper.className = "eItem";
+                  wrapper.id = `docsObjId_remote_${idx}`;
 
-            const removeSpan = document.createElement("span");
-            removeSpan.className = "eClose";
-            removeSpan.title = "Remove";
-            removeSpan.innerHTML = "&times;";
-            removeSpan.addEventListener("click", () => {
-                  cbEmailAttachment.remoteAttachments = cbEmailAttachment.remoteAttachments.filter((item) => item.name !== name);
-                  cbEmailAttachment.attachmentSize = Math.max(0, (cbEmailAttachment.attachmentSize || 0) - blob.size);
-                  wrapper.remove();
+                  const nameSpan = document.createElement("span");
+                  nameSpan.className = "attachName";
+                  nameSpan.dataset.remoteName = attachment.name;
+                  nameSpan.innerText = attachment.name;
+
+                  const removeSpan = document.createElement("span");
+                  removeSpan.className = "eClose";
+                  removeSpan.title = "Remove";
+                  removeSpan.innerHTML = "&times;";
+                  removeSpan.addEventListener("click", () => {
+                        cbEmailAttachment.remoteAttachments = cbEmailAttachment.remoteAttachments.filter((item) => item.name !== attachment.name);
+                        cbEmailAttachment.attachmentSize = Math.max(0, (cbEmailAttachment.attachmentSize || 0) - (attachment.size || 0));
+                        wrapper.remove();
+                  });
+
+                  wrapper.appendChild(nameSpan);
+                  wrapper.appendChild(removeSpan);
+                  attachmentsContainer.appendChild(wrapper);
             });
-
-            wrapper.appendChild(nameSpan);
-            wrapper.appendChild(removeSpan);
-            attachmentsContainer.appendChild(wrapper);
       }
 }
