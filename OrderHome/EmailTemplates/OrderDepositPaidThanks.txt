@@ -1,0 +1,8 @@
+Hi <%CustomerName%>,
+
+Thanks for your deposit payment. We’ve allocated the funds to your order and the team is moving ahead with the next steps.
+
+If you have any questions, reply to this email and we’ll be happy to help.
+
+Thanks again,
+H2O Spa Team
