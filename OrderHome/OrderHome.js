@@ -212,7 +212,7 @@ class OrderHome {
             return row;
       }
 
-      applyStyleToSelection(contentArea, style) {
+      applyStyleToSelection(contentArea, styleOptions = {}) {
             const selection = window.getSelection();
             if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
                   return;
@@ -224,7 +224,7 @@ class OrderHome {
             }
 
             const span = document.createElement("span");
-            Object.assign(span.style, style);
+            Object.assign(span.style, styleOptions);
 
             const contents = range.extractContents();
             span.appendChild(contents);
@@ -268,6 +268,24 @@ class OrderHome {
       patchAttachmentHandling() {
             if (!cbEmailAttachment.remoteAttachments) {
                   cbEmailAttachment.remoteAttachments = [];
+            }
+
+            if (!cbEmailAttachment._originalGetAttachments) {
+                  cbEmailAttachment._originalGetAttachments = cbEmailAttachment.GetAttachments.bind(cbEmailAttachment);
+                  cbEmailAttachment.GetAttachments = function () {
+                        const existing = cbEmailAttachment._originalGetAttachments();
+                        const formData = existing || new FormData();
+
+                        cbEmailAttachment.remoteAttachments.forEach((attachment, idx) => {
+                              formData.append(`remote_file_${idx}`, attachment.blob, attachment.name);
+                        });
+
+                        if (!existing && cbEmailAttachment.remoteAttachments.length === 0) {
+                              return null;
+                        }
+
+                        return formData;
+                  };
             }
 
             if (!cbEmailAttachment._originalGetAttachments) {
