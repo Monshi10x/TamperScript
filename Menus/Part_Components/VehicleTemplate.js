@@ -1211,6 +1211,7 @@ class VehicleMenu extends LHSMenuWindow {
                   }, null, false, 1);
                   qtyField[1].id = `rect-qty-${rectIndex}`;
                   qtyField[0].htmlFor = qtyField[1].id;
+                  qtyField[1].setAttribute("min", "0");
                   const widthField = createInput_Infield("Width", roundNumber(rect.w, 1), null, () => {
                         rect.w = parseFloat(widthField[1].value || rect.w);
                         this.refresh(); this.updateFromTemplateFields();
@@ -1223,6 +1224,8 @@ class VehicleMenu extends LHSMenuWindow {
                   }, null, false, 1);
                   heightField[1].id = `rect-height-${rectIndex}`;
                   heightField[0].htmlFor = heightField[1].id;
+                  widthField[1].setAttribute("min", "0");
+                  heightField[1].setAttribute("min", "0");
                   const rtaField = createCheckbox_Infield("Is RTA", rect.appTape !== "None", null, () => {
                         rect.appTape = rtaField[1].checked ? AppTapeLookup["Medium Tack"] : "None";
                         this.refresh(); this.updateFromTemplateFields();
@@ -1234,6 +1237,8 @@ class VehicleMenu extends LHSMenuWindow {
 
                   const scaleW = createInput_Infield("Target Width", roundNumber(rect.w, 1), null, null, null, false, 1)[1];
                   const scaleH = createInput_Infield("Target Height", roundNumber(rect.h, 1), null, null, null, false, 1)[1];
+                  scaleW.setAttribute("min", "0");
+                  scaleH.setAttribute("min", "0");
                   scaleW.style.width = "calc(100% - 0px)";
                   scaleH.style.width = "calc(100% - 0px)";
                   const scaleBtn = createButton("Calc Scale", "width:100%;margin:0;", () => {
@@ -1284,6 +1289,8 @@ class VehicleMenu extends LHSMenuWindow {
                         img.h = parseFloat(heightField[1].value || img.h);
                         this.refresh();
                   }, null, false, 1);
+                  widthField[1].setAttribute("min", "0");
+                  heightField[1].setAttribute("min", "0");
                   widthField[1].id = `img-width-${imageIndex}`;
                   widthField[0].htmlFor = widthField[1].id;
                   heightField[1].id = `img-height-${imageIndex}`;
@@ -1675,14 +1682,29 @@ class VehicleTemplate extends SubMenu {
             rowContainer.id = "rowContainer";
             rowContainer.className = this.rowID;
 
-            var description = createInput_Infield("Description", null, "width:100px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false);
+            const descriptionOptions = ["fender", "bonnet", "back", "tub", "roof", "front door left", "front door right", "rear door left", "rear door right", "tailgate", "front bumper", "rear bumper", "front quarter left", "front quarter right", "rear quarter left", "rear quarter right", "side skirt left", "side skirt right"];
+            var description = createInput_Infield("Description", null, "width:140px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false);
+            const descListId = `vehicle-desc-${this.rowID}`;
             description[1].id = "description";
-            var quantity = createInput_Infield("Qty", 1, "width:50px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 1);
+            description[1].setAttribute("list", descListId);
+            const descDatalist = document.createElement("datalist");
+            descDatalist.id = descListId;
+            descriptionOptions.forEach(opt => {
+                  const o = document.createElement("option");
+                  o.value = opt;
+                  descDatalist.appendChild(o);
+            });
+            rowContainer.appendChild(descDatalist);
+
+            var quantity = createInput_Infield("Qty", 1, "width:60px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 1);
             quantity[1].id = "quantity";
+            quantity[1].setAttribute("min", "0");
             var width = createInput_Infield("Width", 0, "width:120px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 50, {postfix: "mm"});
             width[1].id = "width";
+            width[1].setAttribute("min", "0");
             var height = createInput_Infield("Height", 0, "width:120px;height:40px;margin:5px;", () => {this.fieldChangeFunction();}, rowContainer, false, 50, {postfix: "mm"});
             height[1].id = "height";
+            height[1].setAttribute("min", "0");
 
             var tempThis = this;
             var deleteBtn = createButton("X", "width:40px;height:40px;margin:0px;background-color:red;border-color:red;position:absolute;top:5px;right:5px;", () => {
@@ -1741,30 +1763,18 @@ class VehicleTemplate extends SubMenu {
                         var panel = createCheckbox_Infield("Panel", true, "width:100px", () => {this.fieldChangeFunction();}, rowContainer);
                         panel[1].id = "panel";
                   }
-                  if(item.description != "Oneway") {
-                        var combo_3M = createButton("3M", "width:40px;height:45px;margin:5px;", () => {
-                              dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
-                              dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
-                        });
-                        rowContainer.appendChild(combo_3M);
-                        var combo_Poly = createButton("Py", "width:40px;height:45px;margin:5px;", () => {
-                              dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
-                              dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
-                        });
-                        rowContainer.appendChild(combo_Poly);
-                  }
-            } else {
-                  var combo_3M_2 = createButton("3M", "width:30px;height:45px;margin:5px;", () => {
-                        dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
-                        dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
-                  });
-                  rowContainer.appendChild(combo_3M_2);
-                  var combo_Poly_2 = createButton("Py", "width:30px;height:45px;margin:5px;", () => {
-                        dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
-                        dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
-                  });
-                  rowContainer.appendChild(combo_Poly_2);
             }
+
+            const combo_3M = createButton("3M", "width:40px;height:45px;margin:5px;", () => {
+                  dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["3M Vehicle"], false, true);
+                  dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["3m Gloss (Standard)"], false, true);
+            });
+            const combo_Poly = createButton("Py", "width:40px;height:45px;margin:5px;", () => {
+                  dropdownInfieldIconsSearchSetSelected(vinyl, VinylLookup["Air Release"], false, true);
+                  dropdownInfieldIconsSearchSetSelected(laminate, LaminateLookup["Gloss"], false, true);
+            });
+            rowContainer.appendChild(combo_3M);
+            rowContainer.appendChild(combo_Poly);
 
             var tapeParts = getPredefinedParts("Tape - ");
             var tapeDropdownElements = [];
@@ -1775,6 +1785,14 @@ class VehicleTemplate extends SubMenu {
             tape[6]();
             $(tape[1]).val(item ? item.appTape : AppTapeLookup["Medium Tack"]).change();
             tape[7]();
+
+            const rtaToggle = createCheckbox_Infield("Is RTA", (item ? item.appTape : AppTapeLookup["Medium Tack"]) !== "None", "width:120px;margin:5px;", () => {
+                  const isChecked = rtaToggle[1].checked;
+                  const targetTape = isChecked ? (AppTapeLookup["Medium Tack"] || "Tape - App Medium Tack") : "None";
+                  dropdownInfieldIconsSearchSetSelected(tape, targetTape, false, true);
+                  this.fieldChangeFunction();
+            }, rowContainer);
+            rtaToggle[1].id = "rta-toggle";
 
             this.l_itemsContainer.appendChild(rowContainer);
       };
