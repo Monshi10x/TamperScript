@@ -666,7 +666,7 @@ class VehicleMenu extends LHSMenuWindow {
                               handleRadius: 6 / scale,
                               offsetY: 20 / scale,
                               offsetX: 20 / scale,
-                              textBackgroundColor: "white"
+                              textBackgroundColor: "yellow"
                         });
                   }
 
@@ -1005,9 +1005,12 @@ class VehicleMenu extends LHSMenuWindow {
                   const cache = this.#rowFieldCache[n];
                   if(!cache) continue;
                   this.rects[n].description = cache.description.value;
-                  this.rects[n].w = cache.width.valueAsNumber || this.rects[n].w;
-                  this.rects[n].h = cache.height.valueAsNumber || this.rects[n].h;
-                  this.rects[n].qty = cache.quantity.valueAsNumber || this.rects[n].qty;
+                  const parsedW = parseFloat(cache.width.value);
+                  const parsedH = parseFloat(cache.height.value);
+                  const parsedQty = parseFloat(cache.quantity.value);
+                  this.rects[n].w = isNaN(parsedW) ? this.rects[n].w : parsedW;
+                  this.rects[n].h = isNaN(parsedH) ? this.rects[n].h : parsedH;
+                  this.rects[n].qty = isNaN(parsedQty) ? this.rects[n].qty : parsedQty;
                   this.rects[n].appTape = cache.tape.value;
                   this.rects[n].vinyl = cache.vinyl.value;
                   this.rects[n].laminate = cache.laminate.value;
