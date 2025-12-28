@@ -560,6 +560,26 @@ class VehicleMenu extends LHSMenuWindow {
             if(this.#showRectangles) this.#renderRects();
       }
 
+      #applyBackgroundScale(scaleW = 1, scaleH = 1) {
+            const bgImage = this.#svgLayers.background?.querySelector('image');
+            if(!bgImage) {
+                  vehicleToast('No background image found to scale', 'error');
+                  return;
+            }
+            const currentW = parseFloat(bgImage.getAttribute('width')) || bgImage.width?.baseVal?.value || 0;
+            const currentH = parseFloat(bgImage.getAttribute('height')) || bgImage.height?.baseVal?.value || 0;
+            if(!currentW || !currentH) {
+                  vehicleToast('Unable to determine background size', 'error');
+                  return;
+            }
+            const newW = currentW * scaleW;
+            const newH = currentH * scaleH;
+            bgImage.setAttribute('width', newW);
+            bgImage.setAttribute('height', newH);
+            this.refresh();
+            vehicleToast(`Background scaled to ${newW.toFixed(1)} x ${newH.toFixed(1)}`, 'success');
+      }
+
       #applyLayerVisibility() {
             const setDisplay = (layer, isVisible) => {
                   if(layer) layer.setAttribute('display', isVisible ? 'inline' : 'none');
@@ -1122,7 +1142,7 @@ class VehicleMenu extends LHSMenuWindow {
             const rectIndex = this.#getRectAtPosition(pos.x, pos.y);
             const imageIndex = this.#getSkewRectAtPosition(pos.x, pos.y);
 
-            if(rectIndex === false && imageIndex === false) return;
+            const isBackgroundTarget = rectIndex === false && imageIndex === false;
 
             if(!customContextMenuContainer) initCustomContextMenu();
             setFieldHidden(false, customContextMenuContainer);
@@ -1300,6 +1320,33 @@ class VehicleMenu extends LHSMenuWindow {
                   panel.appendChild(applyScaleBtn);
                   panel.appendChild(resetBtn);
                   panel.appendChild(deleteBtn);
+            } else if(isBackgroundTarget) {
+                  const title = createText("Background Options", "color:white;font-weight:bold;margin:0;");
+                  panel.appendChild(title);
+
+                  const scaleWField = createInput_Infield("Width Scale", 1, null, null, null, false, 0.01)[1];
+                  const scaleHField = createInput_Infield("Height Scale", 1, null, null, null, false, 0.01)[1];
+                  scaleWField.style.width = "calc(100% - 0px)";
+                  scaleHField.style.width = "calc(100% - 0px)";
+
+                  const applyScaleBtn = createButton("Apply Scale", "width:100%;", () => {
+                        const scaleW = parseFloat(scaleWField.value || "1") || 1;
+                        const scaleH = parseFloat(scaleHField.value || "1") || 1;
+                        this.#applyBackgroundScale(scaleW, scaleH);
+                  });
+
+                  const applyCopiedScaleBtn = createButton("Apply Copied Scale", "width:100%;", () => {
+                        if(this.#copiedRectScale) {
+                              this.#applyBackgroundScale(this.#copiedRectScale.w, this.#copiedRectScale.h);
+                        } else {
+                              vehicleToast('No copied scale found', 'error');
+                        }
+                  });
+
+                  panel.appendChild(scaleWField.parentElement);
+                  panel.appendChild(scaleHField.parentElement);
+                  panel.appendChild(applyScaleBtn);
+                  panel.appendChild(applyCopiedScaleBtn);
             }
 
             containerPanel.appendChild(panel);
