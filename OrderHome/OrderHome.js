@@ -204,9 +204,9 @@ class OrderHome {
                   checkbox.type = "checkbox";
                   checkbox.checked = true;
                   checkbox.dataset.attachmentName = fileName;
-                  checkbox.addEventListener("change", (e) => {
+                  checkbox.addEventListener("change", async (e) => {
                         const shouldInclude = e.target.checked;
-                        this.toggleRemoteAttachment(fileName, shouldInclude);
+                        await this.toggleRemoteAttachment(fileName, shouldInclude);
                   });
 
                   const text = document.createElement("span");
@@ -378,24 +378,35 @@ class OrderHome {
             this.renderRemoteAttachments();
       }
 
-      toggleRemoteAttachment(name, shouldInclude) {
+      async toggleRemoteAttachment(name, shouldInclude) {
             if (shouldInclude) {
                   const cached = this.#attachmentCache.get(name);
-                  if (cached) {
+                  if (cached?.blob) {
                         this.addRemoteAttachment(name, cached.blob);
+                        return;
+                  }
+
+                  const existing = cbEmailAttachment.remoteAttachments?.find((item) => item.name === name && item.blob);
+                  if (existing?.blob) {
+                        this.addRemoteAttachment(name, existing.blob);
+                        return;
+                  }
+
+                  const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
+                  try {
+                        const response = await fetch(`${attachmentBaseUrl}${name}`);
+                        if (!response.ok) {
+                              throw new Error(`Failed to load attachment ${name}`);
+                        }
+                        const fetchedBlob = await response.blob();
+                        this.#attachmentCache.set(name, { blob: fetchedBlob, size: fetchedBlob.size });
+                        this.addRemoteAttachment(name, fetchedBlob);
+                  } catch (error) {
+                        console.error("OrderHome attachment toggle error:", error);
                   }
             } else {
                   this.removeRemoteAttachment(name);
             }
-
-            const size = blob?.size || 0;
-            const existing = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
-            if (!existing) {
-                  cbEmailAttachment.remoteAttachments.push({ name, blob, size });
-                  cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + size;
-            }
-
-            this.renderRemoteAttachments();
       }
 
       removeRemoteAttachment(name) {
