@@ -16,6 +16,7 @@ class OrderHome {
             { key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt" }
       ];
       #emailTemplates = {};
+      #attachmentCache = new Map();
       #defaultAttachmentFiles = ["OrderDepositPaidThanks.txt", "OrderFinalPaymentRequest.txt"];
       #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/";
 
@@ -120,10 +121,12 @@ class OrderHome {
             });
 
             const effectsContainer = this.buildTextEffects(contentArea);
+            const attachmentsContainer = this.buildAttachmentSelector();
 
             this.#emailTemplateContainer.appendChild(header);
             this.#emailTemplateContainer.appendChild(buttonContainer);
             this.#emailTemplateContainer.appendChild(effectsContainer);
+            this.#emailTemplateContainer.appendChild(attachmentsContainer);
 
             overlayContainer.appendChild(this.#emailTemplateContainer);
 
@@ -169,6 +172,55 @@ class OrderHome {
             effectsContainer.appendChild(highlightRow);
 
             return effectsContainer;
+      }
+
+      buildAttachmentSelector() {
+            const wrapper = document.createElement("div");
+            wrapper.style.display = "flex";
+            wrapper.style.flexDirection = "column";
+            wrapper.style.gap = "6px";
+            wrapper.style.borderTop = "1px solid #1f2937";
+            wrapper.style.paddingTop = "10px";
+
+            const header = document.createElement("div");
+            header.innerText = "Attachments";
+            header.style.fontWeight = "600";
+            header.style.fontSize = "14px";
+
+            const selectContainer = document.createElement("div");
+            selectContainer.style.display = "flex";
+            selectContainer.style.flexDirection = "column";
+            selectContainer.style.gap = "4px";
+
+            const attachmentFiles = window.ORDER_HOME_ATTACHMENT_FILES || this.#defaultAttachmentFiles;
+            attachmentFiles.forEach((fileName) => {
+                  const row = document.createElement("label");
+                  row.style.display = "flex";
+                  row.style.alignItems = "center";
+                  row.style.gap = "8px";
+                  row.style.cursor = "pointer";
+
+                  const checkbox = document.createElement("input");
+                  checkbox.type = "checkbox";
+                  checkbox.checked = true;
+                  checkbox.dataset.attachmentName = fileName;
+                  checkbox.addEventListener("change", (e) => {
+                        const shouldInclude = e.target.checked;
+                        this.toggleRemoteAttachment(fileName, shouldInclude);
+                  });
+
+                  const text = document.createElement("span");
+                  text.innerText = fileName;
+                  text.style.fontSize = "12px";
+
+                  row.appendChild(checkbox);
+                  row.appendChild(text);
+                  selectContainer.appendChild(row);
+            });
+
+            wrapper.appendChild(header);
+            wrapper.appendChild(selectContainer);
+            return wrapper;
       }
 
       createEffectRow(labelText, applyCallback) {
@@ -260,6 +312,7 @@ class OrderHome {
                                     throw new Error(`Failed to load attachment ${fileName}`);
                               }
                               const blob = await response.blob();
+                              this.#attachmentCache.set(fileName, { blob, size: blob.size });
                               this.addRemoteAttachment(fileName, blob);
                         } catch (error) {
                               console.error("OrderHome attachment load error:", error);
@@ -325,11 +378,56 @@ class OrderHome {
             this.renderRemoteAttachments();
       }
 
+      toggleRemoteAttachment(name, shouldInclude) {
+            if (shouldInclude) {
+                  const cached = this.#attachmentCache.get(name);
+                  if (cached) {
+                        this.addRemoteAttachment(name, cached.blob);
+                  }
+            } else {
+                  this.removeRemoteAttachment(name);
+            }
+
+            const size = blob?.size || 0;
+            const existing = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
+            if (!existing) {
+                  cbEmailAttachment.remoteAttachments.push({ name, blob, size });
+                  cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + size;
+            }
+
+            this.renderRemoteAttachments();
+      }
+
+      removeRemoteAttachment(name) {
+            if (!Array.isArray(cbEmailAttachment.remoteAttachments)) {
+                  return;
+            }
+
+            const target = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
+            if (target) {
+                  cbEmailAttachment.remoteAttachments = cbEmailAttachment.remoteAttachments.filter((item) => item.name !== name);
+                  cbEmailAttachment.attachmentSize = Math.max(0, (cbEmailAttachment.attachmentSize || 0) - (target.size || 0));
+            }
+
+            const attachmentsContainer = document.getElementById("divClientEmailAttachments");
+            const chip = attachmentsContainer?.querySelector(`.attachName[data-remote-name=\"${name}\"]`)?.parentElement;
+            if (chip) {
+                  chip.remove();
+            }
+      }
+
       renderRemoteAttachments() {
             const attachmentsContainer = document.getElementById("divClientEmailAttachments");
             if (!attachmentsContainer || !Array.isArray(cbEmailAttachment.remoteAttachments)) {
                   return;
             }
+
+            const remoteNames = cbEmailAttachment.remoteAttachments.map((a) => a.name);
+            attachmentsContainer.querySelectorAll(".attachName[data-remote-name]").forEach((node) => {
+                  if (!remoteNames.includes(node.dataset.remoteName)) {
+                        node.parentElement?.remove();
+                  }
+            });
 
             cbEmailAttachment.remoteAttachments.forEach((attachment, idx) => {
                   const alreadyRendered = attachmentsContainer.querySelector(`.attachName[data-remote-name=\"${attachment.name}\"]`);
