@@ -1227,7 +1227,8 @@ class VehicleMenu extends LHSMenuWindow {
                   widthField[1].setAttribute("min", "0");
                   heightField[1].setAttribute("min", "0");
                   const rtaField = createCheckbox_Infield("Is RTA", rect.appTape !== "None", null, () => {
-                        rect.appTape = rtaField[1].checked ? AppTapeLookup["Medium Tack"] : "None";
+                        const mediumTape = AppTapeLookup["Medium Tack"] || "Tape - App Medium Tack";
+                        rect.appTape = rtaField[1].checked ? mediumTape : "None";
                         this.refresh(); this.updateFromTemplateFields();
                   }, null);
                   rtaField[1].id = `rect-rta-${rectIndex}`;
@@ -1696,6 +1697,11 @@ class VehicleTemplate extends SubMenu {
             });
             rowContainer.appendChild(descDatalist);
             description[1].addEventListener("click", () => {
+                  if(typeof description[1].showPicker === "function") description[1].showPicker();
+            });
+            description[1].addEventListener("mousedown", (e) => {
+                  e.preventDefault();
+                  description[1].focus();
                   if(typeof description[1].showPicker === "function") description[1].showPicker();
             });
 
