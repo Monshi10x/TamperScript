@@ -387,6 +387,15 @@ class OrderHome {
             } else {
                   this.removeRemoteAttachment(name);
             }
+
+            const size = blob?.size || 0;
+            const existing = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
+            if (!existing) {
+                  cbEmailAttachment.remoteAttachments.push({ name, blob, size });
+                  cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + size;
+            }
+
+            this.renderRemoteAttachments();
       }
 
       removeRemoteAttachment(name) {
