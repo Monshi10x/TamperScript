@@ -367,7 +367,7 @@ class VehicleMenu extends LHSMenuWindow {
                   const productNo = getNumProducts();
                   let partNo = 0;
                   this.#showMeasures = true;
-                  try {measuresCkb[1].checked = true;} catch(e) {}
+                  try {measuresCkb[1].checked = true;} catch(e) { }
                   this.refresh();
                   await AddPart("No Cost Part", productNo);
                   partNo++;
@@ -1169,11 +1169,11 @@ class VehicleMenu extends LHSMenuWindow {
 
             removeAllChildrenFromParent(customContextMenuContainer);
             const containerPanel = document.createElement('div');
-            containerPanel.style = "padding:10px;display:flex;flex-direction:column;gap:6px;color:white;background-color:" + COLOUR.DarkGrey + ";width:300px;box-shadow:0 4px 12px rgba(0,0,0,0.8);position:relative;cursor:default;user-select:none;";
+            containerPanel.style = "padding:0px;display:flex;flex-direction:column;gap:6px;color:white;background-color:" + COLOUR.DarkGrey + ";width:100%;box-shadow:0 4px 12px rgba(0,0,0,0.8);position:relative;cursor:default;user-select:none;padding-top:15px;";
             let dragOffset = {x: 0, y: 0};
             const dragHandle = document.createElement('div');
             dragHandle.innerText = "☰";
-            dragHandle.style = "position:absolute;left:10px;top:10px;cursor:grab;color:white;font-size:16px;";
+            dragHandle.style = "position:absolute;left:5px;top:5px;cursor:grab;color:white;font-size:18px;";
             dragHandle.onmousedown = (e) => {
                   e.preventDefault();
                   dragHandle.style.cursor = "grabbing";
@@ -1196,7 +1196,6 @@ class VehicleMenu extends LHSMenuWindow {
             const closeBtn = createButton("X", "background-color:red;width:26px;height:26px;position:absolute;top:6px;right:6px;margin:0px;min-height:26px;border:0px;font-weight:bold;font-size:14px;", () => {
                   if(outsideHandler) document.removeEventListener('mousedown', outsideHandler, true);
                   closeCustomContextMenu();
-                  vehicleToast('Closed');
             });
             containerPanel.appendChild(closeBtn);
 
@@ -1208,26 +1207,26 @@ class VehicleMenu extends LHSMenuWindow {
                   const title = createText("Rectangle Options", "color:white;font-weight:bold;margin:0;");
                   panel.appendChild(title);
 
-                  const descField = createInput_Infield("Description", rect.description, null, () => {
+                  const descField = createInput_Infield("Description", rect.description, "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", () => {
                         rect.description = descField[1].value;
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false);
                   descField[1].id = `rect-desc-${rectIndex}`;
                   descField[0].htmlFor = descField[1].id;
-                  const qtyField = createInput_Infield("Qty", roundNumber(rect.qty, 1), null, () => {
+                  const qtyField = createInput_Infield("Qty", roundNumber(rect.qty, 1), "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", () => {
                         rect.qty = parseFloat(qtyField[1].value || rect.qty);
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false, 1);
                   qtyField[1].id = `rect-qty-${rectIndex}`;
                   qtyField[0].htmlFor = qtyField[1].id;
                   qtyField[1].setAttribute("min", "0");
-                  const widthField = createInput_Infield("Width", roundNumber(rect.w, 1), null, () => {
+                  const widthField = createInput_Infield("Width", roundNumber(rect.w, 1), "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", () => {
                         rect.w = parseFloat(widthField[1].value || rect.w);
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false, 1);
                   widthField[1].id = `rect-width-${rectIndex}`;
                   widthField[0].htmlFor = widthField[1].id;
-                  const heightField = createInput_Infield("Height", roundNumber(rect.h, 1), null, () => {
+                  const heightField = createInput_Infield("Height", roundNumber(rect.h, 1), "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", () => {
                         rect.h = parseFloat(heightField[1].value || rect.h);
                         this.refresh(); this.updateFromTemplateFields();
                   }, null, false, 1);
@@ -1237,13 +1236,13 @@ class VehicleMenu extends LHSMenuWindow {
                   heightField[1].setAttribute("min", "0");
                   [descField[1], qtyField[1], widthField[1], heightField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
 
-                  const scaleW = createInput_Infield("Target Width", roundNumber(rect.w, 1), null, null, null, false, 1)[1];
-                  const scaleH = createInput_Infield("Target Height", roundNumber(rect.h, 1), null, null, null, false, 1)[1];
+                  const scaleW = createInput_Infield("Target Width", roundNumber(rect.w, 1), "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", null, null, false, 1)[1];
+                  const scaleH = createInput_Infield("Target Height", roundNumber(rect.h, 1), "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", null, null, false, 1)[1];
                   scaleW.setAttribute("min", "0");
                   scaleH.setAttribute("min", "0");
                   scaleW.style.width = "calc(100% - 0px)";
                   scaleH.style.width = "calc(100% - 0px)";
-                  const scaleBtn = createButton("Calc Scale", "width:100%;margin:0;", () => {
+                  const scaleBtn = createButton("Calc Scale", "width:calc(100% - 10px);margin:5px;", () => {
                         const targetW = parseFloat(scaleW.value || rect.w);
                         const targetH = parseFloat(scaleH.value || rect.h);
                         const scaleResultW = targetW / rect.w;
@@ -1252,7 +1251,7 @@ class VehicleMenu extends LHSMenuWindow {
                         vehicleToast(`Saved scale W:${scaleResultW.toFixed(3)} H:${scaleResultH.toFixed(3)}`, "success");
                   });
 
-                  const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;margin:0;", () => {
+                  const deleteBtn = createButton("Delete", "background-color:red;border-color:red;width:calc(100% - 10px);margin:5px;", () => {
                         this.#deleteRectAndRow(rectIndex);
                         closeCustomContextMenu();
                   });
@@ -1261,11 +1260,11 @@ class VehicleMenu extends LHSMenuWindow {
                   panel.appendChild(qtyField[0]);
                   panel.appendChild(widthField[0]);
                   panel.appendChild(heightField[0]);
-                  const scaleHeading = createText("Scale", "color:white;font-weight:bold;margin:6px 0 0 0;");
+                  const scaleHeading = createText("Figure Out Scale", "color:white;font-weight:bold;margin:6px 0 0 0;");
                   panel.appendChild(scaleHeading);
                   panel.appendChild(scaleW.parentElement);
                   panel.appendChild(scaleH.parentElement);
-                  const applySavedScaleBtn = createButton("Apply Saved Scale", "width:100%;margin:0;", () => {
+                  const applySavedScaleBtn = createButton("Apply Saved Scale", "width:calc(100% - 10px);margin:5px;", () => {
                         if(this.#copiedRectScale) {
                               rect.w = rect.w * this.#copiedRectScale.w;
                               rect.h = rect.h * this.#copiedRectScale.h;
@@ -1284,11 +1283,11 @@ class VehicleMenu extends LHSMenuWindow {
                   const title = createText("Image Options", "color:white;font-weight:bold;margin:0;");
                   panel.appendChild(title);
 
-                  const widthField = createInput_Infield("Width", roundNumber(img.w, 1), null, () => {
+                  const widthField = createInput_Infield("Width", roundNumber(img.w, 1), "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", () => {
                         img.w = parseFloat(widthField[1].value || img.w);
                         this.refresh();
                   }, null, false, 1);
-                  const heightField = createInput_Infield("Height", roundNumber(img.h, 1), null, () => {
+                  const heightField = createInput_Infield("Height", roundNumber(img.h, 1), "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", () => {
                         img.h = parseFloat(heightField[1].value || img.h);
                         this.refresh();
                   }, null, false, 1);
@@ -1300,16 +1299,16 @@ class VehicleMenu extends LHSMenuWindow {
                   heightField[0].htmlFor = heightField[1].id;
                   [widthField[1], heightField[1]].forEach(el => {el.style.width = "calc(100% - 0px)";});
 
-                  const copyBtn = createButton("Copy", "width:100%;", () => {this.#copySkewableRect(imageIndex); vehicleToast('Image copied', "success");});
-                  const pasteBtn = createButton("Paste", "width:100%;", () => {this.#pasteSkewableRect(pos.x, pos.y); this.refresh(); vehicleToast('Image pasted', "success");});
-                  const resetBtn = createButton("Reset Size", "width:100%;", () => {this.#resetSkewableRect(imageIndex); vehicleToast('Image reset', "info");});
+                  const copyBtn = createButton("Copy", "width:calc(100% - 10px);margin:5px;", () => {this.#copySkewableRect(imageIndex); vehicleToast('Image copied', "success");});
+                  const pasteBtn = createButton("Paste", "width:calc(100% - 10px);margin:5px;", () => {this.#pasteSkewableRect(pos.x, pos.y); this.refresh(); vehicleToast('Image pasted', "success");});
+                  const resetBtn = createButton("Reset Size", "width:calc(100% - 10px);margin:5px;", () => {this.#resetSkewableRect(imageIndex); vehicleToast('Image reset', "info");});
 
-                  const copyScaleBtn = createButton("Copy Target Scale", "width:100%;", () => {
+                  const copyScaleBtn = createButton("Copy Target Scale", "width:calc(100% - 10px);margin:5px;", () => {
                         this.#copiedImageScale = {w: img.w, h: img.h};
                         this.#copiedRectScale = {w: img.w / img.naturalW, h: img.h / img.naturalH};
                         vehicleToast('Image scale copied', "success");
                   });
-                  const applyScaleBtn = createButton("Apply Copied Scale", "width:100%;", () => {
+                  const applyScaleBtn = createButton("Apply Copied Scale", "width:calc(100% - 10px);margin:5px;", () => {
                         if(this.#copiedRectScale) {
                               img.w = img.w * this.#copiedRectScale.w;
                               img.h = img.h * this.#copiedRectScale.h;
@@ -1325,7 +1324,7 @@ class VehicleMenu extends LHSMenuWindow {
                         }
                   });
 
-                  const deleteBtn = createButton("Delete", "width:100%;background-color:red;border-color:red;margin:0;", () => {
+                  const deleteBtn = createButton("Delete", "width:calc(100% - 10px);margin:5px;background-color:red;border-color:red;", () => {
                         this.#deleteSkewableRect(imageIndex);
                         closeCustomContextMenu();
                         vehicleToast('Image deleted', "info");
@@ -1343,18 +1342,18 @@ class VehicleMenu extends LHSMenuWindow {
                   const title = createText("Background Options", "color:white;font-weight:bold;margin:0;");
                   panel.appendChild(title);
 
-                  const scaleWField = createInput_Infield("Width Scale", 1, null, null, null, false, 0.01)[1];
-                  const scaleHField = createInput_Infield("Height Scale", 1, null, null, null, false, 0.01)[1];
+                  const scaleWField = createInput_Infield("Width Scale", 1, "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", null, null, false, 0.01)[1];
+                  const scaleHField = createInput_Infield("Height Scale", 1, "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", null, null, false, 0.01)[1];
                   scaleWField.style.width = "calc(100% - 0px)";
                   scaleHField.style.width = "calc(100% - 0px)";
 
-                  const applyScaleBtn = createButton("Apply Scale", "width:100%;", () => {
+                  const applyScaleBtn = createButton("Apply Scale", "width:calc(100% - 10px);margin:5px;", () => {
                         const scaleW = parseFloat(scaleWField.value || "1") || 1;
                         const scaleH = parseFloat(scaleHField.value || "1") || 1;
                         this.#applyBackgroundScale(scaleW, scaleH);
                   });
 
-                  const applyCopiedScaleBtn = createButton("Apply Copied Scale", "width:100%;", () => {
+                  const applyCopiedScaleBtn = createButton("Apply Copied Scale", "width:calc(100% - 10px);margin:5px;", () => {
                         if(this.#copiedRectScale) {
                               this.#applyBackgroundScale(this.#copiedRectScale.w, this.#copiedRectScale.h);
                         } else {
@@ -1805,7 +1804,7 @@ class VehicleTemplate extends SubMenu {
             this.callback();
       };
 
-      Update() {}
+      Update() { }
 
       rowObjects = [];
       uniqueGroupsByKeys = [];
