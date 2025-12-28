@@ -665,7 +665,8 @@ class VehicleMenu extends LHSMenuWindow {
                               tickLength: 15 / scale,
                               handleRadius: 6 / scale,
                               offsetY: 20 / scale,
-                              offsetX: 20 / scale
+                              offsetX: 20 / scale,
+                              textBackgroundColor: "white"
                         });
                   }
 
@@ -1662,7 +1663,7 @@ class VehicleTemplate extends SubMenu {
       addRow = (item) => {
             this.rowID++;
             var rowContainer = document.createElement('div');
-            rowContainer.style = "width:100%;height:55px;display:block;float:left;background-color:#aaa;margin-top:10px;";
+            rowContainer.style = "width:100%;display:block;float:left;background-color:#aaa;margin-top:10px;max-height:150px;overflow-y:auto;position:relative;padding:5px 50px 5px 5px;box-sizing:border-box;";
             rowContainer.id = "rowContainer";
             rowContainer.className = this.rowID;
 
@@ -1676,7 +1677,7 @@ class VehicleTemplate extends SubMenu {
             height[1].id = "height";
 
             var tempThis = this;
-            var deleteBtn = createButton("X", "width:40px;height:100%;margin:0px;margin-left:5px;margin-right:0px;background-color:red;border-color:red;float:right", () => {
+            var deleteBtn = createButton("X", "width:40px;height:40px;margin:0px;background-color:red;border-color:red;position:absolute;top:5px;right:5px;", () => {
                   var rows = tempThis.parentObject.querySelectorAll("#rowContainer");
                   var rowN = parseFloat(deleteBtn.id);
                   var actualIndex = 0;
