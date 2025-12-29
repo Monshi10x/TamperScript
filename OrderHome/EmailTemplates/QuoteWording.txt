@@ -61,8 +61,8 @@ Illuminated or fabricated signage typically requires <strong>3–5 weeks</strong
   <span style="font-weight:700;">Google</span>
   <span aria-label="Rated 4.9 out of 5 stars" title="4.9 out of 5">
     <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
-    <span style="margin-left:6px; font-weight:700;">4.9</span>
+    <span style="font-weight:700;">4.9</span>
   </span>
-  <span style="margin-left:6px; color:#666;">(47 reviews)</span>
+  <span style="color:#666;">(47 reviews)</span>
 </p>
 <img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/EmailFooter.jpg" style="width:100%;height:auto;max-width:400px;" width="300" height="76">
