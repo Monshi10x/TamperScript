@@ -354,6 +354,70 @@ class OrderHome {
                   } else if (signature.trim().length > 0 && !content.includes(signature)) {
                         content = `${content}\n\n${signature}`;
                   }
+            };
+      }
+
+      addRemoteAttachment(name, blob, index) {
+            if (!cbEmailAttachment.remoteAttachments) {
+                  cbEmailAttachment.remoteAttachments = [];
+            }
+
+            const size = blob?.size || 0;
+            const existing = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
+            if (!existing) {
+                  cbEmailAttachment.remoteAttachments.push({ name, blob, size });
+                  cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + size;
+            }
+
+            this.renderRemoteAttachments();
+      }
+
+      async toggleRemoteAttachment(name, shouldInclude) {
+            if (shouldInclude) {
+                  const cached = this.#attachmentCache.get(name);
+                  if (cached?.blob) {
+                        this.addRemoteAttachment(name, cached.blob);
+                        return;
+                  }
+
+                  const existing = cbEmailAttachment.remoteAttachments?.find((item) => item.name === name && item.blob);
+                  if (existing?.blob) {
+                        this.addRemoteAttachment(name, existing.blob);
+                        return;
+                  }
+
+                  const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
+                  try {
+                        const response = await fetch(`${attachmentBaseUrl}${name}`);
+                        if (!response.ok) {
+                              throw new Error(`Failed to load attachment ${name}`);
+                        }
+                        const fetchedBlob = await response.blob();
+                        this.#attachmentCache.set(name, { blob: fetchedBlob, size: fetchedBlob.size });
+                        this.addRemoteAttachment(name, fetchedBlob);
+                  } catch (error) {
+                        console.error("OrderHome attachment toggle error:", error);
+                  }
+            } else {
+                  this.removeRemoteAttachment(name);
+            }
+      }
+
+      removeRemoteAttachment(name) {
+            if (!Array.isArray(cbEmailAttachment.remoteAttachments)) {
+                  return;
+            }
+
+            const target = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
+            if (target) {
+                  cbEmailAttachment.remoteAttachments = cbEmailAttachment.remoteAttachments.filter((item) => item.name !== name);
+                  cbEmailAttachment.attachmentSize = Math.max(0, (cbEmailAttachment.attachmentSize || 0) - (target.size || 0));
+            }
+
+            const attachmentsContainer = document.getElementById("divClientEmailAttachments");
+            const chip = attachmentsContainer?.querySelector(`.attachName[data-remote-name=\"${name}\"]`)?.parentElement;
+            if (chip) {
+                  chip.remove();
             }
 
             return content;
