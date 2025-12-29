@@ -363,6 +363,7 @@ class OrderHome {
             // Allow swapping by tag ids in the template HTML
             const container = document.createElement("div");
             container.innerHTML = content;
+            console.log(container.innerHTML);
 
             const nameNode = container.querySelector("#salesperson-name");
             if(nameNode) {
@@ -378,6 +379,7 @@ class OrderHome {
             if(emailNode) {
                   emailNode.textContent = userEmail;
             }
+            console.log(container.innerHTML);
 
             return container.innerHTML;
       }
