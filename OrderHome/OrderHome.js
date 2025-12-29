@@ -18,7 +18,7 @@ class OrderHome {
       #emailTemplates = {};
       #userInfo = null;
       #attachmentCache = new Map();
-      #defaultAttachmentFiles = ["OrderDepositPaidThanks.txt", "OrderFinalPaymentRequest.txt", "Capabilities One Page 3D CUT LETTERS V2 (E).pdf"];
+      #defaultAttachmentFiles = ["Capabilities One Page 3D CUT LETTERS V2 (E).pdf"];
       #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailAttachments/";
 
       constructor() {
@@ -188,6 +188,17 @@ class OrderHome {
 
                   const personalizedContent = this.personalizeTemplate(templateContent, customerFirstName, quoteNumber);
                   contentArea.innerHTML = personalizedContent;
+
+                  // Trigger a synthetic keyup event because it wasn't saving
+                  const event = new KeyboardEvent('keyup', {
+                        key: 'Enter',
+                        code: 'Enter',
+                        keyCode: 13,
+                        which: 13,
+                        bubbles: true
+                  });
+                  contentArea.focus();
+                  contentArea.dispatchEvent(event);
             }, parent);
       }
 
