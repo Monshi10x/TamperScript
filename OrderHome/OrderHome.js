@@ -115,6 +115,8 @@ class OrderHome {
             buttonContainer.style.display = "flex";
             buttonContainer.style.flexDirection = "column";
             buttonContainer.style.gap = "8px";
+            buttonContainer.style.maxHeight = "300px";
+            buttonContainer.style.overflowY = "auto";
 
             this.#templateDefinitions.forEach((template) => {
                   this.createTemplateButton(template, customerFirstName, contentArea, buttonContainer);
@@ -170,6 +172,21 @@ class OrderHome {
 
             effectsContainer.appendChild(textColorRow);
             effectsContainer.appendChild(highlightRow);
+
+            const importantButton = document.createElement("button");
+            importantButton.innerText = "Important";
+            importantButton.style.backgroundColor = "#dc2626";
+            importantButton.style.color = "#fef2f2";
+            importantButton.style.border = "none";
+            importantButton.style.padding = "8px";
+            importantButton.style.borderRadius = "4px";
+            importantButton.style.cursor = "pointer";
+            importantButton.style.fontWeight = "700";
+            importantButton.addEventListener("click", (e) => {
+                  e.preventDefault();
+                  this.applyStyleToSelection(contentArea, { color: "#dc2626", fontWeight: "700" });
+            });
+            effectsContainer.appendChild(importantButton);
 
             return effectsContainer;
       }
