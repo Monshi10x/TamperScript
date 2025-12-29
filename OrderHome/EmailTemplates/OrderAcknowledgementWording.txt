@@ -4,7 +4,8 @@ mso-fareast-font-family:&quot;Times New Roman&quot;"><o:p></o:p></span></p><p>Pl
 <p>Kind Regards,<br>
       <span id="salesperson-name">Pearl Cargill</span>
 </p>
-<p id="salesperson-phone">0439 972 409<br>
+<p>
+      <span id="salesperson-phone"0439 972 409</span><br>
       <span>Ph: 07 3804 3884</span><br>
       <span id="salesperson-email">springwood@signarama.com.au</span><br>
       <span>Signarama Springwood</span>
