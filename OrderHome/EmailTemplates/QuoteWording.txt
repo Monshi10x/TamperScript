@@ -1,22 +1,22 @@
-<p>Hi John,</p>
+<p>Hi <span id="customer-name">John</span>,</p>
 
-<p>Thank you for the opportunity to assist with your signage project. As discussed, please find your detailed quotation from <strong>SIGNARAMA Springwood</strong> attached.</p>
+<p>Thank you for the opportunity to assist with your signage project. <br>As discussed, please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</strong>attached.</p>
 
 <p><strong>Next steps to proceed:</strong></p>
 
-<p>
-1. <strong>Review & approve</strong><br>
+<p><strong>
+<span style="color: rgb(0, 0, 255);">1. Approve Quote</span></strong><br>
 Please confirm your acceptance of this quote by replying to this email.
 </p>
 
-<p>
-2. <strong>Arrange payment</strong><br>
-To commence production, payment is required as follows:
+<p><strong>
+<span style="color: rgb(0, 0, 255);">2. Arrange payment</span><br></strong>
+To commence proofing and production, payment is required as follows:
 </p>
 
 <p style="margin-left:15px;">
-• Orders under <strong>$600.00</strong>: 100% payment upfront<br>
-• Orders over <strong>$600.00</strong>: 50% deposit, with the balance payable <strong>prior to installation or supply</strong>
+• Orders <u>under</u> <strong>$600.00</strong>: 100% payment upfront<br>
+• Orders <u>over</u> <strong>$600.00</strong>: 50% deposit, with the balance payable <strong>before installation or supply</strong>
 </p>
 
 <p>
@@ -26,40 +26,35 @@ Account: 3064-70312
 </p>
 
 <p>
-Alternatively, payment can be made via credit card. Please note that <span style="font-size:10pt;">a 2.5% surcharge applies to credit card payments</span>.
+Alternatively, payment can be made via credit card over the phone. However,&nbsp;<span style="font-size:10pt;">a <strong>2.5% surcharge</strong> applies</span>.
 </p>
 
-<p>
-3. <strong>Send payment confirmation</strong><br>
+<p><strong>
+<span style="color: rgb(0, 0, 255);">3. Send payment confirmation</span></strong><br>
 Once payment has been made, please email your remittance advice to 
 <a href="mailto:admin.springwood@signarama.com.au">admin.springwood@signarama.com.au</a> 
 and reference your <strong>quote number</strong>.
+</p><p><strong><span style="color: rgb(0, 0, 255);">4.&nbsp;Artwork approval<br></span></strong>After payment is received, you will recieve an artwork proof in 1-2 business days for your approval.</p>
+
+<p><strong>
+<span style="color: rgb(0, 0, 255);">4. Artwork approval &amp; production</span></strong><br>
+After artwork approval, standard production timeframes are approximately <strong>5-14 business days</strong>, subject to current workload and type of sign.<br>
+Illuminated or fabricated signage typically requires <strong>3–5 weeks</strong>.
 </p>
 
-<p>
-4. <strong>Artwork approval & production</strong><br>
-After artwork approval, standard production timeframes are approximately <strong>7–14 business days</strong>, subject to current workload.<br>
-Illuminated or fabricated signage typically requires <strong>4–5 weeks</strong>.
-</p>
+<p><em><strong>For firm delivery or installation dates, please speak with your salesperson.</strong></em></p>
 
-<p><em><strong>For firm delivery or installation dates, please speak with a member of our team.</strong></em></p>
-
-<p>I’ll give you a call shortly to walk through the quote and answer any questions. We look forward to working with you on this project.</p>
+<p>I’ll give you a call shortly to walk through the quote and answer any questions. <br>We look forward to working with you on this project.</p>
 
 <p>If you need anything in the meantime, please don’t hesitate to contact us.</p>
 
-<p>Kind regards,</p>
-
-<p>
-<strong>Tristan Cargill</strong><br>
-p: 07 3804 3884<br>
-m: 0490 768 751<br>
-<a href="mailto:springwood@signarama.com.au">springwood@signarama.com.au</a><br>
-<strong>Signarama Springwood</strong>
+<p>Kind Regards,<br>
+      <span id="salesperson-name">Pearl Cargill</span>
 </p>
-
-<img src="https://cdn.gorilladash.com/images/media/5193978/signarama-english.png" style="width:250px;height:50px" width="250" height="50">
-
 <p>
-<img src="https://leda.inc/qrcode?q=02a30637-44dd-4c7b-aacf-f1f7105c6006" style="border:none;">
+      <span id="salesperson-phone">0439 972 409</span><br>
+      <span>Ph: 07 3804 3884</span><br>
+      <span id="salesperson-email">springwood@signarama.com.au</span><br>
+      <span>Signarama Springwood</span>
 </p>
+<img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/EmailFooter.jpg" style="width:100%;height:auto;max-width:400px;" width="300" height="76">

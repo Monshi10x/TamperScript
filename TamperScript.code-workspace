@@ -259,6 +259,7 @@
 		},
 		"editor.fontFamily": "Consolas, 'Courier New', monospace",
 		"editor.fontSize": 12,
-		"liveServer.settings.multiRootWorkspaceName": "TamperScript"
+		"liveServer.settings.multiRootWorkspaceName": "TamperScript",
+		"chatgpt.openOnStartup": true
 	}
 }

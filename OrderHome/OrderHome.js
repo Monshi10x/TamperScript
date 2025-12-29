@@ -18,8 +18,8 @@ class OrderHome {
       #emailTemplates = {};
       #userInfo = null;
       #attachmentCache = new Map();
-      #defaultAttachmentFiles = ["OrderDepositPaidThanks.txt", "OrderFinalPaymentRequest.txt"];
-      #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/";
+      #defaultAttachmentFiles = ["OrderDepositPaidThanks.txt", "OrderFinalPaymentRequest.txt", "Capabilities One Page 3D CUT LETTERS V2 (E).pdf"];
+      #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailAttachments/";
 
       constructor() {
             const defaultTemplateBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/";
@@ -132,7 +132,7 @@ class OrderHome {
             this.#emailTemplateContainer.style = [
                   "position:absolute",
                   "top:0",
-                  "right:-260px",
+                  "right:-265px",
                   "width:240px",
                   "height:100%",
                   "background-color:#111827",
