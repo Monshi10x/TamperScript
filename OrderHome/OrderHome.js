@@ -83,6 +83,11 @@ class OrderHome {
                               email: user.EmailAddress || "",
                               phone: user.CellPhoneNumber || user.WorkPhoneNumber || user.HomePhoneNumber || ""
                         };
+                        console.log("OrderHome salesperson info:", {
+                              name: `${this.#userInfo.firstName} ${this.#userInfo.lastName}`.trim(),
+                              phone: this.#userInfo.phone,
+                              email: this.#userInfo.email
+                        });
                   }
             } catch (error) {
                   console.error("OrderHome user fetch error:", error);
@@ -337,98 +342,52 @@ class OrderHome {
             selection.selectAllChildren(span);
       }
 
-      personalizeTemplate(templateContent, customerFirstName) {
-            let content = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
-
-            if (this.#userInfo) {
-                  const fullName = `${this.#userInfo.firstName} ${this.#userInfo.lastName}`.trim();
-                  content = content.replaceAll("<%SalesPersonName%>", fullName || this.#userInfo.firstName || "");
-                  content = content.replaceAll("<%SalesPersonPhone%>", this.#userInfo.phone || "");
-                  content = content.replaceAll("<%SalesPersonEmail%>", this.#userInfo.email || "");
-
-                  const signaturePlaceholder = "<%SalesPersonSignature%>";
-                  const signature = this.buildSignature(fullName, this.#userInfo.phone, this.#userInfo.email);
-
-                  if (content.includes(signaturePlaceholder)) {
-                        content = content.replaceAll(signaturePlaceholder, signature);
-                  } else if (signature.trim().length > 0 && !content.includes(signature)) {
-                        content = `${content}\n\n${signature}`;
-                  }
-            };
-      }
-
-      addRemoteAttachment(name, blob, index) {
-            if (!cbEmailAttachment.remoteAttachments) {
-                  cbEmailAttachment.remoteAttachments = [];
-            }
-
-            const size = blob?.size || 0;
-            const existing = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
-            if (!existing) {
-                  cbEmailAttachment.remoteAttachments.push({ name, blob, size });
-                  cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + size;
-            }
-
-            this.renderRemoteAttachments();
-      }
-
-      async toggleRemoteAttachment(name, shouldInclude) {
-            if (shouldInclude) {
-                  const cached = this.#attachmentCache.get(name);
-                  if (cached?.blob) {
-                        this.addRemoteAttachment(name, cached.blob);
-                        return;
-                  }
-
-                  const existing = cbEmailAttachment.remoteAttachments?.find((item) => item.name === name && item.blob);
-                  if (existing?.blob) {
-                        this.addRemoteAttachment(name, existing.blob);
-                        return;
-                  }
-
-                  const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
-                  try {
-                        const response = await fetch(`${attachmentBaseUrl}${name}`);
-                        if (!response.ok) {
-                              throw new Error(`Failed to load attachment ${name}`);
-                        }
-                        const fetchedBlob = await response.blob();
-                        this.#attachmentCache.set(name, { blob: fetchedBlob, size: fetchedBlob.size });
-                        this.addRemoteAttachment(name, fetchedBlob);
-                  } catch (error) {
-                        console.error("OrderHome attachment toggle error:", error);
-                  }
-            } else {
-                  this.removeRemoteAttachment(name);
-            }
-      }
-
-      removeRemoteAttachment(name) {
-            if (!Array.isArray(cbEmailAttachment.remoteAttachments)) {
-                  return;
-            }
-
-            const target = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
-            if (target) {
-                  cbEmailAttachment.remoteAttachments = cbEmailAttachment.remoteAttachments.filter((item) => item.name !== name);
-                  cbEmailAttachment.attachmentSize = Math.max(0, (cbEmailAttachment.attachmentSize || 0) - (target.size || 0));
-            }
-
-            const attachmentsContainer = document.getElementById("divClientEmailAttachments");
-            const chip = attachmentsContainer?.querySelector(`.attachName[data-remote-name=\"${name}\"]`)?.parentElement;
-            if (chip) {
-                  chip.remove();
-            }
-
-            return content;
-      }
-
       buildSignature(fullName, phone, email) {
             const lines = [];
             if (fullName) lines.push(fullName);
             if (phone) lines.push(`Mobile: ${phone}`);
             if (email) lines.push(`Email: ${email}`);
             return lines.join("\n");
+      }
+
+      personalizeTemplate(templateContent, customerFirstName) {
+            const userName = `${this.#userInfo?.firstName || ""} ${this.#userInfo?.lastName || ""}`.trim();
+            const userPhone = this.#userInfo?.phone || "";
+            const userEmail = this.#userInfo?.email || "";
+
+            let content = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
+            content = content.replaceAll("<%SalesPersonName%>", userName);
+            content = content.replaceAll("<%SalesPersonPhone%>", userPhone);
+            content = content.replaceAll("<%SalesPersonEmail%>", userEmail);
+
+            // Allow swapping by tag ids in the template HTML
+            const container = document.createElement("div");
+            container.innerHTML = content;
+
+            const nameNode = container.querySelector("#salesperson-name");
+            if (nameNode) {
+                  nameNode.textContent = userName;
+            }
+
+            const phoneNode = container.querySelector("#salesperson-phone");
+            if (phoneNode) {
+                  phoneNode.textContent = userPhone;
+            }
+
+            const emailNode = container.querySelector("#salesperson-email");
+            if (emailNode) {
+                  emailNode.textContent = userEmail;
+            }
+
+            const signaturePlaceholder = container.querySelector("#salesperson-signature");
+            const signatureText = this.buildSignature(userName, userPhone, userEmail);
+            if (signaturePlaceholder) {
+                  signaturePlaceholder.textContent = signatureText;
+            } else if (signatureText && !content.includes(signatureText)) {
+                  container.innerHTML = `${container.innerHTML}\n\n${signatureText}`;
+            }
+
+            return container.innerHTML;
       }
 
       initPaymentModal() {
@@ -554,6 +513,8 @@ class OrderHome {
             } else {
                   this.removeRemoteAttachment(name);
             }
+
+            this.renderRemoteAttachments();
       }
 
       removeRemoteAttachment(name) {
