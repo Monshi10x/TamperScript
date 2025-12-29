@@ -372,12 +372,12 @@ class OrderHome {
 
             const phoneNode = container.querySelector("#salesperson-phone");
             if(phoneNode) {
-                  phoneNode.textContent = userPhone;
+                  phoneNode.textContent = "M: " + userPhone;
             }
 
             const emailNode = container.querySelector("#salesperson-email");
             if(emailNode) {
-                  emailNode.textContent = userEmail;
+                  emailNode.textContent = "E: " + userEmail;
             }
             console.log(container.innerHTML);
 
