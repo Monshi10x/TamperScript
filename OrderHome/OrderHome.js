@@ -16,6 +16,7 @@ class OrderHome {
             { key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt" }
       ];
       #emailTemplates = {};
+      #userInfo = null;
       #attachmentCache = new Map();
       #defaultAttachmentFiles = ["OrderDepositPaidThanks.txt", "OrderFinalPaymentRequest.txt"];
       #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/";
@@ -30,7 +31,7 @@ class OrderHome {
       }
 
       async start() {
-            await this.fetchEmailTemplates();
+            await Promise.all([this.fetchEmailTemplates(), this.fetchCurrentUser()]);
             this.initPaymentModal();
       }
 
@@ -52,6 +53,41 @@ class OrderHome {
                         this.#emailTemplates[template.key] = "";
                   }
             }));
+      }
+
+      async fetchCurrentUser() {
+            try {
+                  const response = await fetch("https://sar10686.corebridge.net/Api/OrderEntryProducts/GetProductMultiQuantitiesCheck?orderProductIds=0", {
+                        method: "GET",
+                        credentials: "include",
+                        mode: "cors",
+                        headers: {
+                              "accept": "*/*",
+                              "accept-language": "en-US,en;q=0.9",
+                              "content-type": "application/json; charset=utf-8",
+                              "x-requested-with": "XMLHttpRequest"
+                        },
+                        referrer: "https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice.aspx"
+                  });
+
+                  if (!response.ok) {
+                        throw new Error(`HTTP ${response.status} – ${response.statusText}`);
+                  }
+
+                  const data = await response.json();
+                  const user = data?.RelatedProperties?.User;
+                  if (user) {
+                        this.#userInfo = {
+                              firstName: user.FirstName || "",
+                              lastName: user.LastName || "",
+                              email: user.EmailAddress || "",
+                              phone: user.CellPhoneNumber || user.WorkPhoneNumber || user.HomePhoneNumber || ""
+                        };
+                  }
+            } catch (error) {
+                  console.error("OrderHome user fetch error:", error);
+                  this.#userInfo = null;
+            }
       }
 
       tickEmailModal() {
@@ -144,7 +180,7 @@ class OrderHome {
                         return;
                   }
 
-                  const personalizedContent = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
+                  const personalizedContent = this.personalizeTemplate(templateContent, customerFirstName);
                   contentArea.innerHTML = personalizedContent;
             }, parent);
       }
@@ -299,6 +335,100 @@ class OrderHome {
             range.insertNode(span);
             selection.removeAllRanges();
             selection.selectAllChildren(span);
+      }
+
+      personalizeTemplate(templateContent, customerFirstName) {
+            let content = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
+
+            if (this.#userInfo) {
+                  const fullName = `${this.#userInfo.firstName} ${this.#userInfo.lastName}`.trim();
+                  content = content.replaceAll("<%SalesPersonName%>", fullName || this.#userInfo.firstName || "");
+                  content = content.replaceAll("<%SalesPersonPhone%>", this.#userInfo.phone || "");
+                  content = content.replaceAll("<%SalesPersonEmail%>", this.#userInfo.email || "");
+
+                  const signaturePlaceholder = "<%SalesPersonSignature%>";
+                  const signature = this.buildSignature(fullName, this.#userInfo.phone, this.#userInfo.email);
+
+                  if (content.includes(signaturePlaceholder)) {
+                        content = content.replaceAll(signaturePlaceholder, signature);
+                  } else if (signature.trim().length > 0 && !content.includes(signature)) {
+                        content = `${content}\n\n${signature}`;
+                  }
+            };
+      }
+
+      addRemoteAttachment(name, blob, index) {
+            if (!cbEmailAttachment.remoteAttachments) {
+                  cbEmailAttachment.remoteAttachments = [];
+            }
+
+            const size = blob?.size || 0;
+            const existing = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
+            if (!existing) {
+                  cbEmailAttachment.remoteAttachments.push({ name, blob, size });
+                  cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + size;
+            }
+
+            this.renderRemoteAttachments();
+      }
+
+      async toggleRemoteAttachment(name, shouldInclude) {
+            if (shouldInclude) {
+                  const cached = this.#attachmentCache.get(name);
+                  if (cached?.blob) {
+                        this.addRemoteAttachment(name, cached.blob);
+                        return;
+                  }
+
+                  const existing = cbEmailAttachment.remoteAttachments?.find((item) => item.name === name && item.blob);
+                  if (existing?.blob) {
+                        this.addRemoteAttachment(name, existing.blob);
+                        return;
+                  }
+
+                  const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
+                  try {
+                        const response = await fetch(`${attachmentBaseUrl}${name}`);
+                        if (!response.ok) {
+                              throw new Error(`Failed to load attachment ${name}`);
+                        }
+                        const fetchedBlob = await response.blob();
+                        this.#attachmentCache.set(name, { blob: fetchedBlob, size: fetchedBlob.size });
+                        this.addRemoteAttachment(name, fetchedBlob);
+                  } catch (error) {
+                        console.error("OrderHome attachment toggle error:", error);
+                  }
+            } else {
+                  this.removeRemoteAttachment(name);
+            }
+      }
+
+      removeRemoteAttachment(name) {
+            if (!Array.isArray(cbEmailAttachment.remoteAttachments)) {
+                  return;
+            }
+
+            const target = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
+            if (target) {
+                  cbEmailAttachment.remoteAttachments = cbEmailAttachment.remoteAttachments.filter((item) => item.name !== name);
+                  cbEmailAttachment.attachmentSize = Math.max(0, (cbEmailAttachment.attachmentSize || 0) - (target.size || 0));
+            }
+
+            const attachmentsContainer = document.getElementById("divClientEmailAttachments");
+            const chip = attachmentsContainer?.querySelector(`.attachName[data-remote-name=\"${name}\"]`)?.parentElement;
+            if (chip) {
+                  chip.remove();
+            }
+
+            return content;
+      }
+
+      buildSignature(fullName, phone, email) {
+            const lines = [];
+            if (fullName) lines.push(fullName);
+            if (phone) lines.push(`Mobile: ${phone}`);
+            if (email) lines.push(`Email: ${email}`);
+            return lines.join("\n");
       }
 
       initPaymentModal() {
