@@ -1,4 +1,4 @@
-(function () {
+(function() {
       'use strict';
 })();
 
@@ -9,11 +9,11 @@ class OrderHome {
       #emailModalIsOpen = false;
       #templateBaseUrl;
       #templateDefinitions = [
-            { key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt" },
-            { key: "OrderAcknowledgement", label: "Order Acknowledgement", file: "OrderAcknowledgementWording.txt" },
-            { key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt" },
-            { key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt" },
-            { key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt" }
+            {key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt"},
+            {key: "OrderAcknowledgement", label: "Order Acknowledgement", file: "OrderAcknowledgementWording.txt"},
+            {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt"},
+            {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt"},
+            {key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt"}
       ];
       #emailTemplates = {};
       #userInfo = null;
@@ -43,12 +43,12 @@ class OrderHome {
             await Promise.all(this.#templateDefinitions.map(async (template) => {
                   try {
                         const response = await fetch(`${this.#templateBaseUrl}${template.file}`);
-                        if (!response.ok) {
+                        if(!response.ok) {
                               throw new Error(`Failed to load ${template.file}`);
                         }
                         const content = await response.text();
                         this.#emailTemplates[template.key] = content;
-                  } catch (error) {
+                  } catch(error) {
                         console.error("OrderHome template load error:", error);
                         this.#emailTemplates[template.key] = "";
                   }
@@ -70,13 +70,13 @@ class OrderHome {
                         referrer: "https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice.aspx"
                   });
 
-                  if (!response.ok) {
+                  if(!response.ok) {
                         throw new Error(`HTTP ${response.status} – ${response.statusText}`);
                   }
 
                   const data = await response.json();
                   const user = data?.RelatedProperties?.User;
-                  if (user) {
+                  if(user) {
                         this.#userInfo = {
                               firstName: user.FirstName || "",
                               lastName: user.LastName || "",
@@ -89,7 +89,7 @@ class OrderHome {
                               email: this.#userInfo.email
                         });
                   }
-            } catch (error) {
+            } catch(error) {
                   console.error("OrderHome user fetch error:", error);
                   this.#userInfo = null;
             }
@@ -99,14 +99,14 @@ class OrderHome {
             const overlayContainer = document.getElementById("simplemodal-container");
             const overlay = document.getElementById("simplemodal-overlay");
 
-            if (overlayContainer && overlay) {
-                  if (!this.#emailModalIsOpen) {
+            if(overlayContainer && overlay) {
+                  if(!this.#emailModalIsOpen) {
                         this.#emailModalIsOpen = true;
                         this.renderTemplatePanel(overlayContainer);
                   }
             } else {
                   this.#emailModalIsOpen = false;
-                  if (this.#emailTemplateContainer) {
+                  if(this.#emailTemplateContainer) {
                         deleteElement(this.#emailTemplateContainer);
                         this.#emailTemplateContainer = null;
                   }
@@ -117,13 +117,13 @@ class OrderHome {
             const contentArea = document.querySelector(".trumbowyg-editor.notranslate");
             const customerFullNameNode = document.querySelectorAll(".eItem")?.[0]?.childNodes?.[0];
 
-            if (!contentArea || !customerFullNameNode) {
+            if(!contentArea || !customerFullNameNode) {
                   return;
             }
 
             const customerFirstName = customerFullNameNode.nodeValue.split(" ")[0];
 
-            if (getComputedStyle(overlayContainer).position === "static") {
+            if(getComputedStyle(overlayContainer).position === "static") {
                   overlayContainer.style.position = "relative";
             }
 
@@ -181,7 +181,7 @@ class OrderHome {
                   e.preventDefault();
 
                   const templateContent = this.#emailTemplates[template.key];
-                  if (!templateContent) {
+                  if(!templateContent) {
                         return;
                   }
 
@@ -205,10 +205,10 @@ class OrderHome {
             effectsContainer.appendChild(title);
 
             const textColorRow = this.createEffectRow("Text Colour", (color) => {
-                  this.applyStyleToSelection(contentArea, { color });
+                  this.applyStyleToSelection(contentArea, {color});
             });
             const highlightRow = this.createEffectRow("Highlight", (color) => {
-                  this.applyStyleToSelection(contentArea, { backgroundColor: color });
+                  this.applyStyleToSelection(contentArea, {backgroundColor: color});
             });
 
             effectsContainer.appendChild(textColorRow);
@@ -225,7 +225,7 @@ class OrderHome {
             importantButton.style.fontWeight = "700";
             importantButton.addEventListener("click", (e) => {
                   e.preventDefault();
-                  this.applyStyleToSelection(contentArea, { color: "#dc2626", fontWeight: "700" });
+                  this.applyStyleToSelection(contentArea, {color: "#dc2626", fontWeight: "700"});
             });
             effectsContainer.appendChild(importantButton);
 
@@ -323,12 +323,12 @@ class OrderHome {
 
       applyStyleToSelection(contentArea, styleOptions = {}) {
             const selection = window.getSelection();
-            if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+            if(!selection || selection.rangeCount === 0 || selection.isCollapsed) {
                   return;
             }
 
             const range = selection.getRangeAt(0);
-            if (!contentArea.contains(range.commonAncestorContainer)) {
+            if(!contentArea.contains(range.commonAncestorContainer)) {
                   return;
             }
 
@@ -344,9 +344,9 @@ class OrderHome {
 
       buildSignature(fullName, phone, email) {
             const lines = [];
-            if (fullName) lines.push(fullName);
-            if (phone) lines.push(`Mobile: ${phone}`);
-            if (email) lines.push(`Email: ${email}`);
+            if(fullName) lines.push(fullName);
+            if(phone) lines.push(`Mobile: ${phone}`);
+            if(email) lines.push(`Email: ${email}`);
             return lines.join("\n");
       }
 
@@ -365,25 +365,25 @@ class OrderHome {
             container.innerHTML = content;
 
             const nameNode = container.querySelector("#salesperson-name");
-            if (nameNode) {
+            if(nameNode) {
                   nameNode.textContent = userName;
             }
 
             const phoneNode = container.querySelector("#salesperson-phone");
-            if (phoneNode) {
+            if(phoneNode) {
                   phoneNode.textContent = userPhone;
             }
 
             const emailNode = container.querySelector("#salesperson-email");
-            if (emailNode) {
+            if(emailNode) {
                   emailNode.textContent = userEmail;
             }
 
-            const signaturePlaceholder = container.querySelector("#salesperson-signature");
+            const signaturePlaceholder = container.querySelector("#salesperson-name");
             const signatureText = this.buildSignature(userName, userPhone, userEmail);
-            if (signaturePlaceholder) {
+            if(signaturePlaceholder) {
                   signaturePlaceholder.textContent = signatureText;
-            } else if (signatureText && !content.includes(signatureText)) {
+            } else if(signatureText && !content.includes(signatureText)) {
                   container.innerHTML = `${container.innerHTML}\n\n${signatureText}`;
             }
 
@@ -392,13 +392,13 @@ class OrderHome {
 
       initPaymentModal() {
             const lastFourInput = document.querySelector("#txtOfflineCcLast4Digits");
-            if (lastFourInput) {
+            if(lastFourInput) {
                   lastFourInput.value = "0000";
             }
       }
 
       async ensureDefaultAttachments() {
-            if (typeof cbEmailAttachment === "undefined") {
+            if(typeof cbEmailAttachment === "undefined") {
                   return;
             }
 
@@ -410,17 +410,17 @@ class OrderHome {
             const existingRemote = Array.isArray(cbEmailAttachment.remoteAttachments) ? cbEmailAttachment.remoteAttachments : [];
             const missingFiles = attachmentFiles.filter((fileName) => !existingRemote.some((item) => item.name === fileName));
 
-            if (missingFiles.length > 0) {
+            if(missingFiles.length > 0) {
                   await Promise.all(missingFiles.map(async (fileName, index) => {
                         try {
                               const response = await fetch(`${attachmentBaseUrl}${fileName}`);
-                              if (!response.ok) {
+                              if(!response.ok) {
                                     throw new Error(`Failed to load attachment ${fileName}`);
                               }
                               const blob = await response.blob();
-                              this.#attachmentCache.set(fileName, { blob, size: blob.size });
+                              this.#attachmentCache.set(fileName, {blob, size: blob.size});
                               this.addRemoteAttachment(fileName, blob);
-                        } catch (error) {
+                        } catch(error) {
                               console.error("OrderHome attachment load error:", error);
                         }
                   }));
@@ -430,39 +430,39 @@ class OrderHome {
       }
 
       patchAttachmentHandling() {
-            if (typeof cbEmailAttachment !== "object" || typeof cbEmailAttachment.GetAttachments !== "function") {
+            if(typeof cbEmailAttachment !== "object" || typeof cbEmailAttachment.GetAttachments !== "function") {
                   return;
             }
 
             const attachmentManager = cbEmailAttachment;
-            if (!Array.isArray(attachmentManager.remoteAttachments)) {
+            if(!Array.isArray(attachmentManager.remoteAttachments)) {
                   attachmentManager.remoteAttachments = [];
             }
 
-            if (attachmentManager._remotePatched) {
+            if(attachmentManager._remotePatched) {
                   return;
             }
 
             attachmentManager._remotePatched = true;
             attachmentManager._originalGetAttachments = attachmentManager.GetAttachments.bind(attachmentManager);
 
-            attachmentManager.GetAttachments = function () {
+            attachmentManager.GetAttachments = function() {
                   try {
                         const existing = attachmentManager._originalGetAttachments();
                         const formData = existing || new FormData();
 
                         attachmentManager.remoteAttachments.forEach((attachment, idx) => {
-                              if (attachment?.blob && attachment?.name) {
+                              if(attachment?.blob && attachment?.name) {
                                     formData.append(`remote_file_${idx}`, attachment.blob, attachment.name);
                               }
                         });
 
-                        if (existing === null && attachmentManager.remoteAttachments.length === 0) {
+                        if(existing === null && attachmentManager.remoteAttachments.length === 0) {
                               return null;
                         }
 
                         return formData;
-                  } catch (error) {
+                  } catch(error) {
                         console.error("OrderHome attachment pipeline error:", error);
                         return null;
                   }
@@ -470,14 +470,14 @@ class OrderHome {
       }
 
       addRemoteAttachment(name, blob, index) {
-            if (!cbEmailAttachment.remoteAttachments) {
+            if(!cbEmailAttachment.remoteAttachments) {
                   cbEmailAttachment.remoteAttachments = [];
             }
 
             const size = blob?.size || 0;
             const existing = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
-            if (!existing) {
-                  cbEmailAttachment.remoteAttachments.push({ name, blob, size });
+            if(!existing) {
+                  cbEmailAttachment.remoteAttachments.push({name, blob, size});
                   cbEmailAttachment.attachmentSize = (cbEmailAttachment.attachmentSize || 0) + size;
             }
 
@@ -485,15 +485,15 @@ class OrderHome {
       }
 
       async toggleRemoteAttachment(name, shouldInclude) {
-            if (shouldInclude) {
+            if(shouldInclude) {
                   const cached = this.#attachmentCache.get(name);
-                  if (cached?.blob) {
+                  if(cached?.blob) {
                         this.addRemoteAttachment(name, cached.blob);
                         return;
                   }
 
                   const existing = cbEmailAttachment.remoteAttachments?.find((item) => item.name === name && item.blob);
-                  if (existing?.blob) {
+                  if(existing?.blob) {
                         this.addRemoteAttachment(name, existing.blob);
                         return;
                   }
@@ -501,13 +501,13 @@ class OrderHome {
                   const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
                   try {
                         const response = await fetch(`${attachmentBaseUrl}${name}`);
-                        if (!response.ok) {
+                        if(!response.ok) {
                               throw new Error(`Failed to load attachment ${name}`);
                         }
                         const fetchedBlob = await response.blob();
-                        this.#attachmentCache.set(name, { blob: fetchedBlob, size: fetchedBlob.size });
+                        this.#attachmentCache.set(name, {blob: fetchedBlob, size: fetchedBlob.size});
                         this.addRemoteAttachment(name, fetchedBlob);
-                  } catch (error) {
+                  } catch(error) {
                         console.error("OrderHome attachment toggle error:", error);
                   }
             } else {
@@ -518,39 +518,39 @@ class OrderHome {
       }
 
       removeRemoteAttachment(name) {
-            if (!Array.isArray(cbEmailAttachment.remoteAttachments)) {
+            if(!Array.isArray(cbEmailAttachment.remoteAttachments)) {
                   return;
             }
 
             const target = cbEmailAttachment.remoteAttachments.find((item) => item.name === name);
-            if (target) {
+            if(target) {
                   cbEmailAttachment.remoteAttachments = cbEmailAttachment.remoteAttachments.filter((item) => item.name !== name);
                   cbEmailAttachment.attachmentSize = Math.max(0, (cbEmailAttachment.attachmentSize || 0) - (target.size || 0));
             }
 
             const attachmentsContainer = document.getElementById("divClientEmailAttachments");
             const chip = attachmentsContainer?.querySelector(`.attachName[data-remote-name=\"${name}\"]`)?.parentElement;
-            if (chip) {
+            if(chip) {
                   chip.remove();
             }
       }
 
       renderRemoteAttachments() {
             const attachmentsContainer = document.getElementById("divClientEmailAttachments");
-            if (!attachmentsContainer || !Array.isArray(cbEmailAttachment.remoteAttachments)) {
+            if(!attachmentsContainer || !Array.isArray(cbEmailAttachment.remoteAttachments)) {
                   return;
             }
 
             const remoteNames = cbEmailAttachment.remoteAttachments.map((a) => a.name);
             attachmentsContainer.querySelectorAll(".attachName[data-remote-name]").forEach((node) => {
-                  if (!remoteNames.includes(node.dataset.remoteName)) {
+                  if(!remoteNames.includes(node.dataset.remoteName)) {
                         node.parentElement?.remove();
                   }
             });
 
             cbEmailAttachment.remoteAttachments.forEach((attachment, idx) => {
                   const alreadyRendered = attachmentsContainer.querySelector(`.attachName[data-remote-name=\"${attachment.name}\"]`);
-                  if (alreadyRendered) {
+                  if(alreadyRendered) {
                         return;
                   }
 
