@@ -22,8 +22,9 @@ To commence proofing and production, payment is required as follows:
 <p>
 <strong>EFT payment details:</strong><br>
 BSB: 014-218<br>
-Account: 3064-70312
-Account Name: Cargill Investment Trust T/As Signarama Springwood
+Account: 3064-70312<br>
+Account Name: Cargill Investment Trust T/As Signarama Springwood<br>
+Reference: <span id="quote-number">#QT-1000</span> 
 </p>
 
 <p>

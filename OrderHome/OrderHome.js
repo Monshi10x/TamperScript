@@ -116,6 +116,7 @@ class OrderHome {
       renderTemplatePanel(overlayContainer) {
             const contentArea = document.querySelector(".trumbowyg-editor.notranslate");
             const customerFullNameNode = document.querySelectorAll(".eItem")?.[0]?.childNodes?.[0];
+            const quoteNumber = document.querySelector("#lblOrderNumber").textContent;
 
             if(!contentArea || !customerFullNameNode) {
                   return;
@@ -160,7 +161,7 @@ class OrderHome {
             buttonContainer.style.overflowY = "auto";
 
             this.#templateDefinitions.forEach((template) => {
-                  this.createTemplateButton(template, customerFirstName, contentArea, buttonContainer);
+                  this.createTemplateButton(template, customerFirstName, quoteNumber, contentArea, buttonContainer);
             });
 
             const effectsContainer = this.buildTextEffects(contentArea);
@@ -176,7 +177,7 @@ class OrderHome {
             this.ensureDefaultAttachments();
       }
 
-      createTemplateButton(template, customerFirstName, contentArea, parent) {
+      createTemplateButton(template, customerFirstName, quoteNumber, contentArea, parent) {
             createButton(template.label, "width:calc(100% - 20px);", (e) => {
                   e.preventDefault();
 
@@ -185,7 +186,7 @@ class OrderHome {
                         return;
                   }
 
-                  const personalizedContent = this.personalizeTemplate(templateContent, customerFirstName);
+                  const personalizedContent = this.personalizeTemplate(templateContent, customerFirstName, quoteNumber);
                   contentArea.innerHTML = personalizedContent;
             }, parent);
       }
@@ -350,12 +351,13 @@ class OrderHome {
             return lines.join("\n");
       }
 
-      personalizeTemplate(templateContent, customerFirstName) {
+      personalizeTemplate(templateContent, customerFirstName, quoteNumber) {
             const userName = `${this.#userInfo?.firstName || ""} ${this.#userInfo?.lastName || ""}`.trim();
             const userPhone = this.#userInfo?.phone || "";
             const userEmail = this.#userInfo?.email || "";
 
             let content = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
+            content = content.replaceAll("<%QuoteNumber%>", quoteNumber);
             content = content.replaceAll("<%SalesPersonName%>", userName);
             content = content.replaceAll("<%SalesPersonPhone%>", userPhone);
             content = content.replaceAll("<%SalesPersonEmail%>", userEmail);
@@ -363,6 +365,11 @@ class OrderHome {
             // Allow swapping by tag ids in the template HTML
             const container = document.createElement("div");
             container.innerHTML = content;
+
+            const quoteNumberNode = container.querySelector("#quote-number");
+            if(quoteNumberNode) {
+                  quoteNumberNode.textContent = quoteNumber;
+            }
 
             const customerNameNode = container.querySelector("#customer-name");
             if(customerNameNode) {
