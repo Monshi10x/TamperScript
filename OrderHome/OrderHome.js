@@ -354,6 +354,7 @@ class OrderHome {
             const userName = `${this.#userInfo?.firstName || ""} ${this.#userInfo?.lastName || ""}`.trim();
             const userPhone = this.#userInfo?.phone || "";
             const userEmail = this.#userInfo?.email || "";
+            console.log(customerFirstName);
 
             let content = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
             content = content.replaceAll("<%SalesPersonName%>", userName);
@@ -363,7 +364,11 @@ class OrderHome {
             // Allow swapping by tag ids in the template HTML
             const container = document.createElement("div");
             container.innerHTML = content;
-            console.log(container.innerHTML);
+
+            const customerNameNode = container.querySelector("#customer-name");
+            if(customerNameNode) {
+                  customerNameNode.textContent = customerFirstName;
+            }
 
             const nameNode = container.querySelector("#salesperson-name");
             if(nameNode) {
@@ -379,7 +384,6 @@ class OrderHome {
             if(emailNode) {
                   emailNode.textContent = "E: " + userEmail;
             }
-            console.log(container.innerHTML);
 
             return container.innerHTML;
       }
