@@ -513,6 +513,8 @@ class OrderHome {
             } else {
                   this.removeRemoteAttachment(name);
             }
+
+            this.renderRemoteAttachments();
       }
 
       removeRemoteAttachment(name) {
