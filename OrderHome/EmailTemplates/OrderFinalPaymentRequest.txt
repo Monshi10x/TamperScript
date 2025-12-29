@@ -1,0 +1,8 @@
+Hi <%CustomerName%>,
+
+Please see the attached invoice for the final balance on your order. Once payment is received, we’ll schedule delivery and installation right away.
+
+If you need a different payment method or have questions about the invoice, reply to this email and we’ll sort it out.
+
+Thank you,
+H2O Spa Team
