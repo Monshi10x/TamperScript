@@ -132,8 +132,8 @@ class OrderHome {
             this.#emailTemplateContainer.style = [
                   "position:absolute",
                   "top:0",
-                  "right:-265px",
-                  "width:240px",
+                  "right:-325px",
+                  "width:300px",
                   "height:100%",
                   "background-color:#111827",
                   "color:#e5e7eb",
