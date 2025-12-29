@@ -24,7 +24,7 @@ To commence proofing and production, payment is required as follows:
 BSB: 014-218<br>
 Account: 3064-70312<br>
 Account Name: Cargill Investment Trust T/As Signarama Springwood<br>
-Reference: <span id="quote-number">#QT-1000</span> 
+Payment Reference: <span id="quote-number">#QT-1000</span> 
 </p>
 
 <p>
@@ -36,15 +36,15 @@ Alternatively, payment can be made via credit card over the phone. This incurrs 
 Once payment has been made, please email your remittance advice to 
 <a href="mailto:admin.springwood@signarama.com.au">admin.springwood@signarama.com.au</a> 
 and reference your <strong>quote number</strong>.
-</p><p><strong><span style="color: rgb(0, 0, 255);">4.&nbsp;Artwork and Design<br></span></strong>After payment, please provide your high-res vector PDF/EPS/AI/SVG logos and any brand-guidlines and specific colours. Following this, you will receive an artwork proof in 1-2 business days for your approval.</p>
+</p><p><strong><span style="color: rgb(0, 0, 255);">4.&nbsp;Artwork and Design<br></span></strong>After payment, please provide your high-res vector PDF/EPS/AI/SVG logos and any brand-guidelines and specific colours. Following this, you will receive an artwork proof in 1-2 business days for your approval.</p>
 
 <p><strong>
-<span style="color: rgb(0, 0, 255);">5. Artwork approval &amp; production</span></strong><br>
+<span style="color: rgb(0, 0, 255);">5. Artwork approval and Production</span></strong><br>
 After artwork approval, standard production timeframes are approximately <strong>5-14 business days</strong>, subject to current workload and type of sign.<br>
 Illuminated or fabricated signage typically requires <strong>3–5 weeks</strong>.
 </p>
 
-<p><em><strong>For firm delivery or installation dates, please speak with your salesperson.</strong></em></p>
+<p><em><strong>For specific delivery or installation dates, please speak with your salesperson.</strong></em></p>
 
 <p>I’ll give you a call shortly to walk through the quote and answer any questions. <br>We look forward to working with you on this project.</p>
 
