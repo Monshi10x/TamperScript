@@ -379,14 +379,6 @@ class OrderHome {
                   emailNode.textContent = userEmail;
             }
 
-            const signaturePlaceholder = container.querySelector("#salesperson-name");
-            const signatureText = this.buildSignature(userName, userPhone, userEmail);
-            if(signaturePlaceholder) {
-                  signaturePlaceholder.textContent = signatureText;
-            } else if(signatureText && !content.includes(signatureText)) {
-                  container.innerHTML = `${container.innerHTML}\n\n${signatureText}`;
-            }
-
             return container.innerHTML;
       }
 
