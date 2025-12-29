@@ -354,7 +354,6 @@ class OrderHome {
             const userName = `${this.#userInfo?.firstName || ""} ${this.#userInfo?.lastName || ""}`.trim();
             const userPhone = this.#userInfo?.phone || "";
             const userEmail = this.#userInfo?.email || "";
-            console.log(customerFirstName);
 
             let content = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
             content = content.replaceAll("<%SalesPersonName%>", userName);
