@@ -154,7 +154,7 @@ class SVGCutfile extends SubscriptionManager {
 
             this.#f_shapeAreas = createInput_Infield("Shape Areas", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "m2"});
 
-            this.#f_totalBoundingRectAreas = createInput_Infield("Bounding Rect Areas", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "m2"});
+            this.#f_totalBoundingRectAreas = createInput_Infield("Bounding Rect Areas", null, "width:15%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "m2"});
 
             let settingsButton = createButton("", "width:40px;height:40px;margin:0px;margin-left:5px;margin-right:10px;font-size:20px;", () => {
                   this.#openSettingsModal();
