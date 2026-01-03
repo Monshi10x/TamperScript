@@ -807,12 +807,12 @@ class Menu3D extends LHSMenuWindow {
                         partIndex = await item.Create(productNo, partIndex);
                         if(item.Description() != "") productDescription += item.Description() + "<br>";
                   }
-
+                 
                   await setProductSummary(productNo, productDescription);
                   productDescription = "";
             }
 
-            Ordui.Alert("done");
+            Toast.notify("done", 3000, {position: "top-right"});
       }
 
       hide() {

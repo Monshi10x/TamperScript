@@ -335,7 +335,7 @@ class WindowMenu extends LHSMenuWindow {
                 */
             }
 
-            Ordui.Alert("Done.");
+            Toast.notify("Done.", 3000, {position: "top-right"});
         }
 
         page.appendChild(windowContainer_addBtn);

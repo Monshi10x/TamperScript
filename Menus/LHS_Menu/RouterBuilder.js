@@ -37,7 +37,7 @@ class RouterMenu extends LHSMenuWindow {
 
                 //-------Router-----------//
                 partIndex = await router.Create(productNo, partIndex);
-                Ordui.Alert("Done.");
+                Toast.notify("Done.", 3000, {position: "top-right"});
             }
         }
 

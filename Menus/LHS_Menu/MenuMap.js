@@ -487,7 +487,7 @@ class MenuMap extends LHSMenuWindow {
                   }
             }
 
-            Ordui.Alert("Done");
+            Toast.notify("Done", 3000, {position: "top-right"});
       }
 
       Description() {

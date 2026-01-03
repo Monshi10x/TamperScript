@@ -746,7 +746,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 			productDescription = "";
 		}
 
-		Ordui.Alert("done");
+		Toast.notify("done", 3000, {position: "top-right"});
 	}
 
 	hide() {

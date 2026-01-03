@@ -254,11 +254,7 @@ class Laser extends SubMenu {
       }
 
       notifyProfileMissing(message) {
-            if(typeof Toast !== "undefined" && Toast.notify) {
-                  this.profileWarningId = Toast.notify(message, 4000, {id: this.profileWarningId, position: "top-right"});
-            } else {
-                  console.warn(message);
-            }
+            this.profileWarningId = Toast.notify(message, 4000, {id: this.profileWarningId, position: "top-right"});
       }
 
       get timeTE() {

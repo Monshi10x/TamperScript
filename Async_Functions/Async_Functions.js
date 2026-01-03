@@ -586,7 +586,7 @@ async function MoveProduct(currentIndex, newIndex) {
 
     await AddBlankProduct();
     await DeleteProduct(getNumProducts());
-    Ordui.Alert("Move Successful");
+    Toast.notify("Move Successful", 3000, {position: "top-right"});
 }
 async function AddPart(name, productNo) {
     console.log("Add Part " + name);

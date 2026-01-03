@@ -33,13 +33,7 @@ let VehicleMenu_Install;
 let VehicleMenu_Artwork;
 
 function vehicleToast(message, type = "info") {
-      if(typeof Toast !== "undefined" && Toast.notify) {
-            Toast.notify(message, 3000, {position: "top-right", type});
-      } else if(typeof Ordui !== "undefined" && Ordui.Alert) {
-            Ordui.Alert(message);
-      } else {
-            alert(message);
-      }
+      Toast.notify(message, 3000, {position: "top-right", type});
 }
 
 class Point {
