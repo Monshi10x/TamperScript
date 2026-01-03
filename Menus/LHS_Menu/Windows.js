@@ -40,7 +40,7 @@ class WindowMenu extends LHSMenuWindow {
             row.id = "windowField_Row";
             windowContainer_rowsContainer.appendChild(row);
 
-            var deleteRowButton = createButton("X", "float:left;width:10%;margin-left:90%;", () => {
+            var deleteRowButton = createButton("X", "float:left;width:10%;margin-left:90%;background-color:" + COLOUR.Red, () => {
                 console.log(thisClass.#rows);
                 for(let i = 0; i < thisClass.#rows.length; i++) {
                     if(thisClass.#rows[i].uniqueID === uniqueRowID) {
@@ -153,7 +153,7 @@ class WindowMenu extends LHSMenuWindow {
         }
 
         var windowContainer_rowsContainer = document.createElement("div");
-        windowContainer_rowsContainer.style = "background-color:white;margin-top:5px;margin-left:0px;margin-right:0px;margin-bottom:0px;min-height:500px;max-height:700px;width:98%;padding:5px;float:left;display:block;color:white;cursor: pointer;border-style:none;overflow-y:scroll;background-color:" + COLOUR.MediumGrey + ";";
+        windowContainer_rowsContainer.style = "background-color:white;margin-top:5px;margin-left:0px;margin-right:0px;margin-bottom:0px;min-height:500px;width:98%;padding:5px;float:left;display:block;color:white;cursor: pointer;border-style:none;overflow-y:none;background-color:" + COLOUR.MediumGrey + ";";
 
         var createProductsButton = createButton("Create Multiple Products", "width:50%;margin:0px;", function() {create(true);});
         var createProductsButton2 = createButton("Create Merged Product", "width:50%;margin:0px;", function() {create(false);});

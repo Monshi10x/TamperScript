@@ -50,7 +50,7 @@ class LHSMenuWindow {
 
         this.#body = document.createElement('div');
         this.#body.id = ID + "body";
-        this.#body.style = "margin: 0px; min-height: 700px; max-height: 1000px; width: 100%; padding: 0px; color: white; cursor: pointer; border-style: none;flex: 1 1 auto;min-height: 0;overflow: auto; ";
+        this.#body.style = "margin: 0px; min-height: 700px; max-height: 1500px; width: 100%; padding: 0px; color: white; cursor: pointer; border-style: none;flex: 1 1 auto;min-height: 0;overflow: auto; ";
 
         this.#pageButtonContainer = document.createElement('div');
         this.#pageButtonContainer.id = ID + "pageButtonContainer";
@@ -182,6 +182,14 @@ class LHSMenuWindow {
 
     get footer() {
         return this.#footer;
+    }
+
+    set buttonContainer(value) {
+        this.#pageButtonContainer = value;
+    }
+
+    get buttonContainer() {
+        return this.#pageButtonContainer;
     }
 
     clearFooter() {
@@ -340,7 +348,7 @@ async function initLHSMenu() {
     headerIcon.classList.add("CPUChipIcon");
     header.appendChild(headerIcon);
 
-    menu_Admin = new AdminPanel("300px", "300px", "Admin", "Admin");
+    menu_Admin = new AdminPanel("400px", "600px", "Admin", "Admin");
     menu_Find = new ProductFinder("400px", "calc(100% - 85px)", "ProductFinder", "Product Finder");
     menu_Area = new AreaMenu("400px", "calc(100% - 85px)", "Area", "Area");
     menu_Lnm = new LnmMenu("400px", "calc(100% - 85px)", "Lnm", "Linear Metre");

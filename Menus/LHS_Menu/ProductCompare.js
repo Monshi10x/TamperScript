@@ -15,7 +15,7 @@ class ProductCompareMenu extends LHSMenuWindow {
         while(this.footer.hasChildNodes()) {this.footer.removeChild(this.footer.lastChild);}
 
         var ProductCompareContainer_Sub = document.createElement('div');
-        ProductCompareContainer_Sub.style = "display: block; float: left; width: 98%; background-color: rgb(255, 255, 255); color: black; height: 400px; margin: 0px; padding: 5px; visibility: visible;overflow-y:scroll";
+        ProductCompareContainer_Sub.style = "display: block; float: left; width: 100%; background-color: rgb(255, 255, 255); color: black; margin: 0px; padding: 5px; visibility: visible;overflow-y:scroll;width:calc(100% - 10px);";
 
         var container1 = document.createElement('div');
         container1.style = "display: block; float: left; width: 100%; background-color: rgb(abc, abc, 221); color: black; min-height: 0px;  visibility: visible;";
@@ -61,7 +61,7 @@ class ProductCompareMenu extends LHSMenuWindow {
         //---------------------------------------//
         //                PRICE DIF              //
         //---------------------------------------//
-        var totalDifference = createText("Total Difference: $0", "width:98%;background-color:#eee;font-weight:bold");
+        var totalDifference = createText("Total Difference: $0", "width:100%;background-color:" + COLOUR.DarkGrey + ";font-weight:bold;color:" + COLOUR.White);
         var totalPrice, totalCost;
         function updateTotalDifference() {
             partWording[0] = "" + width[1].value + "mm x " + height[1].value + "mm [" + roundNumber(parseFloat(width[1].value / 1000) * parseFloat(height[1].value / 1000), 2) + " sqm]" + "\n\n";
@@ -276,7 +276,8 @@ class ProductCompareMenu extends LHSMenuWindow {
         page.appendChild(container3);
         ProductCompareContainer_Sub.appendChild(container2);
         page.appendChild(ProductCompareContainer_Sub);
-        this.footer.appendChild(totalDifference);
+        this.buttonContainer.appendChild(totalDifference);
+        //this.footer.appendChild();
         this.footer.appendChild(createProductBtn_Influence);
         this.footer.appendChild(createProductBtn_NoInfluence);
 
