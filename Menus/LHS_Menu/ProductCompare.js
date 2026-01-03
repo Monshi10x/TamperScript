@@ -238,7 +238,7 @@ class ProductCompareMenu extends LHSMenuWindow {
             var summary = "Additional price to convert the following:<br>" + wording;
 
             await setProductSummary(productIndex, summary);
-            Ordui.Alert("Done.");
+            Toast.notify("Done.", 3000, {position: "top-right"});
         }
 
         async function createProductWithoutInfluence() {
@@ -269,7 +269,7 @@ class ProductCompareMenu extends LHSMenuWindow {
             var summary = "Additional price to convert the following:<br>" + wording + "<br> <b>THIS OPTION WILL COST $" + roundNumber(totalPrice, 2) + "+gst</b>";
 
             await setProductSummary(productIndex, summary);
-            Ordui.Alert("Done.");
+            Toast.notify("Done.", 3000, {position: "top-right"});
         }
 
         page.appendChild(container1);

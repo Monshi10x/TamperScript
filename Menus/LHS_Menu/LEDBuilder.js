@@ -218,7 +218,7 @@ class LEDMenu extends LHSMenuWindow {
             if(!inExisting) {
                 await setProductSummary(productNo, "<div>LED light panels</div><div><ul><li>Single-Sided<br></li><li>6500K (Cool White) Bright LED Lighting</li><li>Outdoor use<br></li></ul></div><div>Includes supply of transformers and connectors.</div><div>Install price not included - see install item below if applicable.</div><div>Final connection to mains to be done by licenced electrician - see other information below.</div>");
             }
-            Ordui.Alert("Done.");
+            Toast.notify("Done.", 3000, {position: "top-right"});
         }
     }
 

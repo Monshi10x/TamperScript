@@ -571,7 +571,7 @@ class LightboxMenu extends LHSMenuWindow {
             //-----------SET PRODUCT QUANTITY----------//
             await setProductQty(productIndex, boxQty);
 
-            Ordui.Alert("Done.");
+            Toast.notify("Done.", 3000, {position: "top-right"});
         }
 
         lightboxUpdate();

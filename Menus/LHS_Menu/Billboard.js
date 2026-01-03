@@ -224,7 +224,7 @@ class BillboardMenu extends LHSMenuWindow {
             partIndex = await tempThis.#artwork.Create(productNo, partIndex);
             partIndex = await tempThis.#totalQuantity.Create(productNo, partIndex);
 
-            Ordui.Alert("Done.");
+            Toast.notify("Done.", 3000, {position: "top-right"});
       }
 
       updateSignFrameSize = () => {
