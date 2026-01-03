@@ -151,6 +151,7 @@ class Size extends SubscriptionManager {
 
       #typeLabel;
       get typeLabel() {return this.#typeLabel;}
+      #f_subscriptionNode;
 
       #subscribedToLabel;
       get inheritedRowSizeLabel() {return this.#subscribedToLabel;}
@@ -246,6 +247,31 @@ class Size extends SubscriptionManager {
             }, this.#container);
 
             this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;position:relative;border:1px solid " + this.#backgroundColor + ";", this.#container);
+
+            this.#f_subscriptionNode = new TNode(this.#container,
+                  {
+                        nodeType: "subscriptionNode",
+                        overrideCssStyle: {backgroundColor: "#469a8fff", height: '30px', width: '30px', margin: "4px", float: "left"},
+                        canAcceptNodes: true,
+                        icon: "https://raw.githubusercontent.com/Monshi10x/TamperScript/refs/heads/main/Images/Icon-Network.svg",
+                        onAcceptDrop: ({node, target}) => {
+                              for(let i = 0; i < this.#lhsMenuWindow.allMaterials.length; i++) {
+                                    //1. Find the matching target element class
+                                    if(target.getAttribute("data-subscription-id") == this.#lhsMenuWindow.allMaterials[i].ID) {
+                                          //2. Ensure the target does not subscribe to this (circular)
+                                          if(this.#lhsMenuWindow.allMaterials[i].isSubscribedTo(this)) {
+                                                Toast.error("Circular Subscriptions not allowed", 4000);
+                                                return;
+                                          };
+
+                                          return this.SubscribeTo(this.#lhsMenuWindow.allMaterials[i]);
+                                    }
+                              }
+                        }
+                  });
+            this.#f_subscriptionNode.el.classList.add("TNodeAccept");
+            this.#f_subscriptionNode.el.dataset.acceptTypes = "subscriptionNode";
+            this.#f_subscriptionNode.el.dataset.subscriptionId = this.ID;
 
             this.#qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#container, true, 1);
 
