@@ -341,17 +341,17 @@ async function initLHSMenu() {
     header.appendChild(headerIcon);
 
     menu_Admin = new AdminPanel("300px", "300px", "Admin", "Admin");
-    menu_Find = new ProductFinder("400px", "600px", "ProductFinder", "Product Finder");
-    menu_Area = new AreaMenu("400px", "600px", "Area", "Area");
-    menu_Lnm = new LnmMenu("400px", "600px", "Lnm", "Linear Metre");
-    menu_LED = new LEDMenu("800px", "600px", "LED", "LEDs");
+    menu_Find = new ProductFinder("400px", "calc(100% - 85px)", "ProductFinder", "Product Finder");
+    menu_Area = new AreaMenu("400px", "calc(100% - 85px)", "Area", "Area");
+    menu_Lnm = new LnmMenu("400px", "calc(100% - 85px)", "Lnm", "Linear Metre");
+    menu_LED = new LEDMenu("800px", "calc(100% - 85px)", "LED", "LEDs");
     menu_Lightbox = new LightboxMenu("800px", "calc(100% - 85px)", "Lightbox", "Lightbox");
     menu_Billboard = new BillboardMenu("1200px", "calc(100% - 85px)", "Billboard", "Billboard");
     menu_ProductCompare = new ProductCompareMenu("800px", "calc(100% - 85px)", "Compare", "Compare");
-    menu_Router = new RouterMenu("800px", "600px", "Router", "Router");
+    menu_Router = new RouterMenu("800px", "calc(100% - 85px)", "Router", "Router");
     menu_Window = new WindowMenu("800px", "calc(100% - 85px)", "Window", "Window");
     menu_Vehicle = new VehicleMenu("1600px", "calc(100% - 85px)", "Vehicle", "Vehicle");
-    menu_creditCardSurcharge = new CreditSurchargeMenu("400px", "600px", "CreditSurchargeMenu", "Credit Card Surcharge");
+    menu_creditCardSurcharge = new CreditSurchargeMenu("400px", "calc(100% - 85px)", "CreditSurchargeMenu", "Credit Card Surcharge");
     menu_3D = new Menu3D("900px", "calc(100% - 85px)", "3DLetterMenu", "3D Letters");
     menu_PanelSigns = new MenuPanelSigns("900px", "calc(100% - 85px)", "PanelSignsMenu", "Panel Signs");
     menu_Charts = new ChartMenu("900px", "700px", "ChartsMenu", "Charts");
