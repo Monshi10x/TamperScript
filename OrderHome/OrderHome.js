@@ -377,30 +377,19 @@ class OrderHome {
             const container = document.createElement("div");
             container.innerHTML = content;
 
-            const quoteNumberNode = container.querySelector("#quote-number");
-            if(quoteNumberNode) {
-                  quoteNumberNode.textContent = quoteNumber;
-            }
+            const replacements = [
+                  {selector: "#quote-number", value: quoteNumber},
+                  {selector: "#customer-name", value: customerFirstName},
+                  {selector: "#salesperson-name", value: userName},
+                  {selector: "#salesperson-phone", value: "M: " + userPhone},
+                  {selector: "#salesperson-email", value: "E: " + userEmail}
+            ];
 
-            const customerNameNode = container.querySelector("#customer-name");
-            if(customerNameNode) {
-                  customerNameNode.textContent = customerFirstName;
-            }
-
-            const nameNode = container.querySelector("#salesperson-name");
-            if(nameNode) {
-                  nameNode.textContent = userName;
-            }
-
-            const phoneNode = container.querySelector("#salesperson-phone");
-            if(phoneNode) {
-                  phoneNode.textContent = "M: " + userPhone;
-            }
-
-            const emailNode = container.querySelector("#salesperson-email");
-            if(emailNode) {
-                  emailNode.textContent = "E: " + userEmail;
-            }
+            replacements.forEach(({selector, value}) => {
+                  container.querySelectorAll(selector).forEach((node) => {
+                        node.textContent = value;
+                  });
+            });
 
             return container.innerHTML;
       }
