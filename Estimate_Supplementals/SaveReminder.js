@@ -46,7 +46,7 @@ class SaveReminder {
                   yesLabel: "Yes, save",
                   noLabel: "Not now",
                   onYes: () => this._triggerSave(),
-                  onNo: () => {},
+                  onNo: () => { },
             });
 
             this._currentToastId = toast?.id || null;
