@@ -170,6 +170,38 @@
                         "minutes": 90,
                         "imageURL": "https://cdn.gorilladash.com/images/media/12781654/signarama-australia-rbwh-square-66600628d2c21.jpg?auto=webp&width=1920"
                   }
+            },
+            "Post and Panel": {
+                  "600x600 Single Post": {
+                        "installers": 1,
+                        "minutes": 90,
+                        "imageURL": null
+                  },
+                  "1200x1200": {
+                        "installers": 2,
+                        "minutes": 60,
+                        "imageURL": null
+                  },
+                  "2400x1200": {
+                        "installers": 1,
+                        "minutes": 120,
+                        "imageURL": null
+                  },
+                  "3000x1200": {
+                        "installers": 2,
+                        "minutes": 120,
+                        "imageURL": null
+                  },
+                  "3000x1500": {
+                        "installers": 2,
+                        "minutes": 120,
+                        "imageURL": null
+                  },
+                  "4000x1500": {
+                        "installers": 2,
+                        "minutes": 120,
+                        "imageURL": null
+                  }
             }
       }
 }

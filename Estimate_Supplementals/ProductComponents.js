@@ -271,7 +271,7 @@ function partInfoTick() {
 				}, partHeader);
 				btn.classList.add('seeSVGButton');
 
-				let svgViewer = new DragZoomSVG("100%", "300px", partText, partHeader, {overrideCssStyles: "outline:none;"});
+				let svgViewer = new DragZoomSVG("100%", "250px", partText, partHeader, {overrideCssStyles: "outline:none;"});
 			}
 			//}
 
@@ -751,17 +751,17 @@ function partInfoTick() {
 				name = VinylLookup["High Tack"];
 				await AddPart(name, l_ProductIndex);
 				await populateGenericDimensions(name);
-                        name = LaminateLookup["Satin"];
-                        await AddPart(name, l_ProductIndex);
-                        await populateGenericDimensions(name);
-                        await GroupParts(l_ProductIndex);
-                  }
-                  Toast.notify("Done.", 3000, {position: "top-right"});
+				name = LaminateLookup["Satin"];
+				await AddPart(name, l_ProductIndex);
+				await populateGenericDimensions(name);
+				await GroupParts(l_ProductIndex);
+			}
+			Toast.notify("Done.", 3000, {position: "top-right"});
 
-                  async function populateGenericDimensions(name, optionalTickSelected) {
-                        var partNoR = getNumPartsInProduct(l_ProductIndex);
-                        await setPartWidth(l_ProductIndex, partNoR, width);
-                        await setPartHeight(l_ProductIndex, partNoR, height);
+			async function populateGenericDimensions(name, optionalTickSelected) {
+				var partNoR = getNumPartsInProduct(l_ProductIndex);
+				await setPartWidth(l_ProductIndex, partNoR, width);
+				await setPartHeight(l_ProductIndex, partNoR, height);
 				await setPartDescription(l_ProductIndex, partNoR, name);
 				await savePart(l_ProductIndex, partNoR);
 				await tickSelected(l_ProductIndex, partNoR, optionalTickSelected == null ? true : optionalTickSelected);
@@ -1001,15 +1001,15 @@ function toggleCopyPartModal(partInstance) {
 
 async function copyParts() {
 	for(var x = 0; x < selectedProductToCopyTo.length; x++) {
-       for(var y = 0; y < selectedPartsToCopy.length; y++) {
-            await copyPart(selectedProductCopyFrom, selectedPartsToCopy[y], selectedProductToCopyTo[x]);
-       }
-   }
-   if(copyPartModal_Container_RHS_NewBlankProduct.style.background == "rgb(0, 100, 255)") {
-       //await add blank product, set temp name,
-   }
+		for(var y = 0; y < selectedPartsToCopy.length; y++) {
+			await copyPart(selectedProductCopyFrom, selectedPartsToCopy[y], selectedProductToCopyTo[x]);
+		}
+	}
+	if(copyPartModal_Container_RHS_NewBlankProduct.style.background == "rgb(0, 100, 255)") {
+		//await add blank product, set temp name,
+	}
 
-   Toast.notify("Done.", 3000, {position: "top-right"});
+	Toast.notify("Done.", 3000, {position: "top-right"});
 }
 function closeCopyModal() {
 	copyPartModal_Container.style.display = "none";
@@ -1124,16 +1124,16 @@ function addQuickFindProducts() {
 			await savePart(productNo, partNo);
 
 			//Transport
-            await AddPart("EWP - _CTE Traccess Diesel Boom Transport - 10km and under", productNo);
-            partNo++;
-            await setPartDescription(productNo, partNo, "Transport");
-            await savePart(productNo, partNo);
+			await AddPart("EWP - _CTE Traccess Diesel Boom Transport - 10km and under", productNo);
+			partNo++;
+			await setPartDescription(productNo, partNo, "Transport");
+			await savePart(productNo, partNo);
 
-            Toast.notify("done", 3000, {position: "top-right"});
-      });
-      modal.setContainerSize(300, 300);
-      modal.value = 1;
-}, footer);
+			Toast.notify("done", 3000, {position: "top-right"});
+		});
+		modal.setContainerSize(300, 300);
+		modal.value = 1;
+	}, footer);
 
 
 
@@ -1149,15 +1149,15 @@ function addQuickFindProducts() {
 			await setProductSummary(productNo, "26ft Trailer Mounted Scissor Lift for elevated access.&nbsp;<div>Delivered to site&nbsp;</div><div><div><br></div><div>Allowance made for " + modal.value + " days hire.&nbsp;</div><div><br></div><div><i><b>Best estimate at the time of quoting is that we will require this EWP. Should a larger EWP be required there will be additional costs for a larger machine including Transport to site.</b></i></div></div>");
 
 			let partNo = 0;
-            await AddPart("EWP - _Scissor Trailer Drawn 26ft (DAILY)", productNo);
-            partNo++;
-            await setPartQty(productNo, partNo, parseInt(modal.value));
-            await setPartDescription(productNo, partNo, "EWP - _Scissor Trailer Drawn 26ft");
-            await savePart(productNo, partNo);
+			await AddPart("EWP - _Scissor Trailer Drawn 26ft (DAILY)", productNo);
+			partNo++;
+			await setPartQty(productNo, partNo, parseInt(modal.value));
+			await setPartDescription(productNo, partNo, "EWP - _Scissor Trailer Drawn 26ft");
+			await savePart(productNo, partNo);
 
-            Toast.notify("done", 3000, {position: "top-right"});
-      });
-      modal.setContainerSize(300, 300);
-      modal.value = 1;
-}, footer);
+			Toast.notify("done", 3000, {position: "top-right"});
+		});
+		modal.setContainerSize(300, 300);
+		modal.value = 1;
+	}, footer);
 }
