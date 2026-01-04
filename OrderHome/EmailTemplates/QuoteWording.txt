@@ -19,13 +19,23 @@ To commence proofing and production, payment is required as follows:
 • Orders <u>over</u> <strong>$600.00</strong>: 50% deposit, with the balance payable <strong>before installation or supply</strong>
 </p>
 
-<p>
-<strong>EFT payment details:</strong><br>
-BSB: 014-218<br>
-Account: 3064-70312<br>
-Account Name: The Trustee for Cargill Investment Trust<br>
-Payment Reference: <span id="quote-number">#QT-1000</span> 
-</p>
+<div style="border:1px solid #d1d1d1ff;border-left:8px solid #ff0000ff; padding:12px 14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
+    <p style="margin:0 0 10px 0; font-weight:700;">Payment options</p>
+
+    <p style="margin:0 0 10px 0;">
+      <strong>EFT (Bank Transfer)</strong><br>
+      Account Name: <strong>{%AccountName%}</strong><br>
+      BSB: <strong>{%BSB%}</strong><br>
+      Account Number: <strong>{%AccountNumber%}</strong><br>
+      Reference: <strong>{%Reference%}</strong> (please use this so we can match your payment)
+    </p>
+
+    <p style="margin:0;">
+      <strong>Credit Card</strong><br>
+      We can take card payment over the phone or in person.
+      <span style="color:#333;">(Card payments incur a {%CardSurcharge%}% surcharge.)</span>
+    </p>
+  </div>
 
 <p>
 Alternatively, payment can be made via credit card over the phone. This incurrs a <strong>2.5% surcharge</strong>.
