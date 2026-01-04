@@ -80,12 +80,12 @@ class Install extends SubMenu {
 		for(let i = 0; i < types.length; i++) {
 			installTypes.push(createDropdownOption(types[i], types[i]));
 		}
-		this.#quickItem = createDropdown_Infield("Type", 0, "margin-left:40px", installTypes, () => {
+		this.#quickItem = createDropdown_Infield("Type", 0, "margin-left:40px;width:40%;", installTypes, () => {
 			this.UpdateInstallLookup();
 		}, this.#quickLookupContainer[1]);
 		$(this.#quickItem[0]).hide();
 
-		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Size", 0, null, 150, false, [], () => {
+		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Size", 0, "width:40%", 150, false, [], () => {
 			this.UpdateInstallTimes();
 		}, this.#quickLookupContainer[1], false);
 		this.UpdateInstallLookup();
@@ -153,7 +153,7 @@ class Install extends SubMenu {
 			array.push([types[i], obj.imageURL == null ? "null" : obj.imageURL]);
 		}
 		deleteElement(this.#quickInstall_sub[0]);
-		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Size", 0, null, 150, false, array, () => {
+		this.#quickInstall_sub = createDropdown_Infield_Icons_Search("Size", 0, "width:40%", 150, false, array, () => {
 			this.UpdateInstallTimes();
 		}, this.#quickLookupContainer[1], false);
 		this.UpdateInstallTimes();

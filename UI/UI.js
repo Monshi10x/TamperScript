@@ -879,7 +879,10 @@ function createDropdown_Infield_Icons_Search(text, selectedIndex, overrideCssSty
         isMouseOver = true;
     });
 
-    if(overrideCssStyles) containerDiv.style.cssText += overrideCssStyles;
+    if(overrideCssStyles) {
+        containerDiv.style.cssText += overrideCssStyles;
+        console.log(overrideCssStyles);
+    }
 
     if(parentObjectToAppendTo != null) {
         parentObjectToAppendTo.appendChild(containerDiv);

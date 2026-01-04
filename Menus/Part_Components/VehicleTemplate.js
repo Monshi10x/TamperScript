@@ -134,6 +134,7 @@ class VehicleMenu extends LHSMenuWindow {
       createContent() {
             const page = this.getPage(0);
             const footer = this.footer;
+            const buttonContainer = this.buttonContainer;
             let thisClass = this;
 
             page.innerHTML = "";
@@ -382,17 +383,17 @@ class VehicleMenu extends LHSMenuWindow {
                   vehicleToast("Done.", "success");
             };
 
-            const measuresCkb = createCheckbox_Infield("Show Measurements", this.#showMeasures, "width: 200px;", () => {this.#showMeasures = measuresCkb[1].checked; this.refresh();}, footer);
-            const qtyCkb = createCheckbox_Infield("Show Quantity", this.#showQuantity, "width: 200px;", () => {this.#showQuantity = qtyCkb[1].checked; this.refresh();}, footer);
-            const descriptionCkb = createCheckbox_Infield("Show Description", this.#showDescription, "width: 200px;", () => {this.#showDescription = descriptionCkb[1].checked; this.refresh();}, footer);
-            const backgroundCkb = createCheckbox_Infield("Show Background", this.#showBackground, "width: 200px;", () => {this.#showBackground = backgroundCkb[1].checked; this.refresh();}, footer);
-            const imagesCkb = createCheckbox_Infield("Show Images", this.#showImages, "width: 200px;", () => {this.#showImages = imagesCkb[1].checked; this.refresh();}, footer);
-            const rectanglesCkb = createCheckbox_Infield("Show Rectangles", this.#showRectangles, "width: 200px;", () => {this.#showRectangles = rectanglesCkb[1].checked; this.refresh();}, footer);
-            const handlesCkb = createCheckbox_Infield("Show Handles", this.#showHandles, "width: 200px;", () => {this.#showHandles = handlesCkb[1].checked; this.refresh();}, footer);
-            const layoutToggle = createDropdown_Infield("Layout", 0, "width: 200px;", [createDropdownOption("Vertical Split", "vertical"), createDropdownOption("Horizontal Split", "horizontal")], () => {
+            const measuresCkb = createCheckbox_Infield("Show Measurements", this.#showMeasures, "width: 200px;", () => {this.#showMeasures = measuresCkb[1].checked; this.refresh();}, buttonContainer);
+            const qtyCkb = createCheckbox_Infield("Show Quantity", this.#showQuantity, "width: 150px;", () => {this.#showQuantity = qtyCkb[1].checked; this.refresh();}, buttonContainer);
+            const descriptionCkb = createCheckbox_Infield("Show Description", this.#showDescription, "width: 150px;", () => {this.#showDescription = descriptionCkb[1].checked; this.refresh();}, buttonContainer);
+            const backgroundCkb = createCheckbox_Infield("Show Background", this.#showBackground, "width: 150px;", () => {this.#showBackground = backgroundCkb[1].checked; this.refresh();}, buttonContainer);
+            const imagesCkb = createCheckbox_Infield("Show Images", this.#showImages, "width: 150px;", () => {this.#showImages = imagesCkb[1].checked; this.refresh();}, buttonContainer);
+            const rectanglesCkb = createCheckbox_Infield("Show Rectangles", this.#showRectangles, "width: 150px;", () => {this.#showRectangles = rectanglesCkb[1].checked; this.refresh();}, buttonContainer);
+            const handlesCkb = createCheckbox_Infield("Show Handles", this.#showHandles, "width: 150px;", () => {this.#showHandles = handlesCkb[1].checked; this.refresh();}, buttonContainer);
+            const layoutToggle = createDropdown_Infield("Layout", 0, "width: 150px;", [createDropdownOption("Vertical Split", "vertical"), createDropdownOption("Horizontal Split", "horizontal")], () => {
                   this.#layoutOrientation = layoutToggle[1].value === "horizontal" ? "horizontal" : "vertical";
                   this.#applyLayout();
-            }, footer);
+            }, buttonContainer);
 
             VehicleMenu_TotalQuantity = new TotalQuantity(leftPane, this.#dragZoomSVG?.svgG, () => {this.updateFromTemplateFields();}, this.#dragZoomSVG);
             VehicleMenu_Template = new VehicleTemplate(leftPane, this.#dragZoomSVG?.svgG, () => {this.initRects(); this.refresh(); this.initBackground();}, () => {this.updateRectsFromFields();}, (rowNumber) => {this.deleteRect(rowNumber);});
@@ -418,7 +419,7 @@ class VehicleMenu extends LHSMenuWindow {
             page.appendChild(rightPane);
             this.#applyLayout();
 
-            const fieldCreateProduct = createButton('Create Product', 'width:300px;height:35px;margin:0px;display:block;float:right', createVehicleProduct);
+            const fieldCreateProduct = createButton('Create Product', 'width:calc(100%);height:35px;margin:0px;display:block;float:right', createVehicleProduct);
             footer.appendChild(fieldCreateProduct);
 
             this.initBackground();
@@ -1573,14 +1574,14 @@ class VehicleTemplate extends SubMenu {
 
             createHeading_Numbered(1, "Choose Template", "width:97%", this.contentContainer);
 
-            this.l_standardCustom = createDropdown_Infield("Standard or Custom", 0, "", [createDropdownOption("Standard", "Standard"), createDropdownOption("Custom", "Custom")], this.changeStandardCustom, this.contentContainer);
+            this.l_standardCustom = createDropdown_Infield("Standard or Custom", 0, "width:25%", [createDropdownOption("Standard", "Standard"), createDropdownOption("Custom", "Custom")], this.changeStandardCustom, this.contentContainer);
             var dropdownItems_types = [];
             for(var l = 0; l < this.predefinedTemplates.length; l++) {
                   dropdownItems_types.push(createDropdownOption(this.predefinedTemplates[l][0], this.predefinedTemplates[l][0]));
             }
-            this.l_vehicleTypes = createDropdown_Infield("Vehicle Type", 0, "", dropdownItems_types, this.changeVehicleTypes, this.contentContainer);
+            this.l_vehicleTypes = createDropdown_Infield("Vehicle Type", 0, "width:25%", dropdownItems_types, this.changeVehicleTypes, this.contentContainer);
 
-            this.l_predefinedTemplate = createDropdown_Infield("Predefined Templates", 0, "", this.predefinedTemplateNames, this.callback, this.contentContainer);
+            this.l_predefinedTemplate = createDropdown_Infield("Predefined Templates", 0, "width:25%", this.predefinedTemplateNames, this.callback, this.contentContainer);
 
             var dropdownItems = [];
             for(var t = 0; t < this.blankTemplates.length; t++) {
