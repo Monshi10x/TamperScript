@@ -2,15 +2,12 @@
   <p style="margin:0 0 14px 0;">Hi <%CustomerName%>,</p>
 
   <p style="margin:0 0 14px 0;">
-    Just a quick follow-up regarding your outstanding balance for <strong>{{InvoiceOrQuoteNumber}}</strong>.
+    Just a quick follow-up regarding your outstanding balance for <strong>{%InvoiceOrQuoteNumber%}</strong>.
   </p>
 
   <div style="border:1px solid #e6e6e6; border-radius:10px; padding:14px 16px; background:#fafafa; margin:0 0 14px 0;">
     <div style="font-size:13px; color:#555; margin:0 0 6px 0;">Amount due</div>
-    <div style="font-size:22px; font-weight:700; margin:0;">${{AmountDue}}</div>
-    <div style="font-size:13px; color:#555; margin:6px 0 0 0;">
-      Due date: <strong>{{DueDate}}</strong>
-    </div>
+    <div style="font-size:22px; font-weight:700; margin:0;">${%AmountDue%}</div>
   </div>
 
   <p style="margin:0 0 14px 0;">
@@ -18,21 +15,21 @@
     Otherwise, could you please arrange payment today so we can keep your job moving without delays.
   </p>
 
-  <div style="border-left:5px solid #111; padding:12px 14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
+  <div style="border:1px solid #e6e6e6;border-left:8px solid #ff0000ff; padding:12px 14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
     <p style="margin:0 0 10px 0; font-weight:700;">Payment options</p>
 
     <p style="margin:0 0 10px 0;">
       <strong>EFT (Bank Transfer)</strong><br>
-      Account Name: <strong>{{AccountName}}</strong><br>
-      BSB: <strong>{{BSB}}</strong><br>
-      Account Number: <strong>{{AccountNumber}}</strong><br>
-      Reference: <strong>{{Reference}}</strong> (please use this so we can match your payment)
+      Account Name: <strong>{%AccountName%}</strong><br>
+      BSB: <strong>{%BSB%}</strong><br>
+      Account Number: <strong>{%AccountNumber%}</strong><br>
+      Reference: <strong>{%Reference%}</strong> (please use this so we can match your payment)
     </p>
 
     <p style="margin:0;">
       <strong>Credit Card</strong><br>
       We can take card payment over the phone or send a payment link on request.
-      <span style="color:#555;">(Card payments incur a {{CardSurcharge}}% surcharge.)</span>
+      <span style="color:#555;">(Card payments incur a {%CardSurcharge%}% surcharge.)</span>
     </p>
   </div>
 
@@ -61,7 +58,7 @@
 
   <hr style="border:none; border-top:1px solid #eaeaea; margin:18px 0;">
   <p style="margin:0; font-size:12px; color:#777;">
-    This email relates to an outstanding balance for {{InvoiceOrQuoteNumber}}. If you believe this has been sent in error, please reply and let us know.
+    This email relates to an outstanding balance for {%InvoiceOrQuoteNumber%}. If you believe this has been sent in error, please reply and let us know.
   </p>
 
 </div>

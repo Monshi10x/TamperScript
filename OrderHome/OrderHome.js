@@ -5,6 +5,15 @@
 window.addEventListener("load", () => new OrderHome());
 
 class OrderHome {
+      githubBranch = "main";
+      //known static info:
+      //BSB: 014-218
+      //Account: 3064-70312
+      //Account Name: The Trustee for Cargill Investment Trust
+      //Payment Reference: <span id="quote-number">#QT-1000</span> 
+      //CardSurcharge 2.5%
+      //Quote or invoice number - get from span with id = 'lblOrderNumber'
+
       #emailTemplateContainer;
       #emailModalIsOpen = false;
       #templateBaseUrl;
@@ -20,10 +29,10 @@ class OrderHome {
       #userInfo = null;
       #attachmentCache = new Map();
       #defaultAttachmentFiles = ["Capabilities One Page 3D CUT LETTERS V2 (E).pdf"];
-      #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailAttachments/";
+      #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/" + this.githubBranch + "/OrderHome/EmailAttachments/";
 
       constructor() {
-            const defaultTemplateBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/OrderHomeAdditions/OrderHome/EmailTemplates/";
+            const defaultTemplateBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/" + this.githubBranch + "/OrderHome/EmailTemplates/";
             this.#templateBaseUrl = window.ORDER_HOME_TEMPLATE_BASE_URL
                   || defaultTemplateBaseUrl;
 
