@@ -14,23 +14,30 @@
     Can you please arrange ASAP so we can keep your job moving without delays.
   </p>
 
-  <div style="border:1px solid #d1d1d1ff;border-left:8px solid #ff0000ff; padding:12px 14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
-    <p style="margin:0 0 10px 0; font-weight:700;">Payment options</p>
+  <div style="border:1px solid #d1d1d1; border-left:8px solid #ff0000; padding:14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
+  <p style="margin:0 0 12px 0; font-weight:700;">Payment options</p>
 
-    <p style="margin:0 0 10px 0;">
-      <strong>EFT (Bank Transfer)</strong><br>
+  <!-- EFT BLOCK -->
+  <div style="border:1px solid #cfcfcf; background:#ffffff; border-radius:6px; padding:12px; margin:0 0 12px 0;">
+    <p style="margin:0 0 8px 0; font-weight:700;">EFT (Bank Transfer)</p>
+    <p style="margin:0;">
       Account Name: <strong>{%AccountName%}</strong><br>
       BSB: <strong>{%BSB%}</strong><br>
       Account Number: <strong>{%AccountNumber%}</strong><br>
-      Reference: <strong>{%Reference%}</strong> (please use this so we can match your payment)
+      Reference: <strong>{%Reference%}</strong><br>
+      <span style="color:#555;">(Please use this reference so we can match your payment)</span>
     </p>
+  </div>
 
+  <!-- CREDIT CARD BLOCK -->
+  <div style="border:1px solid #cfcfcf; background:#ffffff; border-radius:6px; padding:12px;">
+    <p style="margin:0 0 8px 0; font-weight:700;">Credit Card</p>
     <p style="margin:0;">
-      <strong>Credit Card</strong><br>
-      We can take card payment over the phone or in person.
+      We can take card payment over the phone or in person.<br>
       <span style="color:#333;">(Card payments incur a {%CardSurcharge%}% surcharge.)</span>
     </p>
   </div>
+</div>
 
   <p style="margin:0 0 14px 0;">
     Need anything adjusted (PO number, split payment, updated invoice, etc.)? Reply here and we’ll sort it quickly.
