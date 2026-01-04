@@ -415,7 +415,7 @@ class OrderHome {
       }
 
       calculateAmountDue() {
-            const preferredSelectors = ["#BalanceDueLabel", "#lblAmountDue"];
+            const preferredSelectors = ["#lblAmountDue"];
             const preferredAmount = this.getAmountFromSelectors(preferredSelectors);
             if(preferredAmount !== null) {
                   return preferredAmount;
