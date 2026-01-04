@@ -421,19 +421,20 @@ class OrderHome {
                   return preferredAmount;
             }
 
-            const totalPaidSelectors = ["#lblTotalPaid", "#hfTotalPaid", "#lblTotalPayments", "#lblTotalPaymentsAmount", "#lblTotalPaidAmount", "#lblTotalPaidValue", "#lblPaymentsToDate", "#tbTotalPaid", "#hfTotalPaidAmount"];
+            const totalPaidSelectors = ["#TotalPayedLabel", "#lblTotalPaid", "#hfTotalPaid", "#lblTotalPayments", "#lblTotalPaymentsAmount", "#lblTotalPaidAmount", "#lblTotalPaidValue", "#lblPaymentsToDate", "#tbTotalPaid", "#hfTotalPaidAmount"];
             const totalPaid = this.getAmountFromSelectors(totalPaidSelectors, {allowZero: true});
 
-            const orderTotalSelectors = ["#lblTotal", "#lblOrderTotal", "#lblTotalWithTax", "#lblEstimateTotal", "#lblGrandTotal", "#hfOrderTotal", "#hfOrderAmount"];
+            const orderTotalSelectors = ["#lblTotalAmount", "#lblTotal", "#lblOrderTotal", "#lblTotalWithTax", "#lblEstimateTotal", "#lblGrandTotal", "#hfOrderTotal", "#hfOrderAmount"];
             const orderTotal = this.getAmountFromSelectors(orderTotalSelectors);
 
             if(orderTotal !== null) {
-                  if(orderTotal > 600 && (totalPaid === 0 || totalPaid === null)) {
+                  if(orderTotal < 600) {
+                        return orderTotal;
+                  }
+
+                  if(totalPaid === 0 || totalPaid === null) {
                         const downPayment = this.getAmountFromSelectors(["#DownpaymentDueValue"]);
-                        if(downPayment !== null) {
-                              return downPayment;
-                        }
-                        return orderTotal * 0.5;
+                        return downPayment !== null ? downPayment : orderTotal * 0.5;
                   }
 
                   const paidAmount = totalPaid ?? 0;
