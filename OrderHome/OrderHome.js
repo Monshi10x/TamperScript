@@ -399,29 +399,50 @@ class OrderHome {
             return new Intl.NumberFormat("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(amount);
       }
 
+      getAmountFromSelectors(selectors, {allowZero = false} = {}) {
+            for(const selector of selectors) {
+                  const amount = this.getCurrencyFromSelector(selector);
+                  if(amount === null) {
+                        continue;
+                  }
+
+                  if(amount > 0 || (allowZero && amount === 0)) {
+                        return amount;
+                  }
+            }
+
+            return null;
+      }
+
       calculateAmountDue() {
             const preferredSelectors = ["#BalanceDueLabel", "#lblAmountDue"];
-            for(const selector of preferredSelectors) {
-                  const amount = this.getCurrencyFromSelector(selector);
-                  if(amount !== null && amount > 0) {
-                        return amount;
-                  }
+            const preferredAmount = this.getAmountFromSelectors(preferredSelectors);
+            if(preferredAmount !== null) {
+                  return preferredAmount;
             }
 
-            const downPaymentSelectors = ["#DownpaymentDueValue", "#tbPaymentAmount", "#txtTotalPaymentAmount"];
-            for(const selector of downPaymentSelectors) {
-                  const amount = this.getCurrencyFromSelector(selector);
-                  if(amount !== null && amount > 0) {
-                        return amount;
-                  }
-            }
+            const totalPaidSelectors = ["#lblTotalPaid", "#hfTotalPaid", "#lblTotalPayments", "#lblTotalPaymentsAmount", "#lblTotalPaidAmount", "#lblTotalPaidValue", "#lblPaymentsToDate", "#tbTotalPaid", "#hfTotalPaidAmount"];
+            const totalPaid = this.getAmountFromSelectors(totalPaidSelectors, {allowZero: true});
 
             const orderTotalSelectors = ["#lblTotal", "#lblOrderTotal", "#lblTotalWithTax", "#lblEstimateTotal", "#lblGrandTotal", "#hfOrderTotal", "#hfOrderAmount"];
-            for(const selector of orderTotalSelectors) {
-                  const total = this.getCurrencyFromSelector(selector);
-                  if(total !== null && total > 0) {
-                        return total < 600 ? total : total * 0.5;
+            const orderTotal = this.getAmountFromSelectors(orderTotalSelectors);
+
+            if(orderTotal !== null) {
+                  if(orderTotal > 600 && (totalPaid === 0 || totalPaid === null)) {
+                        const downPayment = this.getAmountFromSelectors(["#DownpaymentDueValue"]);
+                        if(downPayment !== null) {
+                              return downPayment;
+                        }
+                        return orderTotal * 0.5;
                   }
+
+                  const paidAmount = totalPaid ?? 0;
+                  return Math.max(orderTotal - paidAmount, 0);
+            }
+
+            const downPaymentFallback = this.getAmountFromSelectors(["#DownpaymentDueValue", "#tbPaymentAmount", "#txtTotalPaymentAmount"]);
+            if(downPaymentFallback !== null) {
+                  return downPaymentFallback;
             }
 
             return null;
