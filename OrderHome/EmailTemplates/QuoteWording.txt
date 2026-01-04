@@ -27,38 +27,54 @@ Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</str
   <tr>
     <td align="center">
 
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; border-collapse:separate; border-spacing:16px 16px;">
-        
+      <table width="100%" cellpadding="0" cellspacing="0"
+             style="max-width:600px; border-collapse:separate; border-spacing:16px 16px;">
+
         <!-- ROW 1 -->
         <tr>
-          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0"
+                   style="height:120px;
+                          border:4px solid #d32f2f;
+                          background:#fff5f5;
+                          border-radius:12px;
+                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
               <tr>
                 <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Quality</div>
-                  <div style="font-size:12px; color:#555; margin:0;">Built to last</div>
+                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Quality</div>
+                  <div style="font-size:12px;color:#555;">Built to last</div>
                 </td>
               </tr>
             </table>
           </td>
 
-          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0"
+                   style="height:120px;
+                          border:4px solid #d32f2f;
+                          background:#fff5f5;
+                          border-radius:12px;
+                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
               <tr>
                 <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Made In-House</div>
-                  <div style="font-size:12px; color:#555; margin:0;">Manufactured locally</div>
+                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Made In-House</div>
+                  <div style="font-size:12px;color:#555;">Manufactured locally</div>
                 </td>
               </tr>
             </table>
           </td>
 
-          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0"
+                   style="height:120px;
+                          border:4px solid #d32f2f;
+                          background:#fff5f5;
+                          border-radius:12px;
+                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
               <tr>
                 <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Family Owned</div>
-                  <div style="font-size:12px; color:#555; margin:0;">Trusted &amp; accountable</div>
+                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Family Owned</div>
+                  <div style="font-size:12px;color:#555;">Trusted &amp; accountable</div>
                 </td>
               </tr>
             </table>
@@ -67,34 +83,49 @@ Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</str
 
         <!-- ROW 2 -->
         <tr>
-          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0"
+                   style="height:120px;
+                          border:4px solid #d32f2f;
+                          background:#fff5f5;
+                          border-radius:12px;
+                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
               <tr>
                 <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Qualified Installers</div>
-                  <div style="font-size:12px; color:#555; margin:0;">Trained &amp; compliant</div>
+                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Qualified Installers</div>
+                  <div style="font-size:12px;color:#555;">Trained &amp; compliant</div>
                 </td>
               </tr>
             </table>
           </td>
 
-          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0"
+                   style="height:120px;
+                          border:4px solid #d32f2f;
+                          background:#fff5f5;
+                          border-radius:12px;
+                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
               <tr>
                 <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Strict QA Checks</div>
-                  <div style="font-size:12px; color:#555; margin:0;">Every job inspected</div>
+                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Strict QA Checks</div>
+                  <div style="font-size:12px;color:#555;">Every job inspected</div>
                 </td>
               </tr>
             </table>
           </td>
 
-          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0"
+                   style="height:120px;
+                          border:4px solid #d32f2f;
+                          background:#fff5f5;
+                          border-radius:12px;
+                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
               <tr>
                 <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Premium Materials</div>
-                  <div style="font-size:12px; color:#555; margin:0;">Commercial-grade only</div>
+                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Premium Materials</div>
+                  <div style="font-size:12px;color:#555;">Commercial-grade only</div>
                 </td>
               </tr>
             </table>
