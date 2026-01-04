@@ -1158,7 +1158,9 @@ class UIContainer_Design2 {
                         '</g>' +
                         '</svg>';
 
-                  let x2 = '<? xml version = "1.0" encoding = "UTF-8" ?> <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="297.35mm" height="210.35mm" viewBox="0 0 842.89 596.28">' +
+                  console.log(this.#f_lineItemDescriptionText.innerText);
+                  let x2 = //this.#f_lineItemDescriptionText.innerText +
+                        '<? xml version = "1.0" encoding = "UTF-8" ?> <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="297.35mm" height="210.35mm" viewBox="0 0 842.89 596.28">' +
                         '<text transform="translate(68.44 91.19)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.CompanyName.replace("&", "and") + '</tspan></text>' +
                         '<text transform="translate(68.44 102.58)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + '' + '</tspan></text>' +
                         '<text transform="translate(68.44 113.97)" style="font-family:ArialMT, Arial; font-size:8.59px; isolation:isolate;"><tspan x="0" y="0">' + this.#jobObject.OrderDescription.replace("&", "and") + '</tspan></text>' +
@@ -1182,9 +1184,10 @@ class UIContainer_Design2 {
                         '</svg>';
 
                   saveToClipboard(x2);
+                  console.log(x2);
 
-                  var parser = new DOMParser();
-                  var doc = parser.parseFromString(x2, "image/svg+xml");
+                  //var parser = new DOMParser();
+                  //var doc = parser.parseFromString(x2, "image/svg+xml");
 
             }, this.#f_illustratorDiv, true);
 
