@@ -2,18 +2,137 @@
 
 <p>
 Thank you for the opportunity to assist with your signage project. <br>
-As discussed, please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</strong>attached.
+Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</strong>attached.
 </p>
 
-<p><strong>Next steps to proceed:</strong></p>
+<div style="text-align:center; margin:26px 0 14px 0; font-family:Arial, Helvetica, sans-serif;">
+  <p style="
+    margin:0;
+    font-size:20px;
+    font-weight:700;
+    color:#111;
+  ">
+    Why choose us
+  </p>
+  <div style="
+    width:60px;
+    height:4px;
+    background:#d32f2f;
+    margin:8px auto 0 auto;
+    border-radius:2px;
+  "></div>
+</div>
+
+<table width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0; font-family:Arial, Helvetica, sans-serif;">
+  <tr>
+    <td align="center">
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; border-collapse:separate; border-spacing:16px 16px;">
+        
+        <!-- ROW 1 -->
+        <tr>
+          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+              <tr>
+                <td align="center" valign="middle" style="padding:14px;">
+                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Quality</div>
+                  <div style="font-size:12px; color:#555; margin:0;">Built to last</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+
+          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+              <tr>
+                <td align="center" valign="middle" style="padding:14px;">
+                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Made In-House</div>
+                  <div style="font-size:12px; color:#555; margin:0;">Manufactured locally</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+
+          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+              <tr>
+                <td align="center" valign="middle" style="padding:14px;">
+                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Family Owned</div>
+                  <div style="font-size:12px; color:#555; margin:0;">Trusted &amp; accountable</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ROW 2 -->
+        <tr>
+          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+              <tr>
+                <td align="center" valign="middle" style="padding:14px;">
+                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Qualified Installers</div>
+                  <div style="font-size:12px; color:#555; margin:0;">Trained &amp; compliant</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+
+          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+              <tr>
+                <td align="center" valign="middle" style="padding:14px;">
+                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Strict QA Checks</div>
+                  <div style="font-size:12px; color:#555; margin:0;">Every job inspected</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+
+          <td width="33.33%" valign="middle" align="center" height="120" style="height:120px;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="height:120px; border:4px solid #d32f2f; background:#fff5f5; border-radius:12px;">
+              <tr>
+                <td align="center" valign="middle" style="padding:14px;">
+                  <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 6px 0;">Premium Materials</div>
+                  <div style="font-size:12px; color:#555; margin:0;">Commercial-grade only</div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+
+<div style="text-align:center; margin:26px 0 14px 0; font-family:Arial, Helvetica, sans-serif;">
+  <p style="
+    margin:0;
+    font-size:20px;
+    font-weight:700;
+    color:#111;
+  ">
+    Next steps to proceed
+  </p>
+  <div style="
+    width:60px;
+    height:4px;
+    background:#d32f2f;
+    margin:8px auto 0 auto;
+    border-radius:2px;
+  "></div>
+</div>
 
 <p>
-<strong><span style="color: rgb(0, 0, 255);">1. Approve Quote</span></strong><br>
+<strong><span style="color: #d32f2f;">1. Approve Quote</span></strong><br>
 Please confirm your acceptance of this quote by replying to this email.
 </p>
 
 <p>
-<strong><span style="color: rgb(0, 0, 255);">2. Arrange payment</span></strong><br>
+<strong><span style="color: #d32f2f;">2. Arrange payment</span></strong><br>
 To commence proofing and production, payment is required as follows:
 </p>
 
@@ -22,7 +141,7 @@ To commence proofing and production, payment is required as follows:
 • Orders <u>over</u> <strong>$600.00</strong>: 50% deposit, with the balance payable <strong>before installation or supply</strong>
 </p>
 
-<div style="border:1px solid #d1d1d1; border-left:8px solid #ff0000; padding:14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
+<div style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; padding:14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
   <p style="margin:0 0 12px 0; font-weight:700;">Payment options</p>
 
   <!-- EFT BLOCK -->
@@ -48,13 +167,13 @@ To commence proofing and production, payment is required as follows:
 </div>
 
 <p>
-<strong><span style="color: rgb(0, 0, 255);">3. Artwork and Design</span></strong><br>
+<strong><span style="color: #d32f2f;">3. Artwork and Design</span></strong><br>
 After payment, please provide your high-res vector PDF/EPS/AI/SVG logos and any brand guidelines and specific colours.
 Following this, you will receive an artwork proof in 1–2 business days for your approval.
 </p>
 
 <p>
-<strong><span style="color: rgb(0, 0, 255);">4. Artwork approval and Production</span></strong><br>
+<strong><span style="color: #d32f2f;">4. Artwork approval and Production</span></strong><br>
 After artwork approval, standard production timeframes are approximately <strong>5–14 business days</strong>, subject to current workload and sign type.<br>
 Illuminated or fabricated signage typically requires <strong>3–5 weeks</strong>.
 </p>
