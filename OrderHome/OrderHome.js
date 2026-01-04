@@ -20,6 +20,7 @@ class OrderHome {
       #templateDefinitions = [
             {key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt"},
             {key: "PaymentDue", label: "Payment Due", file: "PaymentDue.txt"},
+            {key: "GoogleReview", label: "Google Review", file: "GoogleReview.txt"},
             {key: "OrderAcknowledgement", label: "Order Acknowledgement", file: "OrderAcknowledgementWording.txt"},
             {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt"},
             {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt"},
