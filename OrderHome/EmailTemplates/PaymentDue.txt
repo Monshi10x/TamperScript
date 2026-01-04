@@ -2,20 +2,19 @@
   <p style="margin:0 0 14px 0;">Hi <%CustomerName%>,</p>
 
   <p style="margin:0 0 14px 0;">
-    Just a quick follow-up regarding your outstanding balance for <strong>{%InvoiceOrQuoteNumber%}</strong>.
+    Please find attached <strong>{%InvoiceOrQuoteNumber%}</strong> with an outstanding balance for payment.
   </p>
 
-  <div style="border:1px solid #e6e6e6; border-radius:10px; padding:14px 16px; background:#fafafa; margin:0 0 14px 0;">
+  <div style="border:1px solid #d1d1d1ff;border-left:8px solid #ff0000ff; padding:12px 14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
     <div style="font-size:13px; color:#555; margin:0 0 6px 0;">Amount due</div>
     <div style="font-size:22px; font-weight:700; margin:0;">${%AmountDue%}</div>
   </div>
 
   <p style="margin:0 0 14px 0;">
-    If payment has already been made, please ignore this message (or reply with the remittance and we’ll mark it as paid).
-    Otherwise, could you please arrange payment today so we can keep your job moving without delays.
+    Can you please arrange ASAP so we can keep your job moving without delays.
   </p>
 
-  <div style="border:1px solid #e6e6e6;border-left:8px solid #ff0000ff; padding:12px 14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
+  <div style="border:1px solid #d1d1d1ff;border-left:8px solid #ff0000ff; padding:12px 14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
     <p style="margin:0 0 10px 0; font-weight:700;">Payment options</p>
 
     <p style="margin:0 0 10px 0;">
@@ -28,8 +27,8 @@
 
     <p style="margin:0;">
       <strong>Credit Card</strong><br>
-      We can take card payment over the phone or send a payment link on request.
-      <span style="color:#555;">(Card payments incur a {%CardSurcharge%}% surcharge.)</span>
+      We can take card payment over the phone or in person.
+      <span style="color:#333;">(Card payments incur a {%CardSurcharge%}% surcharge.)</span>
     </p>
   </div>
 
