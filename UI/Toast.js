@@ -49,6 +49,37 @@ class Toast {
       static error(message, duration, options = {}) {
             return this._show("error", message, duration, options);
       }
+      static confirm(message, options = {}) {
+            const {
+                  onYes,
+                  onNo,
+                  yesLabel = "Yes",
+                  noLabel = "No",
+                  type = "info",
+                  ...rest
+            } = options || {};
+
+            const actions = [
+                  {
+                        label: yesLabel,
+                        onClick: () => {
+                              try {onYes?.();} catch(err) {console.error(err);}
+                        },
+                  },
+                  {
+                        label: noLabel,
+                        onClick: () => {
+                              try {onNo?.();} catch(err) {console.error(err);}
+                        },
+                  },
+            ];
+
+            return this._show(type, message, rest.duration, {
+                  ...rest,
+                  actions,
+                  closeOnClick: rest.closeOnClick ?? false,
+            });
+      }
 
       static dismiss(idOrElement) {
             if(!idOrElement) return false;

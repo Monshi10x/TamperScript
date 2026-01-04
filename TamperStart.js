@@ -138,6 +138,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/SummaryHelper.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/CostAnalysisSummary.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/InstallSummary.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/SaveReminder.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Images.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Colour.js

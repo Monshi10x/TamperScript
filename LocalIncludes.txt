@@ -138,6 +138,7 @@
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Estimate_Supplementals\SummaryHelper.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Estimate_Supplementals\CostAnalysisSummary.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Estimate_Supplementals\InstallSummary.js
+// @require      file://C:\Users\Tristan PC\Documents\TamperScript\Estimate_Supplementals\SaveReminder.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Styles\Styles.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Styles\Images.js
 // @require      file://C:\Users\Tristan PC\Documents\TamperScript\Styles\Colour.js

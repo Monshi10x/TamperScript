@@ -40,6 +40,7 @@ var installSummary;
 var quoteSeconds_CurrentSession = 0;
 var quoteSeconds_Stored = 0;
 var quoteSeconds_Total = 0;
+var saveReminder;
 
 
 (function() {
@@ -68,6 +69,7 @@ var quoteSeconds_Total = 0;
   createTogglePartsContainer();
   createSummaryHelper();
   installSummary = new InstallSummary();
+  saveReminder = new SaveReminder();
   initLHSMenu();
   init();
   updateErrors();
