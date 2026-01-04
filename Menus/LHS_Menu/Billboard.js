@@ -81,8 +81,8 @@ class BillboardMenu extends LHSMenuWindow {
             this.#canvasCtx = this.#dragZoomCanvas.canvasCtx;
 
             var infoContainer = document.createElement("div");
-            infoContainer.style = "width:45%;box-sizing:border-box;overflow-y:scroll;display:block;float:left;background-color:" + COLOUR.MediumGrey;
-            infoContainer.style.height = this.height + "px";
+            infoContainer.style = "width:50%;box-sizing:border-box;overflow-y:scroll;height:100%;display:block;float:left;background-color:" + COLOUR.MediumGrey;
+            //infoContainer.style.height = this.height + "px";
 
             let thisClass = this;
             function createAttachmentTypeContainer() {
@@ -143,8 +143,8 @@ class BillboardMenu extends LHSMenuWindow {
             createAttachmentTypeContainer();
 
             page.appendChild(infoContainer);
-
-            this.#dragZoomSVG = new DragZoomSVG(page.getBoundingClientRect().width / 2 + 50 + "px", this.height + "px", '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"></svg>',
+            //page.getBoundingClientRect().width / 2 + 50 + "px"
+            this.#dragZoomSVG = new DragZoomSVG("calc(50%)", "calc(100% - 0px)", '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="1980.32mm" height="1186.57mm" viewBox="0 0 5613.5 3363.5"></svg>',
                   page, {
                   convertShapesToPaths: false,
                   scaleStrokeOnScroll: false,
@@ -224,7 +224,7 @@ class BillboardMenu extends LHSMenuWindow {
             partIndex = await tempThis.#artwork.Create(productNo, partIndex);
             partIndex = await tempThis.#totalQuantity.Create(productNo, partIndex);
 
-            Ordui.Alert("Done.");
+            Toast.notify("Done.", 3000, {position: "top-right"});
       }
 
       updateSignFrameSize = () => {

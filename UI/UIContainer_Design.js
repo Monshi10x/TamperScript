@@ -167,8 +167,7 @@ class UIContainer_Design {
             let self = this;
             let cb = function() {
                   setFieldDisabled(false, self.#f_popOutBtn);
-                  //console.log("in modal function callback");
-                  console.trace("in modal function callback");
+
                   self.popOutLeave();
                   self.onCallback();
                   self.modalIsOpen = false;

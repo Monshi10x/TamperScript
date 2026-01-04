@@ -121,8 +121,8 @@ class Vinyl extends Material {      /*
       /*
                         
       Start             */
-      constructor(parentObject, sizeClass, type) {
-            super(parentObject, sizeClass, type);
+      constructor(parentObject, sizeClass, options = {UPDATES_PAUSED: false}) {
+            super(parentObject, sizeClass, options);
 
             /*
             InheritedParentSizeSplits*/
@@ -201,7 +201,7 @@ class Vinyl extends Material {      /*
                   }
                   vinylDropdownElements.push([element.Name, isStocked ? "blue" : "white"]);
             });
-            this.#f_material = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:60%;", 10, true, vinylDropdownElements, () => {this.UpdateFromFields();}, f_container_material);
+            this.#f_material = createDropdown_Infield_Icons_Search("Vinyl", 0, "width:70%;", 10, true, vinylDropdownElements, () => {this.UpdateFromFields();}, f_container_material);
             dropdownInfieldIconsSearchSetSelected(this.#f_material, VinylLookup["Air Release"], false, false);
 
             /*
@@ -274,11 +274,13 @@ class Vinyl extends Material {      /*
 
             this.UpdateFromInheritedData();
             this.UpdateOutput();
-            this.UpdateVisualizer();
+
             this.UpdateMachineTimes();
             this.UpdateProductionTimes();
 
             this.UpdateDataForSubscribers();
+
+            this.UpdateVisualizer();
 
             this.PushToSubscribers();
 
@@ -286,8 +288,22 @@ class Vinyl extends Material {      /*
       }
 
       UpdateVisualizer() {
+
             if(this.#f_visualiser) {
-                  //this.#f_visualiser.setSizeArrays(this.#matrixSizes);
+                  this.#f_visualiser.setBleedFields(this.#f_bleedTop[1], this.#f_bleedBottom[1], this.#f_bleedLeft[1], this.#f_bleedRight[1]);
+                  this.#f_visualiser.setJoinOrientationField(this.#f_joinOrientation[1]);
+                  this.#f_visualiser.setRollWidthField(this.#f_rollWidth[1]);
+                  this.#f_visualiser.setJoinOverlapField(this.#f_joinOverlap[1]);
+
+                  let matrixSizeArrays = [];
+                  this.SUBSCRIPTION_DATA.forEach((subscription/**{parent: p, data: [{...}]}*/) => {
+
+                        subscription.data.forEach((dataEntry/**{QWHD: QWHD, matrixSizes: [...]}*/) => {
+
+                              if(dataEntry.matrixSizes) matrixSizeArrays.push(dataEntry.matrixSizes);
+                        });
+                  });
+                  if(matrixSizeArrays) this.#f_visualiser.setSizeArrays(...matrixSizeArrays);
                   this.#f_visualiser.UpdateFromFields();
             }
       }

@@ -11,7 +11,9 @@ class SubMenu extends SubscriptionManager {
       get UNIQUEID() {return this.#UNIQUEID;}
       get ID() {return this.UNIQUEID;};
 
-      constructor(parentContainer, canvasCtx, updateFunction, headerText) {
+      constructor(parentContainer, canvasCtx, updateFunction, headerText, options = {
+            isRequired: true
+      }) {
             super();
             this.#canvasCtx = canvasCtx;
             this.#parentContainer = parentContainer;
@@ -27,7 +29,7 @@ class SubMenu extends SubscriptionManager {
                   let label = createLabel(this.UNIQUEID, "width:100%", this.contentContainer);
             }
 
-            this.#required = createCheckbox_Infield("Required", true, "width:97%", () => {this.Update();}, this.contentContainer, true);
+            this.#required = createCheckbox_Infield("Required", options.isRequired, "width:97%", () => {this.Update();}, this.contentContainer);
       }
 
       get ctx() {return this.#canvasCtx;}

@@ -129,7 +129,7 @@ class CreditSurchargeMenu extends LHSMenuWindow {
             await DeletePart(productNo, 1);
             console.log(this.creditSurchargeIncGst);
             await q_AddPart_CostPrice(productNo, 0, true, false, 1, parent.creditSurchargeIncGst, parent.creditSurchargeIncGst, "Credit card surcharge");
-            Ordui.Alert("done");
+            Toast.notify("done", 3000, {position: "top-right"});
       }
 
 }

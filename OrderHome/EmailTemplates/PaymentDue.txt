@@ -1,0 +1,70 @@
+<div style="font-family: Arial, Helvetica, sans-serif; color:#1a1a1a; line-height:1.45; font-size:14px;">
+  <p style="margin:0 0 14px 0;">Hi <%CustomerName%>,</p>
+
+  <p style="margin:0 0 14px 0;">
+    Please find attached <strong>{%InvoiceOrQuoteNumber%}</strong> with an outstanding balance for payment.
+  </p>
+
+  <div style="border:1px solid #d1d1d1ff;border-left:8px solid #ff0000ff; padding:12px 14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
+    <div style="font-size:13px; color:#555; margin:0 0 6px 0;">Amount due</div>
+    <div style="font-size:22px; font-weight:700; margin:0;">${%AmountDue%}</div>
+  </div>
+
+  <p style="margin:0 0 14px 0;">
+    Can you please arrange ASAP so we can keep your job moving without delays.
+  </p>
+
+  <div style="border:1px solid #d1d1d1; border-left:8px solid #ff0000; padding:14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
+  <p style="margin:0 0 12px 0; font-weight:700;">Payment options</p>
+
+  <!-- EFT BLOCK -->
+  <div style="border:1px solid #cfcfcf; background:#ffffff; border-radius:6px; padding:12px; margin:0 0 12px 0;">
+    <p style="margin:0 0 8px 0; font-weight:700;">EFT (Bank Transfer)</p>
+    <p style="margin:0;">
+      Account Name: <strong>{%AccountName%}</strong><br>
+      BSB: <strong>{%BSB%}</strong><br>
+      Account Number: <strong>{%AccountNumber%}</strong><br>
+      Reference: <strong>{%Reference%}</strong><br>
+      <span style="color:#555;">(Please use this reference so we can match your payment)</span>
+    </p>
+  </div>
+
+  <!-- CREDIT CARD BLOCK -->
+  <div style="border:1px solid #cfcfcf; background:#ffffff; border-radius:6px; padding:12px;">
+    <p style="margin:0 0 8px 0; font-weight:700;">Credit Card</p>
+    <p style="margin:0;">
+      We can take card payment over the phone or in person.<br>
+      <span style="color:#333;">(Card payments incur a {%CardSurcharge%}% surcharge.)</span>
+    </p>
+  </div>
+</div>
+
+  <p style="margin:0 0 14px 0;">
+    Need anything adjusted (PO number, split payment, updated invoice, etc.)? Reply here and we’ll sort it quickly.
+  </p>
+
+  <p>Kind Regards,<br>
+      <span id="salesperson-name">Pearl Cargill</span>
+</p>
+<p>
+      <span id="salesperson-phone">0439 972 409</span><br>
+      <span>Ph: 07 3804 3884</span><br>
+      <span id="salesperson-email">springwood@signarama.com.au</span><br>
+      <span>Signarama Springwood</span>
+</p>
+<p style="margin:0; font-family: Arial, sans-serif; font-size:14px; line-height:1.3;">
+  <span style="font-weight:700;">Google</span>
+  <span aria-label="Rated 4.9 out of 5 stars" title="4.9 out of 5">
+    <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
+    <span style="font-weight:700;">4.9</span>
+  </span>
+  <span style="color:#666;">(47 reviews)</span>
+</p>
+<img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/EmailFooter.jpg" style="width:100%;height:auto;max-width:400px;" width="300" height="76">
+
+  <hr style="border:none; border-top:1px solid #eaeaea; margin:18px 0;">
+  <p style="margin:0; font-size:12px; color:#777;">
+    This email relates to an outstanding balance for {%InvoiceOrQuoteNumber%}. If you believe this has been sent in error, please reply and let us know.
+  </p>
+
+</div>

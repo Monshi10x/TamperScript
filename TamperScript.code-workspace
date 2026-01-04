@@ -5,7 +5,10 @@
 			"path": "."
 		},
 		{
-			"path": "../TestCode"
+			"path": "../SignSchedulerServer2"
+		},
+		{
+			"path": "../SignScheduler"
 		}
 	],
 	"settings": {
@@ -76,6 +79,14 @@
 				"padding": "5px"
 		},{
 				"text": "overrideable",
+				"color": "#0051ff",
+				"fontStyle": "bold",
+				"fontWeight":"bold",
+				"backgroundColor": "#181818",
+				"overviewRulerColor": "grey",
+				"padding": "5px"
+		},{
+				"text": "overrides",
 				"color": "#0051ff",
 				"fontStyle": "bold",
 				"fontWeight":"bold",
@@ -250,6 +261,8 @@
 			]
 		},
 		"editor.fontFamily": "Consolas, 'Courier New', monospace",
-		"editor.fontSize": 12
+		"editor.fontSize": 12,
+		"liveServer.settings.multiRootWorkspaceName": "TamperScript",
+		"chatgpt.openOnStartup": true
 	}
 }

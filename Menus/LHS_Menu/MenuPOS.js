@@ -159,7 +159,7 @@ class MenuPOS extends LHSMenuWindow {
             await setProductSummary(productNo, this.Description());
             await setProductName(productNo, this.#f_typeDropdown[1].value);
 
-            Ordui.Alert("Done");
+            Toast.notify("Done", 3000, {position: "top-right"});
             return newPartIndex;
       }
       //catchNull(value, valueIfNull)

@@ -1797,15 +1797,16 @@ class TSVGMeasurement {
                   unit = "mm",
                   scale = 1,
                   precision = 0,
-                  arrowSize = 5,
-                  textOffset = 20,
+                  arrowSize = 30,
+                  textOffset = 100,
                   stroke = "#000",
                   lineWidth = 1,
                   fontSize = "12px",
-                  tickLength = 8,
+                  tickLength = 100,
                   handleRadius = 8,
                   offsetX = 0,
                   offsetY = 0,
+                  textBackgroundColor = null,
                   sideHint = null
             } = options;
 
@@ -1821,7 +1822,8 @@ class TSVGMeasurement {
                                     autoLabel, unit, scale, precision,
                                     arrowSize, textOffset, stroke, fontSize,
                                     tickLength, handleRadius, lineWidth,
-                                    sideHint
+                                    sideHint,
+                                    textBackgroundColor
                               }));
                         }
                   };
@@ -1862,6 +1864,8 @@ class TSVGMeasurement {
             this.fontSize = fontSize;
             this.tickLength = tickLength;
             this.handleRadius = handleRadius;
+            this.textBackgroundColor = textBackgroundColor;
+            this.textBackgroundFilterId = null;
 
             this.group = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
@@ -1897,11 +1901,54 @@ class TSVGMeasurement {
                   "alignment-baseline": this.getAlignmentBaseline(),
             });
 
+            if(this.textBackgroundColor) {
+                  this.textBackgroundFilterId = this.ensureTextBackgroundFilter(this.textBackgroundColor);
+                  if(this.textBackgroundFilterId) this.label.setAttribute("filter", `url(#${this.textBackgroundFilterId})`);
+            }
+
             this.group.append(this.line, this.arrowHead1, this.arrowHead2, this.tick1, this.tick2, this.label);
       }
 
       getTextAnchor() {
             return 'middle';
+      }
+
+      ensureTextBackgroundFilter(color) {
+            const svgRoot = this.group.ownerSVGElement || (this.svgElement instanceof SVGSVGElement ? this.svgElement : this.svgElement.ownerSVGElement);
+            if(!svgRoot) return null;
+
+            let defs = svgRoot.querySelector('defs');
+            if(!defs) {
+                  defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                  svgRoot.insertBefore(defs, svgRoot.firstChild);
+            }
+
+            const existing = defs.querySelector(`filter[data-tsvg-bg='${color}']`);
+            if(existing) return existing.id;
+
+            const filterId = `tsvg-text-bg-${TSVGMeasurement.idCounter++}`;
+            const filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+            filter.setAttribute("x", "0");
+            filter.setAttribute("y", "0");
+            filter.setAttribute("width", "1");
+            filter.setAttribute("height", "1");
+            filter.setAttribute("id", filterId);
+            filter.dataset.tsvgBg = color;
+
+            const flood = document.createElementNS("http://www.w3.org/2000/svg", "feFlood");
+            flood.setAttribute("flood-color", color);
+            flood.setAttribute("result", "bg");
+
+            const merge = document.createElementNS("http://www.w3.org/2000/svg", "feMerge");
+            const mergeNodeBg = document.createElementNS("http://www.w3.org/2000/svg", "feMergeNode");
+            mergeNodeBg.setAttribute("in", "bg");
+            const mergeNodeSource = document.createElementNS("http://www.w3.org/2000/svg", "feMergeNode");
+            mergeNodeSource.setAttribute("in", "SourceGraphic");
+            merge.append(mergeNodeBg, mergeNodeSource);
+
+            filter.append(flood, merge);
+            defs.appendChild(filter);
+            return filterId;
       }
 
       getAlignmentBaseline() {

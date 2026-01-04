@@ -7,29 +7,29 @@ class Menu3D extends LHSMenuWindow {
 
 
       /** @QuickTemplate */
-      #addQuickTemplateBtn;
+      addQuickTemplateBtn;
       #createProductBtn;
       /**
        * @Size
        */
       #sizeContainer;
-      #addSizeBtn;
+      addSizeBtn;
       #sizeArray = [];
       /**
        * @Sheet
        */
       #sheetContainer;
-      #addSheetBtn;
+      addSheetBtn;
       /**
        * @Vinyl
        */
       #vinylContainer;
-      #addVinylBtn;
+      addVinylBtn;
       /**
        * @Laminate
        */
       #laminateContainer;
-      #addLaminateBtn;
+      addLaminateBtn;
       /**
        * @AppTape
        */
@@ -39,7 +39,7 @@ class Menu3D extends LHSMenuWindow {
        * @HandTrimming
        */
       #handTrimmingContainer;
-      #addHandTrimmingBtn;
+      addHandTrimmingBtn;
       /**
        * @PrintMounting
        */
@@ -50,19 +50,19 @@ class Menu3D extends LHSMenuWindow {
        */
       #production;
       #productionContainer;
-      #addProductionBtn;
+      addProductionBtn;
       /**
        * @Artwork
        */
       #artwork;
       #artworkContainer;
-      #addArtworkBtn;
+      addArtworkBtn;
       /**
        * @Install
        */
       #install;
       #installContainer;
-      #addInstallBtn;
+      addInstallBtn;
       /**
        * @AllMaterialsArray
        */
@@ -112,25 +112,25 @@ class Menu3D extends LHSMenuWindow {
             document.addEventListener("loadedPredefinedParts", () => {
                   /*
                   ToggleOpen */
-                  let toggleOpenBtn = createButton("Open All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllOpen();}, this.page1);
+                  let toggleOpenBtn = createButton("Open All", "width:20%;height:40px;margin:0px;", () => {this.toggleAllOpen();}, this.page1);
                   /*
                   ToggleClosed */
-                  let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllClosed();}, this.page1);
+                  let toggleClosedBtn = createButton("Close All", "width:20%;height:40px;margin:0px;", () => {this.toggleAllClosed();}, this.page1);
 
-                  this.#addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
+                  this.addQuickTemplateBtn = createDropdown_Infield_Icons_Search("Add Quick Template Product", 0, "width:40%;height:35px;margin:0px;box-sizing:border-box;", 150, false,
                         this.quickTemplates,
-                        () => {this.#addQuickTemplate();},
+                        () => {this.addQuickTemplate();},
                         this.page1, false
                   );
 
-                  this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.#updateViewMode();}, this.page1);
+                  this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.updateViewMode();}, this.page1);
             });
 
             this.#createProductBtn = createButton("Create Product   " + "\u25BA", "width:100%;margin:0px;", () => {this.CreateProduct(this);});
             this.footer.appendChild(this.#createProductBtn);
       }
 
-      #addQuickTemplate() {
+      addQuickTemplate() {
             this.#numProducts++;
 
             let productDetails = null;
@@ -151,346 +151,412 @@ class Menu3D extends LHSMenuWindow {
             let artwork = null;
             let install = null;
 
-            switch(this.#addQuickTemplateBtn[1].value) {
+            switch(this.addQuickTemplateBtn[1].value) {
                   case "3D Non-lit Letters":
-                        productDetails = this.#add(ProductDetails, this.page1, []);
-                        productDetails.productLocation = "";
-                        productDetails.productName = "3D Fabricated Non-lit Letters";
+                        productDetails = this.add(ProductDetails, this.page1, [], {
+                              propertiesToAssign: {
+                                    productName: "3D Fabricated Non-lit Letters"
+                              }
+                        });
 
-                        svgCutfile = this.#add(SVGCutfile, this.page1, []);
+                        svgCutfile = this.add(SVGCutfile, this.page1, []);
 
-                        coil = this.#add(Coil, this.page1, [SVGCutfile]);
+                        coil = this.add(Coil, this.page1, [SVGCutfile]);
 
-                        production = this.#add(ProductionSubscribable, this.page1, [Coil]);
-                        production.typeLabel = "LASER WELD PRODUCTION";
+                        production = this.add(ProductionSubscribable, this.page1, [Coil], {
+                              propertiesToAssign: {
+                                    typeLabel: "LASER WELD PRODUCTION"
+                              }
+                        });
                         production.showRequiresInputTag(true);
 
-                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Stainless";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", thickness: "1.2mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "STAINLESS SHEET";
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Stainless",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    sheetPerimeterIsCut: false,
+                                    typeLabel: "STAINLESS SHEET"
+                              }
+                        });
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", thickness: "1.2", profile: "Cut Through", quality: "Good Quality"});
 
-                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Foamed PVC";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Foamed PVC - (sqm) - 2440x1220x10.0 Matte White (Signex Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Foamed PVC", thickness: "10mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "CELUKA SHEET";
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Foamed PVC",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Foamed PVC - (sqm) - 2440x1220x10 Matte White (Signex Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    sheetPerimeterIsCut: false,
+                                    typeLabel: "CELUKA SHEET"
+                              }
+                        });
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Foamed PVC", thickness: "10", profile: "Cut Through", quality: "Good Quality"});
 
-                        sheet = this.#add(Sheet, this.page1, [svgCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Corflute";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "CORFLUTE POUNCE";
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Corflute",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Corflute - (sqm) - 2440x1220x3 Matte White (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    useOverallSVGSize: true,
+                                    typeLabel: "CORFLUTE POUNCE",
+                              }
+                        });
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
 
-                        painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
-                        painting.UPDATES_PAUSED = true;
-                        painting.formula = "Fabricated NON-LIT Letters";
-                        painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
-                        painting.UPDATES_PAUSED = false;
+                        painting = this.add(Painting, this.page1, [SVGCutfile, Coil], {
+                              propertiesToAssign: {
+                                    formula: "Fabricated NON-LIT Letters",
+                                    numberOfCoats: "x3 (2K for Raw Metals Alum/Steel/Stainless...)"
+                              }
+                        });
 
-                        artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+                        artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;
-                        install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+                        install = this.add(InstallSubscribable, this.page1, [Sheet]);
                         break;
                   case "3D Front-lit Letters":
-                        productDetails = this.#add(ProductDetails, this.page1, []);
-                        productDetails.productLocation = "";
-                        productDetails.productName = "3D Fabricated Front-lit Letters";
+                        productDetails = this.add(ProductDetails, this.page1, [], {
+                              propertiesToAssign: {
+                                    productName: "3D Fabricated Front-lit Letters"
+                              }
+                        });
 
-                        svgCutfile = this.#add(SVGCutfile, this.page1, []);
+                        svgCutfile = this.add(SVGCutfile, this.page1, []);
 
-                        coil = this.#add(Coil, this.page1, [SVGCutfile]);
+                        coil = this.add(Coil, this.page1, [SVGCutfile]);
 
-                        production = this.#add(ProductionSubscribable, this.page1, [Coil]);
-                        production.typeLabel = "LASER WELD PRODUCTION";
+                        production = this.add(ProductionSubscribable, this.page1, [Coil], {
+                              propertiesToAssign: {
+                                    typeLabel: "LASER WELD PRODUCTION"
+                              }
+                        });
                         production.showRequiresInputTag(true);
 
-                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Stainless";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", thickness: "1.2mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "STAINLESS SHEET";
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Stainless",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    sheetPerimeterIsCut: false,
+                                    typeLabel: "STAINLESS SHEET"
+                              }
+                        });
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", thickness: "1.2", profile: "Cut Through", quality: "Good Quality"});
 
-                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Acrylic";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10mm", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "OPAL FACE SHEET";
-
-                        led = this.#add(LED, this.page1, [SVGCutfile]);
-                        led.UPDATES_PAUSED = true;
-                        led.formula = "3D Letters 100D - 200 per m2";
-                        led.material = "LED Module - 6500K 1.08W 5yr 175deg 12V";
-                        led.UPDATES_PAUSED = false;
-
-                        sheet = this.#add(Sheet, this.page1, [svgCutfile, led]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "ACM";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "2mm", profile: "Cut Through", quality: "Fast"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "ACM for LEDs";
-
-                        transformer = this.#add(Transformer, this.page1, [LED]);
-
-                        sheet = this.#add(Sheet, this.page1, [svgCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Corflute";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "CORFLUTE POUNCE";
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Acrylic",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    sheetPerimeterIsCut: false,
+                                    typeLabel: "OPAL FACE SHEET"
+                              }
+                        });
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
 
 
-                        painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
-                        painting.UPDATES_PAUSED = true;
-                        painting.formula = "Fabricated FRONT-LIT Letters";
-                        painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
-                        painting.UPDATES_PAUSED = false;
+                        led = this.add(LED, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    formula: "3D Letters 100D - 200 per m2",
+                                    material: "LED Module - 6500K 1.08W 5yr 175deg 12V"
+                              }
+                        });
 
-                        artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+                        sheet = this.add(Sheet, this.page1, [svgCutfile, led], {
+                              propertiesToAssign: {
+                                    material: "ACM",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    typeLabel: "ACM for LEDs",
+                                    sheetPerimeterIsCut: false
+                              }
+                        });
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "2", profile: "Cut Through", quality: "Fast"});
+
+                        transformer = this.add(Transformer, this.page1, [LED]);
+
+                        sheet = this.add(Sheet, this.page1, [svgCutfile], {
+                              propertiesToAssign: {
+                                    material: "Corflute",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Corflute - (sqm) - 2440x1220x3 Matte White (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    useOverallSVGSize: true,
+                                    typeLabel: "CORFLUTE POUNCE"
+                              }
+                        });
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+
+
+                        painting = this.add(Painting, this.page1, [SVGCutfile, Coil], {
+                              propertiesToAssign: {
+                                    formula: "Fabricated FRONT-LIT Letters",
+                                    numberOfCoats: "x3 (2K for Raw Metals Alum/Steel/Stainless...)"
+                              }
+                        });
+
+                        artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;
-                        install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+                        install = this.add(InstallSubscribable, this.page1, [Sheet]);
                         break;
                   case "3D Halo-lit Letters":
-                        productDetails = this.#add(ProductDetails, this.page1, []);
-                        productDetails.productLocation = "";
-                        productDetails.productName = "3D Fabricated Halo-lit Letters";
+                        productDetails = this.add(ProductDetails, this.page1, [], {
+                              propertiesToAssign: {
+                                    productName: "3D Fabricated Halo-lit Letters"
+                              }
+                        });
 
-                        svgCutfile = this.#add(SVGCutfile, this.page1, []);
+                        svgCutfile = this.add(SVGCutfile, this.page1, []);
 
-                        coil = this.#add(Coil, this.page1, [SVGCutfile]);
+                        coil = this.add(Coil, this.page1, [SVGCutfile]);
 
-                        production = this.#add(ProductionSubscribable, this.page1, [Coil]);
-                        production.typeLabel = "LASER WELD PRODUCTION";
+                        production = this.add(ProductionSubscribable, this.page1, [Coil], {
+                              propertiesToAssign: {
+                                    typeLabel: "LASER WELD PRODUCTION"
+                              }
+                        });
                         production.showRequiresInputTag(true);
 
-                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Stainless";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", thickness: "1.2mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "STAINLESS SHEET";
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Stainless",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Stainless - (sqm) - 2440x1220x1.2 2B (Vulcan)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    sheetPerimeterIsCut: false,
+                                    typeLabel: "STAINLESS SHEET"
+                              }
+                        });
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Stainless", thickness: "1.2", profile: "Cut Through", quality: "Good Quality"});
 
-                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Acrylic";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10mm", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "OPAL BACK SHEET";
 
-                        led = this.#add(LED, this.page1, [SVGCutfile]);
-                        led.UPDATES_PAUSED = true;
-                        led.formula = "3D Letters 100D - 200 per m2";
-                        led.material = "LED Module - 6500K 1.08W 5yr 175deg 12V";
-                        led.UPDATES_PAUSED = false;
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Acrylic",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    sheetPerimeterIsCut: false,
+                                    typeLabel: "OPAL BACK SHEET"
+                              }
+                        });
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10", profile: "Opal Cut Through And Rebate", quality: "Good Quality"});
 
-                        sheet = this.#add(Sheet, this.page1, [svgCutfile, led]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "ACM";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "2mm", profile: "Cut Through", quality: "Fast"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "ACM for LEDs";
+                        led = this.add(LED, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    formula: "3D Letters 100D - 200 per m2",
+                                    material: "LED Module - 6500K 1.08W 5yr 175deg 12V"
+                              }
+                        });
 
-                        transformer = this.#add(Transformer, this.page1, [LED]);
+                        sheet = this.add(Sheet, this.page1, [svgCutfile, led], {
+                              propertiesToAssign: {
+                                    material: "ACM",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    typeLabel: "ACM for LEDs",
+                                    sheetPerimeterIsCut: false
+                              }
+                        });
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "2", profile: "Cut Through", quality: "Fast"});
 
-                        sheet = this.#add(Sheet, this.page1, [svgCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Corflute";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "CORFLUTE POUNCE";
+                        transformer = this.add(Transformer, this.page1, [LED]);
 
-                        painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
-                        painting.UPDATES_PAUSED = true;
-                        painting.formula = "Fabricated BACK-LIT Letters";
-                        painting.numberOfCoats = "x3 (2K for Raw Metals Alum/Steel/Stainless...)";
-                        painting.UPDATES_PAUSED = false;
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Corflute",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Corflute - (sqm) - 2440x1220x3 Matte White (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    useOverallSVGSize: true,
+                                    typeLabel: "CORFLUTE POUNCE",
+                              }
+                        });
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
 
-                        artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+
+                        painting = this.add(Painting, this.page1, [SVGCutfile, Coil], {
+                              propertiesToAssign: {
+                                    formula: "Fabricated BACK-LIT Letters",
+                                    numberOfCoats: "x3 (2K for Raw Metals Alum/Steel/Stainless...)"
+                              }
+                        });
+
+                        artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;
-                        install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+                        install = this.add(InstallSubscribable, this.page1, [Sheet]);
                         break;
                   case "3D 10mm Acrylic Letters":
-                        productDetails = this.#add(ProductDetails, this.page1, []);
-                        productDetails.productLocation = "";
-                        productDetails.productName = "3D 10mm Acrylic Letters";
+                        productDetails = this.add(ProductDetails, this.page1, [], {
+                              propertiesToAssign: {
+                                    productName: "3D 10mm Acrylic Letters"
+                              }
+                        });
 
-                        svgCutfile = this.#add(SVGCutfile, this.page1, []);
+                        svgCutfile = this.add(SVGCutfile, this.page1, []);
 
-                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Acrylic";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.thickness = "10";
-                        sheet.sheetMaterial = "Acrylic - (sqm) - White/Black 2440x1220x10 (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.setCuttingMachine("laser");
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10mm", profile: "Cut Through", quality: "Glossy Edge"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "ACRYLIC SHEET";
 
-                        sheet = this.#add(Sheet, this.page1, [svgCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Corflute";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "CORFLUTE POUNCE";
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Acrylic",
+                                    sheetSize: "2440x1220",
+                                    thickness: "10",
+                                    sheetMaterial: "Acrylic - (sqm) - White/Black 2440x1220x10 (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    preferredCuttingMachine: "laser",
+                                    sheetPerimeterIsCut: false,
+                                    typeLabel: "ACRYLIC SHEET"
+                              }
+                        });
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10", profile: "Cut Through", quality: "Glossy Edge"});
 
-                        painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
-                        painting.UPDATES_PAUSED = true;
-                        painting.formula = "10-20mmD Letters";
-                        painting.numberOfCoats = "x2 (2K for Acrylic/ACM)";
-                        painting.UPDATES_PAUSED = false;
 
-                        artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+                        sheet = this.add(Sheet, this.page1, [svgCutfile], {
+                              propertiesToAssign: {
+                                    material: "Corflute",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Corflute - (sqm) - 2440x1220x3 Matte White (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    useOverallSVGSize: true,
+                                    typeLabel: "CORFLUTE POUNCE"
+                              }
+                        });
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+
+
+                        painting = this.add(Painting, this.page1, [SVGCutfile, Coil], {
+                              propertiesToAssign: {
+                                    formula: "10-20mmD Letters",
+                                    numberOfCoats: "x2 (2K for Acrylic/ACM)"
+                              }
+                        });
+
+                        artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;
-                        install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+                        install = this.add(InstallSubscribable, this.page1, [Sheet]);
                         break;
                   case "3D 20mm Acrylic Letters":
-                        productDetails = this.#add(ProductDetails, this.page1, []);
-                        productDetails.productLocation = "";
-                        productDetails.productName = "3D 20mm Acrylic Letters";
+                        productDetails = this.add(ProductDetails, this.page1, [], {
+                              propertiesToAssign: {
+                                    productName: "3D 20mm Acrylic Letters"
+                              }
+                        });
 
-                        svgCutfile = this.#add(SVGCutfile, this.page1, []);
+                        svgCutfile = this.add(SVGCutfile, this.page1, []);
 
-                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Acrylic";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.thickness = "20";
-                        sheet.sheetMaterial = "Acrylic - (sqm) - White/Black 2440x1220x20 (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.setCuttingMachine("laser");
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "20mm", profile: "Cut Through", quality: "Glossy Edge"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "ACRYLIC SHEET";
 
-                        sheet = this.#add(Sheet, this.page1, [svgCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Corflute";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "CORFLUTE POUNCE";
+                        sheet = this.add(Sheet, this.page1, [SVGCutfile], {
+                              propertiesToAssign: {
+                                    material: "Acrylic",
+                                    sheetSize: "2440x1220",
+                                    thickness: "20",
+                                    sheetMaterial: "Acrylic - (sqm) - White/Black 2440x1220x20 (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    preferredCuttingMachine: "laser",
+                                    sheetPerimeterIsCut: false,
+                                    typeLabel: "ACRYLIC SHEET"
+                              }
+                        });
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "20", profile: "Cut Through", quality: "Glossy Edge"});
 
-                        painting = this.#add(Painting, this.page1, [SVGCutfile, Coil]);
-                        painting.UPDATES_PAUSED = true;
-                        painting.formula = "10-20mmD Letters";
-                        painting.numberOfCoats = "x2 (2K for Acrylic/ACM)";
-                        painting.UPDATES_PAUSED = false;
 
-                        artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+                        sheet = this.add(Sheet, this.page1, [svgCutfile], {
+                              propertiesToAssign: {
+                                    material: "Corflute",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Corflute - (sqm) - 2440x1220x3 Matte White (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    useOverallSVGSize: true,
+                                    typeLabel: "CORFLUTE POUNCE"
+                              }
+                        });
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+
+
+                        painting = this.add(Painting, this.page1, [SVGCutfile, Coil], {
+                              propertiesToAssign: {
+                                    formula: "10-20mmD Letters",
+                                    numberOfCoats: "x2 (2K for Acrylic/ACM)"
+                              }
+                        });
+
+                        artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;
-                        install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+                        install = this.add(InstallSubscribable, this.page1, [Sheet]);
                         break;
                   case "2D Cut ACM Letters":
-                        productDetails = this.#add(ProductDetails, this.page1, []);
-                        productDetails.productLocation = "";
-                        productDetails.productName = "2D Cut ACM Letters";
+                        productDetails = this.add(ProductDetails, this.page1, [], {
+                              propertiesToAssign: {
+                                    productName: "2D Cut ACM Letters"
+                              }
+                        });
 
-                        svgCutfile = this.#add(SVGCutfile, this.page1, []);
+                        svgCutfile = this.add(SVGCutfile, this.page1, []);
 
-                        sheet = this.#add(Sheet, this.page1, [SVGCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "ACM";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.thickness = "3x0.21";
-                        sheet.sheetMaterial = "ACM - (sqm) - 2440x1220x3x0.21 White Satin/Gloss (Mulfords)";
-                        sheet.setCuttingMachine("router");
-                        sheet.sheetPerimeterIsCut = false;
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "ACM SHEET";
+                        sheet = this.add(Sheet, this.page1, [svgCutfile], {
+                              propertiesToAssign: {
+                                    material: "ACM",
+                                    sheetSize: "2440x1220",
+                                    thickness: "3x0.21",
+                                    sheetMaterial: "ACM - (sqm) - 2440x1220x3x0.21 White Satin/Gloss (Mulfords)",
+                                    preferredCuttingMachine: "router",
+                                    sheetPerimeterIsCut: false,
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    typeLabel: "ACM SHEET"
+                              }
+                        });
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
 
-                        sheet = this.#add(Sheet, this.page1, [svgCutfile]);
-                        sheet.UPDATES_PAUSED = true;
-                        sheet.material = "Corflute";
-                        sheet.sheetSize = "2440x1220";
-                        sheet.sheetMaterial = "Corflute - (sqm) - 2440x1220x3.0 Matte White (Mulfords)";
-                        sheet.joinMethod = Sheet.joinMethod["Full Sheet + Offcut"];
-                        sheet.useOverallSVGSize = true;
-                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"});
-                        sheet.UPDATES_PAUSED = false;
-                        sheet.typeLabel = "CORFLUTE POUNCE";
+                        sheet = this.add(Sheet, this.page1, [svgCutfile], {
+                              propertiesToAssign: {
+                                    material: "Corflute",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Corflute - (sqm) - 2440x1220x3 Matte White (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    useOverallSVGSize: true,
+                                    typeLabel: "CORFLUTE POUNCE"
+                              }
+                        });
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
 
-                        artwork = this.#add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+
+                        artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;
-                        install = this.#add(InstallSubscribable, this.page1, [Sheet]);
+                        install = this.add(InstallSubscribable, this.page1, [Sheet]);
                         break;
                   default:
                         break;
             }
-            this.#updateViewMode();
+            this.updateViewMode();
       }
 
-      #add(classType, container, subscribeTo = []) {
-            let newItem = new classType(container, this);
-            newItem.productNumber = this.#getProductNumber();
+      add(classType, container, subscribeTo = [], options = {
+            UPDATES_PAUSED: true,
+            propertiesToAssign: {
+                  //material: "ACM",
+                  //sheetSize: "2440x1220",
+                  //sheetMaterial: "ACM - (sqm) - 2440x1220x3x0.21 Primer/Primer (Mulfords)",
+                  //typeLabel: "ACM SHEET"
+            },
+            itemUpdateOnCompletion: true
+      }) {
+            let newItem = new classType(container, this, options);
+            newItem.productNumber = this.getProductNumber();
+
+            Object.assign(newItem, options.propertiesToAssign);
 
             for(let sub of subscribeTo) {
                   if(typeof sub === 'function') {
@@ -509,21 +575,27 @@ class Menu3D extends LHSMenuWindow {
                   }
             }
 
+            if(options.itemUpdateOnCompletion) {
+                  newItem.UPDATES_PAUSED = false;
+                  newItem.UpdateFromFields();
+            }
+
             this.#allMaterials.push(newItem);
-            this.#UpdateFromFields();
+            this.UpdateFromFields();
+
             return newItem;
       }
 
-      #addBlank(classType, container, options = {productNumber: null}) {
+      addBlank(classType, container, options = {productNumber: null}) {
             let newItem = new classType(container, this);
             if(options.productNumber != null) newItem.productNumber = options.productNumber;
 
             this.#allMaterials.push(newItem);
 
-            this.#UpdateFromFields();
+            this.UpdateFromFields();
       }
 
-      #getProductNumber() {
+      getProductNumber() {
             return this.#numProducts;
       }
 
@@ -537,7 +609,7 @@ class Menu3D extends LHSMenuWindow {
                         break;
                   }
             }
-            this.#UpdateFromFields();
+            this.UpdateFromFields();
       }
 
       DeleteProduct(productNumber) {
@@ -550,7 +622,7 @@ class Menu3D extends LHSMenuWindow {
                   }
             }
             this.#numProducts--;
-            this.#updateViewMode();
+            this.updateViewMode();
       }
 
       DeleteProductsAll() {
@@ -559,9 +631,9 @@ class Menu3D extends LHSMenuWindow {
             }
       }
 
-      #UpdateFromFields() { }
+      UpdateFromFields() { }
 
-      #toggleAllOpen() {
+      toggleAllOpen() {
             for(let i = 0; i < this.#containers.length; i++) {
                   this.#containers[i].Maximize();
             }
@@ -570,7 +642,7 @@ class Menu3D extends LHSMenuWindow {
             }
       }
 
-      #toggleAllClosed() {
+      toggleAllClosed() {
             for(let i = 0; i < this.#containers.length; i++) {
                   this.#containers[i].Minimize();
             }
@@ -579,7 +651,7 @@ class Menu3D extends LHSMenuWindow {
             }
       }
 
-      #updateViewMode() {
+      updateViewMode() {
             for(let i = 0; i < this.#productContainers.length; i++) {
                   deleteElement(this.#productContainers[i].container);
             }
@@ -595,7 +667,7 @@ class Menu3D extends LHSMenuWindow {
 
                         this.#containers.push(UIContainer);
                         let addBtn = createButton("Add +", "width:100px;min-height:30px;margin:0px;border:0px;", () => {
-                              this.#addBlank(this.#creationOrder[i], this.#containers[i].contentContainer);
+                              this.addBlank(this.#creationOrder[i], this.#containers[i].contentContainer);
                         }, null);
                         UIContainer.addHeadingButtons(addBtn);
                   }
@@ -636,12 +708,21 @@ class Menu3D extends LHSMenuWindow {
                               this.DeleteProduct(currentProductNumber);
                         }, null));
 
-                        let dropdown = createDropdown("Add", 0, "width:200px;height:30px;margin:0px;border:none;padding:0px;min-height:30px;float:right;", this.#creationOrder.map((item) => {
-                              return createDropdownOption(item.name, item.name);
-                        }), () => {
-                              this.#addBlank(this.#creationOrder.filter((item) => item.name == dropdown.value)[0], newProductContainer.contentContainer, {productNumber: uniqueProductNumbers[i]});
+                        const dropdown = new TDropdown({
+                              label: 'Add Component',
+                              defaultValue: '',
+                              options:
+                                    this.#creationOrder.map((item) => {
+                                          return {label: item.name, value: item.name, img: 'https://raw.githubusercontent.com/Monshi10x/TamperScript/refs/heads/main/Images/Icon-Component.svg'};
+                                    }),
+                              parent: null,
+                              onChange: (val) => {
+                                    if(val != "") {
+                                          this.addBlank(this.#creationOrder.filter((item) => item.name == val)[0], newProductContainer.contentContainer, {productNumber: uniqueProductNumbers[i]});
+                                    }
+                              }
                         });
-                        newProductContainer.addHeadingButtons(dropdown);
+                        newProductContainer.addHeadingButtons(dropdown.wrapper);
 
                         //add items to it
                         for(let j = 0; j < this.#allMaterials.length; j++) {
@@ -660,6 +741,7 @@ class Menu3D extends LHSMenuWindow {
                               swapThreshold: 1,
                               ghostClass: 'sortable-ghost',
                               direction: 'vertical',
+                              handle: ".sortableHandle"
                         });
                   }
             } else if(this.#viewMode[1].value == "Per Type2") {
@@ -673,7 +755,7 @@ class Menu3D extends LHSMenuWindow {
                         UIContainer.contentContainer = d[1];
                         this.#containers.push(UIContainer);
                         let addBtn = createButton("+", "width:50px;min-height:100%;margin:0px;border:0px;", () => {
-                              this.#addBlank(this.#creationOrder[i], this.#containers[i].contentContainer);
+                              this.addBlank(this.#creationOrder[i], this.#containers[i].contentContainer);
                         }, UIContainer.contentContainer);
                   }
                   for(let x = 0; x < this.#containers.length; x++) {
@@ -725,12 +807,12 @@ class Menu3D extends LHSMenuWindow {
                         partIndex = await item.Create(productNo, partIndex);
                         if(item.Description() != "") productDescription += item.Description() + "<br>";
                   }
-
+                 
                   await setProductSummary(productNo, productDescription);
                   productDescription = "";
             }
 
-            Ordui.Alert("done");
+            Toast.notify("done", 3000, {position: "top-right"});
       }
 
       hide() {

@@ -151,6 +151,7 @@ class Size extends SubscriptionManager {
 
       #typeLabel;
       get typeLabel() {return this.#typeLabel;}
+      #f_subscriptionNode;
 
       #subscribedToLabel;
       get inheritedRowSizeLabel() {return this.#subscribedToLabel;}
@@ -163,6 +164,7 @@ class Size extends SubscriptionManager {
       #includeSizeInDescription = false;
       #showIDInContainer = true;
       #rowName;
+      #grabHandle;
       #lhsMenuWindow;
       #backgroundColor = COLOUR.BrightGreen;
       get backgroundColor() {return this.#backgroundColor;}
@@ -200,10 +202,12 @@ class Size extends SubscriptionManager {
       #dataForSubscribers = [];
       #matrixSizes = [];
 
-      constructor(parentContainer, lhsMenuWindow) {
+      constructor(parentContainer, lhsMenuWindow, options = {UPDATES_PAUSED: false}) {
             super();
             if(!lhsMenuWindow instanceof LHSMenuWindow) throw new Error('Parameter 2 must be an instance of LHSMenuWindow');
             this.#lhsMenuWindow = lhsMenuWindow;
+
+            this.UPDATES_PAUSED = options.UPDATES_PAUSED;
 
             this.#container = document.createElement("div");
             this.#container.style =
@@ -217,6 +221,22 @@ class Size extends SubscriptionManager {
                   $(this).css("box-shadow", "rgba(0, 0, 0, 0.8) 3px 4px 10px 0px");
             });
 
+            this.#grabHandle = document.createElement("div");
+            this.#grabHandle.style = `display:block;width:24px;height:40px;background-color:${COLOUR.DarkGrey};padding:0px;margin:0px;float:left;`;
+            this.#grabHandle.className = "sortableHandle";
+            // Icon
+            const icon = document.createElement('div');
+            icon.textContent = '⋮⋮'; // vertical grip dots
+            icon.style.fontSize = '20px';
+            icon.style.lineHeight = '40px';
+            icon.style.color = 'white';
+            icon.style.textAlign = 'center';
+            icon.style.marginTop = '0px';
+            icon.style.pointerEvents = 'none'; // important for SortableJS
+
+            this.#grabHandle.appendChild(icon);
+            this.#container.appendChild(this.#grabHandle);
+
             this.#productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
                         this.productNumber = modal.value;
@@ -227,6 +247,31 @@ class Size extends SubscriptionManager {
             }, this.#container);
 
             this.#typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;position:relative;border:1px solid " + this.#backgroundColor + ";", this.#container);
+
+            this.#f_subscriptionNode = new TNode(this.#container,
+                  {
+                        nodeType: "subscriptionNode",
+                        overrideCssStyle: {backgroundColor: "#469a8fff", height: '30px', width: '30px', margin: "4px", float: "left"},
+                        canAcceptNodes: true,
+                        icon: "https://raw.githubusercontent.com/Monshi10x/TamperScript/refs/heads/main/Images/Icon-Network.svg",
+                        onAcceptDrop: ({node, target}) => {
+                              for(let i = 0; i < this.#lhsMenuWindow.allMaterials.length; i++) {
+                                    //1. Find the matching target element class
+                                    if(target.getAttribute("data-subscription-id") == this.#lhsMenuWindow.allMaterials[i].ID) {
+                                          //2. Ensure the target does not subscribe to this (circular)
+                                          if(this.#lhsMenuWindow.allMaterials[i].isSubscribedTo(this)) {
+                                                Toast.error("Circular Subscriptions not allowed", 4000);
+                                                return;
+                                          };
+
+                                          return this.SubscribeTo(this.#lhsMenuWindow.allMaterials[i]);
+                                    }
+                              }
+                        }
+                  });
+            this.#f_subscriptionNode.el.classList.add("TNodeAccept");
+            this.#f_subscriptionNode.el.dataset.acceptTypes = "subscriptionNode";
+            this.#f_subscriptionNode.el.dataset.subscriptionId = this.ID;
 
             this.#qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#container, true, 1);
 
@@ -259,7 +304,9 @@ class Size extends SubscriptionManager {
             this.UpdateDataForSubscribers();
       }
 
-      UpdateFromFields() {
+      /*overrides*/UpdateFromFields() {
+            if(this.UPDATES_PAUSED) return;
+
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();
       }
@@ -287,8 +334,11 @@ class Size extends SubscriptionManager {
                   let returnedSizes = arg1_returnedSizes[0];
                   for(let i = 0; i < Object.keys(returnedSizes).length; i++) {
                         if(returnedSizes[Object.keys(returnedSizes)[i]]["show"] === true) {
+                              this.UPDATES_PAUSED = true;
                               $(this.#width[1]).val(parseFloat(returnedSizes[Object.keys(returnedSizes)[i]]["width"])).change();
                               $(this.#height[1]).val(parseFloat(returnedSizes[Object.keys(returnedSizes)[i]]["height"])).change();
+                              this.UPDATES_PAUSED = false;
+                              this.UpdateFromFields();
                               break;
                         }
                   }

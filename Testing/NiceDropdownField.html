@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Floating Image Select with Search + Blank</title>
+  <title>TDropdown Floating Image Select</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -10,14 +10,14 @@
       background: #f9f9f9;
     }
 
-    .floating-image-select-wrapper {
+    .TDropdown-wrapper {
       position: relative;
       width: 300px;
       margin-top: 40px;
       user-select: none;
     }
 
-    .floating-select-display {
+    .TDropdown-display {
       width: 100%;
       padding: 12px;
       padding-right: 40px;
@@ -33,7 +33,7 @@
       gap: 8px;
     }
 
-    .floating-select-label {
+    .TDropdown-label {
       position: absolute;
       top: 16px;
       left: 12px;
@@ -45,15 +45,15 @@
       pointer-events: none;
     }
 
-    .floating-image-select-wrapper.open .floating-select-label,
-    .floating-image-select-wrapper.selected .floating-select-label {
+    .TDropdown-wrapper.open .TDropdown-label,
+    .TDropdown-wrapper.selected .TDropdown-label {
       top: -10px;
       left: 10px;
       font-size: 12px;
       color: #6a0dad;
     }
 
-    .dropdown-arrow {
+    .TDropdown-arrow {
       position: absolute;
       top: 50%;
       right: 12px;
@@ -64,11 +64,11 @@
       transition: transform 0.2s ease;
     }
 
-    .floating-image-select-wrapper.open .dropdown-arrow {
+    .TDropdown-wrapper.open .TDropdown-arrow {
       transform: translateY(-50%) rotate(180deg);
     }
 
-    .dropdown-list {
+    .TDropdown-list {
       position: absolute;
       top: 100%;
       left: 0;
@@ -82,7 +82,7 @@
       box-sizing: border-box;
     }
 
-    .dropdown-search {
+    .TDropdown-search {
       width: 100%;
       padding: 8px 10px;
       border: none;
@@ -92,7 +92,7 @@
       outline: none;
     }
 
-    .dropdown-item {
+    .TDropdown-item {
       display: flex;
       align-items: center;
       padding: 8px 12px;
@@ -102,18 +102,18 @@
       gap: 8px;
     }
 
-    .dropdown-item:hover {
+    .TDropdown-item:hover {
       background: #f0e6ff;
     }
 
-    .dropdown-item img {
+    .TDropdown-item img {
       width: 50px;
       height: 50px;
       object-fit: contain;
       flex-shrink: 0;
     }
 
-    .reset-button {
+    .TDropdown-reset {
       position: absolute;
       top: 12px;
       right: 36px;
@@ -129,7 +129,7 @@
       transition: background 0.2s ease;
     }
 
-    .reset-button:hover {
+    .TDropdown-reset:hover {
       background: #4e078c;
     }
   </style>
@@ -146,30 +146,30 @@
         this.onChange = onChange;
 
         this.wrapper = document.createElement('div');
-        this.wrapper.className = 'floating-image-select-wrapper';
+        this.wrapper.className = 'TDropdown-wrapper';
 
         this.display = document.createElement('div');
-        this.display.className = 'floating-select-display';
+        this.display.className = 'TDropdown-display';
         this.display.tabIndex = 0;
 
         this.label = document.createElement('label');
-        this.label.className = 'floating-select-label';
+        this.label.className = 'TDropdown-label';
         this.label.innerText = label;
 
         this.arrow = document.createElement('div');
-        this.arrow.className = 'dropdown-arrow';
+        this.arrow.className = 'TDropdown-arrow';
         this.arrow.innerHTML = '&#9660;';
 
         this.resetBtn = document.createElement('div');
-        this.resetBtn.className = 'reset-button';
+        this.resetBtn.className = 'TDropdown-reset';
         this.resetBtn.innerHTML = '&#8634;';
 
         this.list = document.createElement('div');
-        this.list.className = 'dropdown-list';
+        this.list.className = 'TDropdown-list';
         this.list.style.display = 'none';
 
         this.searchInput = document.createElement('input');
-        this.searchInput.className = 'dropdown-search';
+        this.searchInput.className = 'TDropdown-search';
         this.searchInput.placeholder = 'Search...';
         this.list.appendChild(this.searchInput);
 
@@ -190,7 +190,7 @@
         this.display.addEventListener('click', () => this.toggle());
         this.resetBtn.addEventListener('click', () => this.setValue(this.defaultValue));
 
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', e => {
           if (!this.wrapper.contains(e.target)) this.close();
         });
 
@@ -208,7 +208,7 @@
         this.itemContainer.innerHTML = '';
         this.filteredOptions.forEach(opt => {
           const item = document.createElement('div');
-          item.className = 'dropdown-item';
+          item.className = 'TDropdown-item';
           item.dataset.value = opt.value;
 
           if (opt.img) {
@@ -272,7 +272,6 @@
 
         this.selectedValue = val;
         this.wrapper.classList.toggle('selected', val !== '');
-
         this.resetBtn.style.display = val !== this.defaultValue ? 'block' : 'none';
 
         if (this.onChange) this.onChange(val);
@@ -287,7 +286,6 @@
       }
     }
 
-    // Example usage
     new FloatingImageSelectInput({
       label: 'Material Type',
       defaultValue: '',

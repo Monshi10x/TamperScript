@@ -1,13 +1,13 @@
 {
       "RouterToolpathTimes": {
             "ACM": {
-                  "2mm": {
+                  "2": {
                         "Cut Through": {
                               "Good Quality": 3000,
                               "Fast": 5000
                         }
                   },
-                  "3mm": {
+                  "3": {
                         "Cut Through": {
                               "Good Quality": 3000,
                               "Fast": 5000
@@ -16,7 +16,7 @@
                               "Good Quality": 3000
                         }
                   },
-                  "4mm": {
+                  "4": {
                         "Cut Through": {
                               "Good Quality": 3000,
                               "Fast": 5000
@@ -27,7 +27,7 @@
                   }
             },
             "Aluminium": {
-                  "3mm": {
+                  "3": {
                         "Cut Through": {
                               "Good Quality": 2000,
                               "Fast": 5000
@@ -38,19 +38,19 @@
                   }
             },
             "Acrylic": {
-                  "4.5mm": {
+                  "4.5": {
                         "Opal Cut Through And Rebate": {
                               "Good Quality": 1000
                         }
                   },
-                  "10mm": {
+                  "10": {
                         "Opal Cut Through And Rebate": {
                               "Good Quality": 1000
                         }
                   }
             },
             "Foamed PVC": {
-                  "10mm": {
+                  "10": {
                         "Cut Through": {
                               "Good Quality": 4000
                         }

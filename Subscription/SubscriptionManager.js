@@ -1,5 +1,7 @@
 class SubscriptionManager {
 
+      UPDATES_PAUSED = false;
+
       ///Subscribers
       #subscribers = [];
       get subscribers() {return this.#subscribers;}
@@ -26,8 +28,9 @@ class SubscriptionManager {
 
             if(!parent.AddSubscriber) return new Error("parent does not contain AddSubscriber method");
             parent.AddSubscriber(this);
-            parent.PushToSubscribers();
-            this.UpdateFromFields();
+            //parent.PushToSubscribers();
+            parent.PushToSubscriber(this);
+            if(!this.UPDATES_PAUSED) this.UpdateFromFields();
 
       }
 
@@ -70,7 +73,7 @@ class SubscriptionManager {
             }
             if(dataFromNewParent) this.#subscriptions.push(data.parent);
 
-            this.UpdateFromFields();
+            if(!this.UPDATES_PAUSED) this.UpdateFromFields();
       }
 
       UnSubscribeFrom(parent) {
@@ -92,8 +95,8 @@ class SubscriptionManager {
                   }
             }
 
-            if(parent.UpdateFromFields) parent.UpdateFromFields();
-            this.UpdateFromFields();
+            if(parent.UpdateFromFields && !parent?.UPDATES_PAUSED) parent.UpdateFromFields();
+            if(!this.UPDATES_PAUSED) this.UpdateFromFields();
       }
 
       ///Subscribers
@@ -109,6 +112,14 @@ class SubscriptionManager {
             for(let i = 0; i < this.#subscribers.length; i++) {
                   this.#subscribers[i].ReceiveSubscriptionData(this.DATA_FOR_SUBSCRIBERS);
             }
+      }
+
+      PushToSubscriber(subscriber) {
+            if(this.DATA_FOR_SUBSCRIBERS.parent == null & this.DATA_FOR_SUBSCRIBERS.data == null)
+                  return console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " attempts sends blank data to " + subscriber.constructor.name + "(" + subscriber.ID + ")" + ", process aborted");
+            console.table("%cSUBSCRIPTION MANAGER.JS", "background-color:" + COLOUR.Orange + ";color:white;font-weight:bold;", this.constructor.name, " sends data to " + subscriber.constructor.name + "(" + subscriber.ID + ")" + " Subscriber, data: ", this.DATA_FOR_SUBSCRIBERS);
+
+            subscriber.ReceiveSubscriptionData(this.DATA_FOR_SUBSCRIBERS);
       }
 
       RemoveSubscriber(subscriber) {

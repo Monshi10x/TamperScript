@@ -22,6 +22,7 @@ class Material extends SubscriptionManager {
       #f_deleteBtn;
       #f_container;
       #f_typeLabel;
+      #f_subscriptionNode;
       #f_productNumberLabel;
       #f_subscribedToLabel;
       #f_subscriptionsContainer;
@@ -32,6 +33,7 @@ class Material extends SubscriptionManager {
       #f_popOutBtn;
       #f_debugTextArea;
       #f_requiresInputTag;
+      #f_grabHandle;
       /*
                         
       GETTER            */
@@ -63,10 +65,12 @@ class Material extends SubscriptionManager {
       /*
                         
       START             */
-      constructor(parentContainer, lhsMenuWindow) {
+      constructor(parentContainer, lhsMenuWindow, options = {UPDATES_PAUSED: false}) {
             super();
             if(!lhsMenuWindow instanceof LHSMenuWindow) throw new Error('Parameter 2 must be an instance of LHSMenuWindow');
             this.#f_lhsMenuWindow = lhsMenuWindow;
+
+            this.UPDATES_PAUSED = options.UPDATES_PAUSED;
 
             this.#f_container = document.createElement("div");
             this.#f_container.style =
@@ -77,6 +81,25 @@ class Material extends SubscriptionManager {
             this.#f_container.addEventListener("click", (e) => {
                   if(e.target == this.#f_container && this.#isMinimized == true) this.onPopOut();
             });
+
+            this.#f_grabHandle = document.createElement("div");
+            this.#f_grabHandle.style = `display:block;width:24px;height:40px;background-color:${COLOUR.DarkGrey};padding:0px;margin:0px;float:left;`;
+            this.#f_grabHandle.className = "sortableHandle";
+            // Icon
+            const icon = document.createElement('div');
+            icon.textContent = '⋮⋮'; // vertical grip dots
+            icon.style.fontSize = '20px';
+            icon.style.lineHeight = '40px';
+            icon.style.color = 'white';
+            icon.style.textAlign = 'center';
+            icon.style.marginTop = '0px';
+            icon.style.pointerEvents = 'none'; // important for SortableJS
+
+            this.#f_grabHandle.appendChild(icon);
+            this.#f_container.appendChild(this.#f_grabHandle);
+
+
+
 
             this.#f_productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
@@ -90,6 +113,31 @@ class Material extends SubscriptionManager {
             this.#f_typeLabel.addEventListener("click", () => {
                   if(this.#isMinimized == true) this.onPopOut();
             });
+
+            this.#f_subscriptionNode = new TNode(this.#f_container,
+                  {
+                        nodeType: "subscriptionNode",
+                        overrideCssStyle: {backgroundColor: "#469a8fff", height: '30px', width: '30px', margin: "4px", float: "left"},
+                        canAcceptNodes: true,
+                        icon: "https://raw.githubusercontent.com/Monshi10x/TamperScript/refs/heads/main/Images/Icon-Network.svg",
+                        onAcceptDrop: ({node, target}) => {
+                              for(let i = 0; i < this.#f_lhsMenuWindow.allMaterials.length; i++) {
+                                    //1. Find the matching target element class
+                                    if(target.getAttribute("data-subscription-id") == this.#f_lhsMenuWindow.allMaterials[i].ID) {
+                                          //2. Ensure the target does not subscribe to this (circular)
+                                          if(this.#f_lhsMenuWindow.allMaterials[i].isSubscribedTo(this)) {
+                                                Toast.error("Circular Subscriptions not allowed", 4000);
+                                                return;
+                                          };
+
+                                          return this.SubscribeTo(this.#f_lhsMenuWindow.allMaterials[i]);
+                                    }
+                              }
+                        }
+                  });
+            this.#f_subscriptionNode.el.classList.add("TNodeAccept");
+            this.#f_subscriptionNode.el.dataset.acceptTypes = "subscriptionNode";
+            this.#f_subscriptionNode.el.dataset.subscriptionId = this.ID;
             /*
             Subscriptions */
             this.#f_subscriptionsModal = createIconButton("https://cdn.gorilladash.com/images/media/6144522/signarama-australia-noun-multiple-assign-2848055-635d23b3b3f2b.png", "Subscriptions",
@@ -135,10 +183,8 @@ class Material extends SubscriptionManager {
             this.Minimize();
       }
 
-      /*
-      Override */
-      UpdateFromFields() {
-            super.UpdateFromFields();
+      /*overrides*/UpdateFromFields() {
+            if(this.UPDATES_PAUSED) return;
 
             this.UpdateSubscribedLabel();
             this.UpdateDebug();

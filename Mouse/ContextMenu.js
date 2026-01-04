@@ -1,7 +1,7 @@
 var customContextMenuContainer;
 function initCustomContextMenu() {
       customContextMenuContainer = document.createElement('div');
-      customContextMenuContainer.style = "display:none;width:200px;min-height:50px;box-shadow: rgb(0 0 0 / 80%) 3px 4px 10px 0px;background-color:white;border:solid black 1px;position:absolute;z-index:10000;left:0;top:0;padding:0px;";
+      customContextMenuContainer.style = "display:none;width:350px;min-height:50px;box-shadow: rgb(0 0 0 / 80%) 3px 4px 10px 0px;background-color:white;border:solid black 1px;position:absolute;z-index:10000;left:0;top:0;padding:0px;";
       customContextMenuContainer.oncontextmenu = function(event) {
             event.preventDefault();
       };

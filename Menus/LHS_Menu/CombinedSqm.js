@@ -81,7 +81,7 @@ class AreaMenu extends LHSMenuWindow {
             await setPartHeight(productNo, populatePartN.value, area_sqSide);
             await setPartText(productNo, populatePartN.value, totalDescription);
             await savePart(productNo, populatePartN.value);
-            Ordui.Alert("Done.");
+            Toast.notify("Done.", 3000, {position: "top-right"});
         }
         var populateProductN = createInput("P.No", null, "width:15%;margin:0px;height:24px", null);
         var populatePartN = createInput("Part", 1, "width:15%;margin:0px;height:24px", null);

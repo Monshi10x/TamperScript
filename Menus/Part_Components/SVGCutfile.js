@@ -29,8 +29,10 @@ class SVGCutfile extends SubscriptionManager {
                         
       Fields            */
       #f_container;
+      #f_grabHandle;
       #f_productNumberLabel;
       #f_typeLabel;
+      #f_subscriptionNode;
       #f_subscribedToLabel;
       #f_visualiser;
       #f_visualiserBtn;
@@ -75,10 +77,12 @@ class SVGCutfile extends SubscriptionManager {
       /*
                         
       Start             */
-      constructor(parentContainer, lhsMenuWindow) {
+      constructor(parentContainer, lhsMenuWindow, options = {UPDATES_PAUSED: false}) {
             super();
             if(!lhsMenuWindow instanceof LHSMenuWindow) throw new Error('Parameter 2 must be an instance of LHSMenuWindow');
             this.#f_lhsMenuWindow = lhsMenuWindow;
+
+            this.UPDATES_PAUSED = options.UPDATES_PAUSED;
 
             this.#f_container = document.createElement("div");
             this.#f_container.style =
@@ -92,6 +96,22 @@ class SVGCutfile extends SubscriptionManager {
                   $(this).css("box-shadow", "rgba(0, 0, 0, 0.8) 3px 4px 10px 0px");
             });
 
+            this.#f_grabHandle = document.createElement("div");
+            this.#f_grabHandle.style = `display:block;width:24px;height:40px;background-color:${COLOUR.DarkGrey};padding:0px;margin:0px;float:left;`;
+            this.#f_grabHandle.className = "sortableHandle";
+            // Icon
+            const icon = document.createElement('div');
+            icon.textContent = '⋮⋮'; // vertical grip dots
+            icon.style.fontSize = '20px';
+            icon.style.lineHeight = '40px';
+            icon.style.color = 'white';
+            icon.style.textAlign = 'center';
+            icon.style.marginTop = '0px';
+            icon.style.pointerEvents = 'none'; // important for SortableJS
+
+            this.#f_grabHandle.appendChild(icon);
+            this.#f_container.appendChild(this.#f_grabHandle);
+
             this.#f_productNumberLabel = createButton(this.productNumber, "height:40px;margin:0px;background-color:" + this.backgroundColor + ";width:60px;font-size:10px;color:" + this.textColor + ";text-align:center;line-height:30px;border:1px solid " + this.backgroundColor + ";", () => {
                   let modal = new ModalSingleInput("Enter New Product Number", () => {
                         this.productNumber = modal.value;
@@ -103,13 +123,38 @@ class SVGCutfile extends SubscriptionManager {
 
             this.#f_typeLabel = createText(this.#Type, "height:40px;margin:0px;background-color:" + this.#backgroundColor + ";width:150px;font-size:10px;color:" + this.#textColor + ";text-align:center;line-height:30px;position:relative;border:1px solid " + this.#backgroundColor + ";", this.#f_container);
 
+            this.#f_subscriptionNode = new TNode(this.#f_container,
+                  {
+                        nodeType: "subscriptionNode",
+                        overrideCssStyle: {backgroundColor: "#469a8fff", height: '30px', width: '30px', margin: "4px", float: "left"},
+                        canAcceptNodes: true,
+                        icon: "https://raw.githubusercontent.com/Monshi10x/TamperScript/refs/heads/main/Images/Icon-Network.svg",
+                        onAcceptDrop: ({node, target}) => {
+                              for(let i = 0; i < this.#f_lhsMenuWindow.allMaterials.length; i++) {
+                                    //1. Find the matching target element class
+                                    if(target.getAttribute("data-subscription-id") == this.#f_lhsMenuWindow.allMaterials[i].ID) {
+                                          //2. Ensure the target does not subscribe to this (circular)
+                                          if(this.#f_lhsMenuWindow.allMaterials[i].isSubscribedTo(this)) {
+                                                Toast.error("Circular Subscriptions not allowed", 4000);
+                                                return;
+                                          };
+
+                                          return this.SubscribeTo(this.#f_lhsMenuWindow.allMaterials[i]);
+                                    }
+                              }
+                        }
+                  });
+            this.#f_subscriptionNode.el.classList.add("TNodeAccept");
+            this.#f_subscriptionNode.el.dataset.acceptTypes = "subscriptionNode";
+            this.#f_subscriptionNode.el.dataset.subscriptionId = this.ID;
+
             this.#f_qty = createInput_Infield("Qty", 1, "width:80px;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 1);
 
             this.#f_pathLength = createInput_Infield("Path Length", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "mm"});
 
             this.#f_shapeAreas = createInput_Infield("Shape Areas", null, "width:13%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "m2"});
 
-            this.#f_totalBoundingRectAreas = createInput_Infield("Bounding Rect Areas", null, "width:20%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "m2"});
+            this.#f_totalBoundingRectAreas = createInput_Infield("Bounding Rect Areas", null, "width:15%;margin:0px 5px;box-shadow:none;box-sizing: border-box;", () => {this.UpdateFromFields();}, this.#f_container, true, 100, {postfix: "m2"});
 
             let settingsButton = createButton("", "width:40px;height:40px;margin:0px;margin-left:5px;margin-right:10px;font-size:20px;", () => {
                   this.#openSettingsModal();
@@ -218,7 +263,9 @@ class SVGCutfile extends SubscriptionManager {
             this.UpdateFromFields();
       }
 
-      UpdateFromFields() {
+      /*overrides*/UpdateFromFields() {
+            super.UpdateFromFields();
+
             this.UpdateWH();
             this.UpdateDataForSubscribers();
             this.PushToSubscribers();

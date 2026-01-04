@@ -170,7 +170,6 @@ class Modal {
       }
 
       returnAllBorrowedFields() {
-            console.trace(this.#borrowedFields);
             for(let i = this.#borrowedFields.length - 1; i >= 0; i--) {
                   insertAfter(this.#borrowedFields[i].elementToBorrow, this.#borrowedFields[i].placeholderBefore);
                   deleteElement(this.#borrowedFields[i].placeholderBefore);
