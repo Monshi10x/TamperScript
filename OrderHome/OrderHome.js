@@ -372,23 +372,126 @@ class OrderHome {
             return lines.join("\n");
       }
 
+      parseCurrencyValue(raw) {
+            if(raw === null || raw === undefined) {
+                  return null;
+            }
+
+            const numeric = parseFloat(String(raw).replace(/[^0-9.-]+/g, ""));
+            return Number.isFinite(numeric) ? Math.round(numeric * 100) / 100 : null;
+      }
+
+      getCurrencyFromSelector(selector) {
+            const node = document.querySelector(selector);
+            if(!node) {
+                  return null;
+            }
+
+            const rawValue = (node.value ?? node.textContent ?? node.innerText ?? "").trim();
+            return this.parseCurrencyValue(rawValue);
+      }
+
+      formatCurrency(amount) {
+            if(typeof amount !== "number" || Number.isNaN(amount)) {
+                  return "";
+            }
+
+            return new Intl.NumberFormat("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(amount);
+      }
+
+      getAmountFromSelectors(selectors, {allowZero = false} = {}) {
+            for(const selector of selectors) {
+                  const amount = this.getCurrencyFromSelector(selector);
+                  if(amount === null) {
+                        continue;
+                  }
+
+                  if(amount > 0 || (allowZero && amount === 0)) {
+                        return amount;
+                  }
+            }
+
+            return null;
+      }
+
+      calculateAmountDue() {
+            const preferredSelectors = ["#BalanceDueLabel", "#lblAmountDue"];
+            const preferredAmount = this.getAmountFromSelectors(preferredSelectors);
+            if(preferredAmount !== null) {
+                  return preferredAmount;
+            }
+
+            const totalPaidSelectors = ["#TotalPayedLabel", "#lblTotalPaid", "#hfTotalPaid", "#lblTotalPayments", "#lblTotalPaymentsAmount", "#lblTotalPaidAmount", "#lblTotalPaidValue", "#lblPaymentsToDate", "#tbTotalPaid", "#hfTotalPaidAmount"];
+            const totalPaid = this.getAmountFromSelectors(totalPaidSelectors, {allowZero: true});
+
+            const orderTotalSelectors = ["#lblTotalAmount", "#lblTotal", "#lblOrderTotal", "#lblTotalWithTax", "#lblEstimateTotal", "#lblGrandTotal", "#hfOrderTotal", "#hfOrderAmount"];
+            const orderTotal = this.getAmountFromSelectors(orderTotalSelectors);
+
+            if(orderTotal !== null) {
+                  if(orderTotal < 600) {
+                        return orderTotal;
+                  }
+
+                  if(totalPaid === 0 || totalPaid === null) {
+                        const downPayment = this.getAmountFromSelectors(["#DownpaymentDueValue"]);
+                        return downPayment !== null ? downPayment : orderTotal * 0.5;
+                  }
+
+                  const paidAmount = totalPaid ?? 0;
+                  return Math.max(orderTotal - paidAmount, 0);
+            }
+
+            const downPaymentFallback = this.getAmountFromSelectors(["#DownpaymentDueValue", "#tbPaymentAmount", "#txtTotalPaymentAmount"]);
+            if(downPaymentFallback !== null) {
+                  return downPaymentFallback;
+            }
+
+            return null;
+      }
+
+      buildPaymentReference(quoteNumber) {
+            if(!quoteNumber) {
+                  return "";
+            }
+
+            const trimmed = quoteNumber.trim();
+            return trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
+      }
+
       personalizeTemplate(templateContent, customerFirstName, quoteNumber) {
             const userName = `${this.#userInfo?.firstName || ""} ${this.#userInfo?.lastName || ""}`.trim();
             const userPhone = this.#userInfo?.phone || "";
             const userEmail = this.#userInfo?.email || "";
 
+            const safeQuoteNumber = quoteNumber || "";
+            const paymentReference = this.buildPaymentReference(safeQuoteNumber);
+            const amountDue = this.calculateAmountDue();
+            const staticPaymentDetails = {
+                  accountName: "The Trustee for Cargill Investment Trust",
+                  bsb: "014-218",
+                  accountNumber: "3064-70312",
+                  cardSurcharge: "2.5"
+            };
+
             let content = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
-            content = content.replaceAll("<%QuoteNumber%>", quoteNumber);
+            content = content.replaceAll("<%QuoteNumber%>", safeQuoteNumber);
             content = content.replaceAll("<%SalesPersonName%>", userName);
             content = content.replaceAll("<%SalesPersonPhone%>", userPhone);
             content = content.replaceAll("<%SalesPersonEmail%>", userEmail);
+            content = content.replaceAll("{%InvoiceOrQuoteNumber%}", paymentReference || safeQuoteNumber);
+            content = content.replaceAll("{%AmountDue%}", this.formatCurrency(amountDue));
+            content = content.replaceAll("{%AccountName%}", staticPaymentDetails.accountName);
+            content = content.replaceAll("{%BSB%}", staticPaymentDetails.bsb);
+            content = content.replaceAll("{%AccountNumber%}", staticPaymentDetails.accountNumber);
+            content = content.replaceAll("{%Reference%}", paymentReference);
+            content = content.replaceAll("{%CardSurcharge%}", staticPaymentDetails.cardSurcharge);
 
             // Allow swapping by tag ids in the template HTML
             const container = document.createElement("div");
             container.innerHTML = content;
 
             const replacements = [
-                  {selector: "#quote-number", value: quoteNumber},
+                  {selector: "#quote-number", value: paymentReference || safeQuoteNumber},
                   {selector: "#customer-name", value: customerFirstName},
                   {selector: "#salesperson-name", value: userName},
                   {selector: "#salesperson-phone", value: "M: " + userPhone},
