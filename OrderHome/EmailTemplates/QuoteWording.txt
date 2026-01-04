@@ -32,9 +32,9 @@ Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</str
 
         <!-- ROW 1 -->
         <tr>
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
             <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:120px;
+                   style="height:140px;
                           border:4px solid #d32f2f;
                           background:#fff5f5;
                           border-radius:12px;
@@ -48,9 +48,9 @@ Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</str
             </table>
           </td>
 
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
             <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:120px;
+                   style="height:140px;
                           border:4px solid #d32f2f;
                           background:#fff5f5;
                           border-radius:12px;
@@ -64,16 +64,16 @@ Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</str
             </table>
           </td>
 
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
             <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:120px;
+                   style="height:140px;
                           border:4px solid #d32f2f;
                           background:#fff5f5;
                           border-radius:12px;
                           box-shadow:0 4px 10px rgba(0,0,0,0.5);">
               <tr>
                 <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Family Owned</div>
+                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Family Owned & Operated</div>
                   <div style="font-size:12px;color:#555;">Trusted &amp; accountable</div>
                 </td>
               </tr>
@@ -83,9 +83,9 @@ Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</str
 
         <!-- ROW 2 -->
         <tr>
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
             <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:120px;
+                   style="height:140px;
                           border:4px solid #d32f2f;
                           background:#fff5f5;
                           border-radius:12px;
@@ -99,9 +99,9 @@ Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</str
             </table>
           </td>
 
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
             <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:120px;
+                   style="height:140px;
                           border:4px solid #d32f2f;
                           background:#fff5f5;
                           border-radius:12px;
@@ -115,9 +115,9 @@ Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</str
             </table>
           </td>
 
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:120px;">
+          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
             <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:120px;
+                   style="height:140px;
                           border:4px solid #d32f2f;
                           background:#fff5f5;
                           border-radius:12px;
@@ -138,7 +138,44 @@ Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</str
   </tr>
 </table>
 
+<!-- Don't just take our word for it -->
+<table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0; font-family:Arial, Helvetica, sans-serif;">
+  <tr>
+    <td align="center">
 
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
+        <tr>
+          <td style="font-size:14px; font-weight:700; color:#111; padding-bottom:4px;">
+            Don’t just take our word for it
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table cellpadding="0" cellspacing="0">
+              <tr>
+                <td valign="middle" style="font-size:13px; color:#111; padding-right:12px;">
+                  <strong>Google Reviews</strong>
+                  <span style="margin-left:6px; color:#f4b400; letter-spacing:1px;">★★★★★</span>
+                  <span style="font-weight:700; margin-left:4px;">4.9</span>
+                </td>
+                <td valign="middle">
+                  <a href="https://www.google.com/search?q=Signarama+Springwood&shndl=-1&source=sh/x/kp/local/m1/1&kgs=520b87ec57183f75&shem=shrtsdl&utm_source=shrtsdl,sh/x/kp/local/m1/1#mpd=~16019470226491169061/customers/reviews"
+                     style="display:inline-block; background:#d32f2f; color:#ffffff; text-decoration:none;
+                            padding:8px 14px; border-radius:6px; font-weight:700; font-size:13px;">
+                    View reviews
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+<br>
 <div style="text-align:center; margin:26px 0 14px 0; font-family:Arial, Helvetica, sans-serif;">
   <p style="
     margin:0;
