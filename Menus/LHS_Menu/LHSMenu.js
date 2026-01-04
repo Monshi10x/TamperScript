@@ -384,7 +384,7 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_Chart"), "Charts", "Charts", null, "loadedPredefinedParts");
     addItem(GM_getResourceURL("Icon_POS"), "POS", "POS", null);
     addItem(GM_getResourceURL("Icon_Map"), "Travel", "Travel", null);
-    addItem("https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Roll.svg", "Ordered Vinyls", "OrderedVinyls", null);
+    addItem("https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Roll.svg", "Ord. Vinyls", "OrderedVinyls", null);
 
     function addItem(imageSrc, text, openMenuName, overrideCss, unlockListenEvent) {
         var itemContainer = document.createElement('div');
