@@ -54,13 +54,12 @@ class CapralMenu extends LHSMenuWindow {
       createGUI() {
             this.clearPages(0);
 
-            const header = createText("Capral Product Browser", "width:100%;padding:10px 12px;box-sizing:border-box;background-color:" + COLOUR.Blue + ";color:white;font-weight:bold;font-family:'Century Gothic', CenturyGothic, AppleGothic, sans-serif;");
-            this.#page.appendChild(header);
-
             const controls = document.createElement("div");
-            controls.style = "display:flex;flex-wrap:wrap;gap:10px;padding:10px;align-items:center;background-color:#f6f8fb;";
+            controls.className = "capral-controls";
+            controls.style = "display:flex;flex-wrap:wrap;gap:10px;padding:10px;align-items:center;background-color:#f6f8fb;position:sticky;top:0;z-index:5;border-bottom:1px solid #c5d9ff;";
 
             this.#categoryDropdownContainer = document.createElement("div");
+            this.#categoryDropdownContainer.className = "capral-category-dropdown";
             this.#categoryDropdownContainer.style = "display:flex;align-items:center;gap:10px;";
             controls.appendChild(this.#categoryDropdownContainer);
 
@@ -76,6 +75,10 @@ class CapralMenu extends LHSMenuWindow {
             controls.appendChild(this.#statusText);
 
             this.#page.appendChild(controls);
+
+            const dropdownStyle = document.createElement("style");
+            dropdownStyle.textContent = ".capral-category-dropdown .TDropdown-item img { width: 100px; height: 100px; }";
+            this.#page.appendChild(dropdownStyle);
 
             this.#productGrid = document.createElement("div");
             this.#productGrid.style = "display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:10px;padding:10px;box-sizing:border-box;overflow-y:auto;background-color:white;color:black;";
