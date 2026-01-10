@@ -3,8 +3,6 @@ class CapralMenu extends LHSMenuWindow {
       #page;
       #statusText;
       #productGrid;
-      #productGridContainer;
-      #loadingOverlay;
       #loadingProgressFill;
       #loadingProgressText;
       #loadingSpinner;
@@ -110,29 +108,25 @@ class CapralMenu extends LHSMenuWindow {
             dropdownStyle.textContent = ".capral-category-dropdown .TDropdown-item img { width: 100px; height: 100px; }";
             this.#page.appendChild(dropdownStyle);
 
-            this.#productGridContainer = document.createElement("div");
-            this.#productGridContainer.style = "position:relative;flex:1 1 auto;min-height:0;";
-
-            this.#productGrid = document.createElement("div");
-            this.#productGrid.style = "display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:10px;padding:10px;box-sizing:border-box;overflow-y:auto;background-color:white;color:black;";
-            this.#productGridContainer.appendChild(this.#productGrid);
-
-            this.#loadingOverlay = document.createElement("div");
-            this.#loadingOverlay.style = "display:none;position:fixed;top:82px;left:160px;right:0;bottom:0;background-color:rgba(0,0,0,0.55);z-index:1000;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:white;";
+            const loadingRow = document.createElement("div");
+            loadingRow.style = "display:flex;align-items:center;gap:10px;width:100%;";
 
             this.#loadingProgressText = document.createElement("div");
-            this.#loadingProgressText.style = "font-size:14px;font-weight:bold;";
-            this.#loadingOverlay.appendChild(this.#loadingProgressText);
+            this.#loadingProgressText.style = "font-size:12px;font-weight:bold;color:#0e335f;";
+            loadingRow.appendChild(this.#loadingProgressText);
 
             const progressBar = document.createElement("div");
-            progressBar.style = "width:70%;height:10px;background:#2d3a4a;border-radius:999px;overflow:hidden;";
+            progressBar.style = "flex:1;height:8px;background:#c5d9ff;border-radius:999px;overflow:hidden;";
             this.#loadingProgressFill = document.createElement("div");
             this.#loadingProgressFill.style = "height:100%;width:0%;background:#1f5ca8;";
             progressBar.appendChild(this.#loadingProgressFill);
-            this.#loadingOverlay.appendChild(progressBar);
+            loadingRow.appendChild(progressBar);
 
-            this.#page.appendChild(this.#productGridContainer);
-            this.#page.appendChild(this.#loadingOverlay);
+            controls.appendChild(loadingRow);
+
+            this.#productGrid = document.createElement("div");
+            this.#productGrid.style = "display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:10px;padding:10px;box-sizing:border-box;overflow-y:auto;background-color:white;color:black;";
+            this.#page.appendChild(this.#productGrid);
       }
 
       async loadAllCategories(forceReload = false) {
@@ -741,13 +735,11 @@ class CapralMenu extends LHSMenuWindow {
       }
 
       showLoadingOverlay() {
-            if(!this.#loadingOverlay) return;
-            this.#loadingOverlay.style.display = "flex";
             this.updateLoadingProgress(0, 1);
             if(this.#loadingSpinner) {
                   this.#loadingSpinner.Delete();
             }
-            this.#loadingSpinner = new Loader(this.#loadingOverlay);
+            this.#loadingSpinner = new Loader(this.#statusText);
             this.#loadingSpinner.setSize(40);
       }
 
@@ -760,8 +752,6 @@ class CapralMenu extends LHSMenuWindow {
       }
 
       hideLoadingOverlay() {
-            if(!this.#loadingOverlay) return;
-            this.#loadingOverlay.style.display = "none";
             if(this.#loadingSpinner) {
                   this.#loadingSpinner.Delete();
                   this.#loadingSpinner = null;
