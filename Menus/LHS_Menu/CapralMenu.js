@@ -6,6 +6,10 @@ class CapralMenu extends LHSMenuWindow {
       #reloadButton;
       #categoryDropdown;
       #categoryDropdownContainer;
+      #filterDropdowns = [];
+      #filterDropdownContainer;
+      #cardProducts = new WeakMap();
+      #isUpdatingFilters = false;
 
       #productsByCategory = new Map();
       #cards = [];
@@ -66,10 +70,21 @@ class CapralMenu extends LHSMenuWindow {
             this.buildCategoryDropdown([{label: "All categories (loading…)", value: "all", img: ""}], "all");
             this.setCategoryDropdownDisabled(true);
 
+            this.#filterDropdownContainer = document.createElement("div");
+            this.#filterDropdownContainer.style = "display:flex;flex-wrap:wrap;gap:10px;align-items:center;";
+            controls.appendChild(this.#filterDropdownContainer);
+
+            this.buildFilterDropdowns();
+
             this.#reloadButton = createButton("Reload", "margin:0;padding:8px 12px;min-width:100px;background-color:#1f5ca8;color:white;border:0;float:none;width:auto;", () => {
                   this.loadAllCategories(true);
             });
             controls.appendChild(this.#reloadButton);
+
+            const resetFiltersButton = createButton("Reset Filters", "margin:0;padding:8px 12px;min-width:120px;background-color:#1f5ca8;color:white;border:0;float:none;width:auto;", () => {
+                  this.resetFilters();
+            });
+            controls.appendChild(resetFiltersButton);
 
             this.#statusText = createText("Load Capral products to begin.", "flex:1 1 100%;padding:8px 10px;color:#0e335f;background-color:#e8f2ff;border:1px solid #c5d9ff;border-radius:4px;box-sizing:border-box;");
             controls.appendChild(this.#statusText);
@@ -94,9 +109,11 @@ class CapralMenu extends LHSMenuWindow {
             this.#productsByCategory.clear();
             this.#cards = [];
             this.#categoryImages.clear();
+            this.#cardProducts = new WeakMap();
             this.#productGrid.innerHTML = "";
             this.buildCategoryDropdown([{label: "All categories (loading…)", value: "all", img: ""}], "all");
             this.setCategoryDropdownDisabled(true);
+            this.buildFilterDropdowns();
             this.updateStatus("Scanning Capral categories " + this.#CAPRAL_CATEGORY_MIN + "-" + this.#CAPRAL_CATEGORY_MAX + "…");
 
             const failedCategories = [];
@@ -119,6 +136,7 @@ class CapralMenu extends LHSMenuWindow {
             this.#isLoading = false;
             this.setCategoryDropdownDisabled(this.#productsByCategory.size === 0);
             this.buildCategoryDropdown(this.buildCategoryOptions(), "all");
+            this.updateFilterDropdowns();
 
             if(this.#productsByCategory.size === 0) {
                   this.updateStatus("No Capral products were returned. Check your connection or try again" + (failedCategories.length ? " (failed categories: " + failedCategories.join(", ") + ")" : "") + ".");
@@ -152,7 +170,11 @@ class CapralMenu extends LHSMenuWindow {
                   options: options,
                   defaultValue: defaultValue,
                   parent: this.#categoryDropdownContainer,
-                  onChange: () => this.applyFilter()
+                  onChange: () => {
+                        if(this.#isUpdatingFilters) return;
+                        this.updateFilterDropdowns();
+                        this.applyFilter();
+                  }
             });
       }
 
@@ -164,8 +186,16 @@ class CapralMenu extends LHSMenuWindow {
 
       applyFilter() {
             const filter = this.#categoryDropdown?.getValue() || "all";
+            const activeFilters = this.getActiveFilters();
             for(const card of this.#cards) {
-                  card.style.display = (filter === "all" || card.dataset.category === filter) ? "flex" : "none";
+                  const cardProduct = this.#cardProducts.get(card);
+                  if(!cardProduct) {
+                        card.style.display = "none";
+                        continue;
+                  }
+                  const matchesCategory = filter === "all" || cardProduct.category === filter;
+                  const matchesFilters = this.productMatchesFilters(cardProduct.product, activeFilters);
+                  card.style.display = matchesCategory && matchesFilters ? "flex" : "none";
             }
       }
 
@@ -283,6 +313,7 @@ class CapralMenu extends LHSMenuWindow {
 
                   this.#productGrid.appendChild(card);
                   this.#cards.push(card);
+                  this.#cardProducts.set(card, {product: product, category: String(category)});
             }
       }
 
@@ -460,6 +491,120 @@ class CapralMenu extends LHSMenuWindow {
                   return fieldName.replace("DIMENSION_", "");
             }
             return fieldName;
+      }
+
+      buildFilterDropdowns() {
+            this.#filterDropdownContainer.innerHTML = "";
+            this.#filterDropdowns = [];
+            this.updateFilterDropdowns();
+      }
+
+      resetFilters() {
+            this.#isUpdatingFilters = true;
+            this.#filterDropdowns.forEach((dropdown) => dropdown.setValue(""));
+            this.#isUpdatingFilters = false;
+            this.updateFilterDropdowns();
+            this.applyFilter();
+      }
+
+      updateFilterDropdowns() {
+            const category = this.#categoryDropdown?.getValue() || "all";
+            const baseProducts = this.getProductsForCategory(category);
+            const previousSelections = this.#filterDropdowns.map((dropdown) => dropdown.getValue());
+            const nextDropdowns = [];
+            const activeFilters = [];
+
+            this.#isUpdatingFilters = true;
+            this.#filterDropdownContainer.innerHTML = "";
+
+            for(let i = 0; i < 3; i++) {
+                  const scopedProducts = this.filterProductsByFilters(baseProducts, activeFilters);
+                  const options = this.buildFilterOptions(scopedProducts);
+                  const currentValue = previousSelections[i] || "";
+                  const hasCurrentValue = options.some((option) => option.value === currentValue);
+                  const dropdown = new TDropdown({
+                        label: "Filter " + (i + 1),
+                        options: options,
+                        defaultValue: "",
+                        parent: this.#filterDropdownContainer,
+                        onChange: () => {
+                              if(this.#isUpdatingFilters) return;
+                              this.updateFilterDropdowns();
+                              this.applyFilter();
+                        }
+                  });
+                  dropdown.setValue(hasCurrentValue ? currentValue : "");
+                  nextDropdowns.push(dropdown);
+
+                  if(hasCurrentValue) {
+                        const [label, value] = currentValue.split("::");
+                        activeFilters.push({label: label, value: value});
+                  }
+            }
+
+            this.#filterDropdowns = nextDropdowns;
+            this.#isUpdatingFilters = false;
+      }
+
+      buildFilterOptions(products) {
+            const optionsMap = new Map();
+            for(const product of products) {
+                  const pairs = this.getDimensionPairs(product);
+                  for(const pair of pairs) {
+                        const key = pair.label + "::" + pair.value;
+                        if(!optionsMap.has(key)) {
+                              optionsMap.set(key, {label: pair.label + ": " + pair.value, value: key, img: ""});
+                        }
+                  }
+            }
+            return Array.from(optionsMap.values()).sort((a, b) => a.label.localeCompare(b.label));
+      }
+
+      getActiveFilters() {
+            return this.#filterDropdowns
+                  .map((dropdown) => dropdown.getValue())
+                  .filter((value) => value)
+                  .map((value) => {
+                        const [label, val] = value.split("::");
+                        return {label: label, value: val};
+                  });
+      }
+
+      filterProductsByFilters(products, filters) {
+            if(filters.length === 0) return products;
+            return products.filter((product) => this.productMatchesFilters(product, filters));
+      }
+
+      productMatchesFilters(product, filters) {
+            if(filters.length === 0) return true;
+            const pairs = this.getDimensionPairs(product);
+            return filters.every((filter) => pairs.some((pair) => pair.label === filter.label && pair.value === filter.value));
+      }
+
+      getProductsForCategory(category) {
+            if(category === "all") {
+                  const allProducts = [];
+                  for(const products of this.#productsByCategory.values()) {
+                        allProducts.push(...products);
+                  }
+                  return allProducts;
+            }
+            const categoryNumber = Number(category);
+            return this.#productsByCategory.get(categoryNumber) || [];
+      }
+
+      getDimensionPairs(product) {
+            if(!product || !Array.isArray(product.custom_fields)) return [];
+            const pairs = [];
+            for(const field of product.custom_fields) {
+                  if(!field?.name) continue;
+                  if(!(field.name === "LENGTH" || field.name.startsWith("DIMENSION_") || field.name === "COATING_DESC" || field.name === "WIDTH" || field.name === "HEIGHT" || field.name === "ALLOY" || field.name === "TEMPER")) continue;
+                  if(!this.isValidDimensionValue(field.value)) continue;
+                  const label = this.getDimensionLabel(field.name);
+                  const value = this.formatDimensionValue(field.value);
+                  if(label && value) pairs.push({label: label, value: value});
+            }
+            return pairs;
       }
 
       createCardImage(url, altText) {
