@@ -17,6 +17,22 @@ class CapralMenu extends LHSMenuWindow {
       #CAPRAL_CATEGORY_MIN = 1;
       #CAPRAL_CATEGORY_MAX = 40;
       #CAPRAL_ENDPOINT = "https://s1k2jek8fa.execute-api.ap-southeast-2.amazonaws.com/production/internal/v1/product_list";
+      #CAPRAL_CATEGORY_LABELS = new Map([
+            [25, "Angle"],
+            [26, "U Channel"],
+            [27, "Tee Section"],
+            [28, "Flat Bar"],
+            [29, "RHS"],
+            [30, "SHS"],
+            [31, "Square Solid"],
+            [32, "Round Hollow"],
+            [33, "Round Solid"],
+            [34, "Machining Round Bar"],
+            [36, "Sheet"],
+            [37, "Plate"],
+            [38, "Treadplate"],
+            [39, "Specialties"]
+      ]);
 
       constructor(width, height, ID, windowTitle) {
             super(width, height, ID, windowTitle);
@@ -87,8 +103,11 @@ class CapralMenu extends LHSMenuWindow {
                   if(failed) failedCategories.push(category);
                   if(products.length > 0) {
                         this.#productsByCategory.set(category, products);
-                        if(categoryImage) {
-                              this.#categoryImages.set(category, categoryImage);
+                        const resolvedCategoryImage = categoryImage || this.extractCategoryImageFromProducts(products);
+                        if(resolvedCategoryImage) {
+                              this.#categoryImages.set(category, resolvedCategoryImage);
+                        } else {
+                              console.log("Capral category missing image, using product fallback failed", {category, products});
                         }
                         this.renderCards(category, products);
                   }
@@ -110,8 +129,9 @@ class CapralMenu extends LHSMenuWindow {
       buildCategoryOptions() {
             const options = [{label: "All categories", value: "all", img: ""}];
             for(const [category, products] of this.#productsByCategory) {
+                  const categoryLabel = this.#CAPRAL_CATEGORY_LABELS.get(category) || ("Category " + category);
                   options.push({
-                        label: "Category " + category + " (" + products.length + ")",
+                        label: categoryLabel + " (" + products.length + ")",
                         value: String(category),
                         img: this.#categoryImages.get(category) || ""
                   });
@@ -168,9 +188,6 @@ class CapralMenu extends LHSMenuWindow {
 
                   const data = await response.json();
                   const categoryImage = this.extractCategoryImage(data, category);
-                  if(!categoryImage) {
-                        console.log("Capral category data for image lookup", {category, data});
-                  }
                   const products = this.extractProducts(data);
                   if(products.length === 0) {
                         return {products: [], failed: false, categoryImage: categoryImage};
@@ -211,6 +228,15 @@ class CapralMenu extends LHSMenuWindow {
             return candidates.find((value) => typeof value === "string" && value.length > 0) || null;
       }
 
+      extractCategoryImageFromProducts(products) {
+            if(!Array.isArray(products)) return null;
+            for(const product of products) {
+                  const imageUrl = this.extractImageUrl(product);
+                  if(imageUrl) return imageUrl;
+            }
+            return null;
+      }
+
       renderCards(category, products) {
             for(const product of products) {
                   const card = document.createElement("div");
@@ -229,10 +255,10 @@ class CapralMenu extends LHSMenuWindow {
                   name.style = "font-weight:bold;color:#0e335f;font-size:14px;";
                   card.appendChild(name);
 
-                  const type = document.createElement("div");
-                  type.innerText = "Type: " + (product.type || product.product_type || "N/A");
-                  type.style = "color:#2d3a4a;font-size:12px;";
-                  card.appendChild(type);
+                  const description = document.createElement("div");
+                  description.innerText = "Description: " + (product.description || "N/A");
+                  description.style = "color:#2d3a4a;font-size:12px;";
+                  card.appendChild(description);
 
                   const price = document.createElement("div");
                   const variantPrices = this.extractVariantPrices(product);
