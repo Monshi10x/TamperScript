@@ -263,6 +263,11 @@ class CapralMenu extends LHSMenuWindow {
                   description.style = "color:#2d3a4a;font-size:12px;";
                   card.appendChild(description);
 
+                  const dimensionPills = this.createDimensionPills(product);
+                  if(dimensionPills) {
+                        card.appendChild(dimensionPills);
+                  }
+
                   const price = document.createElement("div");
                   const variantPrices = this.extractVariantPrices(product);
                   price.innerText = "Cost: " + (variantPrices.length ? this.formatPrices(variantPrices) : "N/A");
@@ -364,6 +369,51 @@ class CapralMenu extends LHSMenuWindow {
       isValidImageUrl(value) {
             if(!this.isNonEmptyString(value)) return false;
             if(value.trim().toUpperCase() === "NONE") return false;
+            return true;
+      }
+
+      createDimensionPills(product) {
+            if(!product || !Array.isArray(product.custom_fields)) return null;
+            const dimensionFields = product.custom_fields.filter((field) => {
+                  if(!field?.name) return false;
+                  if(!(field.name === "LENGTH" || field.name.startsWith("DIMENSION_"))) return false;
+                  return this.isValidDimensionValue(field.value);
+            });
+
+            if(dimensionFields.length === 0) return null;
+
+            const wrapper = document.createElement("div");
+            wrapper.style = "display:flex;flex-wrap:wrap;gap:6px;";
+
+            for(const field of dimensionFields) {
+                  const pill = document.createElement("div");
+                  pill.style = "display:flex;flex-direction:column;gap:2px;background:#e8f2ff;border:1px solid #c5d9ff;border-radius:999px;padding:4px 10px;";
+
+                  const label = document.createElement("div");
+                  label.innerText = field.name.replace("DIMENSION_", "");
+                  label.style = "font-size:10px;color:#1f5ca8;text-transform:uppercase;letter-spacing:0.4px;";
+
+                  const value = document.createElement("div");
+                  value.innerText = field.value;
+                  value.style = "font-size:12px;color:#0e335f;font-weight:bold;";
+
+                  pill.appendChild(label);
+                  pill.appendChild(value);
+                  wrapper.appendChild(pill);
+            }
+
+            return wrapper;
+      }
+
+      isValidDimensionValue(value) {
+            if(value === null || value === undefined) return false;
+            if(typeof value === "number") return value !== 0;
+            const trimmed = String(value).trim();
+            if(trimmed.length === 0) return false;
+            if(trimmed.toUpperCase() === "NONE") return false;
+            const numeric = Number(trimmed);
+            if(!Number.isNaN(numeric) && numeric === 0) return false;
+            if(trimmed === "0.00") return false;
             return true;
       }
 
