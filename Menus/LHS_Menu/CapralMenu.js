@@ -494,6 +494,7 @@ class CapralMenu extends LHSMenuWindow {
       }
 
       buildFilterDropdowns() {
+            if(!this.#filterDropdownContainer) return;
             this.#filterDropdownContainer.innerHTML = "";
             this.#filterDropdowns = [];
             this.updateFilterDropdowns();
@@ -508,6 +509,7 @@ class CapralMenu extends LHSMenuWindow {
       }
 
       updateFilterDropdowns() {
+            if(!this.#filterDropdownContainer) return;
             const category = this.#categoryDropdown?.getValue() || "all";
             const baseProducts = this.getProductsForCategory(category);
             const previousSelections = this.#filterDropdowns.map((dropdown) => dropdown.getValue());
