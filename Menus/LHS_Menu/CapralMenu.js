@@ -410,7 +410,7 @@ class CapralMenu extends LHSMenuWindow {
                   label.style = "font-size:10px;color:" + (isPrimary ? "#e8f2ff" : "#1f5ca8") + ";text-transform:uppercase;letter-spacing:0.4px;";
 
                   const value = document.createElement("div");
-                  value.innerText = field.value;
+                  value.innerText = this.formatDimensionValue(field.value);
                   value.style = "font-size:12px;color:" + (isPrimary ? "#ffffff" : "#0e335f") + ";font-weight:bold;";
 
                   pill.appendChild(label);
@@ -431,6 +431,21 @@ class CapralMenu extends LHSMenuWindow {
             if(!Number.isNaN(numeric) && numeric === 0) return false;
             if(trimmed === "0.00") return false;
             return true;
+      }
+
+      formatDimensionValue(value) {
+            if(value === null || value === undefined) return "";
+            const numeric = Number(value);
+            if(!Number.isNaN(numeric)) {
+                  return numeric.toString();
+            }
+            const trimmed = String(value).trim();
+            if(trimmed.includes(".")) {
+                  const parsed = Number(trimmed);
+                  if(!Number.isNaN(parsed)) return parsed.toString();
+                  return trimmed.replace(/(\.\d*?)0+$/, "$1").replace(/\.$/, "");
+            }
+            return trimmed;
       }
 
       getDimensionLabel(fieldName) {
