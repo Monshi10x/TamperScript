@@ -690,7 +690,8 @@ class CapralMenu extends LHSMenuWindow {
                   const cost = this.getDraggedProductCost(this.#draggedProduct);
                   const description = this.getDraggedProductDescription(this.#draggedProduct);
                   const partNo = getNumPartsInProduct(productNo);
-                  await q_AddPart_CostMarkup(productNo, partNo, true, false, 1, cost, 2.5, description);
+                  const createdPartNo = await q_AddPart_CostMarkup(productNo, partNo, true, false, 1, cost, 2.5, description);
+                  await setPartNotes(productNo, createdPartNo, this.buildPartNotes(this.#draggedProduct));
                   this.#draggedProduct = null;
             };
             document.addEventListener("dropEvent", this.#onDrop);
@@ -704,5 +705,32 @@ class CapralMenu extends LHSMenuWindow {
 
       getDraggedProductDescription(product) {
             return product.description || product.name || product.title || "Capral Item";
+      }
+
+      buildPartNotes(product) {
+            const sku = this.getProductSku(product);
+            const prices = this.extractVariantPrices(product);
+            const dimensions = this.getDimensionPairs(product);
+            const dimensionText = dimensions.length
+                  ? dimensions.map((pair) => pair.label + ": " + pair.value).join(", ")
+                  : "N/A";
+            const priceText = prices.length ? this.formatPrices(prices) : "N/A";
+            return [
+                  "Name: " + (product.name || product.title || "N/A"),
+                  "Description: " + (product.description || "N/A"),
+                  "SKU: " + (sku || "N/A"),
+                  "Cost: " + priceText,
+                  "Category: " + (product.category || "N/A"),
+                  "Dimensions: " + dimensionText
+            ].join("\n");
+      }
+
+      getProductSku(product) {
+            if(product?.sku) return product.sku;
+            if(Array.isArray(product?.variants)) {
+                  const variantWithSku = product.variants.find((variant) => variant?.sku);
+                  if(variantWithSku) return variantWithSku.sku;
+            }
+            return null;
       }
 }
