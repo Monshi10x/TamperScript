@@ -502,7 +502,7 @@ class CapralMenu extends LHSMenuWindow {
 
       resetFilters() {
             this.#isUpdatingFilters = true;
-            this.#filterDropdowns.forEach((dropdown) => dropdown.setValue(""));
+            this.#filterDropdowns.forEach((entry) => entry.dropdown.setValue(""));
             this.#isUpdatingFilters = false;
             this.updateFilterDropdowns();
             this.applyFilter();
@@ -512,20 +512,21 @@ class CapralMenu extends LHSMenuWindow {
             if(!this.#filterDropdownContainer) return;
             const category = this.#categoryDropdown?.getValue() || "all";
             const baseProducts = this.getProductsForCategory(category);
-            const previousSelections = this.#filterDropdowns.map((dropdown) => dropdown.getValue());
+            const previousSelections = new Map(this.#filterDropdowns.map((entry) => [entry.label, entry.dropdown.getValue()]));
             const nextDropdowns = [];
-            const activeFilters = [];
+            const labels = this.getFilterLabels(baseProducts);
 
             this.#isUpdatingFilters = true;
             this.#filterDropdownContainer.innerHTML = "";
 
-            for(let i = 0; i < 3; i++) {
-                  const scopedProducts = this.filterProductsByFilters(baseProducts, activeFilters);
-                  const options = this.buildFilterOptions(scopedProducts);
-                  const currentValue = previousSelections[i] || "";
+            for(const label of labels) {
+                  const otherFilters = this.getActiveFilters().filter((filter) => filter.label !== label);
+                  const scopedProducts = this.filterProductsByFilters(baseProducts, otherFilters);
+                  const options = this.buildFilterOptionsForLabel(scopedProducts, label);
+                  const currentValue = previousSelections.get(label) || "";
                   const hasCurrentValue = options.some((option) => option.value === currentValue);
                   const dropdown = new TDropdown({
-                        label: "Filter " + (i + 1),
+                        label: label,
                         options: options,
                         defaultValue: "",
                         parent: this.#filterDropdownContainer,
@@ -536,12 +537,7 @@ class CapralMenu extends LHSMenuWindow {
                         }
                   });
                   dropdown.setValue(hasCurrentValue ? currentValue : "");
-                  nextDropdowns.push(dropdown);
-
-                  if(hasCurrentValue) {
-                        const [label, value] = currentValue.split("::");
-                        activeFilters.push({label: label, value: value});
-                  }
+                  nextDropdowns.push({label: label, dropdown: dropdown});
             }
 
             this.#filterDropdowns = nextDropdowns;
@@ -562,9 +558,23 @@ class CapralMenu extends LHSMenuWindow {
             return Array.from(optionsMap.values()).sort((a, b) => a.label.localeCompare(b.label));
       }
 
+      buildFilterOptionsForLabel(products, label) {
+            const optionsMap = new Map();
+            for(const product of products) {
+                  const pairs = this.getDimensionPairs(product).filter((pair) => pair.label === label);
+                  for(const pair of pairs) {
+                        const key = pair.label + "::" + pair.value;
+                        if(!optionsMap.has(key)) {
+                              optionsMap.set(key, {label: pair.value, value: key, img: ""});
+                        }
+                  }
+            }
+            return Array.from(optionsMap.values()).sort((a, b) => a.label.localeCompare(b.label));
+      }
+
       getActiveFilters() {
             return this.#filterDropdowns
-                  .map((dropdown) => dropdown.getValue())
+                  .map((entry) => entry.dropdown.getValue())
                   .filter((value) => value)
                   .map((value) => {
                         const [label, val] = value.split("::");
@@ -593,6 +603,27 @@ class CapralMenu extends LHSMenuWindow {
             }
             const categoryNumber = Number(category);
             return this.#productsByCategory.get(categoryNumber) || [];
+      }
+
+      getFilterLabels(products) {
+            const labels = new Set();
+            for(const product of products) {
+                  const pairs = this.getDimensionPairs(product);
+                  for(const pair of pairs) {
+                        labels.add(pair.label);
+                  }
+            }
+            const preferredOrder = ["A", "B", "T", "RADIUS", "LENGTH", "WIDTH", "HEIGHT", "COATING", "ALLOY", "TEMPER"];
+            return Array.from(labels).sort((a, b) => {
+                  const aIndex = preferredOrder.indexOf(a);
+                  const bIndex = preferredOrder.indexOf(b);
+                  if(aIndex !== -1 || bIndex !== -1) {
+                        if(aIndex === -1) return 1;
+                        if(bIndex === -1) return -1;
+                        return aIndex - bIndex;
+                  }
+                  return a.localeCompare(b);
+            });
       }
 
       getDimensionPairs(product) {
