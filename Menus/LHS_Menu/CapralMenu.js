@@ -118,7 +118,7 @@ class CapralMenu extends LHSMenuWindow {
             this.#productGridContainer.appendChild(this.#productGrid);
 
             this.#loadingOverlay = document.createElement("div");
-            this.#loadingOverlay.style = "display:none;position:sticky;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.55);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:white;";
+            this.#loadingOverlay.style = "display:none;position:fixed;top:82px;left:160px;right:0;bottom:0;background-color:rgba(0,0,0,0.55);z-index:1000;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:white;";
 
             this.#loadingProgressText = document.createElement("div");
             this.#loadingProgressText.style = "font-size:14px;font-weight:bold;";
@@ -131,8 +131,8 @@ class CapralMenu extends LHSMenuWindow {
             progressBar.appendChild(this.#loadingProgressFill);
             this.#loadingOverlay.appendChild(progressBar);
 
-            this.#productGridContainer.appendChild(this.#loadingOverlay);
             this.#page.appendChild(this.#productGridContainer);
+            this.#page.appendChild(this.#loadingOverlay);
       }
 
       async loadAllCategories(forceReload = false) {
