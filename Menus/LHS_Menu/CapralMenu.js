@@ -335,14 +335,33 @@ class CapralMenu extends LHSMenuWindow {
       }
 
       extractImageUrl(product) {
-            if(!product || !Array.isArray(product.custom_fields)) return null;
-            const imageField = product.custom_fields.find((field) => field?.name === "Google_Merchant_Image_2_URL");
+            if(!product) return null;
+            const productImage = this.extractImageUrlFromFields(product.custom_fields);
+            if(this.isValidImageUrl(productImage)) return productImage;
+            if(Array.isArray(product.variants)) {
+                  for(const variant of product.variants) {
+                        const variantImage = this.extractImageUrlFromFields(variant?.custom_fields);
+                        if(this.isValidImageUrl(variantImage)) return variantImage;
+                  }
+            }
+            return null;
+      }
+
+      extractImageUrlFromFields(customFields) {
+            if(!Array.isArray(customFields)) return null;
+            const imageField = customFields.find((field) => field?.name === "Google_Merchant_Image_2_URL");
             if(!imageField || !imageField.value) return null;
             return typeof imageField.value === "string" ? imageField.value.trim() : imageField.value;
       }
 
       isNonEmptyString(value) {
             return typeof value === "string" && value.trim().length > 0;
+      }
+
+      isValidImageUrl(value) {
+            if(!this.isNonEmptyString(value)) return false;
+            if(value.trim().toUpperCase() === "NONE") return false;
+            return true;
       }
 
       createCardImage(url, altText) {
