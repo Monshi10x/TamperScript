@@ -81,9 +81,9 @@ class CapralMenu extends LHSMenuWindow {
             this.setCategoryDropdownDisabled(true);
 
             this.#filterDropdownContainer = document.createElement("div");
-            this.#filterDropdownContainer.style = "display:flex;flex-wrap:wrap;gap:10px;align-items:center;";
-            controls.appendChild(this.#filterDropdownContainer);
-
+            this.#filterDropdownContainer.style = "display:flex;flex-wrap:wrap;gap:10px;align-items:center;transform:scale(0.6);transform-origin:left top;width:100%;";
+            const filterWrapper = createDivStyle5("margin:0;width:100%;", "Filters", controls);
+            filterWrapper[1].appendChild(this.#filterDropdownContainer);
             this.buildFilterDropdowns();
 
             this.#reloadButton = createButton("Reload", "margin:0;padding:8px 12px;min-width:100px;background-color:#1f5ca8;color:white;border:0;float:none;width:auto;", () => {
@@ -704,7 +704,8 @@ class CapralMenu extends LHSMenuWindow {
       }
 
       getDraggedProductDescription(product) {
-            return product.description || product.name || product.title || "Capral Item";
+            const base = product.description || product.name || product.title || "Capral Item";
+            return base.includes("(Capral)") ? base : base + " (Capral)";
       }
 
       buildPartNotes(product) {
