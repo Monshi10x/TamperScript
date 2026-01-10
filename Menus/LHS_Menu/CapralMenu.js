@@ -253,15 +253,15 @@ class CapralMenu extends LHSMenuWindow {
                         card.appendChild(image);
                   }
 
+                  const description = document.createElement("div");
+                  description.innerText = product.description || "N/A";
+                  description.style = "font-weight:bold;color:#0e335f;font-size:14px;";
+                  card.appendChild(description);
+
                   const name = document.createElement("div");
                   name.innerText = product.name || product.title || "Unnamed product";
-                  name.style = "font-weight:bold;color:#0e335f;font-size:14px;";
+                  name.style = "color:#2d3a4a;font-size:12px;";
                   card.appendChild(name);
-
-                  const description = document.createElement("div");
-                  description.innerText = "Description: " + (product.description || "N/A");
-                  description.style = "color:#2d3a4a;font-size:12px;";
-                  card.appendChild(description);
 
                   const dimensionPills = this.createDimensionPills(product);
                   if(dimensionPills) {
@@ -382,20 +382,36 @@ class CapralMenu extends LHSMenuWindow {
 
             if(dimensionFields.length === 0) return null;
 
+            const preferredOrder = ["A", "B", "T", "RADIUS", "LENGTH"];
+            dimensionFields.sort((a, b) => {
+                  const aLabel = this.getDimensionLabel(a.name);
+                  const bLabel = this.getDimensionLabel(b.name);
+                  const aIndex = preferredOrder.indexOf(aLabel);
+                  const bIndex = preferredOrder.indexOf(bLabel);
+                  if(aIndex !== -1 || bIndex !== -1) {
+                        if(aIndex === -1) return 1;
+                        if(bIndex === -1) return -1;
+                        return aIndex - bIndex;
+                  }
+                  return aLabel.localeCompare(bLabel);
+            });
+
             const wrapper = document.createElement("div");
             wrapper.style = "display:flex;flex-wrap:wrap;gap:6px;";
 
             for(const field of dimensionFields) {
+                  const labelText = this.getDimensionLabel(field.name);
+                  const isPrimary = ["A", "B", "T", "RADIUS", "LENGTH"].includes(labelText);
                   const pill = document.createElement("div");
-                  pill.style = "display:flex;flex-direction:column;gap:2px;background:#e8f2ff;border:1px solid #c5d9ff;border-radius:999px;padding:4px 10px;";
+                  pill.style = "display:flex;flex-direction:column;gap:2px;background:" + (isPrimary ? "#1f5ca8" : "#e8f2ff") + ";border:1px solid " + (isPrimary ? "#1f5ca8" : "#c5d9ff") + ";border-radius:999px;padding:4px 10px;";
 
                   const label = document.createElement("div");
-                  label.innerText = field.name.replace("DIMENSION_", "");
-                  label.style = "font-size:10px;color:#1f5ca8;text-transform:uppercase;letter-spacing:0.4px;";
+                  label.innerText = labelText;
+                  label.style = "font-size:10px;color:" + (isPrimary ? "#e8f2ff" : "#1f5ca8") + ";text-transform:uppercase;letter-spacing:0.4px;";
 
                   const value = document.createElement("div");
                   value.innerText = field.value;
-                  value.style = "font-size:12px;color:#0e335f;font-weight:bold;";
+                  value.style = "font-size:12px;color:" + (isPrimary ? "#ffffff" : "#0e335f") + ";font-weight:bold;";
 
                   pill.appendChild(label);
                   pill.appendChild(value);
@@ -415,6 +431,15 @@ class CapralMenu extends LHSMenuWindow {
             if(!Number.isNaN(numeric) && numeric === 0) return false;
             if(trimmed === "0.00") return false;
             return true;
+      }
+
+      getDimensionLabel(fieldName) {
+            if(!fieldName) return "";
+            if(fieldName === "LENGTH") return "LENGTH";
+            if(fieldName.startsWith("DIMENSION_")) {
+                  return fieldName.replace("DIMENSION_", "");
+            }
+            return fieldName;
       }
 
       createCardImage(url, altText) {
