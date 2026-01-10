@@ -3,6 +3,11 @@ class CapralMenu extends LHSMenuWindow {
       #page;
       #statusText;
       #productGrid;
+      #productGridContainer;
+      #loadingOverlay;
+      #loadingProgressFill;
+      #loadingProgressText;
+      #loadingSpinner;
       #reloadButton;
       #categoryDropdown;
       #categoryDropdownContainer;
@@ -82,7 +87,7 @@ class CapralMenu extends LHSMenuWindow {
 
             this.#filterDropdownContainer = document.createElement("div");
             this.#filterDropdownContainer.style = "display:flex;flex-wrap:wrap;gap:10px;align-items:center;width:100%;";
-            const filterWrapper = createDivStyle5("margin:0;width:60%;", "Filters", controls);
+            const filterWrapper = createDivStyle5("margin:0;width:100%;", "Filters", controls);
             filterWrapper[1].appendChild(this.#filterDropdownContainer);
             this.buildFilterDropdowns();
 
@@ -105,9 +110,29 @@ class CapralMenu extends LHSMenuWindow {
             dropdownStyle.textContent = ".capral-category-dropdown .TDropdown-item img { width: 100px; height: 100px; }";
             this.#page.appendChild(dropdownStyle);
 
+            this.#productGridContainer = document.createElement("div");
+            this.#productGridContainer.style = "position:relative;";
+
             this.#productGrid = document.createElement("div");
             this.#productGrid.style = "display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:10px;padding:10px;box-sizing:border-box;overflow-y:auto;background-color:white;color:black;";
-            this.#page.appendChild(this.#productGrid);
+            this.#productGridContainer.appendChild(this.#productGrid);
+
+            this.#loadingOverlay = document.createElement("div");
+            this.#loadingOverlay.style = "display:none;position:absolute;inset:0;background-color:rgba(0,0,0,0.55);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:white;";
+
+            this.#loadingProgressText = document.createElement("div");
+            this.#loadingProgressText.style = "font-size:14px;font-weight:bold;";
+            this.#loadingOverlay.appendChild(this.#loadingProgressText);
+
+            const progressBar = document.createElement("div");
+            progressBar.style = "width:70%;height:10px;background:#2d3a4a;border-radius:999px;overflow:hidden;";
+            this.#loadingProgressFill = document.createElement("div");
+            this.#loadingProgressFill.style = "height:100%;width:0%;background:#1f5ca8;";
+            progressBar.appendChild(this.#loadingProgressFill);
+            this.#loadingOverlay.appendChild(progressBar);
+
+            this.#productGridContainer.appendChild(this.#loadingOverlay);
+            this.#page.appendChild(this.#productGridContainer);
       }
 
       async loadAllCategories(forceReload = false) {
@@ -125,11 +150,16 @@ class CapralMenu extends LHSMenuWindow {
             this.setCategoryDropdownDisabled(true);
             this.buildFilterDropdowns();
             this.updateStatus("Scanning Capral categories " + this.#CAPRAL_CATEGORY_MIN + "-" + this.#CAPRAL_CATEGORY_MAX + "…");
+            this.showLoadingOverlay();
 
             const failedCategories = [];
+            const totalCategories = this.#CAPRAL_CATEGORY_MAX - this.#CAPRAL_CATEGORY_MIN + 1;
+            let loadedCategories = 0;
             for(let category = this.#CAPRAL_CATEGORY_MIN; category <= this.#CAPRAL_CATEGORY_MAX; category++) {
                   this.updateStatus("Loading category " + category + " of " + this.#CAPRAL_CATEGORY_MAX + "…");
                   const {products, failed, categoryImage} = await this.fetchCategory(category);
+                  loadedCategories += 1;
+                  this.updateLoadingProgress(loadedCategories, totalCategories);
                   if(failed) failedCategories.push(category);
                   if(products.length > 0) {
                         this.#productsByCategory.set(category, products);
@@ -147,6 +177,7 @@ class CapralMenu extends LHSMenuWindow {
             this.setCategoryDropdownDisabled(this.#productsByCategory.size === 0);
             this.buildCategoryDropdown(this.buildCategoryOptions(), "all");
             this.updateFilterDropdowns();
+            this.hideLoadingOverlay();
 
             if(this.#productsByCategory.size === 0) {
                   this.updateStatus("No Capral products were returned. Check your connection or try again" + (failedCategories.length ? " (failed categories: " + failedCategories.join(", ") + ")" : "") + ".");
@@ -561,6 +592,7 @@ class CapralMenu extends LHSMenuWindow {
                         }
                   });
                   dropdown.setValue(hasCurrentValue ? currentValue : "");
+                  dropdown.element.style.width = "200px";
                   nextDropdowns.push({label: label, dropdown: dropdown});
             }
 
@@ -706,6 +738,34 @@ class CapralMenu extends LHSMenuWindow {
       getDraggedProductDescription(product) {
             const base = product.description || product.name || product.title || "Capral Item";
             return base.includes("(Capral)") ? base : base + " (Capral)";
+      }
+
+      showLoadingOverlay() {
+            if(!this.#loadingOverlay) return;
+            this.#loadingOverlay.style.display = "flex";
+            this.updateLoadingProgress(0, 1);
+            if(this.#loadingSpinner) {
+                  this.#loadingSpinner.Delete();
+            }
+            this.#loadingSpinner = new Loader(this.#loadingOverlay);
+            this.#loadingSpinner.setSize(40);
+      }
+
+      updateLoadingProgress(current, total) {
+            if(!this.#loadingProgressFill || !this.#loadingProgressText) return;
+            const safeTotal = total || 1;
+            const percent = Math.round((current / safeTotal) * 100);
+            this.#loadingProgressFill.style.width = percent + "%";
+            this.#loadingProgressText.innerText = "Loaded " + current + " of " + safeTotal + " categories";
+      }
+
+      hideLoadingOverlay() {
+            if(!this.#loadingOverlay) return;
+            this.#loadingOverlay.style.display = "none";
+            if(this.#loadingSpinner) {
+                  this.#loadingSpinner.Delete();
+                  this.#loadingSpinner = null;
+            }
       }
 
       buildPartNotes(product) {
