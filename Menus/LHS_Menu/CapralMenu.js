@@ -689,7 +689,8 @@ class CapralMenu extends LHSMenuWindow {
                   const productNo = event.detail.productNo;
                   const cost = this.getDraggedProductCost(this.#draggedProduct);
                   const description = this.getDraggedProductDescription(this.#draggedProduct);
-                  await q_AddPart_CostMarkup(productNo, 0, true, false, 1, cost, 2.5, description);
+                  const partNo = getNumPartsInProduct(productNo);
+                  await q_AddPart_CostMarkup(productNo, partNo, true, false, 1, cost, 2.5, description);
                   this.#draggedProduct = null;
             };
             document.addEventListener("dropEvent", this.#onDrop);
