@@ -2,13 +2,15 @@ class CapralMenu extends LHSMenuWindow {
 
       #page;
       #statusText;
-      #categoryFilter;
       #productGrid;
       #reloadButton;
+      #categoryDropdown;
+      #categoryDropdownContainer;
 
       #productsByCategory = new Map();
       #cards = [];
       #imageCache = new Map();
+      #categoryImages = new Map();
       #isLoading = false;
       #hasAttemptedLoad = false;
 
@@ -42,15 +44,12 @@ class CapralMenu extends LHSMenuWindow {
             const controls = document.createElement("div");
             controls.style = "display:flex;flex-wrap:wrap;gap:10px;padding:10px;align-items:center;background-color:#f6f8fb;";
 
-            const filterLabel = createText("Category", "margin-right:4px;color:#0e335f;font-weight:bold;");
-            controls.appendChild(filterLabel);
+            this.#categoryDropdownContainer = document.createElement("div");
+            this.#categoryDropdownContainer.style = "display:flex;align-items:center;gap:10px;";
+            controls.appendChild(this.#categoryDropdownContainer);
 
-            this.#categoryFilter = document.createElement("select");
-            this.#categoryFilter.style = "min-width:160px;padding:6px 8px;border:1px solid #c5d9ff;border-radius:4px;font-size:13px;";
-            this.#categoryFilter.onchange = () => this.applyFilter();
-            this.#categoryFilter.appendChild(new Option("All categories (loading…)", "all"));
-            this.#categoryFilter.disabled = true;
-            controls.appendChild(this.#categoryFilter);
+            this.buildCategoryDropdown([{label: "All categories (loading…)", value: "all", img: ""}], "all");
+            this.setCategoryDropdownDisabled(true);
 
             this.#reloadButton = createButton("Reload", "margin:0;padding:8px 12px;min-width:100px;background-color:#1f5ca8;color:white;border:0;float:none;width:auto;", () => {
                   this.loadAllCategories(true);
@@ -75,26 +74,29 @@ class CapralMenu extends LHSMenuWindow {
             this.#isLoading = true;
             this.#productsByCategory.clear();
             this.#cards = [];
+            this.#categoryImages.clear();
             this.#productGrid.innerHTML = "";
-            this.#categoryFilter.innerHTML = "";
-            this.#categoryFilter.appendChild(new Option("All categories (loading…)", "all"));
-            this.#categoryFilter.disabled = true;
+            this.buildCategoryDropdown([{label: "All categories (loading…)", value: "all", img: ""}], "all");
+            this.setCategoryDropdownDisabled(true);
             this.updateStatus("Scanning Capral categories 1-" + this.#CAPRAL_CATEGORY_MAX + "…");
 
             const failedCategories = [];
             for(let category = this.#CAPRAL_CATEGORY_MIN; category <= this.#CAPRAL_CATEGORY_MAX; category++) {
                   this.updateStatus("Loading category " + category + " of " + this.#CAPRAL_CATEGORY_MAX + "…");
-                  const {products, failed} = await this.fetchCategory(category);
+                  const {products, failed, categoryImage} = await this.fetchCategory(category);
                   if(failed) failedCategories.push(category);
                   if(products.length > 0) {
                         this.#productsByCategory.set(category, products);
-                        this.addCategoryOption(category, products.length);
+                        if(categoryImage) {
+                              this.#categoryImages.set(category, categoryImage);
+                        }
                         this.renderCards(category, products);
                   }
             }
 
             this.#isLoading = false;
-            this.#categoryFilter.disabled = this.#productsByCategory.size === 0;
+            this.setCategoryDropdownDisabled(this.#productsByCategory.size === 0);
+            this.buildCategoryDropdown(this.buildCategoryOptions(), "all");
 
             if(this.#productsByCategory.size === 0) {
                   this.updateStatus("No Capral products were returned. Check your connection or try again" + (failedCategories.length ? " (failed categories: " + failedCategories.join(", ") + ")" : "") + ".");
@@ -105,13 +107,40 @@ class CapralMenu extends LHSMenuWindow {
             }
       }
 
-      addCategoryOption(category, count) {
-            const option = new Option("Category " + category + " (" + count + ")", category);
-            this.#categoryFilter.appendChild(option);
+      buildCategoryOptions() {
+            const options = [{label: "All categories", value: "all", img: ""}];
+            for(const [category, products] of this.#productsByCategory) {
+                  options.push({
+                        label: "Category " + category + " (" + products.length + ")",
+                        value: String(category),
+                        img: this.#categoryImages.get(category) || ""
+                  });
+            }
+            return options;
+      }
+
+      buildCategoryDropdown(options, defaultValue) {
+            if(this.#categoryDropdown?.element?.parentNode) {
+                  this.#categoryDropdown.element.parentNode.removeChild(this.#categoryDropdown.element);
+            }
+
+            this.#categoryDropdown = new TDropdown({
+                  label: "Category",
+                  options: options,
+                  defaultValue: defaultValue,
+                  parent: this.#categoryDropdownContainer,
+                  onChange: () => this.applyFilter()
+            });
+      }
+
+      setCategoryDropdownDisabled(disabled) {
+            if(!this.#categoryDropdown) return;
+            this.#categoryDropdown.element.style.pointerEvents = disabled ? "none" : "auto";
+            this.#categoryDropdown.element.style.opacity = disabled ? "0.6" : "1";
       }
 
       applyFilter() {
-            const filter = this.#categoryFilter.value;
+            const filter = this.#categoryDropdown?.getValue() || "all";
             for(const card of this.#cards) {
                   card.style.display = (filter === "all" || card.dataset.category === filter) ? "flex" : "none";
             }
@@ -138,15 +167,19 @@ class CapralMenu extends LHSMenuWindow {
                   }
 
                   const data = await response.json();
+                  const categoryImage = this.extractCategoryImage(data, category);
+                  if(!categoryImage) {
+                        console.log("Capral category data for image lookup", {category, data});
+                  }
                   const products = this.extractProducts(data);
                   if(products.length === 0) {
-                        return {products: [], failed: false};
+                        return {products: [], failed: false, categoryImage: categoryImage};
                   }
-                  return {products: products, failed: false};
+                  return {products: products, failed: false, categoryImage: categoryImage};
             } catch(error) {
                   console.error("Capral fetch error for category " + category, error);
                   this.updateStatus("Category " + category + " failed: " + error.message);
-                  return {products: [], failed: true};
+                  return {products: [], failed: true, categoryImage: null};
             }
       }
 
@@ -159,6 +192,23 @@ class CapralMenu extends LHSMenuWindow {
             if(Array.isArray(dataField)) return dataField;
             if(Array.isArray(dataField?.data)) return dataField.data;
             return [];
+      }
+
+      extractCategoryImage(apiResponse) {
+            if(!apiResponse) return null;
+            const category = apiResponse.category ?? apiResponse.category_data ?? apiResponse.categoryInfo;
+            const candidates = [
+                  category?.image_url,
+                  category?.image,
+                  category?.image?.url,
+                  category?.image?.src,
+                  apiResponse.category_image,
+                  apiResponse.image,
+                  apiResponse.image_url,
+                  apiResponse.images?.[0]?.src,
+                  apiResponse.images?.[0]?.url
+            ];
+            return candidates.find((value) => typeof value === "string" && value.length > 0) || null;
       }
 
       renderCards(category, products) {

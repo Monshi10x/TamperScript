@@ -85,6 +85,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/DragAndDrop/DragAndDrop.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UI.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UIContainerType3.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/TDropdown.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Async_Functions/Async_Functions.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Toggle.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Common.js
