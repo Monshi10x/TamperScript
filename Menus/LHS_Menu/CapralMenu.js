@@ -118,7 +118,7 @@ class CapralMenu extends LHSMenuWindow {
             this.#productGridContainer.appendChild(this.#productGrid);
 
             this.#loadingOverlay = document.createElement("div");
-            this.#loadingOverlay.style = "display:none;position:absolute;inset:0;background-color:rgba(0,0,0,0.55);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:white;";
+            this.#loadingOverlay.style = "display:none;position:sticky;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.55);z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:white;";
 
             this.#loadingProgressText = document.createElement("div");
             this.#loadingProgressText.style = "font-size:14px;font-weight:bold;";
