@@ -8,6 +8,7 @@ class CapralMenu extends LHSMenuWindow {
 
       #productsByCategory = new Map();
       #cards = [];
+      #imageCache = new Map();
       #isLoading = false;
       #hasAttemptedLoad = false;
 
@@ -167,6 +168,12 @@ class CapralMenu extends LHSMenuWindow {
                   card.dataset.category = String(category);
                   card.style = "display:flex;flex-direction:column;gap:6px;background:linear-gradient(135deg,#f7fbff,#eef4ff);border:1px solid #c5d9ff;border-left:4px solid #1f5ca8;border-radius:6px;padding:10px;cursor:pointer;box-shadow:rgb(0 0 0 / 10%) 0px 2px 6px;";
 
+                  const imageUrl = this.extractImageUrl(product);
+                  if(imageUrl) {
+                        const image = this.createCardImage(imageUrl, product.name || product.title || "Capral product image");
+                        card.appendChild(image);
+                  }
+
                   const name = document.createElement("div");
                   name.innerText = product.name || product.title || "Unnamed product";
                   name.style = "font-weight:bold;color:#0e335f;font-size:14px;";
@@ -178,7 +185,8 @@ class CapralMenu extends LHSMenuWindow {
                   card.appendChild(type);
 
                   const price = document.createElement("div");
-                  price.innerText = "Cost: " + this.formatPrice(this.extractPrice(product));
+                  const variantPrices = this.extractVariantPrices(product);
+                  price.innerText = "Cost: " + (variantPrices.length ? this.formatPrices(variantPrices) : "N/A");
                   price.style = "color:#1f5ca8;font-weight:bold;font-size:12px;";
                   card.appendChild(price);
 
@@ -194,22 +202,19 @@ class CapralMenu extends LHSMenuWindow {
             }
       }
 
-      extractPrice(product) {
-            if(product == null) return null;
-            if(typeof product.price === "number") return product.price;
-            if(typeof product.calculated_price === "number") return product.calculated_price;
-            if(Array.isArray(product.variants) && product.variants.length > 0) {
-                  if(typeof product.variants[0].price === "number") return product.variants[0].price;
-                  if(typeof product.variants[0].calculated_price === "number") return product.variants[0].calculated_price;
+      extractVariantPrices(product) {
+            if(!product || !Array.isArray(product.variants)) return [];
+            const priceSet = new Set();
+            for(const variant of product.variants) {
+                  if(variant && typeof variant.price === "number") {
+                        priceSet.add(variant.price);
+                  }
             }
-            return null;
+            return Array.from(priceSet.values()).sort((a, b) => a - b);
       }
 
-      formatPrice(value) {
-            if(value === null || value === undefined || isNaN(Number(value))) {
-                  return "N/A";
-            }
-            return "$" + Number(value).toFixed(2);
+      formatPrices(values) {
+            return values.map((value) => "$" + Number(value).toFixed(2)).join(" | ");
       }
 
       totalProductCount() {
@@ -227,12 +232,20 @@ class CapralMenu extends LHSMenuWindow {
                   body.removeChild(body.firstChild);
             }
 
+            const imageUrl = this.extractImageUrl(product);
+            if(imageUrl) {
+                  const image = this.createCardImage(imageUrl, product.name || product.title || "Capral product image");
+                  image.style.cssText += "max-height:220px;object-fit:contain;";
+                  body.appendChild(image);
+            }
+
             const summary = document.createElement("div");
             summary.style = "padding:10px;color:#0e335f;";
+            const variantPrices = this.extractVariantPrices(product);
             summary.innerHTML = "<b>Name:</b> " + (product.name || "N/A") + "<br>" +
                   "<b>Type:</b> " + (product.type || product.product_type || "N/A") + "<br>" +
                   "<b>Category:</b> " + category + "<br>" +
-                  "<b>Cost:</b> " + this.formatPrice(this.extractPrice(product)) + "<br>" +
+                  "<b>Cost:</b> " + (variantPrices.length ? this.formatPrices(variantPrices) : "N/A") + "<br>" +
                   "<b>SKU:</b> " + (product.sku || (product.variants && product.variants[0] ? product.variants[0].sku || "N/A" : "N/A"));
             body.appendChild(summary);
 
@@ -243,5 +256,28 @@ class CapralMenu extends LHSMenuWindow {
 
             const closeBtn = createButton("Close", "margin:10px;background-color:#1f5ca8;color:white;border:0;padding:8px 12px;float:none;width:auto;", () => modal.hide());
             modal.addFooterElement(closeBtn);
+      }
+
+      extractImageUrl(product) {
+            if(!product || !Array.isArray(product.custom_fields)) return null;
+            const imageField = product.custom_fields.find((field) => field?.name === "Google_Merchant_Image_2_URL");
+            if(!imageField || !imageField.value) return null;
+            return imageField.value;
+      }
+
+      createCardImage(url, altText) {
+            let cachedImage = this.#imageCache.get(url);
+            if(!cachedImage) {
+                  cachedImage = document.createElement("img");
+                  cachedImage.src = url;
+                  cachedImage.loading = "lazy";
+                  cachedImage.style = "width:100%;height:140px;object-fit:cover;border-radius:4px;border:1px solid #c5d9ff;background-color:white;";
+                  cachedImage.alt = altText;
+                  this.#imageCache.set(url, cachedImage);
+            }
+
+            const image = cachedImage.cloneNode(true);
+            image.alt = altText;
+            return image;
       }
 }
