@@ -10,6 +10,8 @@ class CapralMenu extends LHSMenuWindow {
       #filterDropdownContainer;
       #cardProducts = new WeakMap();
       #isUpdatingFilters = false;
+      #draggedProduct;
+      #onDrop;
 
       #productsByCategory = new Map();
       #cards = [];
@@ -48,11 +50,19 @@ class CapralMenu extends LHSMenuWindow {
 
       show() {
             super.show();
+            this.registerDropListener();
             if(!this.#hasAttemptedLoad) {
                   this.loadAllCategories();
             } else {
                   this.applyFilter();
             }
+      }
+
+      hide() {
+            if(this.#onDrop) {
+                  document.removeEventListener("dropEvent", this.#onDrop);
+            }
+            super.hide();
       }
 
       createGUI() {
@@ -283,10 +293,24 @@ class CapralMenu extends LHSMenuWindow {
                         card.appendChild(image);
                   }
 
+                  const headerRow = document.createElement("div");
+                  headerRow.style = "display:flex;align-items:center;gap:6px;";
+
                   const description = document.createElement("div");
                   description.innerText = product.description || "N/A";
-                  description.style = "font-weight:bold;color:#0e335f;font-size:14px;";
-                  card.appendChild(description);
+                  description.style = "font-weight:bold;color:#0e335f;font-size:14px;flex:1;";
+                  headerRow.appendChild(description);
+
+                  const dragButton = createButton("Drag", "margin:0;padding:4px 8px;min-width:auto;float:none;font-size:11px;background-color:#1f5ca8;color:white;border:0;", () => { });
+                  dragButton.draggable = true;
+                  dragButton.addEventListener("dragstart", (event) => {
+                        this.#draggedProduct = product;
+                        if(event.dataTransfer) {
+                              event.dataTransfer.setData("text/plain", "capral-product");
+                        }
+                  });
+                  headerRow.appendChild(dragButton);
+                  card.appendChild(headerRow);
 
                   const name = document.createElement("div");
                   name.innerText = product.name || product.title || "Unnamed product";
@@ -654,5 +678,30 @@ class CapralMenu extends LHSMenuWindow {
             const image = cachedImage.cloneNode(true);
             image.alt = altText;
             return image;
+      }
+
+      registerDropListener() {
+            if(this.#onDrop) {
+                  document.removeEventListener("dropEvent", this.#onDrop);
+            }
+            this.#onDrop = async (event) => {
+                  if(!this.#draggedProduct || !event?.detail?.productNo) return;
+                  const productNo = event.detail.productNo;
+                  const cost = this.getDraggedProductCost(this.#draggedProduct);
+                  const description = this.getDraggedProductDescription(this.#draggedProduct);
+                  await q_AddPart_CostMarkup(productNo, 0, true, false, 1, cost, 2.5, description);
+                  this.#draggedProduct = null;
+            };
+            document.addEventListener("dropEvent", this.#onDrop);
+      }
+
+      getDraggedProductCost(product) {
+            const prices = this.extractVariantPrices(product);
+            if(prices.length > 0) return prices[0];
+            return 0;
+      }
+
+      getDraggedProductDescription(product) {
+            return product.description || product.name || product.title || "Capral Item";
       }
 }
