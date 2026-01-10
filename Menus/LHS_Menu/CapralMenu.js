@@ -232,7 +232,7 @@ class CapralMenu extends LHSMenuWindow {
             if(!Array.isArray(products)) return null;
             for(const product of products) {
                   const imageUrl = this.extractImageUrl(product);
-                  if(imageUrl) return imageUrl;
+                  if(this.isNonEmptyString(imageUrl)) return imageUrl;
             }
             return null;
       }
@@ -338,7 +338,11 @@ class CapralMenu extends LHSMenuWindow {
             if(!product || !Array.isArray(product.custom_fields)) return null;
             const imageField = product.custom_fields.find((field) => field?.name === "Google_Merchant_Image_2_URL");
             if(!imageField || !imageField.value) return null;
-            return imageField.value;
+            return typeof imageField.value === "string" ? imageField.value.trim() : imageField.value;
+      }
+
+      isNonEmptyString(value) {
+            return typeof value === "string" && value.trim().length > 0;
       }
 
       createCardImage(url, altText) {
