@@ -14,7 +14,7 @@ class CapralMenu extends LHSMenuWindow {
       #isLoading = false;
       #hasAttemptedLoad = false;
 
-      #CAPRAL_CATEGORY_MIN = 1;
+      #CAPRAL_CATEGORY_MIN = 25;
       #CAPRAL_CATEGORY_MAX = 40;
       #CAPRAL_ENDPOINT = "https://s1k2jek8fa.execute-api.ap-southeast-2.amazonaws.com/production/internal/v1/product_list";
       #CAPRAL_CATEGORY_LABELS = new Map([
@@ -97,7 +97,7 @@ class CapralMenu extends LHSMenuWindow {
             this.#productGrid.innerHTML = "";
             this.buildCategoryDropdown([{label: "All categories (loading…)", value: "all", img: ""}], "all");
             this.setCategoryDropdownDisabled(true);
-            this.updateStatus("Scanning Capral categories 1-" + this.#CAPRAL_CATEGORY_MAX + "…");
+            this.updateStatus("Scanning Capral categories " + this.#CAPRAL_CATEGORY_MIN + "-" + this.#CAPRAL_CATEGORY_MAX + "…");
 
             const failedCategories = [];
             for(let category = this.#CAPRAL_CATEGORY_MIN; category <= this.#CAPRAL_CATEGORY_MAX; category++) {
@@ -376,13 +376,13 @@ class CapralMenu extends LHSMenuWindow {
             if(!product || !Array.isArray(product.custom_fields)) return null;
             const dimensionFields = product.custom_fields.filter((field) => {
                   if(!field?.name) return false;
-                  if(!(field.name === "LENGTH" || field.name.startsWith("DIMENSION_"))) return false;
+                  if(!(field.name === "LENGTH" || field.name.startsWith("DIMENSION_") || field.name === "COATING_DESC" || field.name === "WIDTH" || field.name === "HEIGHT" || field.name === "ALLOY" || field.name === "TEMPER")) return false;
                   return this.isValidDimensionValue(field.value);
             });
 
             if(dimensionFields.length === 0) return null;
 
-            const preferredOrder = ["A", "B", "T", "RADIUS", "LENGTH"];
+            const preferredOrder = ["A", "B", "T", "RADIUS", "LENGTH", "WIDTH", "HEIGHT", "COATING_DESC", "ALLOY", "TEMPER"];
             dimensionFields.sort((a, b) => {
                   const aLabel = this.getDimensionLabel(a.name);
                   const bLabel = this.getDimensionLabel(b.name);
@@ -401,7 +401,7 @@ class CapralMenu extends LHSMenuWindow {
 
             for(const field of dimensionFields) {
                   const labelText = this.getDimensionLabel(field.name);
-                  const isPrimary = ["A", "B", "T", "RADIUS", "LENGTH"].includes(labelText);
+                  const isPrimary = ["A", "B", "T", "RADIUS", "LENGTH", "WIDTH", "HEIGHT", "COATING_DESC"].includes(labelText);
                   const pill = document.createElement("div");
                   pill.style = "display:flex;flex-direction:column;gap:2px;background:" + (isPrimary ? "#1f5ca8" : "#e8f2ff") + ";border:1px solid " + (isPrimary ? "#1f5ca8" : "#c5d9ff") + ";border-radius:999px;padding:4px 10px;";
 
@@ -451,6 +451,11 @@ class CapralMenu extends LHSMenuWindow {
       getDimensionLabel(fieldName) {
             if(!fieldName) return "";
             if(fieldName === "LENGTH") return "LENGTH";
+            if(fieldName === "WIDTH") return "WIDTH";
+            if(fieldName === "HEIGHT") return "HEIGHT";
+            if(fieldName === "COATING_DESC") return "COATING";
+            if(fieldName === "ALLOY") return "ALLOY";
+            if(fieldName === "TEMPER") return "TEMPER";
             if(fieldName.startsWith("DIMENSION_")) {
                   return fieldName.replace("DIMENSION_", "");
             }
