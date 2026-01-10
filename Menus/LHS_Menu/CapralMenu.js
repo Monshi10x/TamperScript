@@ -81,8 +81,8 @@ class CapralMenu extends LHSMenuWindow {
             this.setCategoryDropdownDisabled(true);
 
             this.#filterDropdownContainer = document.createElement("div");
-            this.#filterDropdownContainer.style = "display:flex;flex-wrap:wrap;gap:10px;align-items:center;transform:scale(0.6);transform-origin:left top;width:100%;";
-            const filterWrapper = createDivStyle5("margin:0;width:100%;", "Filters", controls);
+            this.#filterDropdownContainer.style = "display:flex;flex-wrap:wrap;gap:10px;align-items:center;width:100%;";
+            const filterWrapper = createDivStyle5("margin:0;width:60%;", "Filters", controls);
             filterWrapper[1].appendChild(this.#filterDropdownContainer);
             this.buildFilterDropdowns();
 
