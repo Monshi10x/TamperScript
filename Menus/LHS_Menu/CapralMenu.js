@@ -111,7 +111,7 @@ class CapralMenu extends LHSMenuWindow {
             this.#page.appendChild(dropdownStyle);
 
             this.#productGridContainer = document.createElement("div");
-            this.#productGridContainer.style = "position:relative;";
+            this.#productGridContainer.style = "position:relative;flex:1 1 auto;min-height:0;";
 
             this.#productGrid = document.createElement("div");
             this.#productGrid.style = "display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:10px;padding:10px;box-sizing:border-box;overflow-y:auto;background-color:white;color:black;";
