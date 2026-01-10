@@ -49,6 +49,7 @@
 // @resource     Icon_Bin2 https://github.com/Monshi10x/TamperScript/raw/main/Images/BinIcon2.svg
 // @resource     Icon_Select https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Select.svg
 // @resource     Icon_Map https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Map.svg
+// @resource     Icon_Capral https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Capral.svg
 // @resource     IMPORTED_CSS file://C:\Users\monsh\Documents\TamperScript\Styles\Styles_Sales.css
 // @resource     JSONTransformers file://C:\Users\monsh\Documents\TamperScript\External Files\Transformers.json
 // @resource     JSONPredefinedVehicleTemplates file://C:\Users\monsh\Documents\TamperScript\External Files\PredefinedVehicleTemplates.json
@@ -118,6 +119,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\MenuPOS.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\MenuMap.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\OrderedVinyls.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\CapralMenu.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\Modal.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalManageSubscriptions.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInput.js
