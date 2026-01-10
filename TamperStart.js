@@ -48,6 +48,7 @@
 // @resource     Icon_Bin2 https://github.com/Monshi10x/TamperScript/raw/main/Images/BinIcon2.svg
 // @resource     Icon_Select https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Select.svg
 // @resource     Icon_Map https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Map.svg
+// @resource     Icon_Capral https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Capral.svg
 // @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_Sales.css
 // @resource     JSONTransformers https://github.com/Monshi10x/TamperScript/raw/main/External Files/Transformers.json
 // @resource     JSONPredefinedVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/PredefinedVehicleTemplates.json
@@ -84,6 +85,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/DragAndDrop/DragAndDrop.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UI.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UIContainerType3.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/TDropdown.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Async_Functions/Async_Functions.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Toggle.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Common.js
@@ -116,6 +118,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/ChartMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/MenuPOS.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/MenuMap.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/CapralMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/Modal.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalManageSubscriptions.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInput.js
