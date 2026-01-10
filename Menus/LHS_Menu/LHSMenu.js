@@ -333,6 +333,7 @@ var menu_Charts;
 var menu_POS;
 var menu_Travel;
 var menu_OrderedVinyls;
+var menu_Capral;
 async function initLHSMenu() {
     var container = document.createElement('div');
     container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + "rgb(36 36 36)" + ";box-shadow: rgb(0, 0, 0) 6px 1px 20px -2px,rgb(0, 0, 0) 6px 1px 60px -2px;";
@@ -366,6 +367,7 @@ async function initLHSMenu() {
     menu_POS = new MenuPOS("900px", "calc(100% - 85px)", "MenuPOS", "POS");
     menu_Travel = new MenuMap("900px", "calc(100% - 85px)", "MenuMap", "Map");
     menu_OrderedVinyls = new OrderedVinyls("900px", "calc(100% - 85px)", "OrderedVinyls", "Ordered Vinyls");
+    menu_Capral = new CapralMenu("1000px", "calc(100% - 85px)", "CapralMenu", "Capral");
 
     addItem(GM_getResourceURL("Icon_Find"), "Find", "finder");
     addItem(GM_getResourceURL("Icon_M2"), "Area", "m2");
@@ -385,6 +387,7 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_POS"), "POS", "POS", null);
     addItem(GM_getResourceURL("Icon_Map"), "Travel", "Travel", null);
     addItem("https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Roll.svg", "Ord. Vinyls", "OrderedVinyls", null);
+    addItem(GM_getResourceURL("Icon_Capral"), "Capral", "Capral", null);
 
     function addItem(imageSrc, text, openMenuName, overrideCss, unlockListenEvent) {
         var itemContainer = document.createElement('div');
@@ -454,6 +457,7 @@ function hideAllMenu() {
     menu_POS.hide();
     menu_Travel.hide();
     menu_OrderedVinyls.hide();
+    menu_Capral.hide();
 }
 
 function openMenu(menu) {
@@ -512,6 +516,9 @@ function openMenu(menu) {
         }
         if(menu == "OrderedVinyls") {
             menu_OrderedVinyls.show();
+        }
+        if(menu == "Capral") {
+            menu_Capral.show();
         }
     }
 }
