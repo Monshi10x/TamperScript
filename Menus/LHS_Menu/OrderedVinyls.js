@@ -56,10 +56,13 @@ class SpandexColourCards {
 
             this.products = [];
             this.loadingSpinner = null;
+            this.draggedProduct = null;
+            this.onDrop = null;
 
             this.injectStyles();
             this.buildUI();
             this.bindEvents();
+            this.registerDropListener();
 
             // load saved token (if any)
             this.setToken(this.getSavedToken());
@@ -185,6 +188,11 @@ class SpandexColourCards {
       .spxSmallBtnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
       .spxHelp{font-size:12px;color:rgba(232,238,246,.7);margin-top:8px;line-height:1.35;}
       .spxHelp code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.10);}
+      .spxDragBtn{
+        border:0;border-radius:10px;padding:6px 10px;font-size:11px;font-weight:800;
+        background:rgba(64,140,255,.35);color:#fff;cursor:grab;
+      }
+      .spxDragBtn:active{cursor:grabbing;}
     `;
 
             if(typeof GM_addStyle === "function") GM_addStyle(css);
@@ -307,6 +315,46 @@ class SpandexColourCards {
             this.ui.status.textContent = text;
             this.ui.summary.textContent = text;
             this.ui.dot.style.background = dot;
+      }
+
+      registerDropListener() {
+            if(this.onDrop) {
+                  document.removeEventListener("dropEvent", this.onDrop);
+            }
+            this.onDrop = async (event) => {
+                  if(!this.draggedProduct || !event?.detail?.productNo) return;
+                  const productNo = event.detail.productNo;
+                  const cost = this.getDraggedProductCost(this.draggedProduct);
+                  const description = this.getDraggedProductDescription(this.draggedProduct);
+                  const partNo = getNumPartsInProduct(productNo);
+                  const createdPartNo = await q_AddPart_CostMarkup(productNo, partNo, true, false, 1, cost, 2.5, description);
+                  await setPartNotes(productNo, createdPartNo, this.buildPartNotes(this.draggedProduct));
+                  this.draggedProduct = null;
+            };
+            document.addEventListener("dropEvent", this.onDrop);
+      }
+
+      getDraggedProductCost(product) {
+            const priceValue = product?.price?.value ?? product?.price?.FULL?.value;
+            const parsed = Number(priceValue);
+            return Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      getDraggedProductDescription(product) {
+            const base = product?.name || product?.baseProductName || product?.baseProduct || "Spandex Item";
+            return base.includes("(Spandex)") ? base : base + " (Spandex)";
+      }
+
+      buildPartNotes(product) {
+            const lines = [
+                  "Name: " + (product?.name || "N/A"),
+                  "Code: " + (product?.code || "N/A"),
+                  "Base: " + (product?.baseProductName || product?.baseProduct || "N/A"),
+                  "Colour: " + (product?.colourCommercial || "N/A"),
+                  "Colour Hex: " + (product?.colourHex || "N/A"),
+                  "Price: " + (this.priceText(product) || "N/A"),
+            ];
+            return lines.join("\n");
       }
 
       /* --------------------- GM request (CORS bypass) --------------------- */
@@ -464,11 +512,15 @@ class SpandexColourCards {
                         const colourName = this.escape(p.colourCommercial || "Colour");
                         const price = this.escape(this.priceText(p));
                         const url = this.safe(p.url);
+                        const dragButton = code
+                              ? `<button class="spxDragBtn" data-code="${this.escape(code)}" draggable="true">Drag</button>`
+                              : "";
 
                         const openLink =
                               url && url.startsWith("/")
                                     ? `<a class="spxLink" href="https://shop.spandex.com${this.escape(url)}" target="_blank" rel="noopener">Open</a>`
                                     : "";
+                        const footerActions = [openLink, dragButton].filter(Boolean).join(" ");
 
                         return `
           <article class="spxCard">
@@ -495,7 +547,7 @@ class SpandexColourCards {
 
               <div class="spxFooter">
                 <span>${p.purchasable === false ? "Not purchasable" : (p.purchasable === true ? "Purchasable" : "")}</span>
-                ${openLink}
+                <span>${footerActions}</span>
               </div>
             </div>
           </article>
@@ -504,6 +556,21 @@ class SpandexColourCards {
                   .join("");
 
             this.ui.shown.textContent = String(items.length);
+            this.bindCardDragEvents(items);
+      }
+
+      bindCardDragEvents(items) {
+            const map = new Map(items.map((item) => [String(item.code || ""), item]));
+            const buttons = this.ui.grid.querySelectorAll(".spxDragBtn");
+            for(const button of buttons) {
+                  button.addEventListener("dragstart", (event) => {
+                        const code = button.dataset.code || "";
+                        this.draggedProduct = map.get(code) || null;
+                        if(event.dataTransfer) {
+                              event.dataTransfer.setData("text/plain", "spandex-product");
+                        }
+                  });
+            }
       }
 
       /* --------------------- load + render --------------------- */
