@@ -302,12 +302,12 @@ class SpandexColourCards {
                   });
             });
 
-            this.ui.fetchTokenBtn.addEventListener("click", () => {
+            /*this.ui.fetchTokenBtn.addEventListener("click", () => {
                   this.fetchBearerToken().catch((e) => {
                         console.error(e);
                         this.setStatus(e?.message || "Token fetch failed", "error", "#ff5a5a");
                   });
-            });
+            });*/
       }
 
       setStatus(text, kind = "muted", dot = "#777") {
@@ -327,7 +327,7 @@ class SpandexColourCards {
                   const cost = this.getDraggedProductCost(this.draggedProduct);
                   const description = this.getDraggedProductDescription(this.draggedProduct);
                   const partNo = getNumPartsInProduct(productNo);
-                  const createdPartNo = await q_AddPart_CostMarkup(productNo, partNo, true, false, 1, cost, 2.5, description);
+                  const createdPartNo = await q_AddPart_CostMarkup(productNo, partNo, true, false, 1, cost, 3, description);
                   await setPartNotes(productNo, createdPartNo, this.buildPartNotes(this.draggedProduct));
                   this.draggedProduct = null;
             };
