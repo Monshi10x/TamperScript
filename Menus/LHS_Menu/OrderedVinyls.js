@@ -47,6 +47,7 @@ class SpandexColourCards {
             // ===== CONFIG =====
             this.PAGE_SIZE = 100; // confirmed cap
             this.TOKEN_STORAGE_KEY = "spx_bearer_token";
+            this.TOKEN_ENDPOINT = "https://signschedulerapp.ts.r.appspot.com/SpandexBearerToken";
 
             // KEEP URL-ENCODED EXACTLY
             this.BASE_URL =
@@ -218,7 +219,7 @@ class SpandexColourCards {
           <div class="spxHelp">
             Token is expiring (your <code>401 InvalidTokenError</code> proves it). Get a fresh one from
             the Spandex site (Network tab → the same API call → Request Headers → <code>authorization</code>).
-            Paste it here, then click <b>Load products</b>.
+            Paste it here, or click <b>Fetch token</b>, then click <b>Load products</b>.
           </div>
 
           <div class="spxRow">
@@ -229,6 +230,7 @@ class SpandexColourCards {
 
           <div class="spxSmallBtnRow">
             <button class="spxBtn" id="spxLoad">Load products</button>
+            <button class="spxBtn" id="spxFetchToken">Fetch token</button>
             <button class="spxBtn" id="spxExport">Export JSON</button>
             <button class="spxBtn" id="spxClear">Clear</button>
             <button class="spxBtn danger" id="spxForget">Forget token</button>
@@ -250,6 +252,7 @@ class SpandexColourCards {
                   token: this.$("#spxToken"),
                   sort: this.$("#spxSort"),
                   onlyHex: this.$("#spxOnlyHex"),
+                  fetchTokenBtn: this.$("#spxFetchToken"),
                   exportBtn: this.$("#spxExport"),
                   loadBtn: this.$("#spxLoad"),
                   clearBtn: this.$("#spxClear"),
@@ -305,6 +308,13 @@ class SpandexColourCards {
                         this.setStatus(e?.message || "Fetch failed", "error", "#ff5a5a");
                   });
             });
+
+            this.ui.fetchTokenBtn.addEventListener("click", () => {
+                  this.fetchBearerToken().catch((e) => {
+                        console.error(e);
+                        this.setStatus(e?.message || "Token fetch failed", "error", "#ff5a5a");
+                  });
+            });
       }
 
       setStatus(text, kind = "muted", dot = "#777") {
@@ -348,6 +358,31 @@ class SpandexColourCards {
       }
 
       /* --------------------- fetch --------------------- */
+
+      async fetchBearerToken() {
+            this.setStatus("Fetching token…", "muted", "#408cff");
+
+            const response = await fetch(this.TOKEN_ENDPOINT, {
+                  method: "GET",
+                  headers: {accept: "application/json"},
+            });
+
+            if(!response.ok) {
+                  throw new Error(`Token fetch failed (HTTP ${response.status})`);
+            }
+
+            const data = await response.json();
+            const rawToken = this.safe(data?.bearerToken);
+
+            if(!rawToken) {
+                  throw new Error("Token response missing bearerToken");
+            }
+
+            const token = /^Bearer\s+/i.test(rawToken) ? rawToken : `Bearer ${rawToken}`;
+            this.setToken(token);
+            this.saveToken(token);
+            this.setStatus("Token updated from endpoint.", "ok", "#5affaa");
+      }
 
       async fetchAll({onProgress} = {}) {
             const token = this.safe(this.bearerToken);
