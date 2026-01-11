@@ -47,6 +47,7 @@ class SpandexColourCards {
             // ===== CONFIG =====
             this.PAGE_SIZE = 100; // confirmed cap
             this.TOKEN_STORAGE_KEY = "spx_bearer_token";
+            this.TOKEN_ENDPOINT = "https://signschedulerapp.ts.r.appspot.com/SpandexBearerToken";
 
             // KEEP URL-ENCODED EXACTLY
             this.BASE_URL =
@@ -54,15 +55,23 @@ class SpandexColourCards {
             // ==================
 
             this.products = [];
+            this.loadingSpinner = null;
+            this.draggedProduct = null;
+            this.onDrop = null;
 
             this.injectStyles();
             this.buildUI();
             this.bindEvents();
+            this.registerDropListener();
 
             // load saved token (if any)
             this.setToken(this.getSavedToken());
 
-            this.setStatus("Ready. Paste token then click “Load products”.", "muted", "#777");
+            this.setStatus("Loading products…", "muted", "#408cff");
+            this.fetchAndRender().catch((e) => {
+                  console.error(e);
+                  this.setStatus(e?.message || "Fetch failed", "error", "#ff5a5a");
+            });
       }
 
       /* --------------------- utils --------------------- */
@@ -124,7 +133,6 @@ class SpandexColourCards {
 
       setToken(token) {
             this.bearerToken = this.safe(token);
-            if(this.ui?.token) this.ui.token.value = this.bearerToken;
       }
 
       /* --------------------- styles --------------------- */
@@ -135,7 +143,7 @@ class SpandexColourCards {
       .spxPanel{background:rgba(11,15,20,.92);border:1px solid rgba(255,255,255,.10);border-radius:16px;overflow:hidden;box-shadow:0 10px 35px rgba(0,0,0,.35);}
       .spxHeader{padding:14px;border-bottom:1px solid rgba(255,255,255,.10);background:rgba(11,15,20,.92);backdrop-filter:blur(10px);}
       .spxTitle{font-size:16px;font-weight:900;margin:0 0 10px 0;}
-      .spxControls{display:grid;grid-template-columns:1fr 220px 160px 220px;gap:10px;align-items:center;}
+      .spxControls{display:grid;grid-template-columns:1fr 160px 220px;gap:10px;align-items:center;}
       @media (max-width: 1000px){.spxControls{grid-template-columns:1fr 1fr;}}
       .spxInput,.spxSelect,.spxBtn{
         width:100%;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
@@ -180,6 +188,11 @@ class SpandexColourCards {
       .spxSmallBtnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
       .spxHelp{font-size:12px;color:rgba(232,238,246,.7);margin-top:8px;line-height:1.35;}
       .spxHelp code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.10);}
+      .spxDragBtn{
+        border:0;border-radius:10px;padding:6px 10px;font-size:11px;font-weight:800;
+        background:rgba(64,140,255,.35);color:#fff;cursor:grab;
+      }
+      .spxDragBtn:active{cursor:grabbing;}
     `;
 
             if(typeof GM_addStyle === "function") GM_addStyle(css);
@@ -202,7 +215,6 @@ class SpandexColourCards {
 
           <div class="spxControls">
             <input class="spxInput" id="spxQ" type="search" placeholder="Search name/code/base/desc..." />
-            <input class="spxInput" id="spxToken" type="password" placeholder="Paste Bearer token here (e.g. Bearer abc...)" />
             <select class="spxSelect" id="spxSort">
               <option value="name_asc">Sort: Name A→Z</option>
               <option value="name_desc">Sort: Name Z→A</option>
@@ -216,9 +228,7 @@ class SpandexColourCards {
           </div>
 
           <div class="spxHelp">
-            Token is expiring (your <code>401 InvalidTokenError</code> proves it). Get a fresh one from
-            the Spandex site (Network tab → the same API call → Request Headers → <code>authorization</code>).
-            Paste it here, then click <b>Load products</b>.
+            Products load automatically when the menu opens. Use search and filters to refine results.
           </div>
 
           <div class="spxRow">
@@ -228,10 +238,9 @@ class SpandexColourCards {
           </div>
 
           <div class="spxSmallBtnRow">
-            <button class="spxBtn" id="spxLoad">Load products</button>
+            <button class="spxBtn" id="spxLoad">Reload products</button>
             <button class="spxBtn" id="spxExport">Export JSON</button>
             <button class="spxBtn" id="spxClear">Clear</button>
-            <button class="spxBtn danger" id="spxForget">Forget token</button>
           </div>
         </div>
 
@@ -247,13 +256,11 @@ class SpandexColourCards {
 
             this.ui = {
                   q: this.$("#spxQ"),
-                  token: this.$("#spxToken"),
                   sort: this.$("#spxSort"),
                   onlyHex: this.$("#spxOnlyHex"),
                   exportBtn: this.$("#spxExport"),
                   loadBtn: this.$("#spxLoad"),
                   clearBtn: this.$("#spxClear"),
-                  forgetBtn: this.$("#spxForget"),
                   grid: this.$("#spxGrid"),
                   status: this.$("#spxStatus"),
                   dot: this.$("#spxDot"),
@@ -268,18 +275,6 @@ class SpandexColourCards {
             this.ui.q.addEventListener("input", () => this.render());
             this.ui.sort.addEventListener("change", () => this.render());
             this.ui.onlyHex.addEventListener("change", () => this.render());
-
-            this.ui.token.addEventListener("input", () => {
-                  const t = this.safe(this.ui.token.value);
-                  this.setToken(t);
-                  if(t) this.saveToken(t);
-            });
-
-            this.ui.forgetBtn.addEventListener("click", () => {
-                  this.clearSavedToken();
-                  this.setToken("");
-                  this.setStatus("Token cleared. Paste a fresh token to load.", "muted", "#777");
-            });
 
             this.ui.clearBtn.addEventListener("click", () => {
                   this.products = [];
@@ -312,6 +307,46 @@ class SpandexColourCards {
             this.ui.status.textContent = text;
             this.ui.summary.textContent = text;
             this.ui.dot.style.background = dot;
+      }
+
+      registerDropListener() {
+            if(this.onDrop) {
+                  document.removeEventListener("dropEvent", this.onDrop);
+            }
+            this.onDrop = async (event) => {
+                  if(!this.draggedProduct || !event?.detail?.productNo) return;
+                  const productNo = event.detail.productNo;
+                  const cost = this.getDraggedProductCost(this.draggedProduct);
+                  const description = this.getDraggedProductDescription(this.draggedProduct);
+                  const partNo = getNumPartsInProduct(productNo);
+                  const createdPartNo = await q_AddPart_CostMarkup(productNo, partNo, true, false, 1, cost, 2.5, description);
+                  await setPartNotes(productNo, createdPartNo, this.buildPartNotes(this.draggedProduct));
+                  this.draggedProduct = null;
+            };
+            document.addEventListener("dropEvent", this.onDrop);
+      }
+
+      getDraggedProductCost(product) {
+            const priceValue = product?.price?.value ?? product?.price?.FULL?.value;
+            const parsed = Number(priceValue);
+            return Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      getDraggedProductDescription(product) {
+            const base = product?.name || product?.baseProductName || product?.baseProduct || "Spandex Item";
+            return base.includes("(Spandex)") ? base : base + " (Spandex)";
+      }
+
+      buildPartNotes(product) {
+            const lines = [
+                  "Name: " + (product?.name || "N/A"),
+                  "Code: " + (product?.code || "N/A"),
+                  "Base: " + (product?.baseProductName || product?.baseProduct || "N/A"),
+                  "Colour: " + (product?.colourCommercial || "N/A"),
+                  "Colour Hex: " + (product?.colourHex || "N/A"),
+                  "Price: " + (this.priceText(product) || "N/A"),
+            ];
+            return lines.join("\n");
       }
 
       /* --------------------- GM request (CORS bypass) --------------------- */
@@ -349,11 +384,33 @@ class SpandexColourCards {
 
       /* --------------------- fetch --------------------- */
 
+      async fetchBearerToken() {
+            const response = await fetch(this.TOKEN_ENDPOINT, {
+                  method: "GET",
+                  headers: {accept: "application/json"},
+            });
+
+            if(!response.ok) {
+                  throw new Error(`Token fetch failed (HTTP ${response.status})`);
+            }
+
+            const data = await response.json();
+            const rawToken = this.safe(data?.bearerToken);
+
+            if(!rawToken) {
+                  throw new Error("Token response missing bearerToken");
+            }
+
+            const token = /^Bearer\s+/i.test(rawToken) ? rawToken : `Bearer ${rawToken}`;
+            this.setToken(token);
+            this.saveToken(token);
+      }
+
       async fetchAll({onProgress} = {}) {
             const token = this.safe(this.bearerToken);
 
             if(!token) {
-                  throw new Error("No token set. Paste a Bearer token (starts with 'Bearer ').");
+                  throw new Error("No token set. Try reloading products.");
             }
             if(!/^Bearer\s+/i.test(token)) {
                   throw new Error("Token must start with 'Bearer ' (include the prefix).");
@@ -447,11 +504,15 @@ class SpandexColourCards {
                         const colourName = this.escape(p.colourCommercial || "Colour");
                         const price = this.escape(this.priceText(p));
                         const url = this.safe(p.url);
+                        const dragButton = code
+                              ? `<button class="spxDragBtn" data-code="${this.escape(code)}" draggable="true">Drag</button>`
+                              : "";
 
                         const openLink =
                               url && url.startsWith("/")
                                     ? `<a class="spxLink" href="https://shop.spandex.com${this.escape(url)}" target="_blank" rel="noopener">Open</a>`
                                     : "";
+                        const footerActions = [openLink, dragButton].filter(Boolean).join(" ");
 
                         return `
           <article class="spxCard">
@@ -478,7 +539,7 @@ class SpandexColourCards {
 
               <div class="spxFooter">
                 <span>${p.purchasable === false ? "Not purchasable" : (p.purchasable === true ? "Purchasable" : "")}</span>
-                ${openLink}
+                <span>${footerActions}</span>
               </div>
             </div>
           </article>
@@ -487,6 +548,21 @@ class SpandexColourCards {
                   .join("");
 
             this.ui.shown.textContent = String(items.length);
+            this.bindCardDragEvents(items);
+      }
+
+      bindCardDragEvents(items) {
+            const map = new Map(items.map((item) => [String(item.code || ""), item]));
+            const buttons = this.ui.grid.querySelectorAll(".spxDragBtn");
+            for(const button of buttons) {
+                  button.addEventListener("dragstart", (event) => {
+                        const code = button.dataset.code || "";
+                        this.draggedProduct = map.get(code) || null;
+                        if(event.dataTransfer) {
+                              event.dataTransfer.setData("text/plain", "spandex-product");
+                        }
+                  });
+            }
       }
 
       /* --------------------- load + render --------------------- */
@@ -497,27 +573,42 @@ class SpandexColourCards {
             this.ui.loaded.textContent = "0";
             this.ui.total.textContent = "?";
 
-            this.setStatus("Fetching…", "muted", "#408cff");
+            if(this.loadingSpinner) {
+                  this.loadingSpinner.Delete();
+            }
+            this.loadingSpinner = new Loader(this.ui.grid);
+            this.loadingSpinner.setSize(40);
 
-            this.products = await this.fetchAll({
-                  onProgress: ({currentPage, pageCount, collected, totalResults}) => {
-                        this.ui.loaded.textContent = String(collected);
-                        this.ui.total.textContent = String(totalResults);
-                        this.setStatus(
-                              `Page ${currentPage} -> +${pageCount} (collected ${collected}/${totalResults})`,
-                              "muted",
-                              "#408cff"
-                        );
-                  },
-            });
+            try {
+                  this.setStatus("Fetching token…", "muted", "#408cff");
+                  await this.fetchBearerToken();
 
-            window.spandexProducts = this.products;
+                  this.setStatus("Fetching products…", "muted", "#408cff");
+                  this.products = await this.fetchAll({
+                        onProgress: ({currentPage, pageCount, collected, totalResults}) => {
+                              this.ui.loaded.textContent = String(collected);
+                              this.ui.total.textContent = String(totalResults);
+                              this.setStatus(
+                                    `Page ${currentPage} -> +${pageCount} (collected ${collected}/${totalResults})`,
+                                    "muted",
+                                    "#408cff"
+                              );
+                        },
+                  });
 
-            this.ui.loaded.textContent = String(this.products.length);
-            this.ui.total.textContent = String(this.products.length);
+                  window.spandexProducts = this.products;
 
-            this.setStatus(`Done. Unique products: ${this.products.length}`, "ok", "#5affaa");
-            this.render();
+                  this.ui.loaded.textContent = String(this.products.length);
+                  this.ui.total.textContent = String(this.products.length);
+
+                  this.setStatus(`Done. Unique products: ${this.products.length}`, "ok", "#5affaa");
+                  this.render();
+            } finally {
+                  if(this.loadingSpinner) {
+                        this.loadingSpinner.Delete();
+                        this.loadingSpinner = null;
+                  }
+            }
       }
 }
 
