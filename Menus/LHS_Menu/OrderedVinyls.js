@@ -45,7 +45,7 @@ class SpandexColourCards {
             if(!this.parent) throw new Error("SpandexColourCards: parent container not found");
 
             // ===== CONFIG =====
-            this.PAGE_SIZE = 100; // confirmed cap
+            this.PAGE_SIZE = 500; // confirmed cap
             this.TOKEN_STORAGE_KEY = "spx_bearer_token";
             this.TOKEN_ENDPOINT = "https://signschedulerapp.ts.r.appspot.com/SpandexBearerToken";
 
@@ -56,6 +56,7 @@ class SpandexColourCards {
             this.CATEGORIES = [
                   {label: "Avery 700", baseProductCode: "955"},
                   {label: "Avery Translucent", baseProductCode: "738"},
+                  {label: "Arlon Translucent", baseProductCode: "TA7"},
             ];
             // ==================
 
