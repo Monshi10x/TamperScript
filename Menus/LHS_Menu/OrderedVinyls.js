@@ -57,6 +57,7 @@ class SpandexColourCards {
                   {label: "Avery 700", baseProductCode: "955"},
                   {label: "Avery Translucent", baseProductCode: "738"},
                   {label: "Arlon Translucent", baseProductCode: "TA7"},
+                  {label: "Avery Supreme Wrap", baseProductCode: "F10"},
             ];
             // ==================
 
