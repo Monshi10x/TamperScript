@@ -60,6 +60,9 @@ class SpandexColourCards {
             // ==================
 
             this.products = [];
+            this.categoryProducts = new Map();
+            this.loadedCategories = new Set();
+            this.activeCategory = this.CATEGORIES[0]?.label || "";
             this.loadingSpinner = null;
             this.draggedProduct = null;
             this.onDrop = null;
@@ -68,6 +71,7 @@ class SpandexColourCards {
             this.buildUI();
             this.bindEvents();
             this.registerDropListener();
+            this.renderTabs();
 
             // load saved token (if any)
             this.setToken(this.getSavedToken());
@@ -161,6 +165,12 @@ class SpandexColourCards {
       .spxToggle{display:inline-flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);user-select:none;}
       .spxToggle input{transform:scale(1.1);}
       .spxRow{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;}
+      .spxTabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+      .spxTab{
+        border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:6px 12px;font-size:12px;
+        background:rgba(255,255,255,.06);color:#e8eef6;cursor:pointer;font-weight:800;
+      }
+      .spxTab.active{background:rgba(64,140,255,.35);border-color:rgba(64,140,255,.6);}
       .spxPill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);font-size:12px;color:rgba(232,238,246,.9);}
       .spxDot{width:10px;height:10px;border-radius:999px;background:#777;border:1px solid rgba(255,255,255,.25);}
       .spxStatus{padding:12px 14px;border-top:1px solid rgba(255,255,255,.10);color:rgba(232,238,246,.85);font-size:13px;}
@@ -237,7 +247,7 @@ class SpandexColourCards {
           </div>
 
           <div class="spxHelp">
-            Products load automatically when the menu opens. Use search and filters to refine results.
+            Products load automatically when the menu opens. Use tabs, search, and filters to refine results.
           </div>
 
           <div class="spxRow">
@@ -245,6 +255,8 @@ class SpandexColourCards {
             <span class="spxPill">Shown: <strong id="spxShown">0</strong> <span class="spxMuted">/ Loaded:</span> <strong id="spxLoaded">0</strong></span>
             <span class="spxPill">TotalResults: <strong id="spxTotal">?</strong></span>
           </div>
+
+          <div class="spxTabs" id="spxTabs"></div>
 
           <div class="spxSmallBtnRow">
             <button class="spxBtn" id="spxLoad">Reload products</button>
@@ -278,6 +290,7 @@ class SpandexColourCards {
                   shown: this.$("#spxShown"),
                   loaded: this.$("#spxLoaded"),
                   total: this.$("#spxTotal"),
+                  tabs: this.$("#spxTabs"),
             };
       }
 
@@ -285,14 +298,28 @@ class SpandexColourCards {
             this.ui.q.addEventListener("input", () => this.render());
             this.ui.sort.addEventListener("change", () => this.render());
             this.ui.onlyHex.addEventListener("change", () => this.render());
+            this.ui.tabs.addEventListener("click", (event) => {
+                  const target = event.target.closest(".spxTab");
+                  if(!target) return;
+                  const label = target.dataset.category || "";
+                  if(!label || label === this.activeCategory) return;
+                  this.activeCategory = label;
+                  this.loadCategory(label).catch((e) => {
+                        console.error(e);
+                        this.setStatus(e?.message || "Fetch failed", "error", "#ff5a5a");
+                  });
+            });
 
             this.ui.clearBtn.addEventListener("click", () => {
                   this.products = [];
+                  this.categoryProducts.clear();
+                  this.loadedCategories.clear();
                   this.ui.grid.innerHTML = "";
                   this.ui.shown.textContent = "0";
                   this.ui.loaded.textContent = "0";
                   this.ui.total.textContent = "?";
                   this.setStatus("Cleared.", "muted", "#777");
+                  this.renderTabs();
             });
 
             this.ui.exportBtn.addEventListener("click", () => {
@@ -305,7 +332,7 @@ class SpandexColourCards {
             });
 
             this.ui.loadBtn.addEventListener("click", () => {
-                  this.fetchAndRender().catch((e) => {
+                  this.loadCategory(this.activeCategory, {force: true}).catch((e) => {
                         console.error(e);
                         this.setStatus(e?.message || "Fetch failed", "error", "#ff5a5a");
                   });
@@ -423,7 +450,7 @@ class SpandexColourCards {
             this.saveToken(token);
       }
 
-      async fetchAll({onProgress} = {}) {
+      async fetchCategory(category, {onProgress} = {}) {
             const token = this.safe(this.bearerToken);
 
             if(!token) {
@@ -438,44 +465,38 @@ class SpandexColourCards {
                   authorization: token,
             };
 
+            if(!category) return [];
+
             const all = [];
-            let totalResults = 0;
+            let currentPage = 0;
+            let categoryTotal = Infinity;
+            let categoryCollected = 0;
+            const query = encodeURIComponent(`::baseProductCode:${category.baseProductCode}`);
 
-            for(const category of this.CATEGORIES) {
-                  let currentPage = 0;
-                  let categoryTotal = Infinity;
-                  let categoryCollected = 0;
-                  const query = encodeURIComponent(`::baseProductCode:${category.baseProductCode}`);
+            while(categoryCollected < categoryTotal) {
+                  const url = `${this.BASE_URL_PREFIX}${query}${this.BASE_URL_SUFFIX}&pageSize=${this.PAGE_SIZE}&currentPage=${currentPage}`;
+                  const data = await this.requestJson(url, headers);
 
-                  while(categoryCollected < categoryTotal) {
-                        const url = `${this.BASE_URL_PREFIX}${query}${this.BASE_URL_SUFFIX}&pageSize=${this.PAGE_SIZE}&currentPage=${currentPage}`;
-                        const data = await this.requestJson(url, headers);
+                  const products = (data.products || []).map((product) => ({
+                        ...product,
+                        spxCategory: category.label,
+                  }));
+                  const pag = data.pagination || {};
+                  if(categoryTotal === Infinity) {
+                        categoryTotal = Number(pag.totalResults ?? 0);
+                  }
 
-                        const products = (data.products || []).map((product) => ({
-                              ...product,
-                              spxCategory: category.label,
-                        }));
-                        const pag = data.pagination || {};
-                        if(categoryTotal === Infinity) {
-                              categoryTotal = Number(pag.totalResults ?? 0);
-                              totalResults += categoryTotal;
-                        }
+                  all.push(...products);
+                  categoryCollected += products.length;
 
-                        all.push(...products);
-                        categoryCollected += products.length;
-
-                        if(onProgress) {
-                              onProgress({
-                                    category: category.label,
-                                    currentPage,
-                                    pageCount: products.length,
-                                    collected: all.length,
-                                    totalResults,
-                              });
-                        }
-
-                        if(products.length === 0) break;
-                        currentPage++;
+                  if(onProgress) {
+                        onProgress({
+                              category: category.label,
+                              currentPage,
+                              pageCount: products.length,
+                              collected: categoryCollected,
+                              totalResults: categoryTotal,
+                        });
                   }
             }
 
@@ -494,7 +515,7 @@ class SpandexColourCards {
             const onlyHex = this.ui.onlyHex.checked;
             const sort = this.ui.sort.value;
 
-            let items = this.products.slice();
+            let items = (this.categoryProducts.get(this.activeCategory) || []).slice();
 
             if(q) {
                   items = items.filter((p) => {
@@ -585,45 +606,30 @@ class SpandexColourCards {
         `;
             };
 
-            const grouped = new Map();
-            for(const category of this.CATEGORIES) {
-                  grouped.set(category.label, []);
-            }
-            for(const item of items) {
-                  const label = item.spxCategory || "Other";
-                  if(!grouped.has(label)) grouped.set(label, []);
-                  grouped.get(label).push(item);
-            }
-
-            const sections = [];
-            for(const category of this.CATEGORIES) {
-                  const groupItems = grouped.get(category.label) || [];
-                  sections.push(`
+            this.ui.grid.innerHTML = `
           <section class="spxCategory">
-            <div class="spxCategoryTitle">${this.escape(category.label)} (${groupItems.length})</div>
+            <div class="spxCategoryTitle">${this.escape(this.activeCategory)} (${items.length})</div>
             <div class="spxCategoryGrid">
-              ${groupItems.map(renderCard).join("")}
+              ${items.map(renderCard).join("")}
             </div>
           </section>
-        `);
-            }
-
-            for(const [label, groupItems] of grouped.entries()) {
-                  if(this.CATEGORIES.some((category) => category.label === label)) continue;
-                  sections.push(`
-          <section class="spxCategory">
-            <div class="spxCategoryTitle">${this.escape(label)} (${groupItems.length})</div>
-            <div class="spxCategoryGrid">
-              ${groupItems.map(renderCard).join("")}
-            </div>
-          </section>
-        `);
-            }
-
-            this.ui.grid.innerHTML = sections.join("");
+        `;
 
             this.ui.shown.textContent = String(items.length);
+            this.ui.loaded.textContent = String(items.length);
+            this.ui.total.textContent = String(items.length);
+            this.renderTabs();
             this.bindCardDragEvents(items);
+      }
+
+      renderTabs() {
+            const tabs = this.CATEGORIES.map((category) => {
+                  const count = this.categoryProducts.get(category.label)?.length ?? 0;
+                  const isActive = category.label === this.activeCategory;
+                  const label = this.escape(category.label);
+                  return `<button class="spxTab${isActive ? " active" : ""}" data-category="${label}">${label} (${count})</button>`;
+            }).join("");
+            this.ui.tabs.innerHTML = tabs;
       }
 
       bindCardDragEvents(items) {
@@ -643,7 +649,14 @@ class SpandexColourCards {
 
       /* --------------------- load + render --------------------- */
 
-      async fetchAndRender() {
+      async loadCategory(label, {force = false} = {}) {
+            const category = this.CATEGORIES.find((item) => item.label === label);
+            if(!category) return;
+            if(this.loadedCategories.has(label) && !force) {
+                  this.render();
+                  return;
+            }
+
             this.ui.grid.innerHTML = "";
             this.ui.shown.textContent = "0";
             this.ui.loaded.textContent = "0";
@@ -659,25 +672,28 @@ class SpandexColourCards {
                   this.setStatus("Fetching token…", "muted", "#408cff");
                   await this.fetchBearerToken();
 
-                  this.setStatus("Fetching products…", "muted", "#408cff");
-                  this.products = await this.fetchAll({
-                        onProgress: ({category, currentPage, pageCount, collected, totalResults}) => {
+                  this.setStatus(`Fetching ${label}…`, "muted", "#408cff");
+                  const products = await this.fetchCategory(category, {
+                        onProgress: ({category: name, currentPage, pageCount, collected, totalResults}) => {
                               this.ui.loaded.textContent = String(collected);
                               this.ui.total.textContent = totalResults ? String(totalResults) : "?";
                               this.setStatus(
-                                    `${category}: page ${currentPage} -> +${pageCount} (collected ${collected})`,
+                                    `${name}: page ${currentPage} -> +${pageCount} (collected ${collected})`,
                                     "muted",
                                     "#408cff"
                               );
                         },
                   });
 
+                  this.categoryProducts.set(label, products);
+                  this.loadedCategories.add(label);
+                  this.products = Array.from(this.categoryProducts.values()).flat();
                   window.spandexProducts = this.products;
 
-                  this.ui.loaded.textContent = String(this.products.length);
-                  this.ui.total.textContent = String(this.products.length);
+                  this.ui.loaded.textContent = String(products.length);
+                  this.ui.total.textContent = String(products.length);
 
-                  this.setStatus(`Done. Unique products: ${this.products.length}`, "ok", "#5affaa");
+                  this.setStatus(`Done. ${label}: ${products.length} products`, "ok", "#5affaa");
                   this.render();
             } finally {
                   if(this.loadingSpinner) {
@@ -685,6 +701,10 @@ class SpandexColourCards {
                         this.loadingSpinner = null;
                   }
             }
+      }
+
+      async fetchAndRender() {
+            await this.loadCategory(this.activeCategory);
       }
 }
 
