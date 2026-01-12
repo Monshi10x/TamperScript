@@ -267,6 +267,7 @@ class SpandexColourCards {
                   q: this.$("#spxQ"),
                   sort: this.$("#spxSort"),
                   onlyHex: this.$("#spxOnlyHex"),
+                  fetchTokenBtn: this.$("#spxFetchToken"),
                   exportBtn: this.$("#spxExport"),
                   loadBtn: this.$("#spxLoad"),
                   clearBtn: this.$("#spxClear"),
@@ -309,6 +310,13 @@ class SpandexColourCards {
                         this.setStatus(e?.message || "Fetch failed", "error", "#ff5a5a");
                   });
             });
+
+            /*this.ui.fetchTokenBtn.addEventListener("click", () => {
+                  this.fetchBearerToken().catch((e) => {
+                        console.error(e);
+                        this.setStatus(e?.message || "Token fetch failed", "error", "#ff5a5a");
+                  });
+            });*/
       }
 
       setStatus(text, kind = "muted", dot = "#777") {
