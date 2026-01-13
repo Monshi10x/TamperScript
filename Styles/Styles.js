@@ -21,6 +21,7 @@ const COLOUR = {
 };
 
 const STYLE = {
+      //Button: "display: block; float: left; width: 45%; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:0px solid " + COLOUR.Blue + ";cursor: pointer;box-shadow:inset 0 1px 2px #ffffff70, 0 4px 6px #00000030, 0 6px 10px #00000015;border-radius:10px;",
       Button: "display: block; float: left; width: 45%; background-color: " + COLOUR.Blue + "; color:white;min-height: 35px; margin: 10px; border:4px solid " + COLOUR.Blue + ";cursor: pointer;box-shadow: rgba(0, 0, 0, 0.3) 3px 4px 10px 0px;",
       InputField: "float:left;width:250px;min-height:40px;border:1px solid rgb(177, 177, 177);box-shadow: rgb(199 199 199) 4px 6px 20px 0px;position: relative;margin:5px;background-color:white;",
       InputInfield: "float:left;width:250px;min-height:40px;border:1px solid rgb(177, 177, 177);box-shadow: rgb(199 199 199) 4px 6px 20px 0px;position: relative;margin:5px;background-color:white;",
