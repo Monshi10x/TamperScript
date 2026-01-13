@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.49
+// @version      10.498
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -120,6 +120,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\MenuMap.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\OrderedVinyls.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\CapralMenu.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Menus\LHS_Menu\ConsoleMenu.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\Modal.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalManageSubscriptions.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInput.js
@@ -136,6 +137,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSheetJoins.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalVinylJoins.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSVG.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Modal\ModalSVG3DViewer.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Mouse\ContextMenu.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Estimate_Supplementals\SaveReminder.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Estimate_Supplementals\ProductComponents.js

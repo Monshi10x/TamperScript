@@ -334,14 +334,19 @@ var menu_POS;
 var menu_Travel;
 var menu_OrderedVinyls;
 var menu_Capral;
+var menu_Console;
 async function initLHSMenu() {
     var container = document.createElement('div');
-    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + "rgb(36 36 36)" + ";box-shadow: rgb(0, 0, 0) 6px 1px 20px -2px,rgb(0, 0, 0) 6px 1px 60px -2px;";
+    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + "rgb(36 36 36)" + ";box-shadow: rgb(0, 0, 0) 6px 1px 20px -2px,rgb(0, 0, 0) 6px 1px 60px -2px;display:flex;flex-direction:column;overflow:hidden;";
     container.id = "LHSMenu";
 
     let header = document.createElement('div');
     header.style = StringCombine("display:flex;justify-content:center;align-items:center;width:100%;height:30px;background-color:", "rgb(36 36 36)");
     container.appendChild(header);
+
+    let itemsContainer = document.createElement('div');
+    itemsContainer.style = "flex:1 1 auto;position:relative;overflow-y:auto;overflow-x:hidden;";
+    container.appendChild(itemsContainer);
 
     let headerIcon = document.createElement('img');
     headerIcon.src = ICON.CPUChip;
@@ -368,41 +373,50 @@ async function initLHSMenu() {
     menu_Travel = new MenuMap("900px", "calc(100% - 85px)", "MenuMap", "Map");
     menu_OrderedVinyls = new OrderedVinyls("900px", "calc(100% - 85px)", "OrderedVinyls", "Ordered Vinyls");
     menu_Capral = new CapralMenu("1000px", "calc(100% - 85px)", "CapralMenu", "Capral");
+    menu_Console = new ConsoleMenu("500px", "calc(100% - 85px)", "ConsoleMenu", "Console");
 
     addItem(GM_getResourceURL("Icon_Find"), "Find", "finder");
     addItem(GM_getResourceURL("Icon_M2"), "Area", "m2");
     addItem(GM_getResourceURL("Icon_Lnm"), "Length", "lnm");
     addItem(GM_getResourceURL("Icon_LED"), "LED", "LED");
-    addItem(GM_getResourceURL("Icon_Lightbox"), "Lightbox", "lightbox", null, "loadedPredefinedParts");
-    addItem(GM_getResourceURL("Icon_Billboard"), "Billboard", "billboard", null, "loadedPredefinedParts");
-    addItem(GM_getResourceURL("Icon_Compare"), "Compare", "compare", null, "loadedPredefinedParts");
-    addItem(GM_getResourceURL("Icon_Router"), "Router", "router", null, "loadedPredefinedParts");
-    addItem(GM_getResourceURL("Icon_Window"), "Window", "window", null, "loadedPredefinedParts");
-    addItem(GM_getResourceURL("Icon_Layers"), "Panel Signs", "panel", null, "loadedPredefinedParts");
-    addItem(GM_getResourceURL("Icon_Vehicle"), "Vehicles", "vehicle", null, "loadedPredefinedParts");
-    addItem(GM_getResourceURL("Icon_Admin"), "Admin", "admin", "position:absolute;bottom:0px;");
+    addItem(GM_getResourceURL("Icon_Lightbox"), "Lightbox", "lightbox", {unlockListenEvent: "loadedPredefinedParts"});
+    addItem(GM_getResourceURL("Icon_Billboard"), "Billboard", "billboard", {unlockListenEvent: "loadedPredefinedParts"});
+    addItem(GM_getResourceURL("Icon_Compare"), "Compare", "compare", {unlockListenEvent: "loadedPredefinedParts"});
+    addItem(GM_getResourceURL("Icon_Router"), "Router", "router", {unlockListenEvent: "loadedPredefinedParts"});
+    addItem(GM_getResourceURL("Icon_Window"), "Window", "window", {unlockListenEvent: "loadedPredefinedParts"});
+    addItem(GM_getResourceURL("Icon_Layers"), "Panel Signs", "panel", {unlockListenEvent: "loadedPredefinedParts"});
+    addItem(GM_getResourceURL("Icon_Vehicle"), "Vehicles", "vehicle", {unlockListenEvent: "loadedPredefinedParts"});
+    addItem(GM_getResourceURL("Icon_Admin"), "Admin", "admin");
     addItem(GM_getResourceURL("Icon_CreditCard"), "Surcharge", "surcharge");
-    addItem(GM_getResourceURL("Icon_3D"), "3D Letters", "3D", null, "loadedPredefinedParts");
-    addItem(GM_getResourceURL("Icon_Chart"), "Charts", "Charts", null, "loadedPredefinedParts");
-    addItem(GM_getResourceURL("Icon_POS"), "POS", "POS", null);
-    addItem(GM_getResourceURL("Icon_Map"), "Travel", "Travel", null);
-    addItem("https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Roll.svg", "Ord. Vinyls", "OrderedVinyls", null);
-    addItem(GM_getResourceURL("Icon_Capral"), "Capral", "Capral", null);
+    addItem(GM_getResourceURL("Icon_3D"), "3D Letters", "3D", {unlockListenEvent: "loadedPredefinedParts"});
+    addItem(GM_getResourceURL("Icon_Chart"), "Charts", "Charts", {unlockListenEvent: "loadedPredefinedParts"});
+    addItem(GM_getResourceURL("Icon_POS"), "POS", "POS");
+    addItem(GM_getResourceURL("Icon_Map"), "Travel", "Travel");
+    addItem("https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Roll.svg", "Ord. Vinyls", "OrderedVinyls");
+    addItem(GM_getResourceURL("Icon_Capral"), "Capral", "Capral");
+    const consoleItem = addItem(GM_getResourceURL("Icon_Find"), "Console", "console", {badgeType: "consoleErrors"});
+    registerConsoleErrorBadge(consoleItem.querySelector(".lhsMenuBadge"));
 
-    function addItem(imageSrc, text, openMenuName, overrideCss, unlockListenEvent) {
+    function addItem(imageSrc, text, openMenuName, options = {}) {
+        const {overrideCss, unlockListenEvent, badgeType} = options;
         var itemContainer = document.createElement('div');
-        itemContainer.style = "display:block;float:left;width:100%;height:50px;margin:0px;cursor:pointer;background-color:" + "rgb(36 36 36)" + ";padding:0px;border-bottom:0px solid #00b;";
+        itemContainer.style = "display:block;float:left;width:100%;height:50px;margin:0px;cursor:pointer;background-color:" + "rgb(36 36 36)" + ";padding:0px;border-bottom:0px solid #00b;position:relative;";
+        itemContainer.classList.add("lhsMenuItem");
+        itemContainer.dataset.selected = "false";
         itemContainer.style.cssText += overrideCss;
         itemContainer.onmouseover = function() {
             itemContainer.style.backgroundColor = COLOUR.DarkGrey;
         };
         itemContainer.onmouseout = function() {
+            if(itemContainer.dataset.selected === "true") return;
             itemContainer.style.backgroundColor = "rgb(36 36 36)";
         };
         itemContainer.onclick = function() {
             openMenu(openMenuName);
             deselectSelectorBars();
             selectorBar.style.backgroundColor = "#0099FF";
+            itemContainer.dataset.selected = "true";
+            itemContainer.style.backgroundColor = COLOUR.DarkGrey;
         };
 
         var selectorBar = document.createElement('div');
@@ -421,6 +435,13 @@ async function initLHSMenu() {
         itemText.style = "display:block;float:right;width:80px;height:15px;padding:17.5px 10px;color:white;font-weight:bold; font-family: Century Gothic, CenturyGothic, AppleGothic, sans-serif";
         itemContainer.appendChild(itemText);
 
+        if(badgeType === "consoleErrors") {
+            const badge = document.createElement("div");
+            badge.className = "lhsMenuBadge";
+            badge.style = "position:absolute;top:8px;right:8px;min-width:18px;height:18px;padding:0 6px;border-radius:9px;background-color:" + COLOUR.Red + ";color:white;font-size:11px;display:none;align-items:center;justify-content:center;";
+            itemContainer.appendChild(badge);
+        }
+
         if(unlockListenEvent) {
             itemContainer.style.pointerEvents = "none";
             //itemContainer.style.backgroundColor = COLOUR.Black;
@@ -432,7 +453,8 @@ async function initLHSMenu() {
             });
         }
 
-        container.appendChild(itemContainer);
+        itemsContainer.appendChild(itemContainer);
+        return itemContainer;
     }
 
     document.getElementsByTagName('body')[0].appendChild(container);
@@ -458,6 +480,7 @@ function hideAllMenu() {
     menu_Travel.hide();
     menu_OrderedVinyls.hide();
     menu_Capral.hide();
+    menu_Console.hide();
 }
 
 function openMenu(menu) {
@@ -519,6 +542,9 @@ function openMenu(menu) {
         }
         if(menu == "Capral") {
             menu_Capral.show();
+        }
+        if(menu == "console") {
+            menu_Console.show();
         }
     }
 }
@@ -614,6 +640,11 @@ function deselectSelectorBars(isSubMenu) {
         var items = document.querySelectorAll("#selectorBar");
         for(var i = 0; i < items.length; i++) {
             items[i].style.backgroundColor = "transparent";
+        }
+        var menuItems = document.querySelectorAll(".lhsMenuItem");
+        for(var i2 = 0; i2 < menuItems.length; i2++) {
+            menuItems[i2].dataset.selected = "false";
+            menuItems[i2].style.backgroundColor = "rgb(36 36 36)";
         }
     } else {
         var items2 = document.querySelectorAll("#selectorBar2");
