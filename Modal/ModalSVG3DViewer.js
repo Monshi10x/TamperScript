@@ -250,7 +250,7 @@ class ModalSVG3DViewer {
             };
             Object.assign(this.#options, options);
 
-            this.#button = createButton(this.#options.buttonLabel, this.#options.buttonStyle, () => {
+            this.#button = createIconButton(GM_getResourceURL("Icon_3D"), this.#options.buttonLabel, `${this.#options.buttonStyle}background-color:${COLOUR.Orange};`, () => {
                   this.open();
             }, parentToAppendTo);
 
