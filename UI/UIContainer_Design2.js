@@ -506,6 +506,7 @@ class UIContainer_Design2 {
       #f_productQty;
       #f_productQtyLoader;
       #f_designer;
+      #f_designerChip;
       #f_WIPStatus;
       #f_lineItemDescriptionText;
       #f_partsText;
@@ -666,6 +667,12 @@ class UIContainer_Design2 {
             if(this.userCanSeeCosting) {
                   this.#f_openInSalesBtn = createLink("display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Blue + ";cursor: pointer;font-size:13px;text-align:center;line-height:30px;", "S", "/SalesModule/Orders/Order.aspx?OrderId=" + this.#jobObject.OrderId, "new window", this.#f_contentContainer);
                   this.addHeadingButtons(this.#f_openInSalesBtn);
+            }
+
+            let designerChipInfo = this.getDesignerChipInfo();
+            if(designerChipInfo) {
+                  this.#f_designerChip = this.createDesignerChip(designerChipInfo);
+                  this.addHeadingButtons(this.#f_designerChip);
             }
             /*
             Proof*/
@@ -1215,6 +1222,37 @@ class UIContainer_Design2 {
                   this.#f_headingContainer.appendChild(itemContainers[i]);
                   this.#addedHeadingItems_combinedWidth += itemContainers[i].offsetWidth;
             }
+      }
+
+      getDesignerChipInfo() {
+            let designerSource = this.#jobObject.AssignedUsers;
+            if(!designerSource || designerSource === "null") {
+                  designerSource = this.#jobObject.DesignerName;
+            }
+            if(!designerSource) {
+                  return null;
+            }
+
+            let normalizedDesigner = designerSource.toLowerCase();
+            let designerConfig = [
+                  {key: "darren", label: "Darren", colour: "#3f6ed0"},
+                  {key: "leandri", label: "Leandri", colour: "#d05aa5"}
+            ];
+
+            for(let i = 0; i < designerConfig.length; i++) {
+                  if(normalizedDesigner.includes(designerConfig[i].key)) {
+                        return designerConfig[i];
+                  }
+            }
+
+            return null;
+      }
+
+      createDesignerChip({label, colour}) {
+            let chip = document.createElement("div");
+            chip.innerText = label;
+            chip.style = "display: block; float: left; height: 30px; border:none; padding: 0px 10px; color:white; font-size:12px; font-weight:600; line-height:30px; margin: 0px 0px 0px 6px; background-color:" + colour + "; border-radius: 999px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;";
+            return chip;
       }
 
       parseKOStorageVariable(koString) {
