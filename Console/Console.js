@@ -18,26 +18,13 @@ function updateErrors() {
 
 function createLog() {
     log = document.createElement('div');
-    var logContainer = document.createElement('div');
-    var header = document.createElement("p");
-    header.innerText = "Console";
-    header.style = "width:100%;padding:8px;font:14px;margin:0px;color:white;text-align:center;font-weight:bold;";
-    logContainer.style = "width:160px;min-height:50px;max-height:200px;position:fixed;left:0px;bottom:50px;background-color:" + "rgb(36 36 36)" + ";display:block;z-index:900;border-bottom: 1px solid " + "rgb(36 36 36)" + ";border-top: 1px solid " + "rgb(36 36 36)" + ";";
-    log.style = "overflow-y: scroll;";
-    log.id = "Log";
     logTextObject = document.createElement('p');
-    logTextObject.style = "color:white; padding:5px";
-    log.appendChild(logTextObject);
-    logContainer.appendChild(header);
-    logContainer.appendChild(log);
-
-    document.getElementsByTagName('body')[0].appendChild(logContainer);
 }
 function showLog() {
-    log.style.display = "block";
+    if(log) log.style.display = "block";
 }
 function hideLog() {
-    log.style.display = "none";
+    if(log) log.style.display = "none";
 }
 
 function addLogText(key, value) {
