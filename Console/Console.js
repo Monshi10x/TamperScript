@@ -7,6 +7,7 @@ var log;
 let logText = new Map();
 var logTextObject;
 var err;
+var consoleErrorBadge;
 
 function updateErrors() {
     error_global_orderMinimum_Price_Install = {name: 'error_global_orderMinimum_Price_Install', value: 'Error -> Install Prices must sum greater than ' + global_orderMinimum_Price_Install + '$ total'};
@@ -47,6 +48,7 @@ function addLogText(key, value) {
     for(let [k, v] of logText.entries()) {
         logTextObject.innerHTML += v + "<br>";
     }
+    updateConsoleErrorBadge();
 }
 function removeLogText(key) {
     if(logText == null) return;
@@ -60,6 +62,7 @@ function removeLogText(key) {
     } else {
         hideLog();
     }
+    updateConsoleErrorBadge();
 }
 function logContainsErrors() {
     if(logText.has("error_global_orderMinimum_Price_Install") ||
@@ -68,6 +71,41 @@ function logContainsErrors() {
         logText.has("error_global_orderMinimum_Price")) {
         return true;
     } else {return false;}
+}
+
+function getConsoleLogText() {
+    if(!logText || logText.size === 0) return "";
+    let message = "";
+    for(let [, value] of logText.entries()) {
+        message += value + "\n";
+    }
+    return message.trim();
+}
+
+function getConsoleErrorCount() {
+    if(!logText) return 0;
+    let count = 0;
+    for(let [key] of logText.entries()) {
+        if(key && String(key).startsWith("error_")) count += 1;
+    }
+    return count;
+}
+
+function registerConsoleErrorBadge(badgeElement) {
+    consoleErrorBadge = badgeElement;
+    updateConsoleErrorBadge();
+}
+
+function updateConsoleErrorBadge() {
+    if(!consoleErrorBadge) return;
+    const count = getConsoleErrorCount();
+    if(count > 0) {
+        consoleErrorBadge.textContent = count;
+        consoleErrorBadge.style.display = "inline-flex";
+    } else {
+        consoleErrorBadge.textContent = "";
+        consoleErrorBadge.style.display = "none";
+    }
 }
 
 function consoleTick() {
