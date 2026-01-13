@@ -336,12 +336,16 @@ var menu_OrderedVinyls;
 var menu_Capral;
 async function initLHSMenu() {
     var container = document.createElement('div');
-    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + "rgb(36 36 36)" + ";box-shadow: rgb(0, 0, 0) 6px 1px 20px -2px,rgb(0, 0, 0) 6px 1px 60px -2px;";
+    container.style = "width:160px;position:fixed;top:82px;left:0px;bottom:0px;background-color:" + "rgb(36 36 36)" + ";box-shadow: rgb(0, 0, 0) 6px 1px 20px -2px,rgb(0, 0, 0) 6px 1px 60px -2px;display:flex;flex-direction:column;overflow:hidden;";
     container.id = "LHSMenu";
 
     let header = document.createElement('div');
     header.style = StringCombine("display:flex;justify-content:center;align-items:center;width:100%;height:30px;background-color:", "rgb(36 36 36)");
     container.appendChild(header);
+
+    let itemsContainer = document.createElement('div');
+    itemsContainer.style = "flex:1 1 auto;position:relative;overflow-y:auto;overflow-x:hidden;";
+    container.appendChild(itemsContainer);
 
     let headerIcon = document.createElement('img');
     headerIcon.src = ICON.CPUChip;
@@ -392,17 +396,22 @@ async function initLHSMenu() {
     function addItem(imageSrc, text, openMenuName, overrideCss, unlockListenEvent) {
         var itemContainer = document.createElement('div');
         itemContainer.style = "display:block;float:left;width:100%;height:50px;margin:0px;cursor:pointer;background-color:" + "rgb(36 36 36)" + ";padding:0px;border-bottom:0px solid #00b;";
+        itemContainer.classList.add("lhsMenuItem");
+        itemContainer.dataset.selected = "false";
         itemContainer.style.cssText += overrideCss;
         itemContainer.onmouseover = function() {
             itemContainer.style.backgroundColor = COLOUR.DarkGrey;
         };
         itemContainer.onmouseout = function() {
+            if(itemContainer.dataset.selected === "true") return;
             itemContainer.style.backgroundColor = "rgb(36 36 36)";
         };
         itemContainer.onclick = function() {
             openMenu(openMenuName);
             deselectSelectorBars();
             selectorBar.style.backgroundColor = "#0099FF";
+            itemContainer.dataset.selected = "true";
+            itemContainer.style.backgroundColor = COLOUR.DarkGrey;
         };
 
         var selectorBar = document.createElement('div');
@@ -432,7 +441,7 @@ async function initLHSMenu() {
             });
         }
 
-        container.appendChild(itemContainer);
+        itemsContainer.appendChild(itemContainer);
     }
 
     document.getElementsByTagName('body')[0].appendChild(container);
@@ -614,6 +623,11 @@ function deselectSelectorBars(isSubMenu) {
         var items = document.querySelectorAll("#selectorBar");
         for(var i = 0; i < items.length; i++) {
             items[i].style.backgroundColor = "transparent";
+        }
+        var menuItems = document.querySelectorAll(".lhsMenuItem");
+        for(var i2 = 0; i2 < menuItems.length; i2++) {
+            menuItems[i2].dataset.selected = "false";
+            menuItems[i2].style.backgroundColor = "rgb(36 36 36)";
         }
     } else {
         var items2 = document.querySelectorAll("#selectorBar2");
