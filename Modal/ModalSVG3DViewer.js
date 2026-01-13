@@ -241,7 +241,7 @@ class ModalSVG3DViewer {
             this.#options = {
                   title: "3D SVG Viewer",
                   buttonLabel: "3D Viewer",
-                  buttonStyle: "margin:5px;min-height:40px;width:calc(50% - 10px);box-sizing:border-box;",
+                  buttonStyle: "margin:5px;min-height:40px;height:40px;width:calc(50% - 10px);box-sizing:border-box;",
                   modalWidth: 900,
                   modalHeight: 650,
                   backgroundColor: "#0a0a0c",
@@ -253,6 +253,13 @@ class ModalSVG3DViewer {
             this.#button = createIconButton(GM_getResourceURL("Icon_3D"), this.#options.buttonLabel, `${this.#options.buttonStyle}background-color:${COLOUR.Orange};`, () => {
                   this.open();
             }, parentToAppendTo);
+            const icon = this.#button.querySelector("img");
+            if(icon) {
+                  icon.style.height = "70%";
+                  icon.style.marginTop = "6px";
+                  icon.style.marginLeft = "4px";
+                  icon.style.marginRight = "4px";
+            }
 
             if(this.#options.startHidden) this.setButtonVisible(false);
 
