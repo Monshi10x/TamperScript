@@ -36,6 +36,7 @@ class SVGCutfile extends SubscriptionManager {
       #f_subscribedToLabel;
       #f_visualiser;
       #f_visualiserBtn;
+      #svg3dViewer;
       #f_svgFile;
       #f_deleteBtn;
       #f_fileChooser;
@@ -183,6 +184,10 @@ class SVGCutfile extends SubscriptionManager {
                   await this.onFileChange();
             }, f_container_fileChooser);
 
+            this.#svg3dViewer = new ModalSVG3DViewer(f_container_fileChooser, {
+                  svgTextProvider: () => this.#f_svgFile
+            });
+
             this.#f_visualiserBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 10px);display:none;height:40px;margin:5px;background-color:" + COLOUR.Orange + ";", () => {
                   this.#f_visualiser = new ModalSVG("SVG", 100, () => {
                         this.UpdateFromFields();
@@ -237,8 +242,22 @@ class SVGCutfile extends SubscriptionManager {
       async onFileChange() {
             console.log("svg file set to");
             console.log(this.#f_svgFile);
-            if(this.#f_svgFile) $(this.#f_visualiserBtn).show();
-            else $(this.#f_visualiserBtn).hide();
+            const isValidSvg = this.#isValidSvgText(this.#f_svgFile);
+            if(isValidSvg) {
+                  $(this.#f_visualiserBtn).show();
+                  this.#svg3dViewer?.setButtonVisible(true);
+            } else {
+                  $(this.#f_visualiserBtn).hide();
+                  this.#svg3dViewer?.setButtonVisible(false);
+                  $(this.#f_pathLength[1]).val(0).change();
+                  $(this.#f_shapeAreas[1]).val(0).change();
+                  $(this.#f_totalBoundingRectAreas[1]).val(0).change();
+                  this.#overallSize = null;
+                  this.#shapeAreas = 0;
+                  this.#totalBoundingRectAreas = 0;
+                  this.UpdateFromFields();
+                  return;
+            }
 
             $(this.#f_pathLength[1]).val(roundNumber(svg_getTotalPathLengths(svg_makeFromString(this.#f_svgFile)), 2)).change();
 
@@ -320,6 +339,14 @@ class SVGCutfile extends SubscriptionManager {
             let depth = 0;
 
             return new QWHD(qty, width, height, depth);
+      }
+
+      #isValidSvgText(svgText) {
+            if(!svgText) return false;
+            const parsed = new DOMParser().parseFromString(svgText, "image/svg+xml");
+            if(parsed.querySelector("parsererror")) return false;
+            const root = parsed.documentElement;
+            return root && root.tagName && root.tagName.toLowerCase() === "svg";
       }
 
       #openSettingsModal() {
