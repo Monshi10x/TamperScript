@@ -16,7 +16,9 @@ async function injectSvg3DViewerImportMap() {
                   "three/examples/jsm/controls/OrbitControls.js":
                         "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js",
                   "three/examples/jsm/loaders/SVGLoader.js":
-                        "https://unpkg.com/three@0.160.0/examples/jsm/loaders/SVGLoader.js"
+                        "https://unpkg.com/three@0.160.0/examples/jsm/loaders/SVGLoader.js",
+                  "three/examples/jsm/exporters/GLTFExporter.js":
+                        "https://unpkg.com/three@0.160.0/examples/jsm/exporters/GLTFExporter.js"
             }
       });
       document.head.appendChild(script);
@@ -33,6 +35,7 @@ class ModalSVG3DViewer {
       #scene;
       #camera;
       #controls;
+      #grid;
       #svgRoot;
       #svgUserGroup;
       #svgFixGroup;
@@ -40,10 +43,15 @@ class ModalSVG3DViewer {
       #resizeObserver;
       #initialized = false;
       #svgText;
+      #settingsContainer;
+      #settingsContent;
+      #sidebar;
 
       #THREE;
       #OrbitControls;
       #SVGLoader;
+      #GLTFExporter;
+      #settings;
 
       constructor(parentToAppendTo, options = {}) {
             this.#options = {
@@ -52,14 +60,7 @@ class ModalSVG3DViewer {
                   buttonStyle: "margin:5px;min-height:40px;width:calc(50% - 10px);box-sizing:border-box;",
                   modalWidth: 900,
                   modalHeight: 650,
-                  depth: 10,
-                  scale: 1,
-                  flipX: false,
-                  flipY: false,
-                  flipZ: false,
                   backgroundColor: "#0a0a0c",
-                  showGrid: true,
-                  curveSegments: 12,
                   svgTextProvider: null,
                   startHidden: true
             };
@@ -70,6 +71,19 @@ class ModalSVG3DViewer {
             }, parentToAppendTo);
 
             if(this.#options.startHidden) this.setButtonVisible(false);
+
+            this.#settings = {
+                  scale: 1,
+                  depth: 10,
+                  curveSegments: 12,
+                  flipX: false,
+                  flipY: false,
+                  flipZ: false,
+                  wireframe: false,
+                  doubleSided: true,
+                  showGrid: true,
+                  bgColor: this.#options.backgroundColor
+            };
       }
 
       setButtonVisible(isVisible) {
@@ -105,13 +119,23 @@ class ModalSVG3DViewer {
             const body = this.#modal.getBodyElement();
             body.style.overflow = "hidden";
 
+            const layout = document.createElement("div");
+            layout.style = "width:100%;height:100%;display:flex;flex-direction:row;gap:0px;";
+            body.appendChild(layout);
+
             this.#viewerContainer = document.createElement("div");
-            this.#viewerContainer.style = `width:100%;height:100%;background-color:${this.#options.backgroundColor};position:relative;`;
-            body.appendChild(this.#viewerContainer);
+            this.#viewerContainer.style = `flex:1;height:100%;background-color:${this.#options.backgroundColor};position:relative;`;
+            layout.appendChild(this.#viewerContainer);
 
             this.#canvas = document.createElement("canvas");
             this.#canvas.style = "width:100%;height:100%;display:block;";
             this.#viewerContainer.appendChild(this.#canvas);
+
+            this.#sidebar = document.createElement("div");
+            this.#sidebar.style = "width:260px;height:100%;border-left:1px solid #ddd;background-color:#f9f9f9;box-sizing:border-box;padding:10px;overflow-y:auto;";
+            layout.appendChild(this.#sidebar);
+
+            this.#buildSidebar();
 
             this.#modal.addFooterElement(createButton("Close", "width:100px;float:right;margin:5px;", () => {
                   this.#modal.hide();
@@ -125,10 +149,12 @@ class ModalSVG3DViewer {
             const THREE = await import("three");
             const {OrbitControls} = await import("three/examples/jsm/controls/OrbitControls.js");
             const {SVGLoader} = await import("three/examples/jsm/loaders/SVGLoader.js");
+            const {GLTFExporter} = await import("three/examples/jsm/exporters/GLTFExporter.js");
 
             this.#THREE = THREE;
             this.#OrbitControls = OrbitControls;
             this.#SVGLoader = SVGLoader;
+            this.#GLTFExporter = GLTFExporter;
 
             this.#buildScene();
             this.#startAnimation();
@@ -173,11 +199,10 @@ class ModalSVG3DViewer {
             dir2.position.set(-350, 400, -250);
             this.#scene.add(dir2);
 
-            if(this.#options.showGrid) {
-                  const grid = new THREE.GridHelper(2000, 40, 0x4a4a4a, 0x2a2a2a);
-                  grid.position.y = 0;
-                  this.#scene.add(grid);
-            }
+            this.#grid = new THREE.GridHelper(2000, 40, 0x4a4a4a, 0x2a2a2a);
+            this.#grid.position.y = 0;
+            this.#grid.visible = !!this.#settings.showGrid;
+            this.#scene.add(this.#grid);
 
             this.#svgRoot = new THREE.Group();
             this.#scene.add(this.#svgRoot);
@@ -212,6 +237,212 @@ class ModalSVG3DViewer {
             this.#rebuildExtrude();
       }
 
+      #buildSidebar() {
+            const makeSectionTitle = (text) => {
+                  const title = document.createElement("div");
+                  title.textContent = text;
+                  title.style = "font-weight:bold;font-size:13px;margin:10px 0 6px 0;color:#333;";
+                  return title;
+            };
+
+            const makeRow = () => {
+                  const row = document.createElement("div");
+                  row.style = "display:flex;align-items:center;gap:6px;margin:6px 0;";
+                  return row;
+            };
+
+            const makeLabel = (text) => {
+                  const label = document.createElement("label");
+                  label.textContent = text;
+                  label.style = "font-size:12px;color:#444;flex:1;";
+                  return label;
+            };
+
+            const makeRange = (min, max, step, value) => {
+                  const input = document.createElement("input");
+                  input.type = "range";
+                  input.min = String(min);
+                  input.max = String(max);
+                  input.step = String(step);
+                  input.value = String(value);
+                  input.style = "flex:1;";
+                  return input;
+            };
+
+            const makeNumber = (min, max, step, value) => {
+                  const input = document.createElement("input");
+                  input.type = "number";
+                  input.min = String(min);
+                  input.max = String(max);
+                  input.step = String(step);
+                  input.value = String(value);
+                  input.style = "width:80px;";
+                  return input;
+            };
+
+            const makeCheckbox = (checked) => {
+                  const input = document.createElement("input");
+                  input.type = "checkbox";
+                  input.checked = !!checked;
+                  return input;
+            };
+
+            const makeButton = (label, onClick) => {
+                  return createButton(label, "width:100%;margin:4px 0;float:none;display:block;", onClick, null);
+            };
+
+            const actionSection = document.createElement("div");
+            actionSection.appendChild(makeSectionTitle("Actions"));
+            actionSection.appendChild(makeButton("Reset View", () => this.#resetView()));
+            actionSection.appendChild(makeButton("Clear", () => this.#clearSvg()));
+            this.#sidebar.appendChild(actionSection);
+
+            const settingsSection = document.createElement("div");
+            settingsSection.appendChild(makeSectionTitle("Settings"));
+            this.#settingsContainer = settingsSection;
+            this.#settingsContent = document.createElement("div");
+
+            const scaleRow = makeRow();
+            scaleRow.appendChild(makeLabel("Scale"));
+            const scaleRange = makeRange(0, 10, 0.01, this.#settings.scale);
+            const scaleNumber = makeNumber(0, 10, 0.01, this.#settings.scale);
+            scaleRow.appendChild(scaleRange);
+            scaleRow.appendChild(scaleNumber);
+            this.#settingsContent.appendChild(scaleRow);
+
+            const depthRow = makeRow();
+            depthRow.appendChild(makeLabel("Depth"));
+            const depthRange = makeRange(0, 500, 0.1, this.#settings.depth);
+            const depthNumber = makeNumber(0, 500, 0.1, this.#settings.depth);
+            depthRow.appendChild(depthRange);
+            depthRow.appendChild(depthNumber);
+            this.#settingsContent.appendChild(depthRow);
+
+            const curveRow = makeRow();
+            curveRow.appendChild(makeLabel("Curve Segments"));
+            const curveRange = makeRange(1, 64, 1, this.#settings.curveSegments);
+            const curveNumber = makeNumber(1, 64, 1, this.#settings.curveSegments);
+            curveRow.appendChild(curveRange);
+            curveRow.appendChild(curveNumber);
+            this.#settingsContent.appendChild(curveRow);
+
+            const flipRow = makeRow();
+            flipRow.appendChild(makeLabel("Flip Axes"));
+            const flipX = makeCheckbox(this.#settings.flipX);
+            const flipY = makeCheckbox(this.#settings.flipY);
+            const flipZ = makeCheckbox(this.#settings.flipZ);
+            const flipWrap = document.createElement("div");
+            flipWrap.style = "display:flex;gap:4px;";
+            flipWrap.appendChild(flipX);
+            flipWrap.appendChild(document.createTextNode("X"));
+            flipWrap.appendChild(flipY);
+            flipWrap.appendChild(document.createTextNode("Y"));
+            flipWrap.appendChild(flipZ);
+            flipWrap.appendChild(document.createTextNode("Z"));
+            flipRow.appendChild(flipWrap);
+            this.#settingsContent.appendChild(flipRow);
+
+            const renderRow = makeRow();
+            renderRow.appendChild(makeLabel("Render"));
+            const wireframe = makeCheckbox(this.#settings.wireframe);
+            const doubleSided = makeCheckbox(this.#settings.doubleSided);
+            const renderWrap = document.createElement("div");
+            renderWrap.style = "display:flex;gap:4px;align-items:center;";
+            renderWrap.appendChild(wireframe);
+            renderWrap.appendChild(document.createTextNode("Wireframe"));
+            renderWrap.appendChild(doubleSided);
+            renderWrap.appendChild(document.createTextNode("Double-sided"));
+            renderRow.appendChild(renderWrap);
+            this.#settingsContent.appendChild(renderRow);
+
+            const worldRow = makeRow();
+            worldRow.appendChild(makeLabel("Grid"));
+            const showGrid = makeCheckbox(this.#settings.showGrid);
+            worldRow.appendChild(showGrid);
+            const bgColor = document.createElement("input");
+            bgColor.type = "color";
+            bgColor.value = this.#settings.bgColor;
+            worldRow.appendChild(bgColor);
+            this.#settingsContent.appendChild(worldRow);
+
+            settingsSection.appendChild(this.#settingsContent);
+            this.#sidebar.appendChild(settingsSection);
+
+            const exportSection = document.createElement("div");
+            exportSection.appendChild(makeSectionTitle("Export"));
+            exportSection.appendChild(makeButton("Current view → PNG", async () => {
+                  await this.#exportViewToPNG();
+            }));
+            exportSection.appendChild(makeButton("Model → GLB (binary)", async () => {
+                  await this.#exportToGLB({what: "model"});
+            }));
+            exportSection.appendChild(makeButton("Model → glTF (JSON)", async () => {
+                  await this.#exportToGLTF({what: "model"});
+            }));
+            exportSection.appendChild(makeButton("Scene → GLB (binary)", async () => {
+                  await this.#exportToGLB({what: "scene"});
+            }));
+            exportSection.appendChild(makeButton("Scene → glTF (JSON)", async () => {
+                  await this.#exportToGLTF({what: "scene"});
+            }));
+            this.#sidebar.appendChild(exportSection);
+
+            const syncPair = (range, number, onChange) => {
+                  const apply = (value) => {
+                        range.value = value;
+                        number.value = value;
+                        onChange(value);
+                  };
+                  range.addEventListener("input", () => apply(range.value));
+                  number.addEventListener("input", () => apply(number.value));
+            };
+
+            syncPair(scaleRange, scaleNumber, (value) => {
+                  this.#settings.scale = Math.max(0, Math.min(10, Number(value)));
+                  this.#applyUserTransforms();
+            });
+            syncPair(depthRange, depthNumber, (value) => {
+                  this.#settings.depth = Math.max(0, Math.min(500, Number(value)));
+                  this.#rebuildExtrude();
+            });
+            syncPair(curveRange, curveNumber, (value) => {
+                  this.#settings.curveSegments = Math.max(1, Math.min(64, Math.round(Number(value))));
+                  this.#rebuildExtrude();
+            });
+
+            flipX.addEventListener("change", () => {
+                  this.#settings.flipX = flipX.checked;
+                  this.#applyUserTransforms();
+            });
+            flipY.addEventListener("change", () => {
+                  this.#settings.flipY = flipY.checked;
+                  this.#applyUserTransforms();
+            });
+            flipZ.addEventListener("change", () => {
+                  this.#settings.flipZ = flipZ.checked;
+                  this.#applyUserTransforms();
+            });
+
+            wireframe.addEventListener("change", () => {
+                  this.#settings.wireframe = wireframe.checked;
+                  this.#applyMaterialFlags();
+            });
+            doubleSided.addEventListener("change", () => {
+                  this.#settings.doubleSided = doubleSided.checked;
+                  this.#applyMaterialFlags();
+            });
+
+            showGrid.addEventListener("change", () => {
+                  this.#settings.showGrid = showGrid.checked;
+                  if(this.#grid) this.#grid.visible = !!this.#settings.showGrid;
+            });
+
+            bgColor.addEventListener("input", () => {
+                  this.#settings.bgColor = bgColor.value;
+                  if(this.#scene?.background) this.#scene.background.set(this.#settings.bgColor);
+            });
+      }
+
       #clearSvg() {
             if(this.#svgUserGroup) {
                   this.#svgRoot.remove(this.#svgUserGroup);
@@ -227,15 +458,29 @@ class ModalSVG3DViewer {
             this.#svgFixGroup = null;
       }
 
+      #resetView() {
+            if(!this.#camera || !this.#controls) return;
+            this.#camera.position.set(0, 250, 500);
+            this.#controls.target.set(0, 60, 0);
+            this.#controls.update();
+      }
+
       #applyUserTransforms() {
             if(!this.#svgUserGroup) return;
 
-            const s = this.#options.scale;
-            const fx = this.#options.flipX ? -1 : 1;
-            const fy = this.#options.flipY ? -1 : 1;
-            const fz = this.#options.flipZ ? -1 : 1;
+            const s = this.#settings.scale;
+            const fx = this.#settings.flipX ? -1 : 1;
+            const fy = this.#settings.flipY ? -1 : 1;
+            const fz = this.#settings.flipZ ? -1 : 1;
 
             this.#svgUserGroup.scale.set(s * fx, s * fy, s * fz);
+      }
+
+      #applyMaterialFlags() {
+            if(!this.#mesh?.material) return;
+            this.#mesh.material.wireframe = !!this.#settings.wireframe;
+            this.#mesh.material.side = this.#settings.doubleSided ? this.#THREE.DoubleSide : this.#THREE.FrontSide;
+            this.#mesh.material.needsUpdate = true;
       }
 
       #fitCameraToObject(box, {padding = 1.25} = {}) {
@@ -301,12 +546,12 @@ class ModalSVG3DViewer {
             }
 
             const extrudeSettings = {
-                  depth: this.#options.depth,
+                  depth: this.#settings.depth,
                   bevelEnabled: false,
                   bevelThickness: 0,
                   bevelSize: 0,
                   bevelSegments: 0,
-                  curveSegments: this.#options.curveSegments
+                  curveSegments: this.#settings.curveSegments
             };
 
             const geometry = new THREE.ExtrudeGeometry(shapes, extrudeSettings);
@@ -317,7 +562,8 @@ class ModalSVG3DViewer {
                   color: 0xeaeaea,
                   metalness: 0.15,
                   roughness: 0.45,
-                  side: THREE.DoubleSide
+                  wireframe: !!this.#settings.wireframe,
+                  side: this.#settings.doubleSided ? THREE.DoubleSide : THREE.FrontSide
             });
 
             this.#mesh = new THREE.Mesh(geometry, material);
@@ -341,5 +587,59 @@ class ModalSVG3DViewer {
 
             const newBox = new THREE.Box3().setFromObject(this.#svgUserGroup);
             this.#fitCameraToObject(newBox);
+      }
+
+      async #exportViewToPNG() {
+            if(!this.#renderer) return;
+            const dataUrl = this.#renderer.domElement.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = dataUrl;
+            link.download = "svg-viewer.png";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+      }
+
+      async #exportToGLB({what = "model"} = {}) {
+            const THREE = this.#THREE;
+            const exporter = new this.#GLTFExporter();
+            const target = what === "scene" ? this.#scene : this.#svgUserGroup;
+            if(!target) return;
+
+            return new Promise((resolve) => {
+                  exporter.parse(target, (result) => {
+                        if(!(result instanceof ArrayBuffer)) return resolve();
+                        const blob = new Blob([result], {type: "model/gltf-binary"});
+                        this.#downloadBlob(blob, `${what}-export.glb`);
+                        resolve();
+                  }, {binary: true});
+            });
+      }
+
+      async #exportToGLTF({what = "model"} = {}) {
+            const exporter = new this.#GLTFExporter();
+            const target = what === "scene" ? this.#scene : this.#svgUserGroup;
+            if(!target) return;
+
+            return new Promise((resolve) => {
+                  exporter.parse(target, (result) => {
+                        if(!result) return resolve();
+                        const json = JSON.stringify(result, null, 2);
+                        const blob = new Blob([json], {type: "application/json"});
+                        this.#downloadBlob(blob, `${what}-export.gltf`);
+                        resolve();
+                  });
+            });
+      }
+
+      #downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1500);
       }
 }
