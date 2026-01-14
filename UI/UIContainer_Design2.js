@@ -506,6 +506,8 @@ class UIContainer_Design2 {
       #f_productQty;
       #f_productQtyLoader;
       #f_designer;
+      #f_designerChip;
+      #f_assignDesignerAllBtn;
       #f_WIPStatus;
       #f_lineItemDescriptionText;
       #f_partsText;
@@ -667,6 +669,12 @@ class UIContainer_Design2 {
                   this.#f_openInSalesBtn = createLink("display: block; float: left; width: " + 30 + "px;height:" + 30 + "px; border:none;color:White;text-align:center;line-height:30px;min-height: 20px; margin: 0px 0px 0px 0px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;background-color:" + COLOUR.Blue + ";cursor: pointer;font-size:13px;text-align:center;line-height:30px;", "S", "/SalesModule/Orders/Order.aspx?OrderId=" + this.#jobObject.OrderId, "new window", this.#f_contentContainer);
                   this.addHeadingButtons(this.#f_openInSalesBtn);
             }
+
+            let designerChipInfo = this.getDesignerChipInfo();
+            if(designerChipInfo) {
+                  this.#f_designerChip = this.createDesignerChip(designerChipInfo);
+                  this.addHeadingButtons(this.#f_designerChip);
+            }
             /*
             Proof*/
             if(this.#jobObject.ProofFileName != "") {
@@ -701,6 +709,10 @@ class UIContainer_Design2 {
             this.#f_productQtyLoader = new Loader(this.#f_productQty[0]);
 
             //Designer
+            let designerRow = document.createElement("div");
+            designerRow.style = "display:flex;align-items:center;gap:8px;width:100%;";
+            inhouseDiv.appendChild(designerRow);
+
             this.#f_designer = createDropdown_Infield("Designer", 2, "",
                   [createDropdownOption("Darren Frankish", "20"),
                   createDropdownOption("Leandri Hayward", "31"),
@@ -709,8 +721,17 @@ class UIContainer_Design2 {
 
                         await AssignUsersToOrderProduct(this.#jobObject.OrderId, this.#jobObject.Id, this.#f_designer[1].value);
 
+                        this.updateDesignerSelection(this.#f_designer[1].value, this.#f_designer[1].options[this.#f_designer[1].selectedIndex].text);
+
                         loader.Delete();
-                  }, inhouseDiv);
+                  }, null);
+
+            designerRow.appendChild(this.#f_designer[0]);
+
+            this.#f_assignDesignerAllBtn = createButton("assign designer to all items", "height:30px;min-height:30px;font-size:11px;line-height:14px;padding:0px 10px;margin-top:6px;margin-left:4px;", async () => {
+                  await this.assignDesignerToAllItems();
+            }, null);
+            designerRow.appendChild(this.#f_assignDesignerAllBtn);
 
             for(let x = 0; x < this.#f_designer[1].options.length; x++) {
 
@@ -1215,6 +1236,111 @@ class UIContainer_Design2 {
                   this.#f_headingContainer.appendChild(itemContainers[i]);
                   this.#addedHeadingItems_combinedWidth += itemContainers[i].offsetWidth;
             }
+      }
+
+      getDesignerChipInfo({designerSource} = {}) {
+            let resolvedDesignerSource = designerSource ?? this.#jobObject.AssignedUsers;
+            if(!resolvedDesignerSource || resolvedDesignerSource === "null") {
+                  resolvedDesignerSource = this.#jobObject.DesignerName;
+            }
+            if(!resolvedDesignerSource) {
+                  return null;
+            }
+
+            let normalizedDesigner = resolvedDesignerSource.toLowerCase();
+            let designerConfig = [
+                  {key: "darren", label: "Darren", colour: "#32cd32"},
+                  {key: "leandri", label: "Leandri", colour: "#d05aa5"}
+            ];
+
+            for(let i = 0; i < designerConfig.length; i++) {
+                  if(normalizedDesigner.includes(designerConfig[i].key)) {
+                        return designerConfig[i];
+                  }
+            }
+
+            return null;
+      }
+
+      updateDesignerSelection(userId, userLabel) {
+            for(let i = 0; i < this.#f_designer[1].options.length; i++) {
+                  if(this.#f_designer[1].options[i].value === userId) {
+                        this.#f_designer[1].selectedIndex = i;
+                        break;
+                  }
+            }
+
+            this.#jobObject.AssignedUsers = userLabel;
+            this.#jobObject.DesignerName = userLabel;
+            this.updateDesignerChipForLabel(userLabel);
+      }
+
+      updateDesignerChipForLabel(userLabel) {
+            let designerChipInfo = this.getDesignerChipInfo({designerSource: userLabel});
+            if(!designerChipInfo && this.#f_designerChip) {
+                  this.#f_designerChip.remove();
+                  this.#f_designerChip = null;
+                  return;
+            }
+
+            if(designerChipInfo && !this.#f_designerChip) {
+                  this.#f_designerChip = this.createDesignerChip(designerChipInfo);
+                  this.addHeadingButtons(this.#f_designerChip);
+                  return;
+            }
+
+            if(designerChipInfo && this.#f_designerChip) {
+                  this.#f_designerChip.innerText = designerChipInfo.label;
+                  this.#f_designerChip.style.backgroundColor = designerChipInfo.colour;
+            }
+      }
+
+      async assignDesignerToAllItems() {
+            let designerValue = this.#f_designer[1].value;
+            let designerLabel = this.#f_designer[1].options[this.#f_designer[1].selectedIndex].text;
+
+            if(!designerValue) return;
+
+            let loader = new Loader(this.#f_designer[0]);
+            let orderProductIds = new Set();
+            let jobNumber = this.#jobObject.OrderInvoiceNumber;
+            let orderId = this.#jobObject.OrderId;
+
+            let pageContainers = document.querySelectorAll(".UIContainer_Design");
+            for(let i = 0; i < pageContainers.length; i++) {
+                  let containerObject = pageContainers[i].containerObject;
+                  if(!containerObject || !containerObject.jobObject) continue;
+                  let jobObject = containerObject.jobObject;
+                  if(jobObject.OrderId === orderId || jobObject.OrderInvoiceNumber === jobNumber) {
+                        containerObject.updateDesignerSelection(designerValue, designerLabel);
+                        orderProductIds.add(jobObject.Id);
+                  }
+            }
+
+            let orderData = await getOrderData(orderId, this.#jobObject.AccountId);
+            let orderProducts = orderData?.d?.OrderProducts ?? orderData?.OrderProducts ?? orderData?.d?.OrderProductList ?? orderData?.OrderProductList ?? [];
+
+            for(let i = 0; i < orderProducts.length; i++) {
+                  let orderProductId = orderProducts[i].OrderProductId ?? orderProducts[i].OrderProductID ?? orderProducts[i].Id;
+                  if(orderProductId != null) {
+                        orderProductIds.add(orderProductId);
+                  }
+            }
+
+            let assignments = [];
+            orderProductIds.forEach((orderProductId) => {
+                  assignments.push(AssignUsersToOrderProduct(orderId, orderProductId, designerValue));
+            });
+            await Promise.all(assignments);
+
+            loader.Delete();
+      }
+
+      createDesignerChip({label, colour}) {
+            let chip = document.createElement("div");
+            chip.innerText = label;
+            chip.style = "display: block; float: left; height: 30px; border:none; padding: 0px 14px; color:white; font-size:10px; font-weight:600; line-height:30px; margin: 0px 0px 0px 6px; background-color:" + colour + "; border-radius: 999px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;";
+            return chip;
       }
 
       parseKOStorageVariable(koString) {
