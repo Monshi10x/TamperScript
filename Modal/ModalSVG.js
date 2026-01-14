@@ -45,7 +45,6 @@ class ModalSVG extends Modal {
       #svgScaleField;
       #svgBaseSize;
       #isUpdatingSvgScale = false;
-      #controlsDisabled = false;
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
@@ -169,7 +168,6 @@ class ModalSVG extends Modal {
             this.addFooterElement(this.#f_cancelSave);
             this.applySavedControlSettings();
             this.fitToSvgBounds();
-            this.applyControlsDisabledState(callerObject);
       }
 
       async loadPathArea() {
@@ -705,7 +703,6 @@ class ModalSVG extends Modal {
 
       updateSavePulse() {
             if(!this.#f_saveSVG) return;
-            if(this.#controlsDisabled) return;
             if(this.#svgScale !== 1) {
                   this.#f_saveSVG.classList.add("urgentPulse");
                   return;
@@ -784,20 +781,6 @@ class ModalSVG extends Modal {
 
       getSavedControlSettings() {
             return ModalSVG.#lastControlSettings || {svgScale: 1};
-      }
-
-      applyControlsDisabledState(callerObject) {
-            if(!(callerObject instanceof SVGCutfile)) return;
-            this.#controlsDisabled = true;
-            if(this.#f_saveSVG) {
-                  this.#f_saveSVG.disabled = true;
-                  this.#f_saveSVG.style.opacity = "0.5";
-                  this.#f_saveSVG.style.pointerEvents = "none";
-                  this.#f_saveSVG.classList.remove("urgentPulse");
-            }
-            if(this.#controlsContainer) {
-                  this.#controlsContainer.style.display = "none";
-            }
       }
 
 }
