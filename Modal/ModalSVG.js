@@ -105,6 +105,10 @@ class ModalSVG extends Modal {
                   pointsToggle.toggle();
             }, this.#viewSettingsContainer);
 
+            this.#svgScaleField = createInput_Infield("SVG Scale", this.#svgScale, "width:250px;", () => {
+                  this.updateSvgScaleFromField();
+            }, this.#viewSettingsContainer, false, 0.1);
+
             this.#controlsContainer = createDivStyle5(null, "Controls", this.getBodyElement())[1];
             this.#svgScaleField = createInput_Infield("SVG Scale", this.#svgScale, "width:250px;", () => {
                   this.updateSvgScaleFromField();
