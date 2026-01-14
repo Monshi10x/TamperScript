@@ -732,6 +732,7 @@ class ModalSVG extends Modal {
       }
 
       cacheOriginalBounds() {
+            if(this.#originalBoundsMm) return;
             let bounds = this.getOverallSvgBounds();
             if(!bounds || bounds.width <= 0 || bounds.height <= 0) return;
             this.#originalBoundsMm = {
@@ -742,8 +743,10 @@ class ModalSVG extends Modal {
 
       updateCalculatedScaleFields() {
             if(!this.#widthShouldBeField || !this.#heightShouldBeField || !this.#calculatedScaleText) return;
-            let bounds = this.getOverallSvgBounds();
-            if(!bounds || bounds.width <= 0 || bounds.height <= 0) {
+            if(!this.#originalBoundsMm) this.cacheOriginalBounds();
+            let boundsWidthMm = this.#originalBoundsMm?.width;
+            let boundsHeightMm = this.#originalBoundsMm?.height;
+            if(!boundsWidthMm || !boundsHeightMm) {
                   this.#calculatedScaleText.innerText = "Calculated Scale: --";
                   this.#calculatedScaleValue = 1;
                   return;
@@ -751,9 +754,6 @@ class ModalSVG extends Modal {
 
             let widthValue = parseFloat(this.#widthShouldBeField[1].value);
             let heightValue = parseFloat(this.#heightShouldBeField[1].value);
-
-            let boundsWidthMm = this.#originalBoundsMm?.width ?? svg_pixelToMM(bounds.width);
-            let boundsHeightMm = this.#originalBoundsMm?.height ?? svg_pixelToMM(bounds.height);
 
             let widthScale = Number.isFinite(widthValue) ? widthValue / boundsWidthMm : null;
             let heightScale = Number.isFinite(heightValue) ? heightValue / boundsHeightMm : null;
