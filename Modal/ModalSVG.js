@@ -133,10 +133,12 @@ class ModalSVG extends Modal {
                         this.updateSvgScaleFromField();
                   }, this.#controlsContainer, false, 0.1);
 
-                  this.#widthShouldBeField = createInput_Infield("Width Should Be", null, "width:250px;", () => { }, this.#controlsContainer, false, null);
-                  this.#heightShouldBeField = createInput_Infield("Height Should Be", null, "width:250px;", () => { }, this.#controlsContainer, false, null);
-                  setFieldDisabled(true, this.#widthShouldBeField[1], this.#widthShouldBeField[0]);
-                  setFieldDisabled(true, this.#heightShouldBeField[1], this.#heightShouldBeField[0]);
+                  this.#widthShouldBeField = createInput_Infield("Width Should Be", null, "width:250px;", () => {
+                        this.updateCalculatedScaleFields();
+                  }, this.#controlsContainer, false, null);
+                  this.#heightShouldBeField = createInput_Infield("Height Should Be", null, "width:250px;", () => {
+                        this.updateCalculatedScaleFields();
+                  }, this.#controlsContainer, false, null);
 
                   this.#calculatedScaleText = createText("Calculated Scale: --", "width:250px;margin:5px 0px;", this.#controlsContainer);
                   this.#applyCalculatedScaleButton = createButton("Apply Calculated Scale", "width:250px;", () => {
@@ -727,38 +729,41 @@ class ModalSVG extends Modal {
             }
       }
 
-      getCalculatedScaleDetails() {
-            if(!this.#svgBaseSize) return null;
-            let bounds = this.getOverallSvgBounds();
-            if(!bounds || bounds.width <= 0 || bounds.height <= 0) return null;
-
-            let widthScale = this.#svgBaseSize.width / bounds.width;
-            let heightScale = this.#svgBaseSize.height / bounds.height;
-            let calculatedScale = roundNumber((widthScale + heightScale) / 2, 6);
-
-            return {
-                  bounds,
-                  widthScale,
-                  heightScale,
-                  calculatedScale
-            };
-      }
-
       updateCalculatedScaleFields() {
             if(!this.#widthShouldBeField || !this.#heightShouldBeField || !this.#calculatedScaleText) return;
-            let calculated = this.getCalculatedScaleDetails();
-            if(!calculated) {
-                  this.#widthShouldBeField[1].value = "";
-                  this.#heightShouldBeField[1].value = "";
+            let bounds = this.getOverallSvgBounds();
+            if(!bounds || bounds.width <= 0 || bounds.height <= 0) {
                   this.#calculatedScaleText.innerText = "Calculated Scale: --";
                   this.#calculatedScaleValue = 1;
                   return;
             }
 
-            this.#calculatedScaleValue = calculated.calculatedScale;
-            this.#widthShouldBeField[1].value = roundNumber(calculated.bounds.width * calculated.widthScale, 6);
-            this.#heightShouldBeField[1].value = roundNumber(calculated.bounds.height * calculated.heightScale, 6);
-            this.#calculatedScaleText.innerText = `Calculated Scale: ${this.#calculatedScaleValue} (W ${roundNumber(calculated.widthScale, 6)} / H ${roundNumber(calculated.heightScale, 6)})`;
+            let widthValue = parseFloat(this.#widthShouldBeField[1].value);
+            let heightValue = parseFloat(this.#heightShouldBeField[1].value);
+
+            let widthScale = Number.isFinite(widthValue) ? widthValue / bounds.width : null;
+            let heightScale = Number.isFinite(heightValue) ? heightValue / bounds.height : null;
+
+            if(Number.isFinite(widthScale) && Number.isFinite(heightScale)) {
+                  this.#calculatedScaleValue = roundNumber((widthScale + heightScale) / 2, 6);
+                  this.#calculatedScaleText.innerText = `Calculated Scale: ${this.#calculatedScaleValue} (W ${roundNumber(widthScale, 6)} / H ${roundNumber(heightScale, 6)})`;
+                  return;
+            }
+
+            if(Number.isFinite(widthScale)) {
+                  this.#calculatedScaleValue = roundNumber(widthScale, 6);
+                  this.#calculatedScaleText.innerText = `Calculated Scale: ${this.#calculatedScaleValue}`;
+                  return;
+            }
+
+            if(Number.isFinite(heightScale)) {
+                  this.#calculatedScaleValue = roundNumber(heightScale, 6);
+                  this.#calculatedScaleText.innerText = `Calculated Scale: ${this.#calculatedScaleValue}`;
+                  return;
+            }
+
+            this.#calculatedScaleText.innerText = "Calculated Scale: --";
+            this.#calculatedScaleValue = 1;
       }
 
       updateSvgScaleFromField() {
