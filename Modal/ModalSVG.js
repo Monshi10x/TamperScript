@@ -1,4 +1,7 @@
 class ModalSVG extends Modal {
+      static #lastControlSettings = {
+            svgScale: 1
+      };
 
       #ID = "ModalSVG " + generateUniqueID();
       #dragZoomSVG;
@@ -38,6 +41,10 @@ class ModalSVG extends Modal {
       #showPoints;
       #f_saveSVG;
       #f_cancelSave;
+      #svgScale = 1;
+      #svgBaseSize;
+      #isUpdatingSvgScale = false;
+      #controlsDisabled = false;
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
@@ -58,6 +65,8 @@ class ModalSVG extends Modal {
 
             this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width + "px", "500px", svgText, this.getBodyElement(), options);
             this.#dragZoomSVG.onMouseUpdate = this.onMouseUpdate;
+            this.#svgBaseSize = this.getSvgBaseSize(svgText);
+            this.cacheOriginalPathData();
 
             this.#statsContainer = createDivStyle5(null, "Stats", this.getBodyElement())[1];
             this.#totalPathLength = createInput_Infield("Total Paths Length", this.#dragZoomSVG.totalPathLengths, null, () => { }, this.#statsContainer, false, 1, {postfix: "mm"});
@@ -150,6 +159,9 @@ class ModalSVG extends Modal {
 
             this.addFooterElement(this.#f_saveSVG);
             this.addFooterElement(this.#f_cancelSave);
+            this.applySavedControlSettings();
+            this.fitToSvgBounds();
+            this.applyControlsDisabledState(callerObject);
       }
 
       async loadPathArea() {
@@ -614,5 +626,155 @@ class ModalSVG extends Modal {
       onMouseUpdate = (updateFrom) => {
             this.updateTools(updateFrom);
       };
+
+      parseSvgLength(value) {
+            if(!value) return null;
+            let match = String(value).trim().match(/^([0-9]*\.?[0-9]+)([a-z%]*)$/i);
+            if(!match) return null;
+            return {value: parseFloat(match[1]), unit: match[2] || ""};
+      }
+
+      getSvgBaseSize(svgText) {
+            let svgElement = null;
+            if(svgText) {
+                  try {
+                        svgElement = svg_makeFromString(svgText);
+                  } catch(error) {
+                        console.warn("Unable to parse SVG text for base size.");
+                  }
+            }
+
+            if(!svgElement) svgElement = this.#dragZoomSVG?.svg;
+            if(!svgElement) return null;
+
+            let widthData = this.parseSvgLength(svgElement.getAttribute("width"));
+            let heightData = this.parseSvgLength(svgElement.getAttribute("height"));
+
+            if(!widthData || !heightData) {
+                  let viewBox = svgElement.getAttribute("viewBox");
+                  if(viewBox) {
+                        let viewBoxParts = viewBox.split(/[\s,]+/).map((entry) => parseFloat(entry)).filter((entry) => !Number.isNaN(entry));
+                        if(viewBoxParts.length === 4) {
+                              widthData = widthData || {value: viewBoxParts[2], unit: "px"};
+                              heightData = heightData || {value: viewBoxParts[3], unit: "px"};
+                        }
+                  }
+            }
+
+            if(!widthData || !heightData) return null;
+
+            return {
+                  width: widthData.value,
+                  height: heightData.value,
+                  widthUnit: widthData.unit,
+                  heightUnit: heightData.unit
+            };
+      }
+
+      applySvgScale(scaleValue) {
+            this.#svgScale = scaleValue;
+            this.scaleSvgPaths(scaleValue);
+            if(this.#svgBaseSize && this.#dragZoomSVG?.svg) {
+                  let width = roundNumber(this.#svgBaseSize.width * scaleValue, 6);
+                  let height = roundNumber(this.#svgBaseSize.height * scaleValue, 6);
+            }
+            this.#dragZoomSVG.refreshElementStyles();
+            this.refreshMeasurements();
+            this.fitToSvgBounds();
+            this.updateSavePulse();
+            this.saveControlSettings();
+      }
+
+      updateSavePulse() {
+            if(!this.#f_saveSVG) return;
+            if(this.#controlsDisabled) return;
+            if(this.#svgScale !== 1) {
+                  this.#f_saveSVG.classList.add("urgentPulse");
+                  return;
+            }
+            this.#f_saveSVG.classList.remove("urgentPulse");
+      }
+
+      cacheOriginalPathData() {
+            if(!this.#dragZoomSVG) return;
+            this.#dragZoomSVG.allPathElements.forEach((element) => {
+                  if(!element.dataset.baseD) {
+                        element.dataset.baseD = element.getAttribute("d") || "";
+                  }
+            });
+      }
+
+      scaleSvgPaths(scaleValue) {
+            this.cacheOriginalPathData();
+            this.#dragZoomSVG.allPathElements.forEach((element) => {
+                  let baseD = element.dataset.baseD;
+                  if(!baseD) return;
+                  try {
+                        let scaledPath = new SVGPathCommander(baseD)
+                              .transform({scale: scaleValue})
+                              .toString();
+                        element.setAttribute("d", scaledPath);
+                  } catch(error) {
+                        console.warn("Unable to scale SVG path.", error);
+                  }
+            });
+      }
+
+      refreshMeasurements() {
+            if(this.#totalPathLength) {
+                  $(this.#totalPathLength[1]).val(this.#dragZoomSVG.totalPathLengths).change();
+            }
+
+            this.loadPathArea();
+            this.loadBoundingRectAreas();
+
+            let groupsToRemove = ["overallMeasures", "itemMeasures", "shapeAreas", "partAreas", "shapeBoundingRects", "itemPoints"];
+            groupsToRemove.forEach((groupId) => {
+                  let group = this.#dragZoomSVG.svg.querySelector(`#${groupId}`);
+                  if(group) group.remove();
+            });
+
+            if(this.#showOverallMeasures?.[1]?.checked) this.showOverallMeasures();
+            if(this.#showIndividualMeasures?.[1]?.checked) this.showElementMeasures();
+            if(this.#showIndividualAreas?.[1]?.checked) this.showPartAreas();
+            if(this.#showShapeAreas?.[1]?.checked) this.showShapeAreas();
+            if(this.#showShapeBoundingRect?.[1]?.checked) this.showShapeBoundingRect();
+            if(this.#showPoints?.[1]?.checked) this.showElementPoints();
+      }
+
+      fitToSvgBounds() {
+            if(!this.#dragZoomSVG?.svg) return;
+            this.#dragZoomSVG.centerAndFitSVGContent(this.#dragZoomSVG.svg, this.#dragZoomSVG.svgG, this.#dragZoomSVG.panZoomInstance);
+      }
+
+      applySavedControlSettings() {
+            let settings = this.getSavedControlSettings();
+            this.#svgScale = settings.svgScale ?? 1;
+            this.applySvgScale(this.#svgScale);
+      }
+
+      saveControlSettings() {
+            ModalSVG.#lastControlSettings = {
+                  svgScale: this.#svgScale
+            };
+      }
+
+      getSavedControlSettings() {
+            return ModalSVG.#lastControlSettings || {svgScale: 1};
+      }
+
+      applyControlsDisabledState(callerObject) {
+            if(!(callerObject instanceof SVGCutfile)) return;
+            this.#controlsDisabled = true;
+            if(this.#f_saveSVG) {
+                  this.#f_saveSVG.disabled = true;
+                  this.#f_saveSVG.style.opacity = "0.5";
+                  this.#f_saveSVG.style.pointerEvents = "none";
+                  this.#f_saveSVG.classList.remove("urgentPulse");
+            }
+            if(this.#controlsContainer) {
+                  this.#controlsContainer.style.display = "none";
+            }
+      }
 
 }
