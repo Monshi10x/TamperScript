@@ -50,6 +50,7 @@ class ModalSVG extends Modal {
       #calculatedScaleText;
       #applyCalculatedScaleButton;
       #calculatedScaleValue = 1;
+      #originalBoundsMm;
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
@@ -87,6 +88,7 @@ class ModalSVG extends Modal {
             this.#dragZoomSVG.onMouseUpdate = this.onMouseUpdate;
             this.#svgBaseSize = this.getSvgBaseSize(svgText);
             this.cacheOriginalPathData();
+            this.cacheOriginalBounds();
 
             this.#statsContainer = createDivStyle5(null, "Stats", this.getBodyElement())[1];
             this.#totalPathLength = createInput_Infield("Total Paths Length", this.#dragZoomSVG.totalPathLengths, null, () => { }, this.#statsContainer, false, 1, {postfix: "mm"});
@@ -729,6 +731,15 @@ class ModalSVG extends Modal {
             }
       }
 
+      cacheOriginalBounds() {
+            let bounds = this.getOverallSvgBounds();
+            if(!bounds || bounds.width <= 0 || bounds.height <= 0) return;
+            this.#originalBoundsMm = {
+                  width: svg_pixelToMM(bounds.width),
+                  height: svg_pixelToMM(bounds.height)
+            };
+      }
+
       updateCalculatedScaleFields() {
             if(!this.#widthShouldBeField || !this.#heightShouldBeField || !this.#calculatedScaleText) return;
             let bounds = this.getOverallSvgBounds();
@@ -741,8 +752,8 @@ class ModalSVG extends Modal {
             let widthValue = parseFloat(this.#widthShouldBeField[1].value);
             let heightValue = parseFloat(this.#heightShouldBeField[1].value);
 
-            let boundsWidthMm = svg_pixelToMM(bounds.width);
-            let boundsHeightMm = svg_pixelToMM(bounds.height);
+            let boundsWidthMm = this.#originalBoundsMm?.width ?? svg_pixelToMM(bounds.width);
+            let boundsHeightMm = this.#originalBoundsMm?.height ?? svg_pixelToMM(bounds.height);
 
             let widthScale = Number.isFinite(widthValue) ? widthValue / boundsWidthMm : null;
             let heightScale = Number.isFinite(heightValue) ? heightValue / boundsHeightMm : null;
