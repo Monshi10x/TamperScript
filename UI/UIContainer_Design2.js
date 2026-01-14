@@ -1249,8 +1249,8 @@ class UIContainer_Design2 {
 
             let normalizedDesigner = resolvedDesignerSource.toLowerCase();
             let designerConfig = [
-                  {key: "darren", label: "Darren", colour: "#32cd32"},
-                  {key: "leandri", label: "Leandri", colour: "#d05aa5"}
+                  {key: "darren", label: "Darren", colour: "#00958f"},
+                  {key: "leandri", label: "Leandri", colour: "#17aa02"}
             ];
 
             for(let i = 0; i < designerConfig.length; i++) {
