@@ -1339,7 +1339,7 @@ class UIContainer_Design2 {
       createDesignerChip({label, colour}) {
             let chip = document.createElement("div");
             chip.innerText = label;
-            chip.style = "display: block; float: left; height: 30px; border:none; padding: 0px 14px; color:white; font-size:10px; font-weight:600; line-height:30px; margin: 0px 0px 0px 6px; background-color:" + colour + "; border-radius: 999px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;";
+            chip.style = "display: block; float: left; height: 22px; border:none; padding: 2px 14px; color:white; font-size:10px; font-weight:600; line-height:22px; margin: 2px 0px 0px 6px; background-color:" + colour + "; border-radius: 999px; box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 8px 0px;";
             return chip;
       }
 
