@@ -1,4 +1,7 @@
 class ModalSVG extends Modal {
+      static #lastControlSettings = {
+            svgScale: 1
+      };
 
       #ID = "ModalSVG " + generateUniqueID();
       #dragZoomSVG;
@@ -163,7 +166,7 @@ class ModalSVG extends Modal {
 
             this.addFooterElement(this.#f_saveSVG);
             this.addFooterElement(this.#f_cancelSave);
-            this.applySvgScale(this.#svgScale);
+            this.applySavedControlSettings();
             this.fitToSvgBounds();
       }
 
@@ -690,13 +693,12 @@ class ModalSVG extends Modal {
             if(this.#svgBaseSize && this.#dragZoomSVG?.svg) {
                   let width = roundNumber(this.#svgBaseSize.width * scaleValue, 6);
                   let height = roundNumber(this.#svgBaseSize.height * scaleValue, 6);
-                  this.#dragZoomSVG.svg.setAttribute("width", `${width}${this.#svgBaseSize.widthUnit}`);
-                  this.#dragZoomSVG.svg.setAttribute("height", `${height}${this.#svgBaseSize.heightUnit}`);
             }
             this.#dragZoomSVG.refreshElementStyles();
             this.refreshMeasurements();
             this.fitToSvgBounds();
             this.updateSavePulse();
+            this.saveControlSettings();
       }
 
       updateSavePulse() {
@@ -758,6 +760,27 @@ class ModalSVG extends Modal {
       fitToSvgBounds() {
             if(!this.#dragZoomSVG?.svg) return;
             this.#dragZoomSVG.centerAndFitSVGContent(this.#dragZoomSVG.svg, this.#dragZoomSVG.svgG, this.#dragZoomSVG.panZoomInstance);
+      }
+
+      applySavedControlSettings() {
+            let settings = this.getSavedControlSettings();
+            this.#svgScale = settings.svgScale ?? 1;
+            if(this.#svgScaleField?.[1]) {
+                  this.#isUpdatingSvgScale = true;
+                  this.#svgScaleField[1].value = this.#svgScale;
+                  this.#isUpdatingSvgScale = false;
+            }
+            this.applySvgScale(this.#svgScale);
+      }
+
+      saveControlSettings() {
+            ModalSVG.#lastControlSettings = {
+                  svgScale: this.#svgScale
+            };
+      }
+
+      getSavedControlSettings() {
+            return ModalSVG.#lastControlSettings || {svgScale: 1};
       }
 
 }
