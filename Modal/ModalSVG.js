@@ -89,6 +89,7 @@ class ModalSVG extends Modal {
             this.#svgBaseSize = this.getSvgBaseSize(svgText);
             this.cacheOriginalPathData();
             this.cacheOriginalBounds();
+            this.applyOriginalBoundsToSvgElement(this.#dragZoomSVG.svg);
 
             this.#statsContainer = createDivStyle5(null, "Stats", this.getBodyElement())[1];
             this.#totalPathLength = createInput_Infield("Total Paths Length", this.#dragZoomSVG.totalPathLengths, null, () => { }, this.#statsContainer, false, 1, {postfix: "mm"});
@@ -184,6 +185,7 @@ class ModalSVG extends Modal {
 
             ///Save Changes
             this.#f_saveSVG = createButton("Save Changes", "", () => {
+                  this.applyOriginalBoundsToSvgElement(this.#dragZoomSVG.svg);
                   if(callerObject instanceof SVGCutfile) {
                         let groups = Array.from(this.#dragZoomSVG.svg.getElementsByTagName("g"));
 
@@ -731,8 +733,38 @@ class ModalSVG extends Modal {
             }
       }
 
+      getCachedOriginalBounds(svgText) {
+            if(!svgText) return null;
+            try {
+                  let svgElement = svg_makeFromString(svgText);
+                  if(!svgElement) return null;
+                  let widthMm = parseFloat(svgElement.getAttribute("data-original-width-mm"));
+                  let heightMm = parseFloat(svgElement.getAttribute("data-original-height-mm"));
+                  if(Number.isFinite(widthMm) && Number.isFinite(heightMm)) {
+                        return {width: widthMm, height: heightMm};
+                  }
+            } catch(error) {
+                  console.warn("Unable to parse SVG text for cached bounds.");
+            }
+            return null;
+      }
+
+      applyOriginalBoundsToSvgElement(svgElement) {
+            if(!svgElement || !this.#originalBoundsMm) return;
+            svgElement.setAttribute("data-original-width-mm", this.#originalBoundsMm.width);
+            svgElement.setAttribute("data-original-height-mm", this.#originalBoundsMm.height);
+      }
+
       cacheOriginalBounds() {
             if(this.#originalBoundsMm) return;
+            let cachedBounds = this.getCachedOriginalBounds(this.#svgText);
+            if(cachedBounds) {
+                  this.#originalBoundsMm = {
+                        width: cachedBounds.width,
+                        height: cachedBounds.height
+                  };
+                  return;
+            }
             let bounds = this.getOverallSvgBounds();
             if(!bounds || bounds.width <= 0 || bounds.height <= 0) return;
             this.#originalBoundsMm = {
