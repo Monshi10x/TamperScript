@@ -720,17 +720,9 @@ class ModalSVG extends Modal {
                   let baseD = element.dataset.baseD;
                   if(!baseD) return;
                   try {
-                        let scaledPath = null;
-                        let commander = SVGPathCommander(baseD);
-                        if(commander && typeof commander.scale === "function") {
-                              scaledPath = commander.scale(scaleValue, scaleValue).toString();
-                        } else if(typeof SVGPathCommander.scale === "function") {
-                              scaledPath = SVGPathCommander.scale(baseD, scaleValue, scaleValue);
-                        } else if(typeof SVGPathCommander.transformPath === "function") {
-                              scaledPath = SVGPathCommander.transformPath(baseD, {scale: [scaleValue, scaleValue]});
-                        }
-
-                        if(!scaledPath) throw new Error("SVGPathCommander scale failed.");
+                        let scaledPath = new SVGPathCommander(baseD)
+                              .transform({scale: scaleValue})
+                              .toString();
                         element.setAttribute("d", scaledPath);
                   } catch(error) {
                         console.warn("Unable to scale SVG path.", error);
