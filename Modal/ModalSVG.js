@@ -38,6 +38,11 @@ class ModalSVG extends Modal {
       #showPoints;
       #f_saveSVG;
       #f_cancelSave;
+      #svgScale = 1;
+      #svgScaleField;
+      #svgBaseSize;
+      #svgScaleGroup;
+      #isUpdatingSvgScale = false;
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
@@ -58,6 +63,8 @@ class ModalSVG extends Modal {
 
             this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width + "px", "500px", svgText, this.getBodyElement(), options);
             this.#dragZoomSVG.onMouseUpdate = this.onMouseUpdate;
+            this.#svgBaseSize = this.getSvgBaseSize(svgText);
+            this.#svgScaleGroup = this.ensureScaleGroup();
 
             this.#statsContainer = createDivStyle5(null, "Stats", this.getBodyElement())[1];
             this.#totalPathLength = createInput_Infield("Total Paths Length", this.#dragZoomSVG.totalPathLengths, null, () => { }, this.#statsContainer, false, 1, {postfix: "mm"});
@@ -99,6 +106,9 @@ class ModalSVG extends Modal {
             }, this.#viewSettingsContainer);
 
             this.#controlsContainer = createDivStyle5(null, "Controls", this.getBodyElement())[1];
+            this.#svgScaleField = createInput_Infield("SVG Scale", this.#svgScale, "width:250px;", () => {
+                  this.updateSvgScaleFromField();
+            }, this.#controlsContainer, false, 0.1);
 
             let deleteTool;
             let selectionTool;
@@ -150,6 +160,7 @@ class ModalSVG extends Modal {
 
             this.addFooterElement(this.#f_saveSVG);
             this.addFooterElement(this.#f_cancelSave);
+            this.applySvgScale(this.#svgScale);
       }
 
       async loadPathArea() {
@@ -614,5 +625,100 @@ class ModalSVG extends Modal {
       onMouseUpdate = (updateFrom) => {
             this.updateTools(updateFrom);
       };
+
+      parseSvgLength(value) {
+            if(!value) return null;
+            let match = String(value).trim().match(/^([0-9]*\.?[0-9]+)([a-z%]*)$/i);
+            if(!match) return null;
+            return {value: parseFloat(match[1]), unit: match[2] || ""};
+      }
+
+      getSvgBaseSize(svgText) {
+            let svgElement = null;
+            if(svgText) {
+                  try {
+                        svgElement = svg_makeFromString(svgText);
+                  } catch(error) {
+                        console.warn("Unable to parse SVG text for base size.");
+                  }
+            }
+
+            if(!svgElement) svgElement = this.#dragZoomSVG?.svg;
+            if(!svgElement) return null;
+
+            let widthData = this.parseSvgLength(svgElement.getAttribute("width"));
+            let heightData = this.parseSvgLength(svgElement.getAttribute("height"));
+
+            if(!widthData || !heightData) {
+                  let viewBox = svgElement.getAttribute("viewBox");
+                  if(viewBox) {
+                        let viewBoxParts = viewBox.split(/[\s,]+/).map((entry) => parseFloat(entry)).filter((entry) => !Number.isNaN(entry));
+                        if(viewBoxParts.length === 4) {
+                              widthData = widthData || {value: viewBoxParts[2], unit: "px"};
+                              heightData = heightData || {value: viewBoxParts[3], unit: "px"};
+                        }
+                  }
+            }
+
+            if(!widthData || !heightData) return null;
+
+            return {
+                  width: widthData.value,
+                  height: heightData.value,
+                  widthUnit: widthData.unit,
+                  heightUnit: heightData.unit
+            };
+      }
+
+      updateSvgScaleFromField() {
+            if(this.#isUpdatingSvgScale) return;
+            let scaleValue = parseFloat(this.#svgScaleField[1].value);
+            if(!Number.isFinite(scaleValue) || scaleValue <= 0) scaleValue = 1;
+            this.#isUpdatingSvgScale = true;
+            this.#svgScaleField[1].value = scaleValue;
+            this.#isUpdatingSvgScale = false;
+            this.applySvgScale(scaleValue);
+      }
+
+      applySvgScale(scaleValue) {
+            this.#svgScale = scaleValue;
+            if(this.#svgBaseSize && this.#dragZoomSVG?.svg) {
+                  let width = roundNumber(this.#svgBaseSize.width * scaleValue, 6);
+                  let height = roundNumber(this.#svgBaseSize.height * scaleValue, 6);
+                  this.#dragZoomSVG.svg.setAttribute("width", `${width}${this.#svgBaseSize.widthUnit}`);
+                  this.#dragZoomSVG.svg.setAttribute("height", `${height}${this.#svgBaseSize.heightUnit}`);
+            }
+            if(this.#svgScaleGroup) {
+                  this.#svgScaleGroup.setAttribute("transform", `scale(${scaleValue})`);
+            }
+            this.updateSavePulse();
+      }
+
+      updateSavePulse() {
+            if(!this.#f_saveSVG) return;
+            if(this.#svgScale !== 1) {
+                  this.#f_saveSVG.classList.add("urgentPulse");
+                  return;
+            }
+            this.#f_saveSVG.classList.remove("urgentPulse");
+      }
+
+      ensureScaleGroup() {
+            let mainGroup = this.#dragZoomSVG?.svg?.querySelector("#mainGcreatedByT");
+            if(!mainGroup) return null;
+            let scaleGroup = mainGroup.querySelector("#scaleGroup");
+            if(scaleGroup) return scaleGroup;
+
+            scaleGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            scaleGroup.id = "scaleGroup";
+
+            let children = Array.from(mainGroup.children);
+            children.forEach((child) => {
+                  scaleGroup.appendChild(child);
+            });
+
+            mainGroup.appendChild(scaleGroup);
+            return scaleGroup;
+      }
 
 }
