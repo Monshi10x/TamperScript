@@ -164,6 +164,7 @@ class ModalSVG extends Modal {
             this.addFooterElement(this.#f_saveSVG);
             this.addFooterElement(this.#f_cancelSave);
             this.applySvgScale(this.#svgScale);
+            this.fitToSvgBounds();
       }
 
       async loadPathArea() {
@@ -692,7 +693,9 @@ class ModalSVG extends Modal {
                   this.#dragZoomSVG.svg.setAttribute("width", `${width}${this.#svgBaseSize.widthUnit}`);
                   this.#dragZoomSVG.svg.setAttribute("height", `${height}${this.#svgBaseSize.heightUnit}`);
             }
+            this.#dragZoomSVG.refreshElementStyles();
             this.refreshMeasurements();
+            this.fitToSvgBounds();
             this.updateSavePulse();
       }
 
@@ -750,6 +753,11 @@ class ModalSVG extends Modal {
             if(this.#showShapeAreas?.[1]?.checked) this.showShapeAreas();
             if(this.#showShapeBoundingRect?.[1]?.checked) this.showShapeBoundingRect();
             if(this.#showPoints?.[1]?.checked) this.showElementPoints();
+      }
+
+      fitToSvgBounds() {
+            if(!this.#dragZoomSVG?.svg) return;
+            this.#dragZoomSVG.centerAndFitSVGContent(this.#dragZoomSVG.svg, this.#dragZoomSVG.svgG, this.#dragZoomSVG.panZoomInstance);
       }
 
 }
