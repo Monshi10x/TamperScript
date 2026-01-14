@@ -741,8 +741,11 @@ class ModalSVG extends Modal {
             let widthValue = parseFloat(this.#widthShouldBeField[1].value);
             let heightValue = parseFloat(this.#heightShouldBeField[1].value);
 
-            let widthScale = Number.isFinite(widthValue) ? widthValue / bounds.width : null;
-            let heightScale = Number.isFinite(heightValue) ? heightValue / bounds.height : null;
+            let boundsWidthMm = svg_pixelToMM(bounds.width);
+            let boundsHeightMm = svg_pixelToMM(bounds.height);
+
+            let widthScale = Number.isFinite(widthValue) ? widthValue / boundsWidthMm : null;
+            let heightScale = Number.isFinite(heightValue) ? heightValue / boundsHeightMm : null;
 
             if(Number.isFinite(widthScale) && Number.isFinite(heightScale)) {
                   this.#calculatedScaleValue = roundNumber((widthScale + heightScale) / 2, 6);
