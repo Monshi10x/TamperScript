@@ -45,25 +45,45 @@ class ModalSVG extends Modal {
       #svgScaleField;
       #svgBaseSize;
       #isUpdatingSvgScale = false;
+      #widthShouldBeField;
+      #heightShouldBeField;
+      #calculatedScaleText;
+      #applyCalculatedScaleButton;
+      #calculatedScaleValue = 1;
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
       get svgFile() {return this.#dragZoomSVG.svg.outerHTML;}
 
-      constructor(headerText, incrementAmount, callback, svgText, callerObject, options = {
-            convertShapesToPaths: true,
-            splitCompoundPaths: true,
-            scaleStrokeOnScroll: true,
-            scaleFontOnScroll: true,
-            defaultStrokeWidth: 1,
-            defaultFontSize: 12
-      }) {
+      constructor(headerText, incrementAmount, callback, svgText, callerObject, options = {}) {
+            const defaultOptions = {
+                  convertShapesToPaths: true,
+                  splitCompoundPaths: true,
+                  scaleStrokeOnScroll: true,
+                  scaleFontOnScroll: true,
+                  defaultStrokeWidth: 1,
+                  defaultFontSize: 12,
+                  hideScaleControl: false,
+                  hideSelectionTool: false,
+                  hideDeleteTool: false
+            };
+            const mergedOptions = {...defaultOptions, ...options};
+            const controlOptions = {
+                  hideScaleControl: mergedOptions.hideScaleControl,
+                  hideSelectionTool: mergedOptions.hideSelectionTool,
+                  hideDeleteTool: mergedOptions.hideDeleteTool
+            };
+            const dragZoomOptions = {...mergedOptions};
+            delete dragZoomOptions.hideScaleControl;
+            delete dragZoomOptions.hideSelectionTool;
+            delete dragZoomOptions.hideDeleteTool;
+
             super(headerText, incrementAmount, callback);
             this.#svgText = svgText;
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
 
-            this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width + "px", "500px", svgText, this.getBodyElement(), options);
+            this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width + "px", "500px", svgText, this.getBodyElement(), dragZoomOptions);
             this.#dragZoomSVG.onMouseUpdate = this.onMouseUpdate;
             this.#svgBaseSize = this.getSvgBaseSize(svgText);
             this.cacheOriginalPathData();
@@ -108,30 +128,52 @@ class ModalSVG extends Modal {
             }, this.#viewSettingsContainer);
 
             this.#controlsContainer = createDivStyle5(null, "Controls", this.getBodyElement())[1];
-            this.#svgScaleField = createInput_Infield("SVG Scale", this.#svgScale, "width:250px;", () => {
-                  this.updateSvgScaleFromField();
-            }, this.#controlsContainer, false, 0.1);
+            if(!controlOptions.hideScaleControl) {
+                  this.#svgScaleField = createInput_Infield("SVG Scale", this.#svgScale, "width:250px;", () => {
+                        this.updateSvgScaleFromField();
+                  }, this.#controlsContainer, false, 0.1);
+
+                  this.#widthShouldBeField = createInput_Infield("Width Should Be", null, "width:250px;", () => { }, this.#controlsContainer, false, null);
+                  this.#heightShouldBeField = createInput_Infield("Height Should Be", null, "width:250px;", () => { }, this.#controlsContainer, false, null);
+                  setFieldDisabled(true, this.#widthShouldBeField[1], this.#widthShouldBeField[0]);
+                  setFieldDisabled(true, this.#heightShouldBeField[1], this.#heightShouldBeField[0]);
+
+                  this.#calculatedScaleText = createText("Calculated Scale: --", "width:250px;margin:5px 0px;", this.#controlsContainer);
+                  this.#applyCalculatedScaleButton = createButton("Apply Calculated Scale", "width:250px;", () => {
+                        if(!Number.isFinite(this.#calculatedScaleValue)) return;
+                        this.applySvgScale(this.#calculatedScaleValue);
+                        if(this.#svgScaleField?.[1]) {
+                              this.#isUpdatingSvgScale = true;
+                              this.#svgScaleField[1].value = this.#calculatedScaleValue;
+                              this.#isUpdatingSvgScale = false;
+                        }
+                  }, this.#controlsContainer);
+            }
 
             let deleteTool;
             let selectionTool;
 
-            selectionTool = createIconButton(GM_getResourceURL("Icon_Select"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
-                  IFELSEF(this.currentTool != "Selection Tool", () => {
-                        if(deleteTool.style.borderColor == "red") $(deleteTool).click();
-                        this.setCurrentTool("Selection Tool");
+            if(!controlOptions.hideSelectionTool) {
+                  selectionTool = createIconButton(GM_getResourceURL("Icon_Select"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
+                        IFELSEF(this.currentTool != "Selection Tool", () => {
+                              if(deleteTool?.style?.borderColor == "red") $(deleteTool).click();
+                              this.setCurrentTool("Selection Tool");
 
-                  }, () => {this.setCurrentTool("null");});
-                  IFELSEF(selectionTool.style.borderColor != "red", () => {selectionTool.style.borderColor = "red";}, () => {selectionTool.style.borderColor = COLOUR.DarkGrey;});
-            }, this.#controlsContainer, true);
+                        }, () => {this.setCurrentTool("null");});
+                        IFELSEF(selectionTool.style.borderColor != "red", () => {selectionTool.style.borderColor = "red";}, () => {selectionTool.style.borderColor = COLOUR.DarkGrey;});
+                  }, this.#controlsContainer, true);
+            }
 
-            deleteTool = createIconButton(GM_getResourceURL("Icon_Bin2"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
-                  IFELSEF(this.currentTool != "Delete Tool", () => {
-                        if(selectionTool.style.borderColor == "red") $(selectionTool).click();
-                        this.setCurrentTool("Delete Tool");
+            if(!controlOptions.hideDeleteTool) {
+                  deleteTool = createIconButton(GM_getResourceURL("Icon_Bin2"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
+                        IFELSEF(this.currentTool != "Delete Tool", () => {
+                              if(selectionTool?.style?.borderColor == "red") $(selectionTool).click();
+                              this.setCurrentTool("Delete Tool");
 
-                  }, () => {this.setCurrentTool("null");});
-                  IFELSEF(deleteTool.style.borderColor != "red", () => {deleteTool.style.borderColor = "red";}, () => {deleteTool.style.borderColor = COLOUR.DarkGrey;});
-            }, this.#controlsContainer, true);
+                        }, () => {this.setCurrentTool("null");});
+                        IFELSEF(deleteTool.style.borderColor != "red", () => {deleteTool.style.borderColor = "red";}, () => {deleteTool.style.borderColor = COLOUR.DarkGrey;});
+                  }, this.#controlsContainer, true);
+            }
 
             this.loadPathArea();
             this.loadBoundingRectAreas();
@@ -673,6 +715,52 @@ class ModalSVG extends Modal {
             };
       }
 
+      getOverallSvgBounds() {
+            if(!this.#dragZoomSVG?.svg) return null;
+            let target = this.#dragZoomSVG.svg.querySelector("#pathGroup") || this.#dragZoomSVG.svgG || this.#dragZoomSVG.svg;
+            if(!target?.getBBox) return null;
+            try {
+                  return target.getBBox();
+            } catch(error) {
+                  console.warn("Unable to get SVG bounds.", error);
+                  return null;
+            }
+      }
+
+      getCalculatedScaleDetails() {
+            if(!this.#svgBaseSize) return null;
+            let bounds = this.getOverallSvgBounds();
+            if(!bounds || bounds.width <= 0 || bounds.height <= 0) return null;
+
+            let widthScale = this.#svgBaseSize.width / bounds.width;
+            let heightScale = this.#svgBaseSize.height / bounds.height;
+            let calculatedScale = roundNumber((widthScale + heightScale) / 2, 6);
+
+            return {
+                  bounds,
+                  widthScale,
+                  heightScale,
+                  calculatedScale
+            };
+      }
+
+      updateCalculatedScaleFields() {
+            if(!this.#widthShouldBeField || !this.#heightShouldBeField || !this.#calculatedScaleText) return;
+            let calculated = this.getCalculatedScaleDetails();
+            if(!calculated) {
+                  this.#widthShouldBeField[1].value = "";
+                  this.#heightShouldBeField[1].value = "";
+                  this.#calculatedScaleText.innerText = "Calculated Scale: --";
+                  this.#calculatedScaleValue = 1;
+                  return;
+            }
+
+            this.#calculatedScaleValue = calculated.calculatedScale;
+            this.#widthShouldBeField[1].value = roundNumber(calculated.bounds.width * calculated.widthScale, 6);
+            this.#heightShouldBeField[1].value = roundNumber(calculated.bounds.height * calculated.heightScale, 6);
+            this.#calculatedScaleText.innerText = `Calculated Scale: ${this.#calculatedScaleValue} (W ${roundNumber(calculated.widthScale, 6)} / H ${roundNumber(calculated.heightScale, 6)})`;
+      }
+
       updateSvgScaleFromField() {
             if(this.#isUpdatingSvgScale) return;
             let scaleValue = parseFloat(this.#svgScaleField[1].value);
@@ -694,6 +782,7 @@ class ModalSVG extends Modal {
             this.refreshMeasurements();
             this.fitToSvgBounds();
             this.updateSavePulse();
+            this.updateCalculatedScaleFields();
             this.saveControlSettings();
       }
 
