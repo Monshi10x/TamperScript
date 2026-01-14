@@ -41,7 +41,6 @@ class ModalSVG extends Modal {
       #svgScale = 1;
       #svgScaleField;
       #svgBaseSize;
-      #svgScaleGroup;
       #isUpdatingSvgScale = false;
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
@@ -64,7 +63,7 @@ class ModalSVG extends Modal {
             this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width + "px", "500px", svgText, this.getBodyElement(), options);
             this.#dragZoomSVG.onMouseUpdate = this.onMouseUpdate;
             this.#svgBaseSize = this.getSvgBaseSize(svgText);
-            this.#svgScaleGroup = this.ensureScaleGroup();
+            this.cacheOriginalPathData();
 
             this.#statsContainer = createDivStyle5(null, "Stats", this.getBodyElement())[1];
             this.#totalPathLength = createInput_Infield("Total Paths Length", this.#dragZoomSVG.totalPathLengths, null, () => { }, this.#statsContainer, false, 1, {postfix: "mm"});
@@ -686,15 +685,14 @@ class ModalSVG extends Modal {
 
       applySvgScale(scaleValue) {
             this.#svgScale = scaleValue;
+            this.scaleSvgPaths(scaleValue);
             if(this.#svgBaseSize && this.#dragZoomSVG?.svg) {
                   let width = roundNumber(this.#svgBaseSize.width * scaleValue, 6);
                   let height = roundNumber(this.#svgBaseSize.height * scaleValue, 6);
                   this.#dragZoomSVG.svg.setAttribute("width", `${width}${this.#svgBaseSize.widthUnit}`);
                   this.#dragZoomSVG.svg.setAttribute("height", `${height}${this.#svgBaseSize.heightUnit}`);
             }
-            if(this.#svgScaleGroup) {
-                  this.#svgScaleGroup.setAttribute("transform", `scale(${scaleValue})`);
-            }
+            this.refreshMeasurements();
             this.updateSavePulse();
       }
 
@@ -707,22 +705,49 @@ class ModalSVG extends Modal {
             this.#f_saveSVG.classList.remove("urgentPulse");
       }
 
-      ensureScaleGroup() {
-            let mainGroup = this.#dragZoomSVG?.svg?.querySelector("#mainGcreatedByT");
-            if(!mainGroup) return null;
-            let scaleGroup = mainGroup.querySelector("#scaleGroup");
-            if(scaleGroup) return scaleGroup;
+      cacheOriginalPathData() {
+            if(!this.#dragZoomSVG) return;
+            this.#dragZoomSVG.allPathElements.forEach((element) => {
+                  if(!element.dataset.baseD) {
+                        element.dataset.baseD = element.getAttribute("d") || "";
+                  }
+            });
+      }
 
-            scaleGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-            scaleGroup.id = "scaleGroup";
+      scaleSvgPaths(scaleValue) {
+            this.cacheOriginalPathData();
+            this.#dragZoomSVG.allPathElements.forEach((element) => {
+                  let baseD = element.dataset.baseD;
+                  if(!baseD) return;
+                  try {
+                        let scaledPath = new SVGPathCommander(baseD).scale(scaleValue, scaleValue).toString();
+                        element.setAttribute("d", scaledPath);
+                  } catch(error) {
+                        console.warn("Unable to scale SVG path.", error);
+                  }
+            });
+      }
 
-            let children = Array.from(mainGroup.children);
-            children.forEach((child) => {
-                  scaleGroup.appendChild(child);
+      refreshMeasurements() {
+            if(this.#totalPathLength) {
+                  $(this.#totalPathLength[1]).val(this.#dragZoomSVG.totalPathLengths).change();
+            }
+
+            this.loadPathArea();
+            this.loadBoundingRectAreas();
+
+            let groupsToRemove = ["overallMeasures", "itemMeasures", "shapeAreas", "partAreas", "shapeBoundingRects", "itemPoints"];
+            groupsToRemove.forEach((groupId) => {
+                  let group = this.#dragZoomSVG.svg.querySelector(`#${groupId}`);
+                  if(group) group.remove();
             });
 
-            mainGroup.appendChild(scaleGroup);
-            return scaleGroup;
+            if(this.#showOverallMeasures?.[1]?.checked) this.showOverallMeasures();
+            if(this.#showIndividualMeasures?.[1]?.checked) this.showElementMeasures();
+            if(this.#showIndividualAreas?.[1]?.checked) this.showPartAreas();
+            if(this.#showShapeAreas?.[1]?.checked) this.showShapeAreas();
+            if(this.#showShapeBoundingRect?.[1]?.checked) this.showShapeBoundingRect();
+            if(this.#showPoints?.[1]?.checked) this.showElementPoints();
       }
 
 }
