@@ -143,11 +143,11 @@ class ModalSVG extends Modal {
                   this.#calculatedScaleText = createText("Calculated Scale: --", "width:250px;margin:5px 0px;", this.#controlsContainer);
                   this.#applyCalculatedScaleButton = createButton("Apply Calculated Scale", "width:250px;", () => {
                         if(!Number.isFinite(this.#calculatedScaleValue)) return;
-                        this.applySvgScale(this.#calculatedScaleValue);
                         if(this.#svgScaleField?.[1]) {
                               this.#isUpdatingSvgScale = true;
                               this.#svgScaleField[1].value = this.#calculatedScaleValue;
                               this.#isUpdatingSvgScale = false;
+                              this.updateSvgScaleFromField();
                         }
                   }, this.#controlsContainer);
             }
