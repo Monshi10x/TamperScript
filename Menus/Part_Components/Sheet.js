@@ -932,7 +932,11 @@ class Sheet extends Material {
 
                   subscription.data.forEach((dataEntry/**{pathLength:{},pathQty: {}}*/) => {
 
-                        if(dataEntry.pathQty) numberOfPaths += dataEntry.pathQty.totalQty;
+                        if(dataEntry.cutData?.numberOfCutPaths != null) {
+                              numberOfPaths += Number(dataEntry.cutData.numberOfCutPaths) || 0;
+                        } else if(dataEntry.pathQty) {
+                              numberOfPaths += dataEntry.pathQty.totalQty;
+                        }
                         if(subscription.parent instanceof LED) {
                               penMarkingQty += dataEntry.qty;
                               penMarkingLength += dataEntry.qty * 100;
