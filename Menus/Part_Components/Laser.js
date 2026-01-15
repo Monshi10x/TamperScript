@@ -114,7 +114,6 @@ class Laser extends SubMenu {
             }
 
             this.applyToolpathData(toolpathData, detectedMaterial, detectedThickness);
-            this.applyDetectedMaterialToRows(detectedMaterial, data, detectedThickness);
             this.UpdateRun();
       }
 
@@ -204,12 +203,16 @@ class Laser extends SubMenu {
             let grooveMaterial = toolpathData.material ?? detectedMaterial;
             let grooveThickness = toolpathData.thickness ?? detectedThickness;
             if(toolpathData.lengthOfGroovesToCut > 0 && toolpathData.numberOfGroovePaths > 0) {
-                  this.addRunRow(toolpathData.lengthOfGroovesToCut, toolpathData.numberOfGroovePaths, {
-                        material: grooveMaterial,
-                        thickness: grooveThickness,
-                        profile: "Groove",
-                        quality: "Good Quality"
-                  });
+                  if(this.supportsProfile(grooveMaterial, grooveThickness, "Groove")) {
+                        this.addRunRow(toolpathData.lengthOfGroovesToCut, toolpathData.numberOfGroovePaths, {
+                              material: grooveMaterial,
+                              thickness: grooveThickness,
+                              profile: "Groove",
+                              quality: "Good Quality"
+                        });
+                  } else {
+                        this.notifyProfileMissing(`Laser groove profile missing for ${grooveMaterial}.`);
+                  }
             }
 
             let markingMaterial = toolpathData.material ?? detectedMaterial;

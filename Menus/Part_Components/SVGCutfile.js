@@ -312,14 +312,50 @@ class SVGCutfile extends SubscriptionManager {
       UpdateDataForSubscribers() {
             this.#dataForSubscribers = [];
 
+            let overallWidthMM = zeroIfNaNNullBlank(this.#overallSize?.width);
+            let overallHeightMM = zeroIfNaNNullBlank(this.#overallSize?.height);
+            let pathLength = zeroIfNaNNullBlank(this.pathLength);
+            let shapeAreas = zeroIfNaNNullBlank(this.#shapeAreas);
+            let boundingRectAreas = zeroIfNaNNullBlank(this.#totalBoundingRectAreas);
+            let pathQty = this.getNumberOfShapes();
+            let numberOfSheets = zeroIfNaNNullBlank(this.qty);
+
             this.#dataForSubscribers.push({
                   overallSize: this.#overallSize,
-                  pathLength: zeroIfNaNNullBlank(this.pathLength),
-                  shapeAreas: zeroIfNaNNullBlank(this.#shapeAreas),
-                  boundingRectAreas: zeroIfNaNNullBlank(this.#totalBoundingRectAreas),
-                  paintedArea: zeroIfNaNNullBlank(this.#shapeAreas),
-                  pathQty: this.getNumberOfShapes(),
-                  QWHD: this.getQWHD()
+                  pathLength: pathLength,
+                  shapeAreas: shapeAreas,
+                  boundingRectAreas: boundingRectAreas,
+                  overallWidthMM: overallWidthMM,
+                  overallHeightMM: overallHeightMM,
+                  paintedArea: shapeAreas,
+                  pathQty: pathQty,
+                  QWHD: this.getQWHD(),
+                  routerData: {
+                        cutPathLength: pathLength,
+                        numberOfCutPaths: pathQty,
+                        numberOfSheets: numberOfSheets,
+                        lengthOfGroovesToCut: 0,
+                        numberOfGroovePaths: 0,
+                        numberOfPenStrokes: 0,
+                        penStrokeLength: 100,
+                        shapeAreas: shapeAreas,
+                        boundingRectAreas: boundingRectAreas,
+                        overallWidthMM: overallWidthMM,
+                        overallHeightMM: overallHeightMM
+                  },
+                  laserData: {
+                        cutPathLength: pathLength,
+                        numberOfCutPaths: pathQty,
+                        numberOfSheets: numberOfSheets,
+                        lengthOfGroovesToCut: 0,
+                        numberOfGroovePaths: 0,
+                        numberOfPenStrokes: 0,
+                        penStrokeLength: 100,
+                        shapeAreas: shapeAreas,
+                        boundingRectAreas: boundingRectAreas,
+                        overallWidthMM: overallWidthMM,
+                        overallHeightMM: overallHeightMM
+                  }
             });
 
             this.DATA_FOR_SUBSCRIBERS = {
