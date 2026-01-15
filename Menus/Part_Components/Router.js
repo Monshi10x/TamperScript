@@ -120,7 +120,6 @@ class Router extends SubMenu {
 		}
 
 		this.applyToolpathData(toolpathData, detectedMaterial, detectedThickness);
-		this.applyDetectedMaterialToRows(detectedMaterial, data, detectedThickness);
 		this.UpdateRun();
 	}
 
