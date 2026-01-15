@@ -69,10 +69,6 @@ class Sheet extends Material {
       /** @example ['ACM - (sqm)', 'Matte Colours Alucobond', '1000x1000', '3x0.30'] */
       #searchTerms = [];
       #parts = [];
-      routerCutProfile = {material: "ACM", thickness: "3", profile: "Cut Through", quality: "Good Quality"};
-      staticRouterRows = [];
-      laserCutProfile = {material: "Stainless", thickness: "1.2", profile: "Cut Through", quality: "Good Quality"};
-      staticLaserRows = [];
       #materialOptions = [
             createDropdownOption("ACM", "ACM"),
             createDropdownOption("Acrylic", "Acrylic"),
@@ -131,25 +127,47 @@ class Sheet extends Material {
        */
       //#dataForSubscribers = [];
 
-      setRouterCutProfile(options = {material: null, thickness: null, profile: null, quality: null}) {
-            this.routerCutProfile = {material: options.material, thickness: options.thickness, profile: options.profile, quality: options.quality};
-            this.UpdateFromFields();
+      addStaticRouterRow() {
+            console.warn("Sheet.addStaticRouterRow is deprecated. Router rows must be managed by Router.");
       }
 
-      addStaticRouterRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", thickness: "", profile: "Cut Through", quality: "Good Quality"}) {
-            this.staticRouterRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
-            this.UpdateFromFields();
+      setRouterCutProfile() {
+            console.warn("Sheet.setRouterCutProfile is deprecated. Router profiles must be managed by Router.");
       }
 
-      setLaserCutProfile(options = {material: null, thickness: null, profile: null, quality: null}) {
-            this.laserCutProfile = {material: options.material, thickness: options.thickness, profile: options.profile, quality: options.quality};
-            this.UpdateFromFields();
+      addStaticLaserRow() {
+            console.warn("Sheet.addStaticLaserRow is deprecated. Laser rows must be managed by Laser.");
       }
 
-      addStaticLaserRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", thickness: "", profile: "Cut Through", quality: "Good Quality"}) {
-            this.staticLaserRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
-            this.UpdateFromFields();
+      setLaserCutProfile() {
+            console.warn("Sheet.setLaserCutProfile is deprecated. Laser profiles must be managed by Laser.");
       }
+
+      getSheetMaterialDetails() {
+            let sheetMaterial = this.#sheetMaterial[1].value;
+            let material = null;
+            let thickness = null;
+
+            if(typeof getPredefinedParts === "function") {
+                  let part = getPredefinedParts(sheetMaterial)[0];
+                  if(part) {
+                        material = part.Material ?? null;
+                        thickness = part.Thickness ?? null;
+                  }
+            }
+
+            if(material == null && sheetMaterial) {
+                  material = sheetMaterial.split(" - ")[0].trim() || null;
+            }
+
+            if(thickness == null && typeof predefinedParts_obj !== "undefined" && predefinedParts_obj) {
+                  let matchedPart = predefinedParts_obj.find(p => p.Name === sheetMaterial) || predefinedParts_obj.find(p => p.Name && p.Name.includes(sheetMaterial));
+                  if(matchedPart && matchedPart.Thickness) thickness = matchedPart.Thickness;
+            }
+
+            return {material, thickness, sheetMaterial};
+      }
+
 
       static guillotineCutsPerType = {
             "Standard Sheet": 0,
@@ -812,6 +830,7 @@ class Sheet extends Material {
             this.#totalRouterNumberOfShapes = 0;
 
             let [sheetSizeWidth, sheetSizeHeight] = this.getSheetSizeWH();
+            let sheetMaterialDetails = this.getSheetMaterialDetails();
 
             let mustBeRouterCut = false;
             let _this = this;
@@ -831,7 +850,7 @@ class Sheet extends Material {
                   setFieldHidden(true, this.#cuttingJoinNote);
                   this.setAllCuttingTypeDisabled(false);
 
-                  let currentMaterial = this.#material[1].value;
+                  let currentMaterial = sheetMaterialDetails.material ?? "";
 
                   let subscriptionQty = this.#inheritedSizes[i].qty;
                   let rowWidth = this.#inheritedSizes[i].width;
@@ -853,7 +872,9 @@ class Sheet extends Material {
                   this.#matrixSizes.push(Sheet.getMatrixSizes(this.currentJoinMethod, rowWidth, rowHeight, sheetSizeWidth, sheetSizeHeight, this.#flipSheet));
                   this.#dataForSubscribers.push({
                         matrixSizes: this.#matrixSizes,
-                        sheetMaterial: this.#sheetMaterial[1].value
+                        sheetMaterial: sheetMaterialDetails.sheetMaterial,
+                        material: sheetMaterialDetails.material,
+                        thickness: sheetMaterialDetails.thickness
                   });
 
                   for(let u = 0; u < uniqueSizes.length; u++) {
@@ -983,25 +1004,10 @@ class Sheet extends Material {
                   this.#laser.Maximize();
             }
 
-
-
-            ///ROUTER
-            this.#router.deleteAllRunRows();
-            this.staticRouterRows.forEach((element) => {
-                  this.#router.addRunRow(eval(element.pathLength), eval(element.numberOfPaths), eval(element.profileSettings));
-            });
-            if(this.#sheetPerimeterIsCut) this.#router.addRunRow(this.#totalRouterPerimeter, numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths, this.routerCutProfile);
-            if(penMarkingQty > 0) this.#router.addRunRow(penMarkingLength, penMarkingQty, {material: "Any", profile: "LED Marking", quality: "SecondsPerCut"});
-
-            ///LASER
-            this.#laser.deleteAllRunRows();
-            this.staticLaserRows.forEach((element) => {
-                  this.#laser.addRunRow(eval(element.pathLength), eval(element.numberOfPaths), eval(element.profileSettings));
-            });
-            if(this.#sheetPerimeterIsCut) this.#laser.addRunRow(this.#totalLaserPerimeter, numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths, this.laserCutProfile);
-
             ///FOLDED
-            if(this.#isFolded[1].checked) {
+            let lengthOfGroovesToCut = 0;
+            let numberOfGroovePaths = 0;
+            if(this.#isFolded[1].checked && parseFloat(this.#f_returnDepth[1].value) > 0) {
                   let foldPerimeter = 0;
                   let numberShapes = 0;
                   let foldedTop = this.#foldedTop[1].checked;
@@ -1030,17 +1036,37 @@ class Sheet extends Material {
                         }
                   }
 
-                  this.#router.addRunRow(foldPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", thickness: "3", profile: "Groove", quality: "Good Quality"});
-                  TODO("Laser folding");
+                  lengthOfGroovesToCut = foldPerimeter;
+                  numberOfGroovePaths = numberOfPaths == 0 ? numberShapes : numberOfPaths;
             }
 
-            this.#router.setupNumberOfSheets = this.#totalRouterNumberOfShapes;
+            let sheetMaterialDetails = this.getSheetMaterialDetails();
+            let effectiveNumberOfPaths = numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths;
+            let effectiveLaserPaths = numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths;
 
-            this.#router.cleanNumberOfSheets = this.#totalRouterNumberOfShapes;
-
-            this.#laser.setupNumberOfSheets = this.#totalLaserNumberOfShapes;
-
-            this.#laser.cleanNumberOfSheets = this.#totalLaserNumberOfShapes;
+            this.#dataForSubscribers.push({
+                  sheetMaterial: sheetMaterialDetails.sheetMaterial,
+                  material: sheetMaterialDetails.material,
+                  thickness: sheetMaterialDetails.thickness,
+                  routerData: {
+                        cutPathLength: this.#sheetPerimeterIsCut ? this.#totalRouterPerimeter : 0,
+                        numberOfCutPaths: this.#sheetPerimeterIsCut ? effectiveNumberOfPaths : 0,
+                        numberOfSheets: this.#totalRouterNumberOfShapes,
+                        lengthOfGroovesToCut: lengthOfGroovesToCut,
+                        numberOfGroovePaths: numberOfGroovePaths,
+                        numberOfPenStrokes: penMarkingQty,
+                        penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100
+                  },
+                  laserData: {
+                        cutPathLength: this.#sheetPerimeterIsCut ? this.#totalLaserPerimeter : 0,
+                        numberOfCutPaths: this.#sheetPerimeterIsCut ? effectiveLaserPaths : 0,
+                        numberOfSheets: this.#totalLaserNumberOfShapes,
+                        lengthOfGroovesToCut: lengthOfGroovesToCut,
+                        numberOfGroovePaths: numberOfGroovePaths,
+                        numberOfPenStrokes: penMarkingQty,
+                        penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100
+                  }
+            });
 
 
             if(this.#totalNumberSupplierCuts === 0) {
