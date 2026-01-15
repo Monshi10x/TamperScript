@@ -130,9 +130,7 @@ class Laser extends SubMenu {
                   penStrokeLength: 100,
                   numberOfSheets: 0,
                   material: null,
-                  thickness: null,
-                  cutProfile: null,
-                  staticRows: []
+                  thickness: null
             };
             let hasData = false;
 
@@ -171,14 +169,6 @@ class Laser extends SubMenu {
                               toolpathData.numberOfSheets += Number(laserData.numberOfSheets) || 0;
                               hasData = true;
                         }
-                        if(laserData.cutProfile && toolpathData.cutProfile == null) {
-                              toolpathData.cutProfile = laserData.cutProfile;
-                              hasData = true;
-                        }
-                        if(Array.isArray(laserData.staticRows) && laserData.staticRows.length > 0) {
-                              toolpathData.staticRows = toolpathData.staticRows.concat(laserData.staticRows);
-                              hasData = true;
-                        }
                   }
             }
 
@@ -200,18 +190,11 @@ class Laser extends SubMenu {
 
             this.deleteAllRunRows(false);
 
-            if(Array.isArray(toolpathData.staticRows)) {
-                  toolpathData.staticRows.forEach((row) => {
-                        this.addRunRow(row.pathLength, row.numberOfPaths, row.profileSettings);
-                  });
-            }
-
-            let cutProfile = toolpathData.cutProfile ?? {};
             let cutRowOptions = {
-                  material: cutProfile.material ?? detectedMaterial,
-                  thickness: cutProfile.thickness ?? detectedThickness,
-                  profile: cutProfile.profile ?? null,
-                  quality: cutProfile.quality ?? null
+                  material: toolpathData.material ?? detectedMaterial,
+                  thickness: toolpathData.thickness ?? detectedThickness,
+                  profile: "Cut Through",
+                  quality: "Good Quality"
             };
 
             if(toolpathData.cutPathLength > 0 || toolpathData.numberOfCutPaths > 0) {
@@ -221,14 +204,12 @@ class Laser extends SubMenu {
             let grooveMaterial = toolpathData.material ?? detectedMaterial;
             let grooveThickness = toolpathData.thickness ?? detectedThickness;
             if(toolpathData.lengthOfGroovesToCut > 0 && toolpathData.numberOfGroovePaths > 0) {
-                  if(this.supportsProfile(grooveMaterial, grooveThickness, "Groove")) {
-                        this.addRunRow(toolpathData.lengthOfGroovesToCut, toolpathData.numberOfGroovePaths, {
-                              material: grooveMaterial,
-                              thickness: grooveThickness,
-                              profile: "Groove",
-                              quality: "Good Quality"
-                        });
-                  }
+                  this.addRunRow(toolpathData.lengthOfGroovesToCut, toolpathData.numberOfGroovePaths, {
+                        material: grooveMaterial,
+                        thickness: grooveThickness,
+                        profile: "Groove",
+                        quality: "Good Quality"
+                  });
             }
 
             let markingMaterial = toolpathData.material ?? detectedMaterial;

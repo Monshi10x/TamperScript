@@ -69,10 +69,6 @@ class Sheet extends Material {
       /** @example ['ACM - (sqm)', 'Matte Colours Alucobond', '1000x1000', '3x0.30'] */
       #searchTerms = [];
       #parts = [];
-      routerCutProfile = {material: "ACM", thickness: "3", profile: "Cut Through", quality: "Good Quality"};
-      staticRouterRows = [];
-      laserCutProfile = {material: "Stainless", thickness: "1.2", profile: "Cut Through", quality: "Good Quality"};
-      staticLaserRows = [];
       #materialOptions = [
             createDropdownOption("ACM", "ACM"),
             createDropdownOption("Acrylic", "Acrylic"),
@@ -131,24 +127,20 @@ class Sheet extends Material {
        */
       //#dataForSubscribers = [];
 
-      setRouterCutProfile(options = {material: null, thickness: null, profile: null, quality: null}) {
-            this.routerCutProfile = {material: options.material, thickness: options.thickness, profile: options.profile, quality: options.quality};
-            this.UpdateFromFields();
+      addStaticRouterRow() {
+            console.warn("Sheet.addStaticRouterRow is deprecated. Router rows must be managed by Router.");
       }
 
-      addStaticRouterRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", thickness: "", profile: "Cut Through", quality: "Good Quality"}) {
-            this.staticRouterRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
-            this.UpdateFromFields();
+      setRouterCutProfile() {
+            console.warn("Sheet.setRouterCutProfile is deprecated. Router profiles must be managed by Router.");
       }
 
-      setLaserCutProfile(options = {material: null, thickness: null, profile: null, quality: null}) {
-            this.laserCutProfile = {material: options.material, thickness: options.thickness, profile: options.profile, quality: options.quality};
-            this.UpdateFromFields();
+      addStaticLaserRow() {
+            console.warn("Sheet.addStaticLaserRow is deprecated. Laser rows must be managed by Laser.");
       }
 
-      addStaticLaserRow(_length, _numberOfPaths, _profileSettings = {material: "ACM", thickness: "", profile: "Cut Through", quality: "Good Quality"}) {
-            this.staticLaserRows.push({pathLength: _length, numberOfPaths: _numberOfPaths, profileSettings: _profileSettings});
-            this.UpdateFromFields();
+      setLaserCutProfile() {
+            console.warn("Sheet.setLaserCutProfile is deprecated. Laser profiles must be managed by Laser.");
       }
 
       getSheetMaterialDetails() {
@@ -176,27 +168,6 @@ class Sheet extends Material {
             return {material, thickness, sheetMaterial};
       }
 
-      resolveStaticRows(rows, context) {
-            let resolvedRows = [];
-
-            rows.forEach((row) => {
-                  let pathLength = this.resolveStaticRowValue(row.pathLength, context);
-                  let numberOfPaths = this.resolveStaticRowValue(row.numberOfPaths, context);
-                  resolvedRows.push({pathLength, numberOfPaths, profileSettings: row.profileSettings});
-            });
-
-            return resolvedRows;
-      }
-
-      resolveStaticRowValue(value, context) {
-            if(typeof value === "number") return value;
-            if(typeof value === "string") {
-                  if(Object.prototype.hasOwnProperty.call(context, value)) return context[value];
-                  let numericValue = Number(value);
-                  if(!Number.isNaN(numericValue)) return numericValue;
-            }
-            return 0;
-      }
 
       static guillotineCutsPerType = {
             "Standard Sheet": 0,
@@ -1070,8 +1041,6 @@ class Sheet extends Material {
             }
 
             let sheetMaterialDetails = this.getSheetMaterialDetails();
-            let staticRouterRows = this.resolveStaticRows(this.staticRouterRows, {pathLength, numberOfPaths, boundingPerimeter});
-            let staticLaserRows = this.resolveStaticRows(this.staticLaserRows, {pathLength, numberOfPaths, boundingPerimeter});
             let effectiveNumberOfPaths = numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths;
             let effectiveLaserPaths = numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths;
 
@@ -1086,9 +1055,7 @@ class Sheet extends Material {
                         lengthOfGroovesToCut: lengthOfGroovesToCut,
                         numberOfGroovePaths: numberOfGroovePaths,
                         numberOfPenStrokes: penMarkingQty,
-                        penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100,
-                        cutProfile: this.routerCutProfile,
-                        staticRows: staticRouterRows
+                        penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100
                   },
                   laserData: {
                         cutPathLength: this.#sheetPerimeterIsCut ? this.#totalLaserPerimeter : 0,
@@ -1097,9 +1064,7 @@ class Sheet extends Material {
                         lengthOfGroovesToCut: lengthOfGroovesToCut,
                         numberOfGroovePaths: numberOfGroovePaths,
                         numberOfPenStrokes: penMarkingQty,
-                        penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100,
-                        cutProfile: this.laserCutProfile,
-                        staticRows: staticLaserRows
+                        penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100
                   }
             });
 

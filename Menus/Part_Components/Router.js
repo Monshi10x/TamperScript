@@ -136,9 +136,7 @@ class Router extends SubMenu {
 			penStrokeLength: 100,
 			numberOfSheets: 0,
 			material: null,
-			thickness: null,
-			cutProfile: null,
-			staticRows: []
+			thickness: null
 		};
 		let hasData = false;
 
@@ -177,14 +175,6 @@ class Router extends SubMenu {
 					toolpathData.numberOfSheets += Number(routerData.numberOfSheets) || 0;
 					hasData = true;
 				}
-				if(routerData.cutProfile && toolpathData.cutProfile == null) {
-					toolpathData.cutProfile = routerData.cutProfile;
-					hasData = true;
-				}
-				if(Array.isArray(routerData.staticRows) && routerData.staticRows.length > 0) {
-					toolpathData.staticRows = toolpathData.staticRows.concat(routerData.staticRows);
-					hasData = true;
-				}
 			}
 		}
 
@@ -196,18 +186,11 @@ class Router extends SubMenu {
 
 		this.deleteAllRunRows(false);
 
-		if(Array.isArray(toolpathData.staticRows)) {
-			toolpathData.staticRows.forEach((row) => {
-				this.addRunRow(row.pathLength, row.numberOfPaths, row.profileSettings);
-			});
-		}
-
-		let cutProfile = toolpathData.cutProfile ?? {};
 		let cutRowOptions = {
-			material: cutProfile.material ?? detectedMaterial,
-			thickness: cutProfile.thickness ?? detectedThickness,
-			profile: cutProfile.profile ?? null,
-			quality: cutProfile.quality ?? null
+			material: toolpathData.material ?? detectedMaterial,
+			thickness: toolpathData.thickness ?? detectedThickness,
+			profile: "Cut Through",
+			quality: "Good Quality"
 		};
 
 		if(toolpathData.cutPathLength > 0 || toolpathData.numberOfCutPaths > 0) {
