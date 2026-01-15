@@ -1043,13 +1043,15 @@ class Sheet extends Material {
             let sheetMaterialDetails = this.getSheetMaterialDetails();
             let effectiveNumberOfPaths = numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths;
             let effectiveLaserPaths = numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths;
+            let routerCutPathLength = (this.#sheetPerimeterIsCut ? this.#totalRouterPerimeter : 0) + pathLength;
+            let laserCutPathLength = (this.#sheetPerimeterIsCut ? this.#totalLaserPerimeter : 0) + pathLength;
 
-            this.#dataForSubscribers.push({
+            let routerLaserData = {
                   sheetMaterial: sheetMaterialDetails.sheetMaterial,
                   material: sheetMaterialDetails.material,
                   thickness: sheetMaterialDetails.thickness,
                   routerData: {
-                        cutPathLength: this.#sheetPerimeterIsCut ? this.#totalRouterPerimeter : 0,
+                        cutPathLength: routerCutPathLength,
                         numberOfCutPaths: this.#sheetPerimeterIsCut ? effectiveNumberOfPaths : 0,
                         numberOfSheets: this.#totalRouterNumberOfShapes,
                         lengthOfGroovesToCut: lengthOfGroovesToCut,
@@ -1058,7 +1060,7 @@ class Sheet extends Material {
                         penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100
                   },
                   laserData: {
-                        cutPathLength: this.#sheetPerimeterIsCut ? this.#totalLaserPerimeter : 0,
+                        cutPathLength: laserCutPathLength,
                         numberOfCutPaths: this.#sheetPerimeterIsCut ? effectiveLaserPaths : 0,
                         numberOfSheets: this.#totalLaserNumberOfShapes,
                         lengthOfGroovesToCut: lengthOfGroovesToCut,
@@ -1066,7 +1068,14 @@ class Sheet extends Material {
                         numberOfPenStrokes: penMarkingQty,
                         penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100
                   }
-            });
+            };
+
+            let routerLaserDataIndex = this.#dataForSubscribers.findIndex(entry => entry.routerData || entry.laserData);
+            if(routerLaserDataIndex >= 0) {
+                  this.#dataForSubscribers[routerLaserDataIndex] = routerLaserData;
+            } else {
+                  this.#dataForSubscribers.push(routerLaserData);
+            }
 
 
             if(this.#totalNumberSupplierCuts === 0) {
