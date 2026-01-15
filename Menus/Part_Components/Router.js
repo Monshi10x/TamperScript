@@ -120,7 +120,6 @@ class Router extends SubMenu {
 		}
 
 		this.applyToolpathData(toolpathData, detectedMaterial, detectedThickness);
-		this.applyDetectedMaterialToRows(detectedMaterial, data, detectedThickness);
 		this.UpdateRun();
 	}
 
@@ -145,34 +144,34 @@ class Router extends SubMenu {
 			if(entry.material && toolpathData.material == null) toolpathData.material = entry.material;
 			if(entry.thickness && toolpathData.thickness == null) toolpathData.thickness = entry.thickness;
 
-			if(entry.routerData) {
-				let routerData = entry.routerData;
-				if(routerData.cutPathLength != null) {
-					toolpathData.cutPathLength += Number(routerData.cutPathLength) || 0;
+			if(entry.cutData) {
+				let cutData = entry.cutData;
+				if(cutData.cutPathLength != null) {
+					toolpathData.cutPathLength += Number(cutData.cutPathLength) || 0;
 					hasData = true;
 				}
-				if(routerData.numberOfCutPaths != null) {
-					toolpathData.numberOfCutPaths += Number(routerData.numberOfCutPaths) || 0;
+				if(cutData.numberOfCutPaths != null) {
+					toolpathData.numberOfCutPaths += Number(cutData.numberOfCutPaths) || 0;
 					hasData = true;
 				}
-				if(routerData.lengthOfGroovesToCut != null) {
-					toolpathData.lengthOfGroovesToCut += Number(routerData.lengthOfGroovesToCut) || 0;
+				if(cutData.lengthOfGroovesToCut != null) {
+					toolpathData.lengthOfGroovesToCut += Number(cutData.lengthOfGroovesToCut) || 0;
 					hasData = true;
 				}
-				if(routerData.numberOfGroovePaths != null) {
-					toolpathData.numberOfGroovePaths += Number(routerData.numberOfGroovePaths) || 0;
+				if(cutData.numberOfGroovePaths != null) {
+					toolpathData.numberOfGroovePaths += Number(cutData.numberOfGroovePaths) || 0;
 					hasData = true;
 				}
-				if(routerData.numberOfPenStrokes != null) {
-					toolpathData.numberOfPenStrokes += Number(routerData.numberOfPenStrokes) || 0;
+				if(cutData.numberOfPenStrokes != null) {
+					toolpathData.numberOfPenStrokes += Number(cutData.numberOfPenStrokes) || 0;
 					hasData = true;
 				}
-				if(routerData.penStrokeLength != null) {
-					toolpathData.penStrokeLength = Number(routerData.penStrokeLength) || toolpathData.penStrokeLength;
+				if(cutData.penStrokeLength != null) {
+					toolpathData.penStrokeLength = Number(cutData.penStrokeLength) || toolpathData.penStrokeLength;
 					hasData = true;
 				}
-				if(routerData.numberOfSheets != null) {
-					toolpathData.numberOfSheets += Number(routerData.numberOfSheets) || 0;
+				if(cutData.numberOfSheets != null) {
+					toolpathData.numberOfSheets += Number(cutData.numberOfSheets) || 0;
 					hasData = true;
 				}
 			}
@@ -203,12 +202,18 @@ class Router extends SubMenu {
 		}
 
 		if(toolpathData.lengthOfGroovesToCut > 0 && toolpathData.numberOfGroovePaths > 0) {
-			this.addRunRow(toolpathData.lengthOfGroovesToCut, toolpathData.numberOfGroovePaths, {
-				material: toolpathData.material ?? detectedMaterial ?? "ACM",
-				thickness: toolpathData.thickness ?? detectedThickness,
-				profile: "Groove",
-				quality: "Good Quality"
-			});
+			let grooveMaterial = toolpathData.material ?? detectedMaterial ?? "ACM";
+			let grooveThickness = toolpathData.thickness ?? detectedThickness;
+			if(this.supportsProfile(grooveMaterial, grooveThickness, "Groove")) {
+				this.addRunRow(toolpathData.lengthOfGroovesToCut, toolpathData.numberOfGroovePaths, {
+					material: grooveMaterial,
+					thickness: grooveThickness,
+					profile: "Groove",
+					quality: "Good Quality"
+				});
+			} else {
+				this.notifyProfileMissing(`Router groove profile missing for ${grooveMaterial}.`);
+			}
 		}
 
 		if(toolpathData.numberOfSheets > 0) {
@@ -352,6 +357,16 @@ class Router extends SubMenu {
 			}
 		}
 		return null;
+	}
+
+	supportsProfile(material, thickness, profile) {
+		if(typeof RouterToolpathTimeLookup !== "object" || RouterToolpathTimeLookup == null) return false;
+		if(!material || !thickness || !profile) return false;
+		let materialLookup = RouterToolpathTimeLookup[material];
+		if(!materialLookup) return false;
+		let thicknessLookup = materialLookup[thickness];
+		if(!thicknessLookup) return false;
+		return Object.prototype.hasOwnProperty.call(thicknessLookup, profile);
 	}
 
 	notifyProfileMissing(message) {
