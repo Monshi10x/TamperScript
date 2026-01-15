@@ -98,12 +98,13 @@ class Laser extends SubMenu {
             if(!this.required) return;
 
             this.latestSubscriptionData = data;
-            let detectedMaterial = this.extractMaterialFromSubscription(data);
+            let toolpathData = this.getToolpathDataFromSubscription(data);
+            let detectedMaterial = toolpathData?.material ?? this.extractMaterialFromSubscription(data);
             if(detectedMaterial == null) {
                   this.notifyProfileMissing(`Laser material profile missing for ${detectedMaterial}.`);
                   return;
             }
-            let detectedThickness = this.extractThicknessFromSubscription(data, detectedMaterial);
+            let detectedThickness = toolpathData?.thickness ?? this.extractThicknessFromSubscription(data, detectedMaterial);
 
             this.detectedMaterial = detectedMaterial;
             this.detectedThickness = detectedThickness;
@@ -112,8 +113,142 @@ class Laser extends SubMenu {
                   this.notifyProfileMissing(`Laser thickness profile missing for ${detectedMaterial}.`);
             }
 
+            this.applyToolpathData(toolpathData, detectedMaterial, detectedThickness);
             this.applyDetectedMaterialToRows(detectedMaterial, data, detectedThickness);
             this.UpdateRun();
+      }
+
+      getToolpathDataFromSubscription(data) {
+            if(!data || !Array.isArray(data.data)) return null;
+
+            let toolpathData = {
+                  cutPathLength: 0,
+                  numberOfCutPaths: 0,
+                  lengthOfGroovesToCut: 0,
+                  numberOfGroovePaths: 0,
+                  numberOfPenStrokes: 0,
+                  penStrokeLength: 100,
+                  numberOfSheets: 0,
+                  material: null,
+                  thickness: null,
+                  cutProfile: null,
+                  staticRows: []
+            };
+            let hasData = false;
+
+            for(let i = 0; i < data.data.length; i++) {
+                  let entry = data.data[i];
+                  if(entry.material && toolpathData.material == null) toolpathData.material = entry.material;
+                  if(entry.thickness && toolpathData.thickness == null) toolpathData.thickness = entry.thickness;
+
+                  if(entry.laserData) {
+                        let laserData = entry.laserData;
+                        if(laserData.cutPathLength != null) {
+                              toolpathData.cutPathLength += Number(laserData.cutPathLength) || 0;
+                              hasData = true;
+                        }
+                        if(laserData.numberOfCutPaths != null) {
+                              toolpathData.numberOfCutPaths += Number(laserData.numberOfCutPaths) || 0;
+                              hasData = true;
+                        }
+                        if(laserData.lengthOfGroovesToCut != null) {
+                              toolpathData.lengthOfGroovesToCut += Number(laserData.lengthOfGroovesToCut) || 0;
+                              hasData = true;
+                        }
+                        if(laserData.numberOfGroovePaths != null) {
+                              toolpathData.numberOfGroovePaths += Number(laserData.numberOfGroovePaths) || 0;
+                              hasData = true;
+                        }
+                        if(laserData.numberOfPenStrokes != null) {
+                              toolpathData.numberOfPenStrokes += Number(laserData.numberOfPenStrokes) || 0;
+                              hasData = true;
+                        }
+                        if(laserData.penStrokeLength != null) {
+                              toolpathData.penStrokeLength = Number(laserData.penStrokeLength) || toolpathData.penStrokeLength;
+                              hasData = true;
+                        }
+                        if(laserData.numberOfSheets != null) {
+                              toolpathData.numberOfSheets += Number(laserData.numberOfSheets) || 0;
+                              hasData = true;
+                        }
+                        if(laserData.cutProfile && toolpathData.cutProfile == null) {
+                              toolpathData.cutProfile = laserData.cutProfile;
+                              hasData = true;
+                        }
+                        if(Array.isArray(laserData.staticRows) && laserData.staticRows.length > 0) {
+                              toolpathData.staticRows = toolpathData.staticRows.concat(laserData.staticRows);
+                              hasData = true;
+                        }
+                  }
+            }
+
+            return hasData ? toolpathData : null;
+      }
+
+      supportsProfile(material, thickness, profile) {
+            if(typeof LaserToolpathTimeLookup !== "object" || LaserToolpathTimeLookup == null) return false;
+            if(!material || !thickness || !profile) return false;
+            let materialLookup = LaserToolpathTimeLookup[material];
+            if(!materialLookup) return false;
+            let thicknessLookup = materialLookup[thickness];
+            if(!thicknessLookup) return false;
+            return Object.prototype.hasOwnProperty.call(thicknessLookup, profile);
+      }
+
+      applyToolpathData(toolpathData, detectedMaterial, detectedThickness) {
+            if(!toolpathData) return;
+
+            this.deleteAllRunRows(false);
+
+            if(Array.isArray(toolpathData.staticRows)) {
+                  toolpathData.staticRows.forEach((row) => {
+                        this.addRunRow(row.pathLength, row.numberOfPaths, row.profileSettings);
+                  });
+            }
+
+            let cutProfile = toolpathData.cutProfile ?? {};
+            let cutRowOptions = {
+                  material: cutProfile.material ?? detectedMaterial,
+                  thickness: cutProfile.thickness ?? detectedThickness,
+                  profile: cutProfile.profile ?? null,
+                  quality: cutProfile.quality ?? null
+            };
+
+            if(toolpathData.cutPathLength > 0 || toolpathData.numberOfCutPaths > 0) {
+                  this.addRunRow(toolpathData.cutPathLength, toolpathData.numberOfCutPaths, cutRowOptions);
+            }
+
+            let grooveMaterial = toolpathData.material ?? detectedMaterial;
+            let grooveThickness = toolpathData.thickness ?? detectedThickness;
+            if(toolpathData.lengthOfGroovesToCut > 0 && toolpathData.numberOfGroovePaths > 0) {
+                  if(this.supportsProfile(grooveMaterial, grooveThickness, "Groove")) {
+                        this.addRunRow(toolpathData.lengthOfGroovesToCut, toolpathData.numberOfGroovePaths, {
+                              material: grooveMaterial,
+                              thickness: grooveThickness,
+                              profile: "Groove",
+                              quality: "Good Quality"
+                        });
+                  }
+            }
+
+            let markingMaterial = toolpathData.material ?? detectedMaterial;
+            let markingThickness = toolpathData.thickness ?? detectedThickness;
+            if(toolpathData.numberOfPenStrokes > 0) {
+                  if(this.supportsProfile(markingMaterial, markingThickness, "LED Marking")) {
+                        let totalPenLength = toolpathData.numberOfPenStrokes * (toolpathData.penStrokeLength || 100);
+                        this.addRunRow(totalPenLength, toolpathData.numberOfPenStrokes, {
+                              material: markingMaterial,
+                              thickness: markingThickness,
+                              profile: "LED Marking",
+                              quality: "SecondsPerCut"
+                        });
+                  }
+            }
+
+            if(toolpathData.numberOfSheets > 0) {
+                  this.setupNumberOfSheets = toolpathData.numberOfSheets;
+                  this.cleanNumberOfSheets = toolpathData.numberOfSheets;
+            }
       }
 
       extractMaterialFromSubscription(data) {
