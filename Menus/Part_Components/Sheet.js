@@ -852,8 +852,6 @@ class Sheet extends Material {
                         sheetMaterial: this.#sheetMaterial[1].value
                   });
 
-
-                  //console.log(uniqueSizes);
                   for(let u = 0; u < uniqueSizes.length; u++) {
                         let w = uniqueSizes[u].width;
                         let h = uniqueSizes[u].height;
@@ -901,6 +899,7 @@ class Sheet extends Material {
             let penMarkingQty = 0;
             let penMarkingLength = 0;
             let pathLength = 0;
+            let boundingPerimeter = 0;
 
             let overallSVGSizes = [];
 
@@ -915,6 +914,8 @@ class Sheet extends Material {
                         }
                         if(subscription.parent instanceof SVGCutfile) {
                               pathLength += dataEntry.pathLength;
+                              boundingPerimeter += (dataEntry.overallSize?.width * 2 + dataEntry.overallSize?.height * 2) * dataEntry.QWHD.qty;
+                              console.log(boundingPerimeter);
                               overallSVGSizes.push(dataEntry.overallSize);
                         }
                   });

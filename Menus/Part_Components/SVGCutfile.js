@@ -75,6 +75,7 @@ class SVGCutfile extends SubscriptionManager {
       set svgFile(value) {
             this.#f_svgFile = value;
       }
+      set typeLabel(value) {this.#f_typeLabel.innerText = value;}
       /*
                         
       Start             */
