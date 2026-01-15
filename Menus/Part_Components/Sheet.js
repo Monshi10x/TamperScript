@@ -34,6 +34,7 @@ class Sheet extends Material {
       #thickness;
       #finish;
       #sheetSize;
+      #f_returnDepth;
       #sheetMaterial;
       #filtersHeader;
       #hasGrain;
@@ -68,9 +69,9 @@ class Sheet extends Material {
       /** @example ['ACM - (sqm)', 'Matte Colours Alucobond', '1000x1000', '3x0.30'] */
       #searchTerms = [];
       #parts = [];
-      routerCutProfile = {material: "ACM", thickness: "3mm", profile: "Cut Through", quality: "Good Quality"};
+      routerCutProfile = {material: "ACM", thickness: "3", profile: "Cut Through", quality: "Good Quality"};
       staticRouterRows = [];
-      laserCutProfile = {material: "Stainless", thickness: "1.2mm", profile: "Cut Through", quality: "Good Quality"};
+      laserCutProfile = {material: "Stainless", thickness: "1.2", profile: "Cut Through", quality: "Good Quality"};
       staticLaserRows = [];
       #materialOptions = [
             createDropdownOption("ACM", "ACM"),
@@ -595,16 +596,18 @@ class Sheet extends Material {
                         setFieldHidden(false, this.#foldedLeft[1], this.#foldedLeft[0]);
                         setFieldHidden(false, this.#foldedRight[1], this.#foldedRight[0]);
                         setFieldHidden(false, this.#foldedBottom[1], this.#foldedBottom[0]);
+                        setFieldHidden(false, this.#f_returnDepth[1], this.#f_returnDepth[0]);
                   } else {
                         setFieldHidden(true, this.#foldedTop[1], this.#foldedTop[0]);
                         setFieldHidden(true, this.#foldedLeft[1], this.#foldedLeft[0]);
                         setFieldHidden(true, this.#foldedRight[1], this.#foldedRight[0]);
                         setFieldHidden(true, this.#foldedBottom[1], this.#foldedBottom[0]);
+                        setFieldHidden(true, this.#f_returnDepth[1], this.#f_returnDepth[0]);
                   }
                   this.UpdateFromFields();
             }, this.#f_foldSideContainer);
 
-
+            this.#f_returnDepth = createInput_Infield("Return Depth", 0, "", () => {this.UpdateFromFields();}, this.#f_foldSideContainer, false, 10, {postfix: "mm"});
             this.#foldedTop = createCheckbox_Infield("Top", false, "margin-left: 20%; width:20%;margin-right: 50%; ", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
             this.#foldedLeft = createCheckbox_Infield("Left", false, "width:20%;margin-right: 20%;", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
             this.#foldedRight = createCheckbox_Infield("Right", false, " width:20%;margin-right: 30%;", () => {this.UpdateFromFields();}, this.#f_foldSideContainer);
@@ -613,6 +616,7 @@ class Sheet extends Material {
             setFieldHidden(true, this.#foldedLeft[1], this.#foldedLeft[0]);
             setFieldHidden(true, this.#foldedRight[1], this.#foldedRight[0]);
             setFieldHidden(true, this.#foldedBottom[1], this.#foldedBottom[0]);
+            setFieldHidden(true, this.#f_returnDepth[1], this.#f_returnDepth[0]);
             f_container_folded.appendChild(this.#f_foldSideContainer);
             /*
             Joins*/
@@ -626,7 +630,7 @@ class Sheet extends Material {
                   this.#visualiser.setHasGrainField(this.#hasGrain[1]);
                   this.#visualiser.setGrainDirectionField(this.#grainDirection[1]);
                   this.#visualiser.setFoldFields(this.#foldedTop[1], this.#foldedLeft[1], this.#foldedRight[1], this.#foldedBottom[1]);
-                  this.#visualiser.setFoldDepth(this.getQWHD().depth);
+                  this.#visualiser.setFoldDepth(parseFloat(this.#f_returnDepth[1].value)/*this.getQWHD().depth*/);//TODO
                   this.#visualiser.setIsFoldedField(this.#isFolded[1]);
                   this.#visualiser.width = this.getQWHD().width;
                   this.#visualiser.height = this.getQWHD().height;
@@ -835,13 +839,13 @@ class Sheet extends Material {
 
                   if(this.#isFolded[1].checked) {
                         if(this.#foldedTop[1].checked)
-                              rowHeight += this.#inheritedSizes[i].depth;
+                              rowHeight += parseFloat(this.#f_returnDepth[1].value);//this.#inheritedSizes[i].depth;
                         if(this.#foldedLeft[1].checked)
-                              rowWidth += this.#inheritedSizes[i].depth;
+                              rowWidth += parseFloat(this.#f_returnDepth[1].value);//this.#inheritedSizes[i].depth;
                         if(this.#foldedRight[1].checked)
-                              rowWidth += this.#inheritedSizes[i].depth;
+                              rowWidth += parseFloat(this.#f_returnDepth[1].value); //this.#inheritedSizes[i].depth;
                         if(this.#foldedBottom[1].checked)
-                              rowHeight += this.#inheritedSizes[i].depth;
+                              rowHeight += parseFloat(this.#f_returnDepth[1].value); //this.#inheritedSizes[i].depth;
                   }
 
                   let uniqueSizes = Sheet.cutResultsByMethod(this.currentJoinMethod, rowWidth, rowHeight, sheetSizeWidth, sheetSizeHeight, this.#flipSheet, true);
@@ -856,7 +860,7 @@ class Sheet extends Material {
                         let w = uniqueSizes[u].width;
                         let h = uniqueSizes[u].height;
                         let q = uniqueSizes[u].qty;
-                        let d = uniqueSizes[u].depth;
+                        let d = parseFloat(this.#f_returnDepth[1].value);//uniqueSizes[u].depth;
                         let qty = q * this.qty * subscriptionQty;
                         let paintedArea =
                               mmToM(w) * mmToM(h) * qty +
@@ -915,7 +919,6 @@ class Sheet extends Material {
                         if(subscription.parent instanceof SVGCutfile) {
                               pathLength += dataEntry.pathLength;
                               boundingPerimeter += (dataEntry.overallSize?.width * 2 + dataEntry.overallSize?.height * 2) * dataEntry.QWHD.qty;
-                              console.log(boundingPerimeter);
                               overallSVGSizes.push(dataEntry.overallSize);
                         }
                   });
@@ -980,6 +983,8 @@ class Sheet extends Material {
                   this.#laser.Maximize();
             }
 
+
+
             ///ROUTER
             this.#router.deleteAllRunRows();
             this.staticRouterRows.forEach((element) => {
@@ -1025,7 +1030,7 @@ class Sheet extends Material {
                         }
                   }
 
-                  this.#router.addRunRow(foldPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", thickness: "3mm", profile: "Groove", quality: "Good Quality", speed: null});
+                  this.#router.addRunRow(foldPerimeter, numberOfPaths == 0 ? numberShapes : numberOfPaths, {material: "ACM", thickness: "3", profile: "Groove", quality: "Good Quality"});
                   TODO("Laser folding");
             }
 

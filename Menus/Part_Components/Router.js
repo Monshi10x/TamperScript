@@ -364,6 +364,7 @@ class Router extends SubMenu {
 
 	runRowIndex = 0;
 	addRunRow(pathLength = 0, numberShapes = 0, options = {material: null, thickness: null, profile: null, quality: null, speed: null, isCustom: false}) {
+		console.log(options);
 		let internalIndex = this.runRowIndex;
 		let l_pathLength = createInput_Infield("Length", pathLength, "width:90%;min-width:90px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 10, {postfix: " mm"});
 		let l_numberShapes = createInput_Infield("# Shapes", numberShapes, "width:90%;min-width:70px;margin:0px;", () => {this.Update();}, this.contentContainer, false, 1);
@@ -414,6 +415,7 @@ class Router extends SubMenu {
 			this.updateCutProfile("Thickness", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
 		}
 		if(options.profile != null && this.fieldHasOption(l_profile[1], options.profile)) {
+			console.log(options.profile);
 			dropdownSetSelectedValue(l_profile[1], options.profile);
 			this.updateCutProfile("Profile", l_material[1], l_thickness[1], l_profile[1], l_quality[1], l_speed[1]);
 		}
