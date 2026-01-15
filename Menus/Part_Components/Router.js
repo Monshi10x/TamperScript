@@ -120,7 +120,6 @@ class Router extends SubMenu {
 		}
 
 		this.applyToolpathData(toolpathData, detectedMaterial, detectedThickness);
-		this.applyDetectedMaterialToRows(detectedMaterial, data, detectedThickness);
 		this.UpdateRun();
 	}
 
@@ -203,12 +202,18 @@ class Router extends SubMenu {
 		}
 
 		if(toolpathData.lengthOfGroovesToCut > 0 && toolpathData.numberOfGroovePaths > 0) {
-			this.addRunRow(toolpathData.lengthOfGroovesToCut, toolpathData.numberOfGroovePaths, {
-				material: toolpathData.material ?? detectedMaterial ?? "ACM",
-				thickness: toolpathData.thickness ?? detectedThickness,
-				profile: "Groove",
-				quality: "Good Quality"
-			});
+			let grooveMaterial = toolpathData.material ?? detectedMaterial ?? "ACM";
+			let grooveThickness = toolpathData.thickness ?? detectedThickness;
+			if(this.supportsProfile(grooveMaterial, grooveThickness, "Groove")) {
+				this.addRunRow(toolpathData.lengthOfGroovesToCut, toolpathData.numberOfGroovePaths, {
+					material: grooveMaterial,
+					thickness: grooveThickness,
+					profile: "Groove",
+					quality: "Good Quality"
+				});
+			} else {
+				this.notifyProfileMissing(`Router groove profile missing for ${grooveMaterial}.`);
+			}
 		}
 
 		if(toolpathData.numberOfSheets > 0) {
@@ -352,6 +357,16 @@ class Router extends SubMenu {
 			}
 		}
 		return null;
+	}
+
+	supportsProfile(material, thickness, profile) {
+		if(typeof RouterToolpathTimeLookup !== "object" || RouterToolpathTimeLookup == null) return false;
+		if(!material || !thickness || !profile) return false;
+		let materialLookup = RouterToolpathTimeLookup[material];
+		if(!materialLookup) return false;
+		let thicknessLookup = materialLookup[thickness];
+		if(!thicknessLookup) return false;
+		return Object.prototype.hasOwnProperty.call(thicknessLookup, profile);
 	}
 
 	notifyProfileMissing(message) {
