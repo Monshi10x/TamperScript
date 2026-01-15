@@ -191,7 +191,8 @@ class Menu3D extends LHSMenuWindow {
                         vinyl = this.add(Vinyl, this.page1, [svgCutfile_lettersWithVinyl], {
                               propertiesToAssign: {
                                     bleedDropdown: "ACM",
-                                    sheetMaterial: "Vinyl - Translucent Cast Colours (Avery 5500) - 6-8 yrs"
+                                    material: "Vinyl - Translucent Cast Colours (Avery 5500) - 6-8 yrs",
+                                    rollWidth: 1230
                               },
                         });
 
@@ -225,10 +226,11 @@ class Menu3D extends LHSMenuWindow {
 
                         led = this.add(LED, this.page1, [svgCutfile_lettersOnly], {
                               propertiesToAssign: {
-                                    formula: "Lightbox 100D - 100 per m2",
+                                    formula: "3D Letters 100D - 200 per m2",
                                     material: "LED Module - 6500K 1.08W 5yr 175deg 12V"
                               }
                         });
+                        led.showRequiresInputTag(true);
 
                         sheet = this.add(Sheet, this.page1, [svgCutfile_sheetWithLetterCutout, led], {
                               propertiesToAssign: {

@@ -117,7 +117,7 @@ class Vinyl extends Material {      /*
       set isJoinHorizontal(value) {this.#f_joinOrientation[1].checked = value; $(this.#f_joinOrientation[1]).change();}
       set bleedLeft(value) {$(this.#f_bleedLeft[1]).val(value).change();}
       set bleedRight(value) {$(this.#f_bleedRight[1]).val(value).change();}
-
+      set rollWidth(value) {$(this.#f_rollWidth[1]).val(value).change();}
       /*
                         
       Start             */
