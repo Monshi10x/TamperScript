@@ -1046,11 +1046,11 @@ class Sheet extends Material {
             let routerCutPathLength = (this.#sheetPerimeterIsCut ? this.#totalRouterPerimeter : 0) + pathLength;
             let laserCutPathLength = (this.#sheetPerimeterIsCut ? this.#totalLaserPerimeter : 0) + pathLength;
 
-            let routerLaserData = {
+            let cutDataEntry = {
                   sheetMaterial: sheetMaterialDetails.sheetMaterial,
                   material: sheetMaterialDetails.material,
                   thickness: sheetMaterialDetails.thickness,
-                  routerData: {
+                  cutData: {
                         cutPathLength: routerCutPathLength,
                         numberOfCutPaths: this.#sheetPerimeterIsCut ? effectiveNumberOfPaths : 0,
                         numberOfSheets: this.#totalRouterNumberOfShapes,
@@ -1058,23 +1058,14 @@ class Sheet extends Material {
                         numberOfGroovePaths: numberOfGroovePaths,
                         numberOfPenStrokes: penMarkingQty,
                         penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100
-                  },
-                  laserData: {
-                        cutPathLength: laserCutPathLength,
-                        numberOfCutPaths: this.#sheetPerimeterIsCut ? effectiveLaserPaths : 0,
-                        numberOfSheets: this.#totalLaserNumberOfShapes,
-                        lengthOfGroovesToCut: lengthOfGroovesToCut,
-                        numberOfGroovePaths: numberOfGroovePaths,
-                        numberOfPenStrokes: penMarkingQty,
-                        penStrokeLength: penMarkingQty > 0 ? penMarkingLength / penMarkingQty : 100
                   }
             };
 
-            let routerLaserDataIndex = this.#dataForSubscribers.findIndex(entry => entry.routerData || entry.laserData);
-            if(routerLaserDataIndex >= 0) {
-                  this.#dataForSubscribers[routerLaserDataIndex] = routerLaserData;
+            let cutDataIndex = this.#dataForSubscribers.findIndex(entry => entry.cutData);
+            if(cutDataIndex >= 0) {
+                  this.#dataForSubscribers[cutDataIndex] = cutDataEntry;
             } else {
-                  this.#dataForSubscribers.push(routerLaserData);
+                  this.#dataForSubscribers.push(cutDataEntry);
             }
 
 

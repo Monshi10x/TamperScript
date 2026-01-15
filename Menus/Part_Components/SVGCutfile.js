@@ -330,20 +330,7 @@ class SVGCutfile extends SubscriptionManager {
                   paintedArea: shapeAreas,
                   pathQty: pathQty,
                   QWHD: this.getQWHD(),
-                  routerData: {
-                        cutPathLength: pathLength,
-                        numberOfCutPaths: pathQty,
-                        numberOfSheets: numberOfSheets,
-                        lengthOfGroovesToCut: 0,
-                        numberOfGroovePaths: 0,
-                        numberOfPenStrokes: 0,
-                        penStrokeLength: 100,
-                        shapeAreas: shapeAreas,
-                        boundingRectAreas: boundingRectAreas,
-                        overallWidthMM: overallWidthMM,
-                        overallHeightMM: overallHeightMM
-                  },
-                  laserData: {
+                  cutData: {
                         cutPathLength: pathLength,
                         numberOfCutPaths: pathQty,
                         numberOfSheets: numberOfSheets,

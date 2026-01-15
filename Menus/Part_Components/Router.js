@@ -144,34 +144,34 @@ class Router extends SubMenu {
 			if(entry.material && toolpathData.material == null) toolpathData.material = entry.material;
 			if(entry.thickness && toolpathData.thickness == null) toolpathData.thickness = entry.thickness;
 
-			if(entry.routerData) {
-				let routerData = entry.routerData;
-				if(routerData.cutPathLength != null) {
-					toolpathData.cutPathLength += Number(routerData.cutPathLength) || 0;
+			if(entry.cutData) {
+				let cutData = entry.cutData;
+				if(cutData.cutPathLength != null) {
+					toolpathData.cutPathLength += Number(cutData.cutPathLength) || 0;
 					hasData = true;
 				}
-				if(routerData.numberOfCutPaths != null) {
-					toolpathData.numberOfCutPaths += Number(routerData.numberOfCutPaths) || 0;
+				if(cutData.numberOfCutPaths != null) {
+					toolpathData.numberOfCutPaths += Number(cutData.numberOfCutPaths) || 0;
 					hasData = true;
 				}
-				if(routerData.lengthOfGroovesToCut != null) {
-					toolpathData.lengthOfGroovesToCut += Number(routerData.lengthOfGroovesToCut) || 0;
+				if(cutData.lengthOfGroovesToCut != null) {
+					toolpathData.lengthOfGroovesToCut += Number(cutData.lengthOfGroovesToCut) || 0;
 					hasData = true;
 				}
-				if(routerData.numberOfGroovePaths != null) {
-					toolpathData.numberOfGroovePaths += Number(routerData.numberOfGroovePaths) || 0;
+				if(cutData.numberOfGroovePaths != null) {
+					toolpathData.numberOfGroovePaths += Number(cutData.numberOfGroovePaths) || 0;
 					hasData = true;
 				}
-				if(routerData.numberOfPenStrokes != null) {
-					toolpathData.numberOfPenStrokes += Number(routerData.numberOfPenStrokes) || 0;
+				if(cutData.numberOfPenStrokes != null) {
+					toolpathData.numberOfPenStrokes += Number(cutData.numberOfPenStrokes) || 0;
 					hasData = true;
 				}
-				if(routerData.penStrokeLength != null) {
-					toolpathData.penStrokeLength = Number(routerData.penStrokeLength) || toolpathData.penStrokeLength;
+				if(cutData.penStrokeLength != null) {
+					toolpathData.penStrokeLength = Number(cutData.penStrokeLength) || toolpathData.penStrokeLength;
 					hasData = true;
 				}
-				if(routerData.numberOfSheets != null) {
-					toolpathData.numberOfSheets += Number(routerData.numberOfSheets) || 0;
+				if(cutData.numberOfSheets != null) {
+					toolpathData.numberOfSheets += Number(cutData.numberOfSheets) || 0;
 					hasData = true;
 				}
 			}

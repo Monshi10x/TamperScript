@@ -138,34 +138,34 @@ class Laser extends SubMenu {
                   if(entry.material && toolpathData.material == null) toolpathData.material = entry.material;
                   if(entry.thickness && toolpathData.thickness == null) toolpathData.thickness = entry.thickness;
 
-                  if(entry.laserData) {
-                        let laserData = entry.laserData;
-                        if(laserData.cutPathLength != null) {
-                              toolpathData.cutPathLength += Number(laserData.cutPathLength) || 0;
+                  if(entry.cutData) {
+                        let cutData = entry.cutData;
+                        if(cutData.cutPathLength != null) {
+                              toolpathData.cutPathLength += Number(cutData.cutPathLength) || 0;
                               hasData = true;
                         }
-                        if(laserData.numberOfCutPaths != null) {
-                              toolpathData.numberOfCutPaths += Number(laserData.numberOfCutPaths) || 0;
+                        if(cutData.numberOfCutPaths != null) {
+                              toolpathData.numberOfCutPaths += Number(cutData.numberOfCutPaths) || 0;
                               hasData = true;
                         }
-                        if(laserData.lengthOfGroovesToCut != null) {
-                              toolpathData.lengthOfGroovesToCut += Number(laserData.lengthOfGroovesToCut) || 0;
+                        if(cutData.lengthOfGroovesToCut != null) {
+                              toolpathData.lengthOfGroovesToCut += Number(cutData.lengthOfGroovesToCut) || 0;
                               hasData = true;
                         }
-                        if(laserData.numberOfGroovePaths != null) {
-                              toolpathData.numberOfGroovePaths += Number(laserData.numberOfGroovePaths) || 0;
+                        if(cutData.numberOfGroovePaths != null) {
+                              toolpathData.numberOfGroovePaths += Number(cutData.numberOfGroovePaths) || 0;
                               hasData = true;
                         }
-                        if(laserData.numberOfPenStrokes != null) {
-                              toolpathData.numberOfPenStrokes += Number(laserData.numberOfPenStrokes) || 0;
+                        if(cutData.numberOfPenStrokes != null) {
+                              toolpathData.numberOfPenStrokes += Number(cutData.numberOfPenStrokes) || 0;
                               hasData = true;
                         }
-                        if(laserData.penStrokeLength != null) {
-                              toolpathData.penStrokeLength = Number(laserData.penStrokeLength) || toolpathData.penStrokeLength;
+                        if(cutData.penStrokeLength != null) {
+                              toolpathData.penStrokeLength = Number(cutData.penStrokeLength) || toolpathData.penStrokeLength;
                               hasData = true;
                         }
-                        if(laserData.numberOfSheets != null) {
-                              toolpathData.numberOfSheets += Number(laserData.numberOfSheets) || 0;
+                        if(cutData.numberOfSheets != null) {
+                              toolpathData.numberOfSheets += Number(cutData.numberOfSheets) || 0;
                               hasData = true;
                         }
                   }
