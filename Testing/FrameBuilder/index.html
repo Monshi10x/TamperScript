@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FrameBuilder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --border: #d6d9e0;
+      --text: #1b2335;
+      --muted: #5f6b85;
+      --accent: #2f7bff;
+      --accent-soft: #e7efff;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    header h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+    header .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: white;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    main {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) 1fr;
+      gap: 16px;
+      padding: 16px 24px 32px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .panel h2 {
+      margin-top: 0;
+      font-size: 16px;
+    }
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+    }
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .row.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .canvas-stack {
+      display: grid;
+      grid-template-rows: auto auto;
+      gap: 16px;
+    }
+    .svg-wrap,
+    .viewer-wrap {
+      position: relative;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px;
+    }
+    .svg-wrap {
+      height: 600px;
+      min-height: 600px;
+      overflow: auto;
+    }
+    .viewer-wrap {
+      min-height: 360px;
+    }
+    .svg-wrap svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #fbfbfd;
+    }
+    .viewer-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .summary-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .summary-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfbfe;
+    }
+    .summary-card h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--accent-soft);
+    }
+    .piece-thumb {
+      width: 140px;
+      height: 40px;
+    }
+    .positions-list {
+      display: grid;
+      gap: 6px;
+      max-height: 160px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px;
+      background: #fff;
+    }
+    .pos-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 6px;
+      align-items: center;
+      font-size: 12px;
+    }
+    .pos-row input[type="number"] {
+      font-size: 12px;
+      padding: 4px 6px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .footer-note {
+      font-size: 11px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FrameBuilder</h1>
+    <div class="actions">
+      <button id="exportSvgBtn">Export SVG Work Order</button>
+      <button id="exportPdfBtn">Export PDF (A4)</button>
+      <button id="exportDiagramBtn">Export Diagram SVG</button>
+      <button id="export3dBtn">Export 3D GLB</button>
+      <button id="export3dPngBtn">Export 3D PNG</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel stack" aria-label="Frame settings">
+      <h2>Frame Inputs</h2>
+      <div class="row">
+        <div>
+          <label for="frameWidth">Overall Width (mm)</label>
+          <input id="frameWidth" type="number" value="1200" min="0" />
+        </div>
+        <div>
+          <label for="frameHeight">Overall Height (mm)</label>
+          <input id="frameHeight" type="number" value="900" min="0" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="verticalCount">Verticals</label>
+          <input id="verticalCount" type="number" value="1" min="0" />
+        </div>
+        <div>
+          <label for="horizontalCount">Horizontals</label>
+          <input id="horizontalCount" type="number" value="1" min="0" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="stockSelect">Stock</label>
+          <select id="stockSelect"></select>
+        </div>
+        <div>
+          <label for="orientationSelect">Orientation</label>
+          <select id="orientationSelect">
+            <option value="face">Face Width</option>
+            <option value="depth">Rotate (Depth to Face)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="cornerType">Corner Type</label>
+          <select id="cornerType">
+            <option value="mitre">Mitred</option>
+            <option value="open">Open/Butt</option>
+          </select>
+        </div>
+        <div>
+          <label for="outerButtPreference">Open Corner Preference</label>
+          <select id="outerButtPreference">
+            <option value="horizontal">Horizontals Full Length</option>
+            <option value="vertical">Verticals Full Length</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="gridPreference">Internal Grid Preference</label>
+          <select id="gridPreference">
+            <option value="vertical">Verticals Full Length</option>
+            <option value="horizontal">Horizontals Full Length</option>
+          </select>
+        </div>
+        <div>
+          <label for="snapSize">Snap (mm)</label>
+          <input id="snapSize" type="number" value="1" min="0.1" step="0.1" />
+        </div>
+      </div>
+      <div class="row">
+        <label class="toggle">
+          <input id="toggleOverallDims" type="checkbox" checked />
+          Show overall dimensions
+        </label>
+        <label class="toggle">
+          <input id="toggleBayDims" type="checkbox" checked />
+          Show bay dimensions
+        </label>
+      </div>
+      <div class="row">
+        <label class="toggle">
+          <input id="toggleLockEqual" type="checkbox" checked />
+          Keep equal spacing unless unlocked
+        </label>
+        <label class="toggle">
+          <input id="toggleShowLabels" type="checkbox" checked />
+          Show part labels
+        </label>
+      </div>
+      <div>
+        <h2>Internal Positions</h2>
+        <div class="row">
+          <div>
+            <label>Verticals (mm from left inside)</label>
+            <div id="verticalPositions" class="positions-list"></div>
+          </div>
+          <div>
+            <label>Horizontals (mm from top inside)</label>
+            <div id="horizontalPositions" class="positions-list"></div>
+          </div>
+        </div>
+        <div class="row">
+          <button id="resetEqualBtn">Reset Equal Spacing</button>
+          <button id="unlockAllBtn">Unlock All</button>
+        </div>
+      </div>
+      <div class="footer-note">
+        Drag internal bars in the 2D diagram to reposition. Snap size applies to drag + 3D measurement mode.
+      </div>
+    </section>
+
+    <section class="canvas-stack">
+      <div class="panel svg-wrap">
+        <h2>2D Frame Diagram</h2>
+        <svg id="frameSvg" viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg" aria-label="Frame diagram"></svg>
+      </div>
+      <div class="panel viewer-wrap">
+        <h2>3D Viewer</h2>
+        <div class="viewer-controls">
+          <button id="viewFrontBtn">Front</button>
+          <button id="viewIsoBtn">Iso</button>
+          <button id="viewTopBtn">Top</button>
+          <button id="toggleMeasureBtn">Measure (Snap)</button>
+          <span id="measureStatus" class="badge">Measure: Off</span>
+        </div>
+        <div id="viewer" style="height: 320px;"></div>
+      </div>
+      <div class="panel">
+        <h2>Summaries</h2>
+        <div class="summary-grid">
+          <div class="summary-card">
+            <h3>Cutting List</h3>
+            <table id="cutListTable"></table>
+          </div>
+          <div class="summary-card">
+            <h3>Material Summary</h3>
+            <div id="materialSummary"></div>
+          </div>
+          <div class="summary-card">
+            <h3>Painted Surface Area</h3>
+            <div id="paintSummary"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/svg2pdf.js@1.4.7/dist/svg2pdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/panzoom@9.4.3/dist/panzoom.min.js"></script>
+
+  <script type="module">
+    const STOCKS = [
+      { label: "25x25x1.6 SHS", width: 25, depth: 25, thickness: 1.6 },
+      { label: "30x30x2.0 SHS", width: 30, depth: 30, thickness: 2 },
+      { label: "50x25x2.0 RHS", width: 50, depth: 25, thickness: 2 },
+      { label: "50x50x2.0 SHS", width: 50, depth: 50, thickness: 2 },
+      { label: "75x50x3.0 RHS", width: 75, depth: 50, thickness: 3 },
+      { label: "100x50x3.0 RHS", width: 100, depth: 50, thickness: 3 }
+    ];
+
+    const DENSITY_ALUMINUM = 2700; // kg/m^3
+
+    class FrameModel {
+      constructor() {
+        this.width = 1200;
+        this.height = 900;
+        this.verticals = 1;
+        this.horizontals = 1;
+        this.cornerType = "mitre";
+        this.outerButtPreference = "horizontal";
+        this.gridPreference = "vertical";
+        this.stock = STOCKS[0];
+        this.orientation = "face";
+        this.snap = 1;
+        this.showOverallDims = true;
+        this.showBayDims = true;
+        this.keepEqualSpacing = true;
+        this.showLabels = true;
+        this.verticalPositions = [];
+        this.horizontalPositions = [];
+        this.verticalLocks = [];
+        this.horizontalLocks = [];
+      }
+
+      setFromInputs(inputs) {
+        this.width = parseFloat(inputs.width.value) || 0;
+        this.height = parseFloat(inputs.height.value) || 0;
+        this.verticals = Math.max(0, parseInt(inputs.verticals.value || "0", 10));
+        this.horizontals = Math.max(0, parseInt(inputs.horizontals.value || "0", 10));
+        this.cornerType = inputs.cornerType.value;
+        this.outerButtPreference = inputs.outerButtPreference.value;
+        this.gridPreference = inputs.gridPreference.value;
+        this.orientation = inputs.orientation.value;
+        this.stock = STOCKS[parseInt(inputs.stock.value, 10)] || STOCKS[0];
+        this.snap = Math.max(0.1, parseFloat(inputs.snap.value || "1"));
+        this.showOverallDims = inputs.toggleOverall.checked;
+        this.showBayDims = inputs.toggleBay.checked;
+        this.keepEqualSpacing = inputs.toggleEqual.checked;
+        this.showLabels = inputs.toggleLabels.checked;
+        this.ensurePositions();
+      }
+
+      get face() {
+        return this.orientation === "face" ? this.stock.width : this.stock.depth;
+      }
+
+      get depth() {
+        return this.orientation === "face" ? this.stock.depth : this.stock.width;
+      }
+
+      get innerWidth() {
+        return Math.max(0, this.width - this.face * 2);
+      }
+
+      get innerHeight() {
+        return Math.max(0, this.height - this.face * 2);
+      }
+
+      ensurePositions() {
+        this.verticalPositions = this.syncPositions({
+          count: this.verticals,
+          positions: this.verticalPositions,
+          locks: this.verticalLocks,
+          span: this.innerWidth
+        });
+        this.horizontalPositions = this.syncPositions({
+          count: this.horizontals,
+          positions: this.horizontalPositions,
+          locks: this.horizontalLocks,
+          span: this.innerHeight
+        });
+      }
+
+      syncPositions({ count, positions, locks, span }) {
+        const nextPositions = [...positions];
+        const nextLocks = [...locks];
+        nextPositions.length = count;
+        nextLocks.length = count;
+        for(let i = 0; i < count; i += 1) {
+          if(nextPositions[i] == null || (this.keepEqualSpacing && !nextLocks[i])) {
+            nextPositions[i] = span === 0 ? 0 : (span * (i + 1)) / (count + 1);
+          }
+          if(nextLocks[i] == null) {
+            nextLocks[i] = false;
+          }
+        }
+        if(locks.length !== nextLocks.length) {
+          locks.length = nextLocks.length;
+        }
+        locks.splice(0, locks.length, ...nextLocks);
+        return nextPositions;
+      }
+
+      setVerticalPosition({ index, value }) {
+        this.verticalPositions[index] = this.clampPosition({ value, span: this.innerWidth });
+        this.verticalLocks[index] = true;
+      }
+
+      setHorizontalPosition({ index, value }) {
+        this.horizontalPositions[index] = this.clampPosition({ value, span: this.innerHeight });
+        this.horizontalLocks[index] = true;
+      }
+
+      clampPosition({ value, span }) {
+        const clamped = Math.min(Math.max(0, value), span);
+        return Math.round(clamped / this.snap) * this.snap;
+      }
+
+      getCutList() {
+        const parts = [];
+        const face = this.face;
+        const innerWidth = this.innerWidth;
+        const innerHeight = this.innerHeight;
+
+        if(this.cornerType === "mitre") {
+          parts.push(this.makePart({ id: "A1", label: "Top", qty: 1, length: this.width, end1: "Mitre 45°", end2: "Mitre 45°" }));
+          parts.push(this.makePart({ id: "A2", label: "Bottom", qty: 1, length: this.width, end1: "Mitre 45°", end2: "Mitre 45°" }));
+          parts.push(this.makePart({ id: "B1", label: "Left", qty: 1, length: this.height, end1: "Mitre 45°", end2: "Mitre 45°" }));
+          parts.push(this.makePart({ id: "B2", label: "Right", qty: 1, length: this.height, end1: "Mitre 45°", end2: "Mitre 45°" }));
+        } else {
+          const horizontalFull = this.outerButtPreference === "horizontal";
+          const hLen = this.width;
+          const vLen = Math.max(0, this.height - (horizontalFull ? face * 2 : 0));
+          const hTrim = Math.max(0, this.width - (horizontalFull ? 0 : face * 2));
+          parts.push(this.makePart({ id: "A1", label: "Top", qty: 1, length: horizontalFull ? hLen : hTrim, end1: "Square", end2: "Square" }));
+          parts.push(this.makePart({ id: "A2", label: "Bottom", qty: 1, length: horizontalFull ? hLen : hTrim, end1: "Square", end2: "Square" }));
+          parts.push(this.makePart({ id: "B1", label: "Left", qty: 1, length: horizontalFull ? vLen : this.height, end1: "Square", end2: "Square" }));
+          parts.push(this.makePart({ id: "B2", label: "Right", qty: 1, length: horizontalFull ? vLen : this.height, end1: "Square", end2: "Square" }));
+        }
+
+        const verticalFull = this.gridPreference === "vertical";
+        const verticalLength = innerHeight;
+        const horizontalLength = innerWidth;
+
+        const sortedVertPositions = this.verticalPositions
+          .map((value, index) => ({ value, index }))
+          .sort((a, b) => a.value - b.value);
+        const sortedHorizPositions = this.horizontalPositions
+          .map((value, index) => ({ value, index }))
+          .sort((a, b) => a.value - b.value);
+
+        if(this.verticals > 0) {
+          for(const item of sortedVertPositions) {
+            const length = verticalFull ? verticalLength : this.segmentLengthForInternal({
+              total: verticalLength,
+              axis: "vertical",
+              pos: item.value,
+              splitPositions: sortedHorizPositions.map((entry) => entry.value),
+              face
+            });
+            const id = `V${item.index + 1}`;
+            parts.push(this.makePart({ id, label: `Vertical ${item.index + 1}`, qty: verticalFull ? 1 : length.length, length, end1: "Square", end2: "Square" }));
+          }
+        }
+
+        if(this.horizontals > 0) {
+          for(const item of sortedHorizPositions) {
+            const length = verticalFull ? this.segmentLengthForInternal({
+              total: horizontalLength,
+              axis: "horizontal",
+              pos: item.value,
+              splitPositions: sortedVertPositions.map((entry) => entry.value),
+              face
+            }) : horizontalLength;
+            const id = `H${item.index + 1}`;
+            parts.push(this.makePart({ id, label: `Horizontal ${item.index + 1}`, qty: verticalFull ? length.length : 1, length, end1: "Square", end2: "Square" }));
+          }
+        }
+
+        return parts.flatMap((part) => {
+          if(Array.isArray(part.length)) {
+            return part.length.map((len, idx) => ({
+              ...part,
+              id: `${part.id}.${idx + 1}`,
+              length: len
+            }));
+          }
+          return part;
+        });
+      }
+
+      segmentLengthForInternal({ total, axis, pos, splitPositions, face }) {
+        if(splitPositions.length === 0) {
+          return [total];
+        }
+        const sorted = [...splitPositions].sort((a, b) => a - b);
+        const segments = [];
+        let last = 0;
+        for(const value of sorted) {
+          const span = Math.max(0, value - last - face);
+          segments.push(span);
+          last = value + face;
+        }
+        const tail = Math.max(0, total - last);
+        segments.push(tail);
+        return segments.filter((len) => len > 0.1);
+      }
+
+      makePart({ id, label, qty, length, end1, end2 }) {
+        return {
+          id,
+          label,
+          qty,
+          length,
+          end1,
+          end2,
+          stock: this.stock.label,
+          face: this.face,
+          depth: this.depth,
+          thickness: this.stock.thickness
+        };
+      }
+
+      calculateTotals({ parts }) {
+        const totalLength = parts.reduce((acc, part) => acc + part.length * part.qty, 0);
+        const perimeter = 2 * (this.face + this.depth);
+        const mitreEnds = parts.reduce((acc, part) => {
+          const ends = [part.end1, part.end2].filter((end) => end.toLowerCase().includes("mitre")).length;
+          return acc + ends * part.qty;
+        }, 0);
+        const paintedAreaMm2 = totalLength * perimeter - mitreEnds * this.face * this.depth;
+        const paintedAreaM2 = paintedAreaMm2 / 1_000_000;
+
+        const metalAreaMm2 = 2 * this.stock.thickness * (this.face + this.depth - 2 * this.stock.thickness);
+        const volumeMm3 = totalLength * metalAreaMm2;
+        const weightKg = (volumeMm3 / 1_000_000_000) * DENSITY_ALUMINUM;
+
+        return {
+          totalLength,
+          paintedAreaM2: Math.max(0, paintedAreaM2),
+          weightKg
+        };
+      }
+    }
+
+    class SvgBuilder {
+      constructor({ svg }) {
+        this.svg = svg;
+      }
+
+      render({ model }) {
+        const svg = this.svg;
+        while(svg.firstChild) {
+          svg.removeChild(svg.firstChild);
+        }
+
+        const padding = 80;
+        const width = model.width;
+        const height = model.height;
+        const viewWidth = width + padding * 2;
+        const viewHeight = height + padding * 2;
+        svg.setAttribute("viewBox", `0 0 ${viewWidth} ${viewHeight}`);
+
+        const group = this.makeGroup({ transform: `translate(${padding}, ${padding})` });
+
+        const outer = this.makeRect({
+          x: 0,
+          y: 0,
+          width,
+          height,
+          fill: "#f2f4f8",
+          stroke: "#1b2335",
+          strokeWidth: 2
+        });
+        group.appendChild(outer);
+
+        const inner = this.makeRect({
+          x: model.face,
+          y: model.face,
+          width: model.innerWidth,
+          height: model.innerHeight,
+          fill: "#ffffff",
+          stroke: "#cdd4e4",
+          strokeWidth: 1
+        });
+        group.appendChild(inner);
+
+        const vBars = this.drawInternalBars({
+          model,
+          axis: "vertical",
+          positions: model.verticalPositions,
+          length: model.innerHeight,
+          offset: { x: model.face, y: model.face }
+        });
+        const hBars = this.drawInternalBars({
+          model,
+          axis: "horizontal",
+          positions: model.horizontalPositions,
+          length: model.innerWidth,
+          offset: { x: model.face, y: model.face }
+        });
+        vBars.forEach((bar) => group.appendChild(bar));
+        hBars.forEach((bar) => group.appendChild(bar));
+
+        if(model.showLabels) {
+          this.drawLabels({ model, group });
+        }
+
+        if(model.showOverallDims || model.showBayDims) {
+          this.drawDimensions({ model, group, padding });
+        }
+
+        svg.appendChild(group);
+      }
+
+      makeGroup({ transform }) {
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        if(transform) {
+          g.setAttribute("transform", transform);
+        }
+        return g;
+      }
+
+      makeRect({ x, y, width, height, fill, stroke, strokeWidth }) {
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", x);
+        rect.setAttribute("y", y);
+        rect.setAttribute("width", width);
+        rect.setAttribute("height", height);
+        rect.setAttribute("fill", fill);
+        rect.setAttribute("stroke", stroke || "none");
+        rect.setAttribute("stroke-width", strokeWidth || 0);
+        return rect;
+      }
+
+      drawInternalBars({ model, axis, positions, length, offset }) {
+        const bars = [];
+        const face = model.face;
+        positions.forEach((value, index) => {
+          if(axis === "vertical") {
+            const rect = this.makeRect({
+              x: offset.x + value - face / 2,
+              y: offset.y,
+              width: face,
+              height: length,
+              fill: "#e6ebf5",
+              stroke: "#98a4bf",
+              strokeWidth: 1
+            });
+            rect.dataset.axis = axis;
+            rect.dataset.index = `${index}`;
+            bars.push(rect);
+          } else {
+            const rect = this.makeRect({
+              x: offset.x,
+              y: offset.y + value - face / 2,
+              width: length,
+              height: face,
+              fill: "#e6ebf5",
+              stroke: "#98a4bf",
+              strokeWidth: 1
+            });
+            rect.dataset.axis = axis;
+            rect.dataset.index = `${index}`;
+            bars.push(rect);
+          }
+        });
+        return bars;
+      }
+
+      drawLabels({ model, group }) {
+        const createText = (text, x, y) => {
+          const node = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          node.setAttribute("x", x);
+          node.setAttribute("y", y);
+          node.setAttribute("font-size", "14");
+          node.setAttribute("font-weight", "600");
+          node.setAttribute("fill", "#1b2335");
+          node.textContent = text;
+          return node;
+        };
+
+        group.appendChild(createText("Top", model.width / 2 - 16, model.face * 0.8));
+        group.appendChild(createText("Bottom", model.width / 2 - 26, model.height - model.face * 0.2));
+        group.appendChild(createText("Left", model.face * 0.3, model.height / 2));
+        group.appendChild(createText("Right", model.width - model.face * 0.8, model.height / 2));
+
+        model.verticalPositions.forEach((value, index) => {
+          group.appendChild(createText(`V${index + 1}`, model.face + value - 10, model.height / 2));
+        });
+        model.horizontalPositions.forEach((value, index) => {
+          group.appendChild(createText(`H${index + 1}`, model.width / 2, model.face + value + 6));
+        });
+      }
+
+      drawDimensions({ model, group, padding }) {
+        const dimGroup = this.makeGroup({});
+        dimGroup.setAttribute("stroke", "#2f7bff");
+        dimGroup.setAttribute("stroke-width", "1");
+        dimGroup.setAttribute("fill", "none");
+
+        const drawLine = (x1, y1, x2, y2) => {
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute("x1", x1);
+          line.setAttribute("y1", y1);
+          line.setAttribute("x2", x2);
+          line.setAttribute("y2", y2);
+          dimGroup.appendChild(line);
+        };
+        const drawText = (text, x, y) => {
+          const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          label.setAttribute("x", x);
+          label.setAttribute("y", y);
+          label.setAttribute("font-size", "12");
+          label.setAttribute("fill", "#2f7bff");
+          label.setAttribute("font-weight", "600");
+          label.textContent = text;
+          dimGroup.appendChild(label);
+        };
+
+        if(model.showOverallDims) {
+          drawLine(0, -20, model.width, -20);
+          drawLine(0, -25, 0, -15);
+          drawLine(model.width, -25, model.width, -15);
+          drawText(`${model.width.toFixed(1)} mm`, model.width / 2 - 20, -26);
+
+          drawLine(-20, 0, -20, model.height);
+          drawLine(-25, 0, -15, 0);
+          drawLine(-25, model.height, -15, model.height);
+          drawText(`${model.height.toFixed(1)} mm`, -52, model.height / 2);
+        }
+
+        if(model.showBayDims) {
+          const innerLeft = model.face;
+          const innerTop = model.face;
+          const vPositions = [0, ...model.verticalPositions, model.innerWidth].sort((a, b) => a - b);
+          const hPositions = [0, ...model.horizontalPositions, model.innerHeight].sort((a, b) => a - b);
+          vPositions.forEach((value, index) => {
+            if(index === vPositions.length - 1) return;
+            const span = vPositions[index + 1] - value;
+            const mid = innerLeft + value + span / 2;
+            drawLine(innerLeft + value, model.height + 20, innerLeft + value + span, model.height + 20);
+            drawText(`${span.toFixed(1)}`, mid - 12, model.height + 34);
+          });
+          hPositions.forEach((value, index) => {
+            if(index === hPositions.length - 1) return;
+            const span = hPositions[index + 1] - value;
+            const mid = innerTop + value + span / 2;
+            drawLine(model.width + 20, innerTop + value, model.width + 20, innerTop + value + span);
+            drawText(`${span.toFixed(1)}`, model.width + 26, mid + 4);
+          });
+        }
+
+        group.appendChild(dimGroup);
+      }
+    }
+
+    class WorkOrderBuilder {
+      constructor({ model }) {
+        this.model = model;
+      }
+
+      build({ diagramSvg, cutListTable, materialSummary, paintSummary }) {
+        const doc = document.implementation.createDocument("http://www.w3.org/2000/svg", "svg", null);
+        const svg = doc.documentElement;
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.setAttribute("width", "210mm");
+        svg.setAttribute("height", "297mm");
+        svg.setAttribute("viewBox", "0 0 210 297");
+
+        const drawBox = ({ x, y, w, h, title }) => {
+          const rect = doc.createElementNS(svg.namespaceURI, "rect");
+          rect.setAttribute("x", x);
+          rect.setAttribute("y", y);
+          rect.setAttribute("width", w);
+          rect.setAttribute("height", h);
+          rect.setAttribute("fill", "#ffffff");
+          rect.setAttribute("stroke", "#d6d9e0");
+          svg.appendChild(rect);
+          if(title) {
+            const label = doc.createElementNS(svg.namespaceURI, "text");
+            label.setAttribute("x", x + 4);
+            label.setAttribute("y", y + 8);
+            label.setAttribute("font-size", "4");
+            label.setAttribute("fill", "#1b2335");
+            label.textContent = title;
+            svg.appendChild(label);
+          }
+        };
+
+        drawBox({ x: 5, y: 8, w: 120, h: 120, title: "Frame Diagram" });
+        const diagramGroup = doc.createElementNS(svg.namespaceURI, "g");
+        const diagramClone = diagramSvg.cloneNode(true);
+        diagramClone.removeAttribute("width");
+        diagramClone.removeAttribute("height");
+        diagramClone.setAttribute("viewBox", diagramSvg.getAttribute("viewBox"));
+        diagramGroup.appendChild(diagramClone);
+        diagramGroup.setAttribute("transform", "translate(8,12) scale(0.1)");
+        svg.appendChild(diagramGroup);
+
+        drawBox({ x: 130, y: 8, w: 75, h: 50, title: "Material Summary" });
+        const materialGroup = doc.createElementNS(svg.namespaceURI, "g");
+        materialGroup.setAttribute("transform", "translate(132,16)");
+        const materialLines = materialSummary.split("\n");
+        materialLines.forEach((line, index) => {
+          const text = doc.createElementNS(svg.namespaceURI, "text");
+          text.setAttribute("x", 0);
+          text.setAttribute("y", 5 + index * 5);
+          text.setAttribute("font-size", "4");
+          text.textContent = line;
+          materialGroup.appendChild(text);
+        });
+        svg.appendChild(materialGroup);
+
+        drawBox({ x: 130, y: 62, w: 75, h: 40, title: "Painted Area" });
+        const paintGroup = doc.createElementNS(svg.namespaceURI, "g");
+        paintGroup.setAttribute("transform", "translate(132,70)");
+        const paintLines = paintSummary.split("\n");
+        paintLines.forEach((line, index) => {
+          const text = doc.createElementNS(svg.namespaceURI, "text");
+          text.setAttribute("x", 0);
+          text.setAttribute("y", 5 + index * 5);
+          text.setAttribute("font-size", "4");
+          text.textContent = line;
+          paintGroup.appendChild(text);
+        });
+        svg.appendChild(paintGroup);
+
+        drawBox({ x: 5, y: 132, w: 200, h: 155, title: "Cutting List" });
+        const tableGroup = doc.createElementNS(svg.namespaceURI, "g");
+        tableGroup.setAttribute("transform", "translate(8,140)");
+        const tableLines = cutListTable.split("\n");
+        tableLines.forEach((line, index) => {
+          const text = doc.createElementNS(svg.namespaceURI, "text");
+          text.setAttribute("x", 0);
+          text.setAttribute("y", 5 + index * 5);
+          text.setAttribute("font-size", "4");
+          text.textContent = line;
+          tableGroup.appendChild(text);
+        });
+        svg.appendChild(tableGroup);
+
+        return svg;
+      }
+    }
+
+    class Svg3DViewer {
+      constructor({ container }) {
+        this.container = container;
+        this.renderer = null;
+        this.scene = null;
+        this.camera = null;
+        this.controls = null;
+        this.currentGroup = null;
+        this.measureEnabled = false;
+        this.measurePoints = [];
+        this.measureGroup = null;
+        this.lastSvg = "";
+      }
+
+      async init() {
+        await this.injectImportMap();
+        const THREE = await import("three");
+        const { OrbitControls } = await import("three/examples/jsm/controls/OrbitControls.js");
+        const { SVGLoader } = await import("three/examples/jsm/loaders/SVGLoader.js");
+        const { GLTFExporter } = await import("three/examples/jsm/exporters/GLTFExporter.js");
+
+        this.THREE = THREE;
+        this.SVGLoader = SVGLoader;
+        this.GLTFExporter = GLTFExporter;
+
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color("#f5f7fb");
+
+        const width = this.container.clientWidth || 600;
+        const height = 320;
+        this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
+        this.camera.position.set(0, 0, 800);
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+        this.renderer.setSize(width, height);
+        this.container.appendChild(this.renderer.domElement);
+
+        const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+        const dir = new THREE.DirectionalLight(0xffffff, 0.6);
+        dir.position.set(200, 400, 300);
+        this.scene.add(ambient, dir);
+
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.1;
+
+        window.addEventListener("resize", () => this.handleResize());
+        this.renderer.domElement.addEventListener("click", (event) => this.handleMeasureClick(event));
+
+        this.measureGroup = new THREE.Group();
+        this.scene.add(this.measureGroup);
+
+        this.animate();
+      }
+
+      async injectImportMap() {
+        if(document.querySelector('script[type="importmap"][data-threejs-frame="1"]')) {
+          return;
+        }
+        const script = document.createElement("script");
+        script.type = "importmap";
+        script.setAttribute("data-threejs-frame", "1");
+        script.textContent = JSON.stringify({
+          imports: {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/examples/jsm/controls/OrbitControls.js": "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js",
+            "three/examples/jsm/loaders/SVGLoader.js": "https://unpkg.com/three@0.160.0/examples/jsm/loaders/SVGLoader.js",
+            "three/examples/jsm/exporters/GLTFExporter.js": "https://unpkg.com/three@0.160.0/examples/jsm/exporters/GLTFExporter.js"
+          }
+        });
+        document.head.appendChild(script);
+      }
+
+      handleResize() {
+        if(!this.renderer || !this.camera) return;
+        const width = this.container.clientWidth || 600;
+        const height = 320;
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+      }
+
+      setMeasureEnabled({ enabled }) {
+        this.measureEnabled = enabled;
+        this.measurePoints = [];
+        this.clearMeasureLines();
+      }
+
+      handleMeasureClick(event) {
+        if(!this.measureEnabled || !this.THREE) return;
+        const rect = this.renderer.domElement.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        const mouse = new this.THREE.Vector2(x, y);
+        const raycaster = new this.THREE.Raycaster();
+        raycaster.setFromCamera(mouse, this.camera);
+        const plane = new this.THREE.Plane(new this.THREE.Vector3(0, 0, 1), 0);
+        const point = new this.THREE.Vector3();
+        raycaster.ray.intersectPlane(plane, point);
+        if(!point) return;
+        this.measurePoints.push(point.clone());
+        if(this.measurePoints.length === 2) {
+          this.drawMeasureLine({ start: this.measurePoints[0], end: this.measurePoints[1] });
+          this.measurePoints = [];
+        }
+      }
+
+      drawMeasureLine({ start, end }) {
+        const snap = this.snap || 1;
+        const s = start.clone();
+        const e = end.clone();
+        s.x = Math.round(s.x / snap) * snap;
+        s.y = Math.round(s.y / snap) * snap;
+        e.x = Math.round(e.x / snap) * snap;
+        e.y = Math.round(e.y / snap) * snap;
+
+        const material = new this.THREE.LineBasicMaterial({ color: 0x2f7bff });
+        const geometry = new this.THREE.BufferGeometry().setFromPoints([s, e]);
+        const line = new this.THREE.Line(geometry, material);
+        this.measureGroup.add(line);
+
+        const distance = s.distanceTo(e);
+        const label = this.makeTextSprite({
+          text: `${distance.toFixed(1)} mm`
+        });
+        const mid = s.clone().lerp(e, 0.5);
+        label.position.copy(mid);
+        this.measureGroup.add(label);
+      }
+
+      clearMeasureLines() {
+        if(!this.measureGroup) return;
+        while(this.measureGroup.children.length) {
+          this.measureGroup.remove(this.measureGroup.children[0]);
+        }
+      }
+
+      makeTextSprite({ text }) {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const pad = 12;
+        ctx.font = "bold 18px system-ui";
+        const metrics = ctx.measureText(text);
+        const width = metrics.width + pad * 2;
+        const height = 28 + pad;
+        canvas.width = width;
+        canvas.height = height;
+        ctx.fillStyle = "rgba(231,239,255,0.9)";
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = "#2f7bff";
+        ctx.font = "bold 18px system-ui";
+        ctx.fillText(text, pad, height / 1.6);
+        const texture = new this.THREE.CanvasTexture(canvas);
+        const material = new this.THREE.SpriteMaterial({ map: texture, transparent: true });
+        const sprite = new this.THREE.Sprite(material);
+        sprite.scale.set(100, 40, 1);
+        return sprite;
+      }
+
+      loadSvg({ svgText, depth }) {
+        if(!this.THREE || !this.SVGLoader) return;
+        this.lastSvg = svgText;
+        if(this.currentGroup) {
+          this.scene.remove(this.currentGroup);
+        }
+        const loader = new this.SVGLoader();
+        const data = loader.parse(svgText);
+        const group = new this.THREE.Group();
+        data.paths.forEach((path) => {
+          const material = new this.THREE.MeshStandardMaterial({
+            color: 0x8fa3c8,
+            side: this.THREE.DoubleSide,
+            metalness: 0.2,
+            roughness: 0.6
+          });
+          const shapes = this.SVGLoader.createShapes(path);
+          shapes.forEach((shape) => {
+            const geometry = new this.THREE.ExtrudeGeometry(shape, {
+              depth,
+              bevelEnabled: false
+            });
+            const mesh = new this.THREE.Mesh(geometry, material);
+            group.add(mesh);
+          });
+        });
+        group.scale.y *= -1;
+        this.currentGroup = group;
+        this.scene.add(group);
+        this.resetView();
+      }
+
+      resetView() {
+        if(!this.currentGroup) return;
+        const box = new this.THREE.Box3().setFromObject(this.currentGroup);
+        const size = new this.THREE.Vector3();
+        box.getSize(size);
+        const center = new this.THREE.Vector3();
+        box.getCenter(center);
+        this.controls.target.copy(center);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const distance = maxDim * 1.8;
+        this.camera.position.set(center.x, center.y, distance);
+        this.camera.updateProjectionMatrix();
+      }
+
+      setViewPreset({ preset }) {
+        if(!this.currentGroup) return;
+        const box = new this.THREE.Box3().setFromObject(this.currentGroup);
+        const center = new this.THREE.Vector3();
+        box.getCenter(center);
+        const size = new this.THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const distance = maxDim * 1.8;
+        if(preset === "front") {
+          this.camera.position.set(center.x, center.y, distance);
+        } else if(preset === "top") {
+          this.camera.position.set(center.x, center.y + distance, 0);
+        } else {
+          this.camera.position.set(center.x + distance * 0.7, center.y + distance * 0.6, distance * 0.7);
+        }
+        this.controls.target.copy(center);
+        this.camera.updateProjectionMatrix();
+      }
+
+      exportGlb() {
+        if(!this.currentGroup || !this.GLTFExporter) return;
+        const exporter = new this.GLTFExporter();
+        exporter.parse(
+          this.currentGroup,
+          (result) => {
+            const blob = new Blob([result], { type: "model/gltf-binary" });
+            this.downloadBlob({ blob, filename: "frame.glb" });
+          },
+          (error) => console.error(error),
+          { binary: true }
+        );
+      }
+
+      exportPng() {
+        if(!this.renderer) return;
+        const dataUrl = this.renderer.domElement.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = "frame-3d.png";
+        link.click();
+      }
+
+      downloadBlob({ blob, filename }) {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      }
+
+      animate() {
+        requestAnimationFrame(() => this.animate());
+        if(this.controls) {
+          this.controls.update();
+        }
+        if(this.renderer && this.scene && this.camera) {
+          this.renderer.render(this.scene, this.camera);
+        }
+      }
+    }
+
+    const inputRefs = {
+      width: document.getElementById("frameWidth"),
+      height: document.getElementById("frameHeight"),
+      verticals: document.getElementById("verticalCount"),
+      horizontals: document.getElementById("horizontalCount"),
+      stock: document.getElementById("stockSelect"),
+      orientation: document.getElementById("orientationSelect"),
+      cornerType: document.getElementById("cornerType"),
+      outerButtPreference: document.getElementById("outerButtPreference"),
+      gridPreference: document.getElementById("gridPreference"),
+      snap: document.getElementById("snapSize"),
+      toggleOverall: document.getElementById("toggleOverallDims"),
+      toggleBay: document.getElementById("toggleBayDims"),
+      toggleEqual: document.getElementById("toggleLockEqual"),
+      toggleLabels: document.getElementById("toggleShowLabels")
+    };
+
+    STOCKS.forEach((stock, index) => {
+      const option = document.createElement("option");
+      option.value = `${index}`;
+      option.textContent = `${stock.label} (t=${stock.thickness}mm)`;
+      inputRefs.stock.appendChild(option);
+    });
+
+    const model = new FrameModel();
+    const frameSvg = document.getElementById("frameSvg");
+    const svgBuilder = new SvgBuilder({ svg: frameSvg });
+    const viewer = new Svg3DViewer({ container: document.getElementById("viewer") });
+
+    await viewer.init();
+    const panzoomInstance = window.panzoom(frameSvg, {
+      maxZoom: 8,
+      minZoom: 0.2,
+      smoothScroll: false
+    });
+    frameSvg.parentElement.addEventListener("wheel", panzoomInstance.zoomWithWheel);
+
+    const cutListTable = document.getElementById("cutListTable");
+    const materialSummary = document.getElementById("materialSummary");
+    const paintSummary = document.getElementById("paintSummary");
+    const verticalPositions = document.getElementById("verticalPositions");
+    const horizontalPositions = document.getElementById("horizontalPositions");
+    const measureStatus = document.getElementById("measureStatus");
+
+    const update = () => {
+      model.setFromInputs(inputRefs);
+      svgBuilder.render({ model });
+      renderPositions();
+      renderCutList();
+      renderSummaries();
+      const svgText = buildSvgFor3d();
+      viewer.snap = model.snap;
+      viewer.loadSvg({ svgText, depth: model.depth });
+    };
+
+    const buildSvgFor3d = () => {
+      const width = model.width;
+      const height = model.height;
+      const face = model.face;
+      const svgParts = [
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">`,
+        `<rect x="0" y="0" width="${width}" height="${height}" fill="#cfd8ea"/>`,
+        `<rect x="${face}" y="${face}" width="${model.innerWidth}" height="${model.innerHeight}" fill="#ffffff"/>`
+      ];
+      model.verticalPositions.forEach((value) => {
+        svgParts.push(`<rect x="${face + value - face / 2}" y="${face}" width="${face}" height="${model.innerHeight}" fill="#cfd8ea"/>`);
+      });
+      model.horizontalPositions.forEach((value) => {
+        svgParts.push(`<rect x="${face}" y="${face + value - face / 2}" width="${model.innerWidth}" height="${face}" fill="#cfd8ea"/>`);
+      });
+      svgParts.push("</svg>");
+      return svgParts.join("");
+    };
+
+    const renderPositions = () => {
+      verticalPositions.innerHTML = "";
+      model.verticalPositions.forEach((value, index) => {
+        verticalPositions.appendChild(createPositionRow({
+          label: `V${index + 1}`,
+          value,
+          locked: model.verticalLocks[index],
+          onChange: (newValue) => {
+            model.setVerticalPosition({ index, value: newValue });
+            update();
+          },
+          onToggleLock: (locked) => {
+            model.verticalLocks[index] = locked;
+            update();
+          }
+        }));
+      });
+
+      horizontalPositions.innerHTML = "";
+      model.horizontalPositions.forEach((value, index) => {
+        horizontalPositions.appendChild(createPositionRow({
+          label: `H${index + 1}`,
+          value,
+          locked: model.horizontalLocks[index],
+          onChange: (newValue) => {
+            model.setHorizontalPosition({ index, value: newValue });
+            update();
+          },
+          onToggleLock: (locked) => {
+            model.horizontalLocks[index] = locked;
+            update();
+          }
+        }));
+      });
+    };
+
+    const createPositionRow = ({ label, value, locked, onChange, onToggleLock }) => {
+      const row = document.createElement("div");
+      row.className = "pos-row";
+      const span = document.createElement("span");
+      span.textContent = label;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.value = value.toFixed(1);
+      input.addEventListener("change", () => onChange(parseFloat(input.value) || 0));
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = locked;
+      checkbox.title = "Lock position";
+      checkbox.addEventListener("change", () => onToggleLock(checkbox.checked));
+      row.append(span, input, checkbox);
+      return row;
+    };
+
+    const renderCutList = () => {
+      const parts = model.getCutList();
+      const headerRow = `
+        <tr>
+          <th>ID</th>
+          <th>Part</th>
+          <th>Qty</th>
+          <th>Stock</th>
+          <th>OAL (mm)</th>
+          <th>End 1</th>
+          <th>End 2</th>
+          <th>Thumbnail</th>
+        </tr>
+      `;
+      const rows = parts.map((part) => {
+        const thumb = renderThumbnailSvg({
+          length: part.length,
+          end1: part.end1,
+          end2: part.end2
+        });
+        return `
+          <tr>
+            <td>${part.id}</td>
+            <td>${part.label}</td>
+            <td>${part.qty}</td>
+            <td>${part.stock}</td>
+            <td>${part.length.toFixed(1)}</td>
+            <td>${part.end1}</td>
+            <td>${part.end2}</td>
+            <td>${thumb}</td>
+          </tr>
+        `;
+      });
+      cutListTable.innerHTML = headerRow + rows.join("");
+    };
+
+    const renderThumbnailSvg = ({ length, end1, end2 }) => {
+      const height = 30;
+      const width = 120;
+      const mitre1 = end1.toLowerCase().includes("mitre");
+      const mitre2 = end2.toLowerCase().includes("mitre");
+      const leftCut = mitre1 ? "10,0 0,15 10,30" : "0,0 0,30";
+      const rightCut = mitre2 ? "110,0 120,15 110,30" : "120,0 120,30";
+      return `
+        <svg class="piece-thumb" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+          <rect x="10" y="6" width="100" height="18" fill="#e6ebf5" stroke="#98a4bf" />
+          <polyline points="${leftCut}" fill="none" stroke="#1b2335" />
+          <polyline points="${rightCut}" fill="none" stroke="#1b2335" />
+          <text x="60" y="24" font-size="10" text-anchor="middle" fill="#1b2335">${length.toFixed(0)}mm</text>
+        </svg>
+      `;
+    };
+
+    const renderSummaries = () => {
+      const parts = model.getCutList();
+      const totals = model.calculateTotals({ parts });
+      materialSummary.textContent = `Stock: ${model.stock.label}\nFace: ${model.face}mm × Depth: ${model.depth}mm\nThickness: ${model.stock.thickness}mm\nTotal Length: ${(totals.totalLength / 1000).toFixed(2)} m\nApprox Weight: ${totals.weightKg.toFixed(2)} kg`;
+      paintSummary.textContent = `Painted surface area: ${totals.paintedAreaM2.toFixed(3)} m²\nMitre allowance applied.`;
+    };
+
+    const attachInputListeners = () => {
+      Object.values(inputRefs).forEach((input) => {
+        input.addEventListener("input", update);
+        input.addEventListener("change", update);
+      });
+    };
+
+    const attachDragHandlers = () => {
+      const svg = document.getElementById("frameSvg");
+      let active = null;
+
+      const startDrag = (event) => {
+        const target = event.target;
+        if(!(target instanceof SVGRectElement)) return;
+        if(!target.dataset.axis) return;
+        active = {
+          axis: target.dataset.axis,
+          index: parseInt(target.dataset.index || "0", 10)
+        };
+      };
+
+      const drag = (event) => {
+        if(!active) return;
+        const pt = svg.createSVGPoint();
+        pt.x = event.clientX;
+        pt.y = event.clientY;
+        const ctm = svg.getScreenCTM();
+        if(!ctm) return;
+        const cursor = pt.matrixTransform(ctm.inverse());
+        const face = model.face;
+        if(active.axis === "vertical") {
+          const x = cursor.x - 80 - face + face / 2;
+          model.setVerticalPosition({ index: active.index, value: x });
+        } else {
+          const y = cursor.y - 80 - face + face / 2;
+          model.setHorizontalPosition({ index: active.index, value: y });
+        }
+        update();
+      };
+
+      const endDrag = () => {
+        active = null;
+      };
+
+      svg.addEventListener("pointerdown", startDrag);
+      window.addEventListener("pointermove", drag);
+      window.addEventListener("pointerup", endDrag);
+    };
+
+    const exportSvg = ({ svgNode, filename }) => {
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svgNode);
+      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(link.href), 500);
+    };
+
+    const exportDiagramBtn = document.getElementById("exportDiagramBtn");
+    const exportSvgBtn = document.getElementById("exportSvgBtn");
+    const exportPdfBtn = document.getElementById("exportPdfBtn");
+    const export3dBtn = document.getElementById("export3dBtn");
+    const export3dPngBtn = document.getElementById("export3dPngBtn");
+
+    exportDiagramBtn.addEventListener("click", () => {
+      const svgNode = document.getElementById("frameSvg");
+      exportSvg({ svgNode, filename: "frame-diagram.svg" });
+    });
+
+    exportSvgBtn.addEventListener("click", () => {
+      const workOrder = new WorkOrderBuilder({ model });
+      const svgNode = workOrder.build({
+        diagramSvg: document.getElementById("frameSvg"),
+        cutListTable: cutListTable.innerText,
+        materialSummary: materialSummary.textContent || "",
+        paintSummary: paintSummary.textContent || ""
+      });
+      exportSvg({ svgNode, filename: "frame-work-order.svg" });
+    });
+
+    exportPdfBtn.addEventListener("click", async () => {
+      const workOrder = new WorkOrderBuilder({ model });
+      const svgNode = workOrder.build({
+        diagramSvg: document.getElementById("frameSvg"),
+        cutListTable: cutListTable.innerText,
+        materialSummary: materialSummary.textContent || "",
+        paintSummary: paintSummary.textContent || ""
+      });
+      const serializer = new XMLSerializer();
+      const svgString = serializer.serializeToString(svgNode);
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
+      await window.svg2pdf(svgString, doc, { xOffset: 0, yOffset: 0, scale: 1 });
+      doc.save("frame-work-order.pdf");
+    });
+
+    export3dBtn.addEventListener("click", () => viewer.exportGlb());
+    export3dPngBtn.addEventListener("click", () => viewer.exportPng());
+
+    document.getElementById("viewFrontBtn").addEventListener("click", () => viewer.setViewPreset({ preset: "front" }));
+    document.getElementById("viewIsoBtn").addEventListener("click", () => viewer.setViewPreset({ preset: "iso" }));
+    document.getElementById("viewTopBtn").addEventListener("click", () => viewer.setViewPreset({ preset: "top" }));
+
+    const toggleMeasureBtn = document.getElementById("toggleMeasureBtn");
+    toggleMeasureBtn.addEventListener("click", () => {
+      viewer.setMeasureEnabled({ enabled: !viewer.measureEnabled });
+      measureStatus.textContent = `Measure: ${viewer.measureEnabled ? "On" : "Off"}`;
+    });
+
+    document.getElementById("resetEqualBtn").addEventListener("click", () => {
+      model.verticalLocks = model.verticalLocks.map(() => false);
+      model.horizontalLocks = model.horizontalLocks.map(() => false);
+      update();
+    });
+
+    document.getElementById("unlockAllBtn").addEventListener("click", () => {
+      model.verticalLocks = model.verticalLocks.map(() => false);
+      model.horizontalLocks = model.horizontalLocks.map(() => false);
+      update();
+    });
+
+    attachInputListeners();
+    attachDragHandlers();
+    update();
+  </script>
+</body>
+</html>
