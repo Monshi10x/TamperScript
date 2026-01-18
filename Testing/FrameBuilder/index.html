@@ -123,6 +123,13 @@
       border-radius: 10px;
       background: #fff;
       padding: 12px;
+    }
+    .svg-wrap {
+      height: 600px;
+      min-height: 600px;
+      overflow: auto;
+    }
+    .viewer-wrap {
       min-height: 360px;
     }
     .svg-wrap svg {
@@ -362,6 +369,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/svg2pdf.js@1.4.7/dist/svg2pdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/panzoom@9.4.3/dist/panzoom.min.js"></script>
 
   <script type="module">
     const STOCKS = [
@@ -1201,10 +1209,17 @@
     });
 
     const model = new FrameModel();
-    const svgBuilder = new SvgBuilder({ svg: document.getElementById("frameSvg") });
+    const frameSvg = document.getElementById("frameSvg");
+    const svgBuilder = new SvgBuilder({ svg: frameSvg });
     const viewer = new Svg3DViewer({ container: document.getElementById("viewer") });
 
     await viewer.init();
+    const panzoomInstance = window.panzoom(frameSvg, {
+      maxZoom: 8,
+      minZoom: 0.2,
+      smoothScroll: false
+    });
+    frameSvg.parentElement.addEventListener("wheel", panzoomInstance.zoomWithWheel);
 
     const cutListTable = document.getElementById("cutListTable");
     const materialSummary = document.getElementById("materialSummary");
