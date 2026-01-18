@@ -338,6 +338,20 @@ class DragZoomSVG {
             this.UpdateFromFields();
       }
 
+      show() {
+            if(this.#f_container) this.#f_container.style.display = "block";
+      }
+
+      hide() {
+            if(this.#f_container) this.#f_container.style.display = "none";
+      }
+
+      toggleShow() {
+            if(!this.#f_container) return;
+
+            toggle(this.#f_container.style.display == "none", () => {this.show();}, () => {this.hide();});
+      }
+
       /*overrideable*/onMouseUpdate(updateFrom) { }
 
       /*overrideable*/onTransform(e) { }

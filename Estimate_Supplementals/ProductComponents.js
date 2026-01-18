@@ -270,8 +270,16 @@ function partInfoTick() {
 					let modalSVG = new ModalSVG("SVG Modal", 1, () => { }, partText, null, {convertShapesToPaths: false, splitCompoundPaths: false, defaultStrokeWidth: 2, scaleStrokeOnScroll: !partText.includes('data-scaleStrokeOnScroll="false"')});
 				}, partHeader);
 				btn.classList.add('seeSVGButton');
+				let svgViewer;
 
-				let svgViewer = new DragZoomSVG("100%", "250px", partText, partHeader, {overrideCssStyles: "outline:none;"});
+				window.addEventListener('quoteReview', (e) => {
+					console.log("Event received quoteReview");
+					if(!svgViewer) {
+						svgViewer = new DragZoomSVG("100%", "250px", partText, partHeader, {overrideCssStyles: "outline:none;"});
+						svgViewer.hide();
+					}
+					svgViewer.toggleShow();
+				});
 			}
 			//}
 

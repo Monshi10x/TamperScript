@@ -123,8 +123,21 @@ function tickSecond() {
 
 const event_testing = new Event("testingEvent");
 
+const quoteReviewEvent = new CustomEvent('quoteReview', {
+  detail: {
+    foo: 'test',
+    value: 123
+  },
+  bubbles: true,
+  cancelable: true
+});
+
 function keyboardTick() {
   $(document.body).keyup(function(e) {
+    if(e.keyCode == KEYCODE.GRAVE_ACCENT_TILDE) {
+      document.dispatchEvent(quoteReviewEvent);
+      console.log("dispatched quoteReviewEvent");
+    }
     if(e.keyCode == 188) {
       //var t = new ModalStandoffHelper("Standoff Helper", 100, null);
       //console.log(getProductPrice(1));
