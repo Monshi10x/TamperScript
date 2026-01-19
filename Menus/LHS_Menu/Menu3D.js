@@ -680,13 +680,13 @@ class Menu3D extends LHSMenuWindow {
                         sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
                         sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
 
-                        vinyl = this.#add(Vinyl, this.page1, [Sheet], {
+                        vinyl = this.add(Vinyl, this.page1, [Sheet], {
                               propertiesToAssign: {
                                     bleedDropdown: "ACM"
                               },
                         });
-                        laminate = this.#add(Laminate, this.page1, [Vinyl]);
-                        printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
+                        laminate = this.add(Laminate, this.page1, [Vinyl]);
+                        printMounting = this.add(PrintMounting, this.page1, [Sheet]);
 
                         artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;
