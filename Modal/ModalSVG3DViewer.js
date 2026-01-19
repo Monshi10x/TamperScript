@@ -288,7 +288,7 @@ class ModalSVG3DViewer {
                   measureLabelBgColor: "#0a2a7a",
                   measureLabelTextColor: "#b9d2ff",
                   measureLabelBorderColor: "#2f7bff",
-                  mmPerUnit: 1
+                  mmPerUnit: svg_pixelToMM(1)
             };
       }
 
@@ -1053,11 +1053,11 @@ class ModalSVG3DViewer {
             }
 
             const extrudeSettings = {
-                  depth: this.#settings.depth,
+                  depth: svg_mmToPixel(this.#settings.depth),
                   bevelEnabled: false,
-                  bevelThickness: 0,
-                  bevelSize: 0,
-                  bevelSegments: 0,
+                  bevelThickness: svg_mmToPixel(0),
+                  bevelSize: svg_mmToPixel(0),
+                  bevelSegments: svg_mmToPixel(0),
                   curveSegments: this.#settings.curveSegments
             };
 
