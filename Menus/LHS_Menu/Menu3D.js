@@ -100,7 +100,8 @@ class Menu3D extends LHSMenuWindow {
             ["3D Halo-lit Letters", GM_getResourceURL("Image_FrostyBoyHalo")],
             ["3D 10mm Acrylic Letters", "https://cdn.gorilladash.com/images/media/5077109/signarama-australia-img-1060-2-small-square-61611e488aba9.jpg?auto=webp&width=1600"],
             ["3D 20mm Acrylic Letters", GM_getResourceURL("Image_FrostyBoy3D")],
-            ["2D Cut ACM Letters", GM_getResourceURL("Image_DJJCutACM")]
+            ["2D Cut ACM Letters", GM_getResourceURL("Image_DJJCutACM")],
+            ["2D Cut ACM Letters With Vinyl", GM_getResourceURL("Image_DJJCutACM")]
       ];
 
 
@@ -638,6 +639,54 @@ class Menu3D extends LHSMenuWindow {
                         sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
                         sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
 
+
+                        artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+                        artwork.artworkItem.artworkTime = 60;
+                        install = this.add(InstallSubscribable, this.page1, [Sheet]);
+                        break;
+                  case "2D Cut ACM Letters With Vinyl":
+                        productDetails = this.add(ProductDetails, this.page1, [], {
+                              propertiesToAssign: {
+                                    productName: "2D Cut ACM Letters"
+                              }
+                        });
+
+                        svgCutfile = this.add(SVGCutfile, this.page1, []);
+
+                        sheet = this.add(Sheet, this.page1, [svgCutfile], {
+                              propertiesToAssign: {
+                                    material: "ACM",
+                                    sheetSize: "2440x1220",
+                                    thickness: "3x0.21",
+                                    sheetMaterial: "ACM - (sqm) - 2440x1220x3x0.21 White Satin/Gloss (Mulfords)",
+                                    preferredCuttingMachine: "router",
+                                    sheetPerimeterIsCut: false,
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    typeLabel: "ACM SHEET"
+                              }
+                        });
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+
+                        sheet = this.add(Sheet, this.page1, [svgCutfile], {
+                              propertiesToAssign: {
+                                    material: "Corflute",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Corflute - (sqm) - 2440x1220x3 Matte White (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    useOverallSVGSize: true,
+                                    typeLabel: "CORFLUTE POUNCE"
+                              }
+                        });
+                        sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+
+                        vinyl = this.#add(Vinyl, this.page1, [Sheet], {
+                              propertiesToAssign: {
+                                    bleedDropdown: "ACM"
+                              },
+                        });
+                        laminate = this.#add(Laminate, this.page1, [Vinyl]);
+                        printMounting = this.#add(PrintMounting, this.page1, [Sheet]);
 
                         artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;
