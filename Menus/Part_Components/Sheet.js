@@ -51,7 +51,7 @@ class Sheet extends Material {
       #currentJoinMethod = "Even Joins";
 
       #sheetPerimeterIsCut = true;
-      #useOverallSVGSize = true;
+      #useOverallSVGSize = false;
       #finalOutputSizesHeader;
       /**
        * @Updated on table changes

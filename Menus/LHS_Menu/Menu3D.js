@@ -154,111 +154,6 @@ class Menu3D extends LHSMenuWindow {
             let install = null;
 
             switch(this.addQuickTemplateBtn[1].value) {
-                  case "10mm Push-through Box":
-                        productDetails = this.add(ProductDetails, this.page1, [], {
-                              propertiesToAssign: {
-                                    productName: "3D Fabricated Non-lit Letters"
-                              }
-                        });
-                        let svgCutfile_lettersOnly = this.add(SVGCutfile, this.page1, [], {
-                              propertiesToAssign: {
-                                    typeLabel: "SVG Letters Only"
-                              }
-                        });
-                        let svgCutfile_lettersWithVinyl = this.add(SVGCutfile, this.page1, [], {
-                              propertiesToAssign: {
-                                    typeLabel: "Letters with Vinyl"
-                              }
-                        });
-                        let svgCutfile_sheetWithLetterCutout = this.add(SVGCutfile, this.page1, [], {
-                              propertiesToAssign: {
-                                    typeLabel: "Sheet with Letter Cut-outs"
-                              }
-                        });
-
-                        sheet = this.add(Sheet, this.page1, [svgCutfile_lettersOnly], {
-                              propertiesToAssign: {
-                                    material: "Acrylic",
-                                    sheetSize: "2440x1220",
-                                    sheetMaterial: "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)",
-                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
-                                    sheetPerimeterIsCut: false,
-                                    preferredCuttingMachine: "laser",
-                                    typeLabel: "10mm OPAL ACRYLIC"
-                              }
-                        });
-                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10", profile: "Cut Through", quality: "Good Quality"});
-
-                        vinyl = this.add(Vinyl, this.page1, [svgCutfile_lettersWithVinyl], {
-                              propertiesToAssign: {
-                                    bleedDropdown: "ACM",
-                                    material: "Vinyl - Translucent Cast Colours (Avery 5500) - 6-8 yrs",
-                                    rollWidth: 1230
-                              },
-                        });
-
-                        sheet = this.add(Sheet, this.page1, [svgCutfile_lettersOnly], {
-                              propertiesToAssign: {
-                                    material: "Acrylic",
-                                    sheetSize: "2440x1220",
-                                    sheetMaterial: "Acrylic - (sqm) - Opal 2440x1220x3 (Mulfords)",
-                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
-                                    sheetPerimeterIsCut: false,
-                                    preferredCuttingMachine: "laser",
-                                    typeLabel: "3mm OPAL ACRYLIC"
-                              }
-                        });
-                        sheet.addStaticLaserRow("boundingPerimeter", "1", {material: "Acrylic", thickness: "4.5", profile: "Cut Through", quality: "Good Quality"});
-
-                        sheet = this.add(Sheet, this.page1, [svgCutfile_sheetWithLetterCutout], {
-                              propertiesToAssign: {
-                                    material: "ACM",
-                                    sheetSize: "2440x1220",
-                                    sheetMaterial: "ACM - (sqm) - 2440x1220x3x0.21 White Satin/Gloss (Mulfords)",
-                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
-                                    sheetPerimeterIsCut: false,
-                                    preferredCuttingMachine: "router",
-                                    typeLabel: "ACM Folded Sheet"
-                              }
-                        });
-                        sheet.addStaticLaserRow("boundingPerimeter", "1", {material: "Acrylic", thickness: "4.5", profile: "Cut Through", quality: "Good Quality"});
-
-
-
-                        led = this.add(LED, this.page1, [svgCutfile_lettersOnly], {
-                              propertiesToAssign: {
-                                    formula: "3D Letters 100D - 200 per m2",
-                                    material: "LED Module - 6500K 1.08W 5yr 175deg 12V"
-                              }
-                        });
-                        led.showRequiresInputTag(true);
-
-                        sheet = this.add(Sheet, this.page1, [svgCutfile_sheetWithLetterCutout, led], {
-                              propertiesToAssign: {
-                                    material: "ACM",
-                                    sheetSize: "2440x1220",
-                                    sheetMaterial: "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)",
-                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
-                                    typeLabel: "ACM for LEDs",
-                                    sheetPerimeterIsCut: false
-                              }
-                        });
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "2", profile: "Cut Through", quality: "Fast"});
-
-                        transformer = this.add(Transformer, this.page1, [LED]);
-
-                        production = this.add(ProductionSubscribable, this.page1, [Coil], {
-                              propertiesToAssign: {
-                                    typeLabel: "Assembly"
-                              }
-                        });
-                        production.showRequiresInputTag(true);
-
-                        artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
-                        artwork.artworkItem.artworkTime = 60;
-                        install = this.add(InstallSubscribable, this.page1, [Sheet]);
-                        break;
-
                   case "3D Non-lit Letters":
                         productDetails = this.add(ProductDetails, this.page1, [], {
                               propertiesToAssign: {
@@ -688,6 +583,111 @@ class Menu3D extends LHSMenuWindow {
                         });
                         laminate = this.add(Laminate, this.page1, [Vinyl]);
                         printMounting = this.add(PrintMounting, this.page1, [Sheet]);
+
+                        artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
+                        artwork.artworkItem.artworkTime = 60;
+                        install = this.add(InstallSubscribable, this.page1, [Sheet]);
+                        break;
+                  case "10mm Push-through Box":
+                        productDetails = this.add(ProductDetails, this.page1, [], {
+                              propertiesToAssign: {
+                                    productName: "3D Fabricated Non-lit Letters"
+                              }
+                        });
+                        let svgCutfile_lettersOnly = this.add(SVGCutfile, this.page1, [], {
+                              propertiesToAssign: {
+                                    typeLabel: "SVG Letters Only"
+                              }
+                        });
+                        let svgCutfile_lettersWithVinyl = this.add(SVGCutfile, this.page1, [], {
+                              propertiesToAssign: {
+                                    typeLabel: "Letters with Vinyl"
+                              }
+                        });
+                        let svgCutfile_sheetWithLetterCutout = this.add(SVGCutfile, this.page1, [], {
+                              propertiesToAssign: {
+                                    typeLabel: "Sheet with Letter Cut-outs"
+                              }
+                        });
+
+                        sheet = this.add(Sheet, this.page1, [svgCutfile_lettersOnly], {
+                              propertiesToAssign: {
+                                    material: "Acrylic",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Acrylic - (sqm) - Opal 2440x1220x10 (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    sheetPerimeterIsCut: false,
+                                    preferredCuttingMachine: "laser",
+                                    typeLabel: "10mm OPAL ACRYLIC"
+                              }
+                        });
+                        sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Acrylic", thickness: "10", profile: "Cut Through", quality: "Good Quality"});
+
+                        vinyl = this.add(Vinyl, this.page1, [svgCutfile_lettersWithVinyl], {
+                              propertiesToAssign: {
+                                    bleedDropdown: "ACM",
+                                    material: "Vinyl - Translucent Cast Colours (Avery 5500) - 6-8 yrs",
+                                    rollWidth: 1230
+                              },
+                        });
+
+                        sheet = this.add(Sheet, this.page1, [svgCutfile_lettersOnly], {
+                              propertiesToAssign: {
+                                    material: "Acrylic",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "Acrylic - (sqm) - Opal 2440x1220x3 (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    sheetPerimeterIsCut: false,
+                                    useOverallSVGSize: true,
+                                    preferredCuttingMachine: "laser",
+                                    typeLabel: "3mm OPAL ACRYLIC"
+                              }
+                        });
+                        sheet.addStaticLaserRow("boundingPerimeter", "1", {material: "Acrylic", thickness: "4.5", profile: "Cut Through", quality: "Good Quality"});
+
+                        sheet = this.add(Sheet, this.page1, [svgCutfile_sheetWithLetterCutout], {
+                              propertiesToAssign: {
+                                    material: "ACM",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "ACM - (sqm) - 2440x1220x3x0.21 White Satin/Gloss (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    sheetPerimeterIsCut: false,
+                                    useOverallSVGSize: true,
+                                    preferredCuttingMachine: "router",
+                                    typeLabel: "ACM Folded Sheet"
+                              }
+                        });
+                        sheet.addStaticLaserRow("boundingPerimeter", "1", {material: "Acrylic", thickness: "4.5", profile: "Cut Through", quality: "Good Quality"});
+
+                        led = this.add(LED, this.page1, [svgCutfile_lettersOnly], {
+                              propertiesToAssign: {
+                                    formula: "3D Letters 100D - 200 per m2",
+                                    material: "LED Module - 6500K 1.08W 5yr 175deg 12V"
+                              }
+                        });
+                        led.showRequiresInputTag(true);
+
+                        sheet = this.add(Sheet, this.page1, [svgCutfile_sheetWithLetterCutout, led], {
+                              propertiesToAssign: {
+                                    material: "ACM",
+                                    sheetSize: "2440x1220",
+                                    sheetMaterial: "ACM - (sqm) - 2440x1220x2x0.15 White Satin/White Gloss (Mulfords)",
+                                    joinMethod: Sheet.joinMethod["Full Sheet + Offcut"],
+                                    typeLabel: "ACM for LEDs",
+                                    sheetPerimeterIsCut: false,
+                                    useOverallSVGSize: true,
+                              }
+                        });
+                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "2", profile: "Cut Through", quality: "Fast"});
+
+                        transformer = this.add(Transformer, this.page1, [LED]);
+
+                        production = this.add(ProductionSubscribable, this.page1, [Coil], {
+                              propertiesToAssign: {
+                                    typeLabel: "Assembly"
+                              }
+                        });
+                        production.showRequiresInputTag(true);
 
                         artwork = this.add(ArtworkSubscribable, this.page1, [SVGCutfile]);
                         artwork.artworkItem.artworkTime = 60;
