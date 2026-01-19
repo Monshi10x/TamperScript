@@ -208,7 +208,7 @@ class Vinyl extends Material {      /*
             RollUsage*/
             let f_container_rollUsage = createDivStyle5(null, "Roll Usage", this.container)[1];
 
-            this.#f_rollWidth = createInput_Infield("Roll Width", 1370, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "mm"});
+            this.#f_rollWidth = createInput_Infield("Roll Width", 1520, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "mm"});
             this.#f_rollWastage = createInput_Infield("Roll Wastage *Approx", 20, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "%"});
             this.#f_rollLengthUsed = createInput_Infield("Roll Length Used *Approx", 0, "width:30%;", () => {this.UpdateFromFields();}, f_container_rollUsage, false, 10, {postfix: "m"});
             setFieldDisabled(true, this.#f_rollLengthUsed[1], this.#f_rollLengthUsed[0]);

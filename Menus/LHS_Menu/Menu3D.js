@@ -653,7 +653,7 @@ class Menu3D extends LHSMenuWindow {
 
                         svgCutfile = this.add(SVGCutfile, this.page1, []);
 
-                        sheet = this.add(Sheet, this.page1, [svgCutfile], {
+                        let acmSheet = this.add(Sheet, this.page1, [svgCutfile], {
                               propertiesToAssign: {
                                     material: "ACM",
                                     sheetSize: "2440x1220",
@@ -665,7 +665,7 @@ class Menu3D extends LHSMenuWindow {
                                     typeLabel: "ACM SHEET"
                               }
                         });
-                        sheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
+                        acmSheet.addStaticRouterRow("pathLength", "numberOfPaths", {material: "ACM", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
 
                         sheet = this.add(Sheet, this.page1, [svgCutfile], {
                               propertiesToAssign: {
@@ -680,9 +680,10 @@ class Menu3D extends LHSMenuWindow {
                         sheet.setLaserCutProfile({material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
                         sheet.addStaticLaserRow("pathLength", "numberOfPaths", {material: "Corflute", thickness: "3", profile: "Cut Through", quality: "Good Quality"});
 
-                        vinyl = this.add(Vinyl, this.page1, [Sheet], {
+                        vinyl = this.add(Vinyl, this.page1, [acmSheet], {
                               propertiesToAssign: {
-                                    bleedDropdown: "ACM"
+                                    bleedDropdown: "ACM",
+                                    rollWidth: 1600
                               },
                         });
                         laminate = this.add(Laminate, this.page1, [Vinyl]);
