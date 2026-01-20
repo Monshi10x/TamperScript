@@ -855,13 +855,35 @@ class ModalSVG extends Modal {
             });
       }
 
+      normalizeSvgPathData(pathData) {
+            if(!pathData) return null;
+            let trimmedPathData = String(pathData).trim();
+            if(!trimmedPathData || trimmedPathData.toLowerCase() === "z") return null;
+
+            let normalizedPathData = trimmedPathData
+                  .replace(/([Zz])(?:\s*[Zz])+/g, "$1")
+                  .replace(/([Zz])\s*(?=[+-]?\d|\.)/g, "$1 M");
+
+            if(!/^[Mm]/.test(normalizedPathData)) {
+                  if(/^[+-]?\d|\./.test(normalizedPathData)) {
+                        normalizedPathData = `M${normalizedPathData}`;
+                  } else {
+                        return null;
+                  }
+            }
+
+            return normalizedPathData;
+      }
+
       scaleSvgPaths(scaleValue) {
             this.cacheOriginalPathData();
             this.#dragZoomSVG.allPathElements.forEach((element) => {
                   let baseD = element.dataset.baseD;
                   if(!baseD) return;
+                  let normalizedPathData = this.normalizeSvgPathData(baseD);
+                  if(!normalizedPathData) return;
                   try {
-                        let scaledPath = new SVGPathCommander(baseD)
+                        let scaledPath = new SVGPathCommander(normalizedPathData)
                               .transform({scale: scaleValue})
                               .toString();
                         element.setAttribute("d", scaledPath);
