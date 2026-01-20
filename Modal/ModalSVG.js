@@ -225,8 +225,13 @@ class ModalSVG extends Modal {
       async loadPathArea() {
             let loader = new Loader(this.#totalShapeAreas[0]);
             let shapeAreaPolygonGroup = this.#dragZoomSVG.svg.querySelector("#shapeAreaPolygons");
-            if(shapeAreaPolygonGroup) shapeAreaPolygonGroup.remove();
+            if(shapeAreaPolygonGroup) {
+                  shapeAreaPolygonGroup.remove();
+                  console.log("Shape area polygons deleted.");
+            }
+            console.log("Shape area worker started.");
             let totalArea = await this.#dragZoomSVG.getTotalPathArea_m2();
+            console.log("Shape area worker finished.");
             $(this.#totalShapeAreas[1]).val(totalArea).change();
             loader.Delete();
             if(this.#showShapeAreaPolygons?.[1]?.checked) {
@@ -478,6 +483,7 @@ class ModalSVG extends Modal {
                   polygonPath.style = `fill:rgb(173, 216, 230);stroke:rgb(70, 130, 180);stroke-width:${1 / svgScale};`;
                   newGroup.appendChild(polygonPath);
             });
+            console.log("Shape area polygons created.");
       }
 
       showPartAreas() {
