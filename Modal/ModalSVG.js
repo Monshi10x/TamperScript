@@ -224,6 +224,8 @@ class ModalSVG extends Modal {
 
       async loadPathArea() {
             let loader = new Loader(this.#totalShapeAreas[0]);
+            let shapeAreaPolygonGroup = this.#dragZoomSVG.svg.querySelector("#shapeAreaPolygons");
+            if(shapeAreaPolygonGroup) shapeAreaPolygonGroup.remove();
             let totalArea = await this.#dragZoomSVG.getTotalPathArea_m2();
             $(this.#totalShapeAreas[1]).val(totalArea).change();
             loader.Delete();
