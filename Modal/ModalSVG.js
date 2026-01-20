@@ -450,13 +450,29 @@ class ModalSVG extends Modal {
                   mainGroup.appendChild(newGroup);
             }
 
-            polygons.forEach((polygonPoints) => {
-                  if(!polygonPoints || polygonPoints.length < 3) return;
-                  let points = polygonPoints.map((point) => `${point.x},${point.y}`).join(" ");
-                  let polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-                  polygon.setAttribute("points", points);
-                  polygon.style = `fill:rgb(173, 216, 230);stroke:rgb(70, 130, 180);stroke-width:${1 / svgScale};`;
-                  newGroup.appendChild(polygon);
+            let buildPathData = (polygonPoints) => {
+                  if(!polygonPoints || polygonPoints.length < 3) return null;
+                  let pathParts = polygonPoints.map((point, index) => `${index === 0 ? "M" : "L"}${point.x} ${point.y}`);
+                  pathParts.push("Z");
+                  return pathParts.join(" ");
+            };
+
+            let outerPolygons = polygons.filter((polygon) => !polygon.isInner);
+
+            outerPolygons.forEach((outerPolygon) => {
+                  let outerPathData = buildPathData(outerPolygon.points);
+                  if(!outerPathData) return;
+
+                  let innerPolygons = polygons.filter((polygon) => polygon.isInner && polygon.outerParentId === outerPolygon.elementId);
+                  let innerPathData = innerPolygons.map((polygon) => buildPathData(polygon.points)).filter(Boolean).join(" ");
+
+                  let combinedPathData = innerPathData ? `${outerPathData} ${innerPathData}` : outerPathData;
+
+                  let polygonPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                  polygonPath.setAttribute("d", combinedPathData);
+                  polygonPath.setAttribute("fill-rule", "evenodd");
+                  polygonPath.style = `fill:rgb(173, 216, 230);stroke:rgb(70, 130, 180);stroke-width:${1 / svgScale};`;
+                  newGroup.appendChild(polygonPath);
             });
       }
 
