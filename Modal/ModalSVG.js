@@ -892,6 +892,8 @@ class ModalSVG extends Modal {
 
       applySvgScale(scaleValue) {
             this.#svgScale = scaleValue;
+            let shapeAreaPolygonGroup = this.#dragZoomSVG?.svg?.querySelector("#shapeAreaPolygons");
+            if(shapeAreaPolygonGroup) shapeAreaPolygonGroup.remove();
             this.scaleSvgPaths(scaleValue);
             if(this.#svgBaseSize && this.#dragZoomSVG?.svg) {
                   let width = roundNumber(this.#svgBaseSize.width * scaleValue, 6);
