@@ -774,6 +774,18 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
                         }
 
                   }
+                  if(event.data.shapeAreaPolygons && svg) {
+                        let shapeAreaPolygonData = [];
+                        for(let i = 0; i < svgElements.length; i++) {
+                              shapeAreaPolygonData.push({
+                                    points: event.data.shapeAreaPolygons[i],
+                                    isInner: svgElements[i].classList.contains("innerPath"),
+                                    outerParentId: svgElements[i].getAttribute("data-outerPathParent") || null,
+                                    elementId: svgElements[i].id || null
+                              });
+                        }
+                        svg.__shapeAreaPolygons = shapeAreaPolygonData;
+                  }
                   console.log("%cWEB WORKER DATA AREAS", "background-color:yellow; color:black;");
                   console.log(event.data);
                   webWorker.terminate();
