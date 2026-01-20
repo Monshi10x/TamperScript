@@ -46,6 +46,8 @@ class ModalSVG extends Modal {
       #svgScaleField;
       #svgBaseSize;
       #isUpdatingSvgScale = false;
+      #isLoadingShapeAreas = false;
+      #pendingShapeAreaPolygonRender = false;
       #widthShouldBeField;
       #heightShouldBeField;
       #calculatedScaleText;
@@ -230,11 +232,14 @@ class ModalSVG extends Modal {
                   console.log("Shape area polygons deleted.");
             }
             console.log("Shape area worker started.");
+            this.#isLoadingShapeAreas = true;
             let totalArea = await this.#dragZoomSVG.getTotalPathArea_m2();
+            this.#isLoadingShapeAreas = false;
             console.log("Shape area worker finished.");
             $(this.#totalShapeAreas[1]).val(totalArea).change();
             loader.Delete();
-            if(this.#showShapeAreaPolygons?.[1]?.checked) {
+            if(this.#pendingShapeAreaPolygonRender || this.#showShapeAreaPolygons?.[1]?.checked) {
+                  this.#pendingShapeAreaPolygonRender = false;
                   this.showShapeAreaPolygons();
             }
       }
@@ -374,6 +379,10 @@ class ModalSVG extends Modal {
       }
 
       showShapeAreaPolygons() {
+            if(this.#isLoadingShapeAreas) {
+                  this.#pendingShapeAreaPolygonRender = true;
+                  return;
+            }
             let elements = this.#dragZoomSVG.svg.querySelector("#shapeAreaPolygons");
             if(elements) {
                   $(elements).show();
