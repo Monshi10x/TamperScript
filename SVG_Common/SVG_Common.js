@@ -774,6 +774,9 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
                         }
 
                   }
+                  if(event.data.shapeAreaPolygons && svg) {
+                        svg.__shapeAreaPolygons = event.data.shapeAreaPolygons;
+                  }
                   console.log("%cWEB WORKER DATA AREAS", "background-color:yellow; color:black;");
                   console.log(event.data);
                   webWorker.terminate();
