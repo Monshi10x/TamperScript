@@ -313,6 +313,8 @@ class ModalSVG extends Modal {
       }
 
       addElementMeasures(element) {
+            if(!element || (!element.classList.contains("outerPath") && !element.classList.contains("innerPath"))) return;
+            if(element.closest("#itemMeasures") || element.closest("#overallMeasures")) return;
             let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
             let newGroup = mainGroup.querySelector("#itemMeasures");
 
@@ -559,6 +561,8 @@ class ModalSVG extends Modal {
       }
 
       addPartAreas(element) {
+            if(!element || (!element.classList.contains("outerPath") && !element.classList.contains("innerPath"))) return;
+            if(element.closest("#itemMeasures") || element.closest("#overallMeasures")) return;
             let timer = setInterval(function() {next();}, 100);
 
             let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
