@@ -860,7 +860,9 @@ class ModalSVG extends Modal {
             let trimmedPathData = String(pathData).trim();
             if(!trimmedPathData || trimmedPathData.toLowerCase() === "z") return null;
 
-            let normalizedPathData = trimmedPathData.replace(/([Zz])\s*(?=[+-]?\d|\.)/g, "$1 M");
+            let normalizedPathData = trimmedPathData
+                  .replace(/([Zz])(?:\s*[Zz])+/g, "$1")
+                  .replace(/([Zz])\s*(?=[+-]?\d|\.)/g, "$1 M");
 
             if(!/^[Mm]/.test(normalizedPathData)) {
                   if(/^[+-]?\d|\./.test(normalizedPathData)) {
