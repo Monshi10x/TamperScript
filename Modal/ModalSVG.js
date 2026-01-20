@@ -350,9 +350,9 @@ class ModalSVG extends Modal {
                   return;
             }
 
-            elements = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT").querySelectorAll("path");
-            for(let i = 0; i < elements.length; i++) {
-                  this.addElementMeasures(elements[i]);
+            let pathElements = this.#dragZoomSVG.allPathElements;
+            for(let i = 0; i < pathElements.length; i++) {
+                  this.addElementMeasures(pathElements[i]);
             }
       }
 
@@ -367,8 +367,6 @@ class ModalSVG extends Modal {
                   $(elements).show();
                   return;
             }
-
-            elements = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT").querySelectorAll("path");
 
             this.addShapeAreas();
       }
@@ -502,9 +500,9 @@ class ModalSVG extends Modal {
                   return;
             }
 
-            elements = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT").querySelectorAll("path");
-            for(let i = 0; i < elements.length; i++) {
-                  this.addPartAreas(elements[i]);
+            let pathElements = this.#dragZoomSVG.allPathElements;
+            for(let i = 0; i < pathElements.length; i++) {
+                  this.addPartAreas(pathElements[i]);
             }
       }
 
