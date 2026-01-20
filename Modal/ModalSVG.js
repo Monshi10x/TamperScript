@@ -979,6 +979,7 @@ class ModalSVG extends Modal {
             if(this.#showIndividualMeasures?.[1]?.checked) this.showElementMeasures();
             if(this.#showIndividualAreas?.[1]?.checked) this.showPartAreas();
             if(this.#showShapeAreas?.[1]?.checked) this.showShapeAreas();
+            if(this.#showShapeAreaPolygons?.[1]?.checked) this.showShapeAreaPolygons();
             if(this.#showShapeBoundingRect?.[1]?.checked) this.showShapeBoundingRect();
             if(this.#showPoints?.[1]?.checked) this.showElementPoints();
       }
