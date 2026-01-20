@@ -966,14 +966,14 @@ class ModalSVG extends Modal {
                   $(this.#totalPathLength[1]).val(this.#dragZoomSVG.totalPathLengths).change();
             }
 
-            this.loadPathArea();
-            this.loadBoundingRectAreas();
-
             let groupsToRemove = ["overallMeasures", "itemMeasures", "shapeAreas", "shapeAreaPolygons", "partAreas", "shapeBoundingRects", "itemPoints"];
             groupsToRemove.forEach((groupId) => {
                   let group = this.#dragZoomSVG.svg.querySelector(`#${groupId}`);
                   if(group) group.remove();
             });
+
+            this.loadPathArea();
+            this.loadBoundingRectAreas();
 
             if(this.#showOverallMeasures?.[1]?.checked) this.showOverallMeasures();
             if(this.#showIndividualMeasures?.[1]?.checked) this.showElementMeasures();
