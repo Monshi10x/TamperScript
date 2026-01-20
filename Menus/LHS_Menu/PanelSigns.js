@@ -452,7 +452,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 					}, itemUpdateOnCompletion: true
 				});
 
-				vinyl = this.#add(Vinyl, this.page1, [Sheet], {
+				vinyl = this.#add(Vinyl, this.page1, [size], {
 					propertiesToAssign: {
 						material: VinylLookup["High Tack"],
 						bleedDropdown: "Wall Graphics",
