@@ -72,6 +72,7 @@ class DragZoomSVG {
       get isHolding() {return this.#holding;}
       get svgFile() {return this.#f_svg.outerHTML;}
       get container() {return this.#f_container;}
+      get shapeAreaPolygons() {return this.#shapeAreaPolygons;}
 
       get unscaledSVGString() {
             let svgClone = this.svg.cloneNode(true);
@@ -292,7 +293,9 @@ class DragZoomSVG {
       }
 
       async getTotalPathArea_m2() {
-            return await svg_getTotalPathArea_m2(this.svg, no);
+            let totalArea = await svg_getTotalPathArea_m2(this.svg, no);
+            this.#shapeAreaPolygons = this.svg.__shapeAreaPolygons || [];
+            return totalArea;
       }
 
       getTotalBoundingRectAreas_m2() {

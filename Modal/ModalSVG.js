@@ -34,6 +34,7 @@ class ModalSVG extends Modal {
       #showOverallMeasures;
       #showIndividualAreas;
       #showShapeAreas;
+      #showShapeAreaPolygons;
       #controlsContainer;
       #showShapeBoundingRect;
       #totalBoundingRectAreas;
@@ -120,6 +121,11 @@ class ModalSVG extends Modal {
                   shapeAreaToggle.toggle();
             }, this.#viewSettingsContainer);
 
+            let shapeAreaPolygonToggle = new Toggle(() => {this.hideShapeAreaPolygons();}, () => {this.showShapeAreaPolygons();});
+            this.#showShapeAreaPolygons = createCheckbox_Infield("Show Shape Area Polygons", false, "width:250px;", () => {
+                  shapeAreaPolygonToggle.toggle();
+            }, this.#viewSettingsContainer);
+
             let shapeBoundingRectToggle = new Toggle(() => {this.hideShapeBoundingRect();}, () => {this.showShapeBoundingRect();});
             this.#showShapeBoundingRect = createCheckbox_Infield("Show Shape Bounding Rect", false, "width:250px;", () => {
                   shapeBoundingRectToggle.toggle();
@@ -195,7 +201,7 @@ class ModalSVG extends Modal {
                               if(groups[i].id == "pathGroup") {
                                     pathGroup = groups[i].outerHTML;
                               }
-                              if(["overallMeasures", "itemMeasures", "shapeAreas", "partAreas", "shapeBoundingRects", "itemPoints"].includes(groups[i].id)) {
+                              if(["overallMeasures", "itemMeasures", "shapeAreas", "shapeAreaPolygons", "partAreas", "shapeBoundingRects", "itemPoints"].includes(groups[i].id)) {
                                     groups[i].remove();
                                     groups.splice(i, 1);
                               }
@@ -219,6 +225,9 @@ class ModalSVG extends Modal {
             let totalArea = await this.#dragZoomSVG.getTotalPathArea_m2();
             $(this.#totalShapeAreas[1]).val(totalArea).change();
             loader.Delete();
+            if(this.#showShapeAreaPolygons?.[1]?.checked) {
+                  this.showShapeAreaPolygons();
+            }
       }
 
       loadBoundingRectAreas() {
@@ -355,6 +364,21 @@ class ModalSVG extends Modal {
             $(elements).hide();
       }
 
+      showShapeAreaPolygons() {
+            let elements = this.#dragZoomSVG.svg.querySelector("#shapeAreaPolygons");
+            if(elements) {
+                  $(elements).show();
+                  return;
+            }
+
+            this.addShapeAreaPolygons();
+      }
+
+      hideShapeAreaPolygons() {
+            let elements = this.#dragZoomSVG.svg.querySelector("#shapeAreaPolygons");
+            $(elements).hide();
+      }
+
       addShapeAreas() {
 
             let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
@@ -410,6 +434,30 @@ class ModalSVG extends Modal {
                   newGroup.appendChild(text);
 
             }
+      }
+
+      addShapeAreaPolygons() {
+            let mainGroup = this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT");
+            let svgScale = this.#dragZoomSVG.scale;
+            let polygons = this.#dragZoomSVG.shapeAreaPolygons || [];
+
+            if(!polygons.length) return;
+
+            let newGroup = mainGroup.querySelector("#shapeAreaPolygons");
+            if(!newGroup) {
+                  newGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                  newGroup.id = "shapeAreaPolygons";
+                  mainGroup.appendChild(newGroup);
+            }
+
+            polygons.forEach((polygonPoints) => {
+                  if(!polygonPoints || polygonPoints.length < 3) return;
+                  let points = polygonPoints.map((point) => `${point.x},${point.y}`).join(" ");
+                  let polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                  polygon.setAttribute("points", points);
+                  polygon.style = `fill:rgb(173, 216, 230);stroke:rgb(70, 130, 180);stroke-width:${1 / svgScale};`;
+                  newGroup.appendChild(polygon);
+            });
       }
 
       showPartAreas() {
@@ -901,7 +949,7 @@ class ModalSVG extends Modal {
             this.loadPathArea();
             this.loadBoundingRectAreas();
 
-            let groupsToRemove = ["overallMeasures", "itemMeasures", "shapeAreas", "partAreas", "shapeBoundingRects", "itemPoints"];
+            let groupsToRemove = ["overallMeasures", "itemMeasures", "shapeAreas", "shapeAreaPolygons", "partAreas", "shapeBoundingRects", "itemPoints"];
             groupsToRemove.forEach((groupId) => {
                   let group = this.#dragZoomSVG.svg.querySelector(`#${groupId}`);
                   if(group) group.remove();
@@ -911,6 +959,7 @@ class ModalSVG extends Modal {
             if(this.#showIndividualMeasures?.[1]?.checked) this.showElementMeasures();
             if(this.#showIndividualAreas?.[1]?.checked) this.showPartAreas();
             if(this.#showShapeAreas?.[1]?.checked) this.showShapeAreas();
+            if(this.#showShapeAreaPolygons?.[1]?.checked) this.showShapeAreaPolygons();
             if(this.#showShapeBoundingRect?.[1]?.checked) this.showShapeBoundingRect();
             if(this.#showPoints?.[1]?.checked) this.showElementPoints();
       }
