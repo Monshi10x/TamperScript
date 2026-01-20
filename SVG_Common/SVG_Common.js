@@ -745,7 +745,7 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
       }
 
       let mainGroup = svg.querySelector("#mainGcreatedByT");
-      let svgElements = mainGroup.getElementsByTagName("path");
+      let svgElements = mainGroup.querySelectorAll(".outerPath, .innerPath");
 
       let totalArea = 0;
 
