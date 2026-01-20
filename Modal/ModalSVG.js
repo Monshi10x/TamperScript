@@ -207,6 +207,8 @@ class ModalSVG extends Modal {
                               }
                         }
 
+                        delete this.#dragZoomSVG.svg.__shapeAreaPolygons;
+
                         callerObject.svgFile = this.#dragZoomSVG.svg.outerHTML;
                         callerObject.onFileChange();
                   }
