@@ -777,11 +777,27 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
                   if(event.data.shapeAreaPolygons && svg) {
                         let shapeAreaPolygonData = [];
                         for(let i = 0; i < svgElements.length; i++) {
+                              let element = svgElements[i];
+                              if(element.classList.contains("outerPath") && !element.id) {
+                                    element.id = generateUniqueID("outerPath-");
+                              }
+                              if(element.classList.contains("innerPath") && !element.getAttribute("data-outerPathParent")) {
+                                    let parentGroup = element.closest("g");
+                                    let siblingOuter = parentGroup?.querySelector(".outerPath");
+                                    if(siblingOuter) {
+                                          if(!siblingOuter.id) siblingOuter.id = generateUniqueID("outerPath-");
+                                          element.setAttribute("data-outerPathParent", siblingOuter.id);
+                                    }
+                              }
+                        }
+
+                        for(let i = 0; i < svgElements.length; i++) {
+                              let element = svgElements[i];
                               shapeAreaPolygonData.push({
                                     points: event.data.shapeAreaPolygons[i],
-                                    isInner: svgElements[i].classList.contains("innerPath"),
-                                    outerParentId: svgElements[i].getAttribute("data-outerPathParent") || null,
-                                    elementId: svgElements[i].id || null
+                                    isInner: element.classList.contains("innerPath"),
+                                    outerParentId: element.getAttribute("data-outerPathParent") || null,
+                                    elementId: element.id || null
                               });
                         }
                         svg.__shapeAreaPolygons = shapeAreaPolygonData;
