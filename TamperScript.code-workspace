@@ -9,6 +9,12 @@
 		},
 		{
 			"path": "../SignScheduler"
+		},
+		{
+			"path": "../../../../Program Files (x86)/Common Files/Adobe/CEP/extensions/Signarama-Illustrator-Helper"
+		},
+		{
+			"path": "../../../../Program Files (x86)/Common Files/Adobe/CEP/extensions/dimensions_plugin_icon_autoscale"
 		}
 	],
 	"settings": {
@@ -262,7 +268,7 @@
 		},
 		"editor.fontFamily": "Consolas, 'Courier New', monospace",
 		"editor.fontSize": 12,
-		"liveServer.settings.multiRootWorkspaceName": "TamperScript",
+		"liveServer.settings.multiRootWorkspaceName": "Signarama-Illustrator-Helper",
 		"chatgpt.openOnStartup": true
 	}
 }
