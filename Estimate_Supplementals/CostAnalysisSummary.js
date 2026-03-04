@@ -9,6 +9,7 @@ var newPanelContent_ProfitContainer_TotalProfit;
 var newPanelContent_MarkupContainer_TotalMarkup;
 var newPanelContent_TimeClock_Time;
 var newPanelContent_Install_Address;
+var newPanelContent_GST_Error;
 function createCostAnalysisSummaryContainer() {
     sidePanel = document.getElementById('divLeftColumn');
     var newPanel = document.createElement('div');
@@ -96,6 +97,11 @@ function createCostAnalysisSummaryContainer() {
     newPanelContent_Install_Address.style = "text-align: right; float:right;width:200px;";
     newPanelContent_Install_Address.innerHTML = "";
 
+    //GST Error
+    newPanelContent_GST_Error = document.createElement("p");
+    newPanelContent_GST_Error.style = "width:100%;float:left;color:red;font-weight:bold;font-size:16px;text-align:center;display:none;";
+    newPanelContent_GST_Error.innerText = "ERROR: GST Mismatch";
+
     //adds
     newPanel.appendChild(newPanelHeader);
     newPanelContent_CostContainer.appendChild(newPanelContent_CostContainer_Header);
@@ -119,6 +125,8 @@ function createCostAnalysisSummaryContainer() {
     newPanelContent_Install.appendChild(newPanelContent_Install_Address);
     newPanelContent.appendChild(newPanelContent_Install);
 
+    newPanel.appendChild(newPanelContent_GST_Error);
+
     newPanel.appendChild(newPanelContent);
     sidePanel.appendChild(newPanel);
 }
@@ -135,6 +143,11 @@ function costAnalysisSummaryTick() {
         markupDecimal = "Inf";
         newPanelContent_MarkupContainer_TotalMarkup.innerHTML = "Inf % / Inf x";
     }
+
+    var totalOrderPricePreGst = 0;
+    var totalOrderPriceIncGst = 0;
+
+    if(totalOrderPricePreGst * 1.1 - totalOrderPriceIncGst > 0.2) $(newPanelContent_GST_Error).toggle();
 
     newPanelContent_CostContainer_TotalCosts.innerHTML = "$" + Math.round(totalOrderCost * 100) / 100;
     newPanelContent_PriceContainer_TotalPrices.innerHTML = "$" + Math.round(totalOrderPricePreGst * 100) / 100;
