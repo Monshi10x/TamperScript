@@ -147,7 +147,7 @@ function costAnalysisSummaryTick() {
     var totalOrderPricePreGst = 0;
     var totalOrderPriceIncGst = 0;
 
-    if(totalOrderPricePreGst * 1.1 - totalOrderPriceIncGst > 0.2) $(newPanelContent_GST_Error).toggle();
+    if(Math.abs(totalOrderPricePreGst * 1.1 - totalOrderPriceIncGst) > 0.2) $(newPanelContent_GST_Error).toggle();
 
     newPanelContent_CostContainer_TotalCosts.innerHTML = "$" + Math.round(totalOrderCost * 100) / 100;
     newPanelContent_PriceContainer_TotalPrices.innerHTML = "$" + Math.round(totalOrderPricePreGst * 100) / 100;
