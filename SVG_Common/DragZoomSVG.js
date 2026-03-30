@@ -249,7 +249,7 @@ class DragZoomSVG {
             this.#f_svg.style.cursor = "grabbing";
             this.#holding = true;
 
-            this.onMouseUpdate("Mouse Down");
+            this.onMouseUpdate("Mouse Down", e);
       }
 
       onMouseMove(e) {
@@ -257,7 +257,7 @@ class DragZoomSVG {
 
             this.updateMouseXY(e);
 
-            this.onMouseUpdate("Mouse Move");
+            this.onMouseUpdate("Mouse Move", e);
       }
 
       onMouseUp(e) {
@@ -266,7 +266,7 @@ class DragZoomSVG {
             this.#f_svg.style.cursor = "auto";
             this.#holding = false;
 
-            this.onMouseUpdate("Mouse Up");
+            this.onMouseUpdate("Mouse Up", e);
       }
 
       onBeforeMouseDown(e) {
@@ -280,6 +280,10 @@ class DragZoomSVG {
       }
 
       onZoom() {
+            this.syncScaleFromTransform();
+      }
+
+      syncScaleFromTransform() {
             this.#scale = this.#panZoomInstance.getTransform().scale;
             this.refreshElementStyles();
       }
@@ -302,23 +306,82 @@ class DragZoomSVG {
             return svg_getTotalBoundingRectAreas_m2(this.outerPathElements, no);
       }
 
+      parseColorChannels(colorValue) {
+            if(!colorValue) return null;
+            let rgbMatch = String(colorValue).match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+            if(rgbMatch) {
+                  return {
+                        r: parseInt(rgbMatch[1], 10),
+                        g: parseInt(rgbMatch[2], 10),
+                        b: parseInt(rgbMatch[3], 10)
+                  };
+            }
+
+            let hexMatch = String(colorValue).trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+            if(!hexMatch) return null;
+            let hex = hexMatch[1];
+            if(hex.length === 3) hex = `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`;
+            return {
+                  r: parseInt(hex.slice(0, 2), 16),
+                  g: parseInt(hex.slice(2, 4), 16),
+                  b: parseInt(hex.slice(4, 6), 16)
+            };
+      }
+
+      colorChannelsToHex(channels) {
+            if(!channels) return "#fffffe";
+            let toHex = (value) => Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, "0");
+            return `#${toHex(channels.r)}${toHex(channels.g)}${toHex(channels.b)}`;
+      }
+
+      getElementFillChannels(element) {
+            let fillValue = element.style.fill || element.getAttribute("fill") || window.getComputedStyle(element)?.fill || "#fffffe";
+            return this.parseColorChannels(fillValue) || {r: 255, g: 255, b: 254};
+      }
+
+      getHoverFillForElement(element) {
+            let channels = this.getElementFillChannels(element);
+            let luminance = ((0.2126 * channels.r) + (0.7152 * channels.g) + (0.0722 * channels.b)) / 255;
+            let adjustTowards = (target, amount) => ({
+                  r: channels.r + (target - channels.r) * amount,
+                  g: channels.g + (target - channels.g) * amount,
+                  b: channels.b + (target - channels.b) * amount
+            });
+
+            if(luminance < 0.35) return this.colorChannelsToHex(adjustTowards(255, 0.28));
+            if(luminance > 0.72) return this.colorChannelsToHex(adjustTowards(0, 0.18));
+            return this.colorChannelsToHex(adjustTowards(255, 0.14));
+      }
+
+      initPathElement(element) {
+            if(!element || element.dataset.tmPathInitialised === "true") return;
+
+            element.dataset.tmPathInitialised = "true";
+            element.setAttribute('stroke-miterlimit', `0`);
+
+            element.addEventListener("mouseover", () => {
+                  if(element.classList.contains("innerPath")) return;
+                  element.classList.add("SVGHover");
+                  element.dataset.previousHoverFill = element.style.fill || "";
+                  element.style.fill = this.getHoverFillForElement(element);
+            });
+            element.addEventListener("mouseout", () => {
+                  element.classList.remove("SVGHover");
+                  element.style.fill = element.dataset.previousHoverFill || "";
+                  delete element.dataset.previousHoverFill;
+            });
+            element.addEventListener("mouseup", (event) => {
+                  if(event.button !== 0) return;
+                  if(element.classList.contains("innerPath")) return;
+                  element.classList.toggle("SVGSelected");
+            });
+      }
+
       initSVGStyles() {
             let svgElements = this.#f_svg.getElementsByTagName("path");
 
             [...svgElements].forEach((element) => {
-                  element.setAttribute('stroke-miterlimit', `0`);
-
-                  element.addEventListener("mouseover", (e) => {
-                        if(element.classList.contains("innerPath")) return;
-                        element.classList.add("SVGHover");
-                  });
-                  element.addEventListener("mouseout", (e) => {
-                        element.classList.remove("SVGHover");
-                  });
-                  element.addEventListener("mouseup", (e) => {
-                        if(element.classList.contains("innerPath")) return;
-                        element.classList.toggle("SVGSelected");
-                  });
+                  this.initPathElement(element);
             });
       }
 
@@ -355,7 +418,7 @@ class DragZoomSVG {
             toggle(this.#f_container.style.display == "none", () => {this.show();}, () => {this.hide();});
       }
 
-      /*overrideable*/onMouseUpdate(updateFrom) { }
+      /*overrideable*/onMouseUpdate(updateFrom, event) { }
 
       /*overrideable*/onTransform(e) { }
 

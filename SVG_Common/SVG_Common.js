@@ -954,6 +954,10 @@ function svg_formatCompoundPaths(svgObject) {
 
             let pathString = svgElements[i].getAttribute("d");
             let pathStringSplitOverZ = pathString.split("Z");
+            let sourcePath = svgElements[i];
+            let sourceStyle = sourcePath.getAttribute("style") || "";
+            let sourceFill = svg_getShapeFill(sourcePath);
+            let sourceStroke = svg_getShapeStroke(sourcePath);
 
             //Shape Group:
             let newPathGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -968,7 +972,11 @@ function svg_formatCompoundPaths(svgObject) {
                   if(j == 0 && !pathClass.contains("innerPath")) {
                         let outerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
                         outerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                        outerPathElement.style = "stroke:green;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#eee;";
+                        svg_copyPathPresentationAttributes(sourcePath, outerPathElement);
+                        outerPathElement.style.cssText += sourceStyle ? ";" + sourceStyle : "";
+                        outerPathElement.style.opacity = "1";
+                        outerPathElement.style.stroke = sourceStroke;
+                        outerPathElement.style.fill = sourceFill;
                         outerPathElement.className.baseVal = "outerPath";
                         outerPathParent_id = generateUniqueID("outerPath-");
                         outerPathElement.id = outerPathParent_id;
@@ -978,7 +986,11 @@ function svg_formatCompoundPaths(svgObject) {
                   else {
                         let innerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
                         innerPathElement.setAttribute("d", pathStringSplitOverZ[j] + "Z");
-                        innerPathElement.style = "stroke:red;stroke-width:" + (2 / this.scale) + ";" + "opacity:1;fill:#fff;";
+                        svg_copyPathPresentationAttributes(sourcePath, innerPathElement);
+                        innerPathElement.style.cssText += sourceStyle ? ";" + sourceStyle : "";
+                        innerPathElement.style.opacity = "1";
+                        innerPathElement.style.stroke = sourceStroke;
+                        innerPathElement.style.fill = "#fffffe";
                         innerPathElement.className.baseVal = "innerPath";
                         innerPathElement.setAttribute("data-outerPathParent", outerPathParent_id);
                         newPathGroup.appendChild(innerPathElement);
@@ -996,6 +1008,49 @@ function svg_formatCompoundPaths(svgObject) {
       });
 
       return svgObject;
+}
+
+function svg_copyPathPresentationAttributes(sourcePath, targetPath) {
+      if(!sourcePath || !targetPath) return;
+
+      const excludedAttributes = new Set(["d", "id", "class", "style", "data-outerPathParent"]);
+      for(let i = 0; i < sourcePath.attributes.length; i++) {
+            let attr = sourcePath.attributes[i];
+            if(excludedAttributes.has(attr.name)) continue;
+            targetPath.setAttribute(attr.name, attr.value);
+      }
+}
+
+function svg_getShapeFill(pathElement) {
+      if(!pathElement) return "#fffffe";
+
+      let computedStyle = window.getComputedStyle(pathElement);
+      let computedFill = computedStyle?.fill;
+      if(computedFill && computedFill !== "none" && computedFill !== "transparent") return computedFill;
+
+      let attrFill = pathElement.getAttribute("fill");
+      if(attrFill && attrFill !== "none" && attrFill !== "transparent") return attrFill;
+
+      let styleFill = pathElement.style?.fill;
+      if(styleFill && styleFill !== "none" && styleFill !== "transparent") return styleFill;
+
+      return "#fffffe";
+}
+
+function svg_getShapeStroke(pathElement) {
+      if(!pathElement) return "";
+
+      let computedStyle = window.getComputedStyle(pathElement);
+      let computedStroke = computedStyle?.stroke;
+      if(computedStroke && computedStroke !== "none" && computedStroke !== "transparent") return computedStroke;
+
+      let attrStroke = pathElement.getAttribute("stroke");
+      if(attrStroke && attrStroke !== "none" && attrStroke !== "transparent") return attrStroke;
+
+      let styleStroke = pathElement.style?.stroke;
+      if(styleStroke && styleStroke !== "none" && styleStroke !== "transparent") return styleStroke;
+
+      return "";
 }
 
 const SummarizePathString = (function() {

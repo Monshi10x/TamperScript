@@ -54,6 +54,22 @@ class ModalSVG extends Modal {
       #applyCalculatedScaleButton;
       #calculatedScaleValue = 1;
       #originalBoundsMm;
+      #svgWorkspaceContainer;
+      #toolColumnContainer;
+      #selectionToolButton;
+      #deleteToolButton;
+      #rectangleToolButton;
+      #circleToolButton;
+      #grabToolButton;
+      #drawRectangleMouseDownPos;
+      #drawRectanglePreview;
+      #drawCircleMouseDownPos;
+      #drawCirclePreview;
+      #grabShapeTarget;
+      #grabStartMousePos;
+      #grabOriginalPathData;
+      #keyDownRef;
+      #contextMenuRef;
 
       get getTotalPathLengths() {return this.#dragZoomSVG.getTotalPathLengths();}
       get currentTool() {return this.#activeTool;}
@@ -86,9 +102,20 @@ class ModalSVG extends Modal {
             this.#svgText = svgText;
 
             this.#containerBeforeCanvas = createDivStyle5(null, "Borrowed Fields", this.getBodyElement())[1];
+            this.#svgWorkspaceContainer = document.createElement("div");
+            this.#svgWorkspaceContainer.style = "display:flex;align-items:stretch;justify-content:flex-start;gap:8px;width:100%;height:500px;";
+            this.getBodyElement().appendChild(this.#svgWorkspaceContainer);
 
-            this.#dragZoomSVG = new DragZoomSVG(this.container.getBoundingClientRect().width + "px", "500px", svgText, this.getBodyElement(), dragZoomOptions);
+            this.#toolColumnContainer = document.createElement("div");
+            this.#toolColumnContainer.style = "display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;width:68px;min-width:68px;padding:4px 0px;";
+            this.#svgWorkspaceContainer.appendChild(this.#toolColumnContainer);
+
+            this.#dragZoomSVG = new DragZoomSVG("calc(100% - 76px)", "100%", svgText, this.#svgWorkspaceContainer, dragZoomOptions);
             this.#dragZoomSVG.onMouseUpdate = this.onMouseUpdate;
+            this.#contextMenuRef = (event) => this.handleContextMenu(event);
+            this.#keyDownRef = (event) => this.handleKeyDown(event);
+            this.#dragZoomSVG.container.addEventListener('contextmenu', this.#contextMenuRef);
+            window.addEventListener('keydown', this.#keyDownRef);
             this.#svgBaseSize = this.getSvgBaseSize(svgText);
             this.cacheOriginalPathData();
             this.cacheOriginalBounds();
@@ -165,28 +192,38 @@ class ModalSVG extends Modal {
 
             let deleteTool;
             let selectionTool;
+            let rectangleTool;
+            let circleTool;
+            let grabTool;
 
             if(!controlOptions.hideSelectionTool) {
-                  selectionTool = createIconButton(GM_getResourceURL("Icon_Select"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
-                        IFELSEF(this.currentTool != "Selection Tool", () => {
-                              if(deleteTool?.style?.borderColor == "red") $(deleteTool).click();
-                              this.setCurrentTool("Selection Tool");
-
-                        }, () => {this.setCurrentTool("null");});
-                        IFELSEF(selectionTool.style.borderColor != "red", () => {selectionTool.style.borderColor = "red";}, () => {selectionTool.style.borderColor = COLOUR.DarkGrey;});
-                  }, this.#controlsContainer, true);
+                  selectionTool = createIconButton(GM_getResourceURL("Icon_Select"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey + ";margin:0px auto;", () => {
+                        this.toggleTool("Selection Tool");
+                  }, this.#toolColumnContainer, true);
+                  this.#selectionToolButton = selectionTool;
             }
 
             if(!controlOptions.hideDeleteTool) {
-                  deleteTool = createIconButton(GM_getResourceURL("Icon_Bin2"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey, () => {
-                        IFELSEF(this.currentTool != "Delete Tool", () => {
-                              if(selectionTool?.style?.borderColor == "red") $(selectionTool).click();
-                              this.setCurrentTool("Delete Tool");
-
-                        }, () => {this.setCurrentTool("null");});
-                        IFELSEF(deleteTool.style.borderColor != "red", () => {deleteTool.style.borderColor = "red";}, () => {deleteTool.style.borderColor = COLOUR.DarkGrey;});
-                  }, this.#controlsContainer, true);
+                  deleteTool = createIconButton(GM_getResourceURL("Icon_Bin2"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey + ";margin:0px auto;", () => {
+                        this.toggleTool("Delete Tool");
+                  }, this.#toolColumnContainer, true);
+                  this.#deleteToolButton = deleteTool;
             }
+
+            rectangleTool = createIconButton(GM_getResourceURL("Icon_Rectangle"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey + ";margin:0px auto;", () => {
+                  this.toggleTool("Rectangle Tool");
+            }, this.#toolColumnContainer, true);
+            this.#rectangleToolButton = rectangleTool;
+
+            circleTool = createIconButton(GM_getResourceURL("Icon_Circle"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey + ";margin:0px auto;", () => {
+                  this.toggleTool("Circle Tool");
+            }, this.#toolColumnContainer, true);
+            this.#circleToolButton = circleTool;
+
+            grabTool = createIconButton(GM_getResourceURL("Icon_Grab"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey + ";margin:0px auto;", () => {
+                  this.toggleTool("Grab Tool");
+            }, this.#toolColumnContainer, true);
+            this.#grabToolButton = grabTool;
 
             this.loadPathArea();
             this.loadBoundingRectAreas();
@@ -221,7 +258,7 @@ class ModalSVG extends Modal {
             this.addFooterElement(this.#f_saveSVG);
             this.addFooterElement(this.#f_cancelSave);
             this.applySavedControlSettings();
-            this.fitToSvgBounds();
+            this.scheduleInitialFitToSvgBounds();
       }
 
       async loadPathArea() {
@@ -256,6 +293,9 @@ class ModalSVG extends Modal {
       }
 
       hide() {
+            if(this.#contextMenuRef) this.#dragZoomSVG?.container?.removeEventListener('contextmenu', this.#contextMenuRef);
+            if(this.#keyDownRef) window.removeEventListener('keydown', this.#keyDownRef);
+            closeCustomContextMenu();
             this.#dragZoomSVG.Close();
             //this.returnAllBorrowedFields();
             super.hide();
@@ -263,7 +303,7 @@ class ModalSVG extends Modal {
 
       onWindowResize(event) {
             super.onWindowResize(event);
-            this.#dragZoomSVG.svgWidth = this.container.getBoundingClientRect().width;
+            this.#dragZoomSVG.svgWidth = this.#dragZoomSVG.container.getBoundingClientRect().width;
             this.UpdateFromFields();
       }
 
@@ -302,9 +342,14 @@ class ModalSVG extends Modal {
 
       showOverallMeasures() {
             let elements = this.#dragZoomSVG.svg.querySelector("#overallMeasures");
-            if(!elements) $(elements).show();
+            if(elements) {
+                  $(elements).show();
+                  this.#dragZoomSVG.syncScaleFromTransform();
+                  return;
+            }
 
             this.addOverallMeasures();
+            this.#dragZoomSVG.syncScaleFromTransform();
       }
 
       hideOverallMeasures() {
@@ -349,6 +394,7 @@ class ModalSVG extends Modal {
             let elements = this.#dragZoomSVG.svg.querySelector("#itemMeasures");
             if(elements) {
                   $(elements).show();
+                  this.#dragZoomSVG.syncScaleFromTransform();
                   return;
             }
 
@@ -356,6 +402,7 @@ class ModalSVG extends Modal {
             for(let i = 0; i < pathElements.length; i++) {
                   this.addElementMeasures(pathElements[i]);
             }
+            this.#dragZoomSVG.syncScaleFromTransform();
       }
 
       hideElementMeasures() {
@@ -663,13 +710,488 @@ class ModalSVG extends Modal {
             $(elements).hide();
       }
 
+      toggleTool(tool) {
+            this.setCurrentTool(this.currentTool === tool ? "null" : tool);
+      }
+
+      updateToolButtonStates() {
+            let buttons = [
+                  {tool: "Selection Tool", button: this.#selectionToolButton},
+                  {tool: "Delete Tool", button: this.#deleteToolButton},
+                  {tool: "Rectangle Tool", button: this.#rectangleToolButton},
+                  {tool: "Circle Tool", button: this.#circleToolButton},
+                  {tool: "Grab Tool", button: this.#grabToolButton}
+            ];
+
+            buttons.forEach((entry) => {
+                  if(!entry.button) return;
+                  entry.button.style.borderColor = this.currentTool === entry.tool ? "red" : COLOUR.DarkGrey;
+            });
+      }
+
+      updateDragRectanglePreview(mousePos) {
+            if(!this.#drawRectanglePreview || !this.#drawRectangleMouseDownPos) return;
+
+            let distX = mousePos.x - this.#drawRectangleMouseDownPos.x;
+            let distY = mousePos.y - this.#drawRectangleMouseDownPos.y;
+
+            this.#drawRectanglePreview.setAttribute("x", distX >= 0 ? this.#drawRectangleMouseDownPos.x : mousePos.x);
+            this.#drawRectanglePreview.setAttribute("y", distY >= 0 ? this.#drawRectangleMouseDownPos.y : mousePos.y);
+            this.#drawRectanglePreview.setAttribute("width", Math.abs(distX));
+            this.#drawRectanglePreview.setAttribute("height", Math.abs(distY));
+      }
+
+      finalizeDrawRectanglePreview() {
+            if(!this.#drawRectanglePreview) return;
+
+            let width = parseFloat(this.#drawRectanglePreview.getAttribute("width")) || 0;
+            let height = parseFloat(this.#drawRectanglePreview.getAttribute("height")) || 0;
+            if(width <= 0 || height <= 0) {
+                  this.#drawRectanglePreview.Delete();
+            } else {
+                  this.commitDrawnRectangle(
+                        parseFloat(this.#drawRectanglePreview.getAttribute("x")) || 0,
+                        parseFloat(this.#drawRectanglePreview.getAttribute("y")) || 0,
+                        width,
+                        height
+                  );
+                  this.#drawRectanglePreview.Delete();
+            }
+
+            this.#drawRectanglePreview = null;
+            this.#drawRectangleMouseDownPos = null;
+      }
+
+      updateDragCirclePreview(mousePos) {
+            if(!this.#drawCirclePreview || !this.#drawCircleMouseDownPos) return;
+
+            let distX = mousePos.x - this.#drawCircleMouseDownPos.x;
+            let distY = mousePos.y - this.#drawCircleMouseDownPos.y;
+            let size = Math.max(Math.abs(distX), Math.abs(distY));
+            let finalX = distX >= 0 ? this.#drawCircleMouseDownPos.x : this.#drawCircleMouseDownPos.x - size;
+            let finalY = distY >= 0 ? this.#drawCircleMouseDownPos.y : this.#drawCircleMouseDownPos.y - size;
+
+            this.#drawCirclePreview.setAttribute("x", finalX);
+            this.#drawCirclePreview.setAttribute("y", finalY);
+            this.#drawCirclePreview.setAttribute("width", size);
+            this.#drawCirclePreview.setAttribute("height", size);
+      }
+
+      finalizeDrawCirclePreview() {
+            if(!this.#drawCirclePreview) return;
+
+            let width = parseFloat(this.#drawCirclePreview.getAttribute("width")) || 0;
+            let height = parseFloat(this.#drawCirclePreview.getAttribute("height")) || 0;
+            if(width <= 0 || height <= 0) {
+                  this.#drawCirclePreview.Delete();
+            } else {
+                  this.commitDrawnCircle(
+                        parseFloat(this.#drawCirclePreview.getAttribute("x")) || 0,
+                        parseFloat(this.#drawCirclePreview.getAttribute("y")) || 0,
+                        width
+                  );
+                  this.#drawCirclePreview.Delete();
+            }
+
+            this.#drawCirclePreview = null;
+            this.#drawCircleMouseDownPos = null;
+      }
+
+      beginGrabShape(shapeElement) {
+            if(!shapeElement) return false;
+            let shapeGroup = shapeElement.parentNode;
+            if(!shapeGroup) return false;
+
+            this.#grabShapeTarget = shapeGroup;
+            this.#grabStartMousePos = {...this.#dragZoomSVG.relativeMouseXY};
+            this.#grabOriginalPathData = Array.from(shapeGroup.querySelectorAll("path")).map((pathElement) => ({
+                  element: pathElement,
+                  d: pathElement.getAttribute("d") || ""
+            }));
+            return true;
+      }
+
+      updateGrabShape(mousePos) {
+            if(!this.#grabShapeTarget || !this.#grabStartMousePos || !this.#grabOriginalPathData?.length) return;
+
+            let deltaX = mousePos.x - this.#grabStartMousePos.x;
+            let deltaY = mousePos.y - this.#grabStartMousePos.y;
+
+            this.#grabOriginalPathData.forEach((entry) => {
+                  if(!entry.d) return;
+                  try {
+                        let translatedPath = new SVGPathCommander(entry.d)
+                              .transform({translate: [deltaX, deltaY]})
+                              .toString();
+                        entry.element.setAttribute("d", translatedPath);
+                  } catch(error) {
+                        console.warn("Unable to translate grabbed shape.", error);
+                  }
+            });
+      }
+
+      finalizeGrabShape() {
+            if(this.#grabOriginalPathData?.length) {
+                  this.#grabOriginalPathData.forEach((entry) => {
+                        entry.element.dataset.baseD = entry.element.getAttribute("d") || entry.d;
+                  });
+                  this.refreshMeasurements();
+                  this.updateSavePulse();
+            }
+
+            this.#grabShapeTarget = null;
+            this.#grabStartMousePos = null;
+            this.#grabOriginalPathData = null;
+      }
+
+      deleteSelectedShapes() {
+            let groupsToDelete = new Set();
+            this.#dragZoomSVG.allPathElements.forEach((element) => {
+                  if(element.classList.contains("SVGSelected") && element.parentNode) groupsToDelete.add(element.parentNode);
+            });
+
+            if(groupsToDelete.size === 0) return;
+
+            groupsToDelete.forEach((group) => {
+                  this.#dragZoomSVG.deleteElement(group);
+            });
+
+            this.refreshMeasurements();
+            this.updateSavePulse();
+            closeCustomContextMenu();
+      }
+
+      createRectanglePathData(x, y, width, height) {
+            return `M ${x} ${y} L ${x + width} ${y} L ${x + width} ${y + height} L ${x} ${y + height} Z`;
+      }
+
+      createCirclePathData(x, y, size) {
+            let radius = size / 2;
+            let centerX = x + radius;
+            let centerY = y + radius;
+            return `M ${centerX - radius} ${centerY} A ${radius} ${radius} 0 1 0 ${centerX + radius} ${centerY} A ${radius} ${radius} 0 1 0 ${centerX - radius} ${centerY} Z`;
+      }
+
+      commitDrawnRectangle(x, y, width, height) {
+            let pathGroup = this.#dragZoomSVG.svg.querySelector("#pathGroup");
+            if(!pathGroup) {
+                  pathGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                  pathGroup.id = "pathGroup";
+                  this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT")?.appendChild(pathGroup);
+            }
+
+            let newPathGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            newPathGroup.id = "newPathGroup";
+
+            let outerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            let pathData = this.createRectanglePathData(x, y, width, height);
+
+            outerPathElement.setAttribute("d", pathData);
+            outerPathElement.dataset.baseD = pathData;
+            outerPathElement.className.baseVal = "outerPath";
+            outerPathElement.id = generateUniqueID("outerPath-");
+            outerPathElement.setAttribute("data-area", "0");
+            outerPathElement.setAttribute("fill", "#fffffe");
+            outerPathElement.setAttribute("stroke", "black");
+            outerPathElement.setAttribute("stroke-width", `${1 / this.#dragZoomSVG.scale}`);
+            outerPathElement.setAttribute("opacity", "1");
+
+            newPathGroup.appendChild(outerPathElement);
+            pathGroup.appendChild(newPathGroup);
+
+            this.#dragZoomSVG.initPathElement(outerPathElement);
+            this.#dragZoomSVG.refreshElementStyles();
+            this.refreshMeasurements();
+            this.updateSavePulse();
+      }
+
+      commitDrawnCircle(x, y, size) {
+            let pathGroup = this.#dragZoomSVG.svg.querySelector("#pathGroup");
+            if(!pathGroup) {
+                  pathGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                  pathGroup.id = "pathGroup";
+                  this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT")?.appendChild(pathGroup);
+            }
+
+            let newPathGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            newPathGroup.id = "newPathGroup";
+
+            let outerPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            let pathData = this.createCirclePathData(x, y, size);
+
+            outerPathElement.setAttribute("d", pathData);
+            outerPathElement.dataset.baseD = pathData;
+            outerPathElement.className.baseVal = "outerPath";
+            outerPathElement.id = generateUniqueID("outerPath-");
+            outerPathElement.setAttribute("data-area", "0");
+            outerPathElement.setAttribute("fill", "#fffffe");
+            outerPathElement.setAttribute("stroke", "black");
+            outerPathElement.setAttribute("stroke-width", `${1 / this.#dragZoomSVG.scale}`);
+            outerPathElement.setAttribute("opacity", "1");
+
+            newPathGroup.appendChild(outerPathElement);
+            pathGroup.appendChild(newPathGroup);
+
+            this.#dragZoomSVG.initPathElement(outerPathElement);
+            this.#dragZoomSVG.refreshElementStyles();
+            this.refreshMeasurements();
+            this.updateSavePulse();
+      }
+
+      getContextTargetShape(event) {
+            let targetPath = event.target?.closest?.("path");
+            if(!targetPath) return null;
+            if(targetPath.classList.contains("outerPath")) return targetPath;
+            if(targetPath.classList.contains("innerPath")) return targetPath.parentNode?.querySelector?.(".outerPath") || null;
+            return null;
+      }
+
+      parseColorToHex(colorValue) {
+            if(!colorValue) return "#fffffe";
+            let value = String(colorValue).trim();
+            if(/^#([0-9a-f]{3}){1,2}$/i.test(value)) {
+                  if(value.length === 4) {
+                        return `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`.toLowerCase();
+                  }
+                  return value.toLowerCase();
+            }
+
+            let rgbMatch = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+            if(!rgbMatch) return "#fffffe";
+
+            let rgbToHex = (component) => Math.max(0, Math.min(255, parseInt(component, 10))).toString(16).padStart(2, "0");
+            return `#${rgbToHex(rgbMatch[1])}${rgbToHex(rgbMatch[2])}${rgbToHex(rgbMatch[3])}`;
+      }
+
+      getShapeFillHex(shapeElement) {
+            return this.parseColorToHex(shapeElement.style.fill || shapeElement.getAttribute("fill") || window.getComputedStyle(shapeElement)?.fill || "#fffffe");
+      }
+
+      applyShapeFill(shapeElement, fillHex) {
+            if(!shapeElement) return;
+            let outerPath = shapeElement.classList.contains("outerPath") ? shapeElement : shapeElement.parentNode?.querySelector?.(".outerPath");
+            if(!outerPath) return;
+
+            outerPath.setAttribute("fill", fillHex);
+            outerPath.style.fill = fillHex;
+            this.updateSavePulse();
+      }
+
+      scaleShapeGroupToSize(shapeElement, targetWidth, targetHeight) {
+            if(!shapeElement) return;
+
+            let shapeGroup = shapeElement.parentNode;
+            if(!shapeGroup?.getBBox) return;
+
+            let boundingBox;
+            try {
+                  boundingBox = shapeGroup.getBBox();
+            } catch(error) {
+                  console.warn("Unable to get shape bounds for resizing.", error);
+                  return;
+            }
+
+            if(!boundingBox || boundingBox.width <= 0 || boundingBox.height <= 0) return;
+
+            let targetWidthPixels = svg_mmToPixel(targetWidth);
+            let targetHeightPixels = svg_mmToPixel(targetHeight);
+
+            let scaleX = targetWidthPixels / boundingBox.width;
+            let scaleY = targetHeightPixels / boundingBox.height;
+            if(!Number.isFinite(scaleX) || !Number.isFinite(scaleY) || scaleX <= 0 || scaleY <= 0) return;
+
+            let shapePaths = shapeGroup.querySelectorAll("path");
+            shapePaths.forEach((pathElement) => {
+                  let currentPathData = pathElement.getAttribute("d");
+                  if(!currentPathData) return;
+
+                  try {
+                        let resizedPath = new SVGPathCommander(currentPathData)
+                              .transform({translate: [-boundingBox.x, -boundingBox.y]})
+                              .transform({scale: [scaleX, scaleY]})
+                              .transform({translate: [boundingBox.x, boundingBox.y]})
+                              .toString();
+
+                        pathElement.setAttribute("d", resizedPath);
+                        pathElement.dataset.baseD = resizedPath;
+                  } catch(error) {
+                        console.warn("Unable to resize shape path.", error);
+                  }
+            });
+
+            this.refreshMeasurements();
+            this.updateSavePulse();
+      }
+
+      handleKeyDown(event) {
+            if(event.key !== "Delete" && event.key !== "Backspace") return;
+
+            const targetTag = (event.target && event.target.tagName) ? event.target.tagName.toLowerCase() : "";
+            if(["input", "textarea", "select"].includes(targetTag) || event.target?.isContentEditable) return;
+
+            let selectedShapeExists = Array.from(this.#dragZoomSVG.allPathElements).some((element) => element.classList.contains("SVGSelected"));
+            if(!selectedShapeExists) return;
+
+            event.preventDefault();
+            this.deleteSelectedShapes();
+      }
+
+      async handleContextMenu(event) {
+            let targetShape = this.getContextTargetShape(event);
+            if(!targetShape) return;
+
+            event.preventDefault();
+            this.#dragZoomSVG.updateMouseXY(event);
+
+            const shapeGroup = targetShape.parentNode;
+            const shapeBounds = shapeGroup?.getBBox?.() || targetShape.getBBox();
+
+            if(!customContextMenuContainer) initCustomContextMenu();
+            setFieldHidden(false, customContextMenuContainer);
+            customContextMenuContainer.style.left = event.pageX + "px";
+            customContextMenuContainer.style.top = event.pageY + "px";
+
+            removeAllChildrenFromParent(customContextMenuContainer);
+            const containerPanel = document.createElement('div');
+            containerPanel.style = "padding:0px;display:flex;flex-direction:column;gap:6px;color:white;background-color:" + COLOUR.DarkGrey + ";width:100%;box-shadow:0 4px 12px rgba(0,0,0,0.8);position:relative;cursor:default;user-select:none;padding-top:15px;";
+            let dragOffset = {x: 0, y: 0};
+            const dragHandle = document.createElement('div');
+            dragHandle.innerText = "☰";
+            dragHandle.style = "position:absolute;left:5px;top:5px;cursor:grab;color:white;font-size:18px;";
+            dragHandle.onmousedown = (e) => {
+                  e.preventDefault();
+                  dragHandle.style.cursor = "grabbing";
+                  dragOffset = {x: e.clientX - customContextMenuContainer.offsetLeft, y: e.clientY - customContextMenuContainer.offsetTop};
+                  const move = (ev) => {
+                        customContextMenuContainer.style.left = (ev.clientX - dragOffset.x) + "px";
+                        customContextMenuContainer.style.top = (ev.clientY - dragOffset.y) + "px";
+                  };
+                  const up = () => {
+                        document.removeEventListener('mousemove', move);
+                        document.removeEventListener('mouseup', up);
+                        dragHandle.style.cursor = "grab";
+                  };
+                  document.addEventListener('mousemove', move);
+                  document.addEventListener('mouseup', up);
+            };
+            containerPanel.appendChild(dragHandle);
+
+            let outsideHandler;
+            const closeBtn = createButton("X", "background-color:red;width:26px;height:26px;position:absolute;top:6px;right:6px;margin:0px;min-height:26px;border:0px;font-weight:bold;font-size:14px;", () => {
+                  if(outsideHandler) document.removeEventListener('mousedown', outsideHandler, true);
+                  closeCustomContextMenu();
+            });
+            containerPanel.appendChild(closeBtn);
+
+            const panel = document.createElement('div');
+            panel.style = "padding:10px;display:flex;flex-direction:column;gap:6px;color:white;";
+
+            const title = createText("Shape Options", "color:white;font-weight:bold;margin:0;");
+            panel.appendChild(title);
+
+            const widthField = createInput_Infield("Width", roundNumber(svg_pixelToMM(shapeBounds.width), 1), "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", () => {
+                  let nextWidth = parseFloat(widthField[1].value);
+                  let nextHeight = parseFloat(heightField[1].value);
+                  if(!Number.isFinite(nextWidth) || !Number.isFinite(nextHeight)) return;
+                  this.scaleShapeGroupToSize(targetShape, nextWidth, nextHeight);
+            }, null, false, 1, {postfix: "mm"});
+            widthField[1].setAttribute("min", "0");
+            widthField[1].style.width = "calc(100% - 0px)";
+
+            const heightField = createInput_Infield("Height", roundNumber(svg_pixelToMM(shapeBounds.height), 1), "box-shadow: black 4px 6px 20px 0px;width:calc(100% - 10px);", () => {
+                  let nextWidth = parseFloat(widthField[1].value);
+                  let nextHeight = parseFloat(heightField[1].value);
+                  if(!Number.isFinite(nextWidth) || !Number.isFinite(nextHeight)) return;
+                  this.scaleShapeGroupToSize(targetShape, nextWidth, nextHeight);
+            }, null, false, 1, {postfix: "mm"});
+            heightField[1].setAttribute("min", "0");
+            heightField[1].style.width = "calc(100% - 0px)";
+
+            const colorRow = document.createElement("div");
+            colorRow.style = "display:flex;align-items:center;gap:8px;margin:5px 0px;";
+            const colorLabel = createText("Fill Colour", "color:white;margin:0;min-width:80px;");
+            const colorInput = document.createElement("input");
+            colorInput.type = "color";
+            colorInput.value = this.getShapeFillHex(targetShape);
+            colorInput.style = "width:48px;height:32px;padding:0;border:0;background:none;cursor:pointer;";
+            colorInput.addEventListener("input", () => {
+                  this.applyShapeFill(targetShape, colorInput.value);
+            });
+            colorRow.appendChild(colorLabel);
+            colorRow.appendChild(colorInput);
+
+            const eyeDropperBtn = createButton("Eye Dropper", "width:calc(100% - 10px);margin:5px;", async () => {
+                  if(typeof EyeDropper === "undefined") {
+                        alert("EyeDropper API is not available in this browser.");
+                        return;
+                  }
+                  try {
+                        const eyeDropper = new EyeDropper();
+                        const result = await eyeDropper.open();
+                        if(result?.sRGBHex) {
+                              colorInput.value = result.sRGBHex;
+                              this.applyShapeFill(targetShape, result.sRGBHex);
+                        }
+                  } catch(error) {
+                        console.warn("EyeDropper cancelled or failed.", error);
+                  }
+            });
+            if(typeof EyeDropper === "undefined") eyeDropperBtn.disabled = true;
+
+            const deleteBtn = createButton("Delete", "background-color:red;border-color:red;width:calc(100% - 10px);margin:5px;", () => {
+                  Array.from(shapeGroup?.querySelectorAll?.(".outerPath, .innerPath") || []).forEach((element) => {
+                        element.classList.add("SVGSelected");
+                  });
+                  this.deleteSelectedShapes();
+            });
+
+            panel.appendChild(widthField[0]);
+            panel.appendChild(heightField[0]);
+            panel.appendChild(colorRow);
+            panel.appendChild(eyeDropperBtn);
+            panel.appendChild(deleteBtn);
+
+            containerPanel.appendChild(panel);
+            customContextMenuContainer.appendChild(containerPanel);
+
+            const rectBounds = customContextMenuContainer.getBoundingClientRect();
+            let top = rectBounds.top;
+            let left = rectBounds.left;
+            if(rectBounds.bottom > window.innerHeight) top = Math.max(0, window.innerHeight - rectBounds.height - 10);
+            if(rectBounds.right > window.innerWidth) left = Math.max(0, window.innerWidth - rectBounds.width - 10);
+            customContextMenuContainer.style.top = `${top}px`;
+            customContextMenuContainer.style.left = `${left}px`;
+
+            outsideHandler = (ev) => {
+                  if(customContextMenuContainer && !customContextMenuContainer.contains(ev.target)) {
+                        closeCustomContextMenu();
+                        document.removeEventListener('mousedown', outsideHandler, true);
+                  }
+            };
+            document.addEventListener('mousedown', outsideHandler, true);
+      }
 
       setCurrentTool(tool) {
+            if(this.currentTool === "Selection Tool" && this.selectionRect) {
+                  this.selectionRect.Delete();
+                  this.selectionRect = null;
+            }
+            if(this.currentTool === "Rectangle Tool") {
+                  this.finalizeDrawRectanglePreview();
+            }
+            if(this.currentTool === "Circle Tool") {
+                  this.finalizeDrawCirclePreview();
+            }
+            if(this.currentTool === "Grab Tool") {
+                  this.finalizeGrabShape();
+            }
             this.#activeTool = tool;
+            this.updateToolButtonStates();
+            this.refreshMeasurements();
             this.updateTools("Tool Selected");
       }
 
-      updateTools(state) {
+      updateTools(state, event) {
             switch(this.#activeTool) {
                   case "Selection Tool":
                         this.#dragZoomSVG.allowPanning = false;
@@ -737,18 +1259,78 @@ class ModalSVG extends Modal {
                                     }
                               }
                               if(this.selectionRect) this.selectionRect.Delete();
+                              this.selectionRect = null;
+                        }
+                        break;
+                  case "Rectangle Tool":
+                        this.#dragZoomSVG.allowPanning = false;
+
+                        if(state == "Mouse Down") {
+                              this.#drawRectangleMouseDownPos = {...this.#dragZoomSVG.relativeMouseXY};
+
+                              this.#drawRectanglePreview = new TSVGRectangle(this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT"), {
+                                    x: this.#drawRectangleMouseDownPos.x,
+                                    y: this.#drawRectangleMouseDownPos.y,
+                                    width: 0,
+                                    height: 0,
+                                    strokeWidth: (1 / this.#dragZoomSVG.scale),
+                                    stroke: "black",
+                                    fill: "#fffffe",
+                                    opacity: 0.5
+                              });
+                        } else if(state == "Mouse Move") {
+                              if(this.#dragZoomSVG.isHolding) {
+                                    this.updateDragRectanglePreview(this.#dragZoomSVG.relativeMouseXY);
+                              }
+                        } else if(state == "Mouse Up") {
+                              this.updateDragRectanglePreview(this.#dragZoomSVG.relativeMouseXY);
+                              this.finalizeDrawRectanglePreview();
+                        }
+                        break;
+                  case "Circle Tool":
+                        this.#dragZoomSVG.allowPanning = false;
+
+                        if(state == "Mouse Down") {
+                              this.#drawCircleMouseDownPos = {...this.#dragZoomSVG.relativeMouseXY};
+
+                              this.#drawCirclePreview = new TSVGRectangle(this.#dragZoomSVG.svg.querySelector("#mainGcreatedByT"), {
+                                    x: this.#drawCircleMouseDownPos.x,
+                                    y: this.#drawCircleMouseDownPos.y,
+                                    width: 0,
+                                    height: 0,
+                                    strokeWidth: (1 / this.#dragZoomSVG.scale),
+                                    stroke: "black",
+                                    fill: "#fffffe",
+                                    opacity: 0.5
+                              });
+                        } else if(state == "Mouse Move") {
+                              if(this.#dragZoomSVG.isHolding) {
+                                    this.updateDragCirclePreview(this.#dragZoomSVG.relativeMouseXY);
+                              }
+                        } else if(state == "Mouse Up") {
+                              this.updateDragCirclePreview(this.#dragZoomSVG.relativeMouseXY);
+                              this.finalizeDrawCirclePreview();
+                        }
+                        break;
+                  case "Grab Tool":
+                        this.#dragZoomSVG.allowPanning = false;
+
+                        if(state == "Mouse Down") {
+                              let targetShape = event ? this.getContextTargetShape(event) : null;
+                              if(targetShape) {
+                                    this.beginGrabShape(targetShape);
+                              }
+                        } else if(state == "Mouse Move") {
+                              if(this.#dragZoomSVG.isHolding) {
+                                    this.updateGrabShape(this.#dragZoomSVG.relativeMouseXY);
+                              }
+                        } else if(state == "Mouse Up") {
+                              this.updateGrabShape(this.#dragZoomSVG.relativeMouseXY);
+                              this.finalizeGrabShape();
                         }
                         break;
                   case "Delete Tool":
-                        let elementsToDelete = [];
-                        this.#dragZoomSVG.allPathElements.forEach((element) => {
-                              if(element.classList.contains("SVGSelected")) elementsToDelete.push(element.parentNode/*Deletes the group containing outer & inner paths*/);
-                        });
-
-                        let countToDelete = elementsToDelete.length;
-                        for(let i = 0; i < countToDelete; i++) {
-                              this.#dragZoomSVG.deleteElement(elementsToDelete[i]);
-                        }
+                        this.deleteSelectedShapes();
                         break;
 
                   default:
@@ -758,8 +1340,8 @@ class ModalSVG extends Modal {
       }
 
       /**Overrides DragZoomSVG onMouseUpdate*/
-      onMouseUpdate = (updateFrom) => {
-            this.updateTools(updateFrom);
+      onMouseUpdate = (updateFrom, event) => {
+            this.updateTools(updateFrom, event);
       };
 
       parseSvgLength(value) {
@@ -981,6 +1563,7 @@ class ModalSVG extends Modal {
       }
 
       refreshMeasurements() {
+            this.#dragZoomSVG.syncScaleFromTransform();
             if(this.#totalPathLength) {
                   $(this.#totalPathLength[1]).val(this.#dragZoomSVG.totalPathLengths).change();
             }
@@ -1001,11 +1584,24 @@ class ModalSVG extends Modal {
             if(this.#showShapeAreaPolygons?.[1]?.checked) this.showShapeAreaPolygons();
             if(this.#showShapeBoundingRect?.[1]?.checked) this.showShapeBoundingRect();
             if(this.#showPoints?.[1]?.checked) this.showElementPoints();
+            this.#dragZoomSVG.syncScaleFromTransform();
       }
 
       fitToSvgBounds() {
             if(!this.#dragZoomSVG?.svg) return;
             this.#dragZoomSVG.centerAndFitSVGContent(this.#dragZoomSVG.svg, this.#dragZoomSVG.svgG, this.#dragZoomSVG.panZoomInstance);
+      }
+
+      scheduleInitialFitToSvgBounds() {
+            let fitAttempts = [0, 40, 120];
+            fitAttempts.forEach((delay) => {
+                  setTimeout(() => {
+                        if(!this.#dragZoomSVG?.svg || !this.#dragZoomSVG?.container?.isConnected) return;
+                        let containerRect = this.#dragZoomSVG.container.getBoundingClientRect();
+                        if(containerRect.width <= 0 || containerRect.height <= 0) return;
+                        this.fitToSvgBounds();
+                  }, delay);
+            });
       }
 
       applySavedControlSettings() {
