@@ -29,6 +29,8 @@ class OrderHome {
       #emailTemplates = {};
       #userInfo = null;
       #attachmentCache = new Map();
+      #pendingAttachmentLoads = 0;
+      #sendButtonLoader = null;
       #defaultAttachmentFiles = [
             {name: "Capabilities One Page 3D CUT LETTERS V2 (E).pdf", isDefault: true},
             {name: "Capabilities One Page 3D FABRICATED LETTERS (E).pdf", isDefault: true},
@@ -200,6 +202,8 @@ class OrderHome {
                   }
             } else {
                   this.#emailModalIsOpen = false;
+                  this.#pendingAttachmentLoads = 0;
+                  this.updateSendButtonLoadingState();
                   if(this.#emailTemplateContainer) {
                         deleteElement(this.#emailTemplateContainer);
                         this.#emailTemplateContainer = null;
@@ -227,15 +231,17 @@ class OrderHome {
             this.#emailTemplateContainer.style = [
                   "position:absolute",
                   "top:0",
+                  "bottom:0",
                   "right:-650px",
                   "width:624px",
-                  "height:100%",
+                  "height:auto",
                   "background-color:#111827",
                   "color:#e5e7eb",
                   "display:flex",
                   "flex-direction:row",
                   "gap:12px",
                   "padding:12px",
+                  "box-sizing:border-box",
                   "box-shadow:0 10px 30px rgba(0,0,0,0.35)",
                   "border-radius:8px",
                   "z-index:2010"
@@ -247,12 +253,14 @@ class OrderHome {
             templateColumn.style.gap = "12px";
             templateColumn.style.width = "300px";
             templateColumn.style.minWidth = "300px";
+            templateColumn.style.minHeight = "0";
 
             const attachmentColumn = document.createElement("div");
             attachmentColumn.style.display = "flex";
             attachmentColumn.style.flexDirection = "column";
             attachmentColumn.style.width = "300px";
             attachmentColumn.style.minWidth = "300px";
+            attachmentColumn.style.minHeight = "0";
             attachmentColumn.style.paddingLeft = "12px";
             attachmentColumn.style.borderLeft = "1px solid #1f2937";
             attachmentColumn.style.overflowY = "auto";
@@ -267,7 +275,8 @@ class OrderHome {
             buttonContainer.style.display = "flex";
             buttonContainer.style.flexDirection = "column";
             buttonContainer.style.gap = "8px";
-            buttonContainer.style.maxHeight = "300px";
+            buttonContainer.style.flex = "1";
+            buttonContainer.style.minHeight = "0";
             buttonContainer.style.overflowY = "auto";
 
             this.#templateDefinitions.forEach((template) => {
@@ -444,6 +453,83 @@ class OrderHome {
       buildAttachmentUrl(fileName) {
             const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
             return `${attachmentBaseUrl}${encodeURIComponent(fileName)}`;
+      }
+
+      getSendEmailButton() {
+            return document.querySelector("#btnClientEmailFormOne");
+      }
+
+      getEmailModalLoaderTarget() {
+            const targets = [
+                  "#clientEmailFormOneModal",
+                  "#order-home-template-panel",
+                  "#simplemodal-container",
+                  "#btnClientEmailFormOne"
+            ];
+
+            for(let i = 0; i < targets.length; i++) {
+                  const target = document.querySelector(targets[i]);
+                  if(target) {
+                        return target;
+                  }
+            }
+
+            return null;
+      }
+
+      updateSendButtonLoadingState() {
+            const sendButton = this.getSendEmailButton();
+            const loaderTarget = this.getEmailModalLoaderTarget();
+            if(!sendButton) {
+                  this.removeSendButtonLoader();
+                  return;
+            }
+
+            if(!sendButton.dataset.orderHomeOriginalHtml) {
+                  sendButton.dataset.orderHomeOriginalHtml = sendButton.innerHTML;
+            }
+
+            if(this.#pendingAttachmentLoads > 0) {
+                  sendButton.disabled = true;
+                  sendButton.style.opacity = "0.7";
+                  sendButton.style.cursor = "wait";
+                  sendButton.style.pointerEvents = "none";
+                  this.ensureSendButtonLoader(loaderTarget);
+                  return;
+            }
+
+            this.removeSendButtonLoader();
+
+            sendButton.disabled = false;
+            sendButton.style.opacity = "";
+            sendButton.style.cursor = "";
+            sendButton.style.pointerEvents = "";
+      }
+
+      ensureSendButtonLoader(loaderTarget) {
+            if(this.#sendButtonLoader || typeof Loader !== "function" || !loaderTarget) {
+                  return;
+            }
+
+            this.#sendButtonLoader = new Loader(loaderTarget, "z-index:2050;display:block !important;top:50%;left:50%;");
+            this.#sendButtonLoader.setSize(24);
+      }
+
+      removeSendButtonLoader() {
+            if(this.#sendButtonLoader) {
+                  this.#sendButtonLoader.Delete();
+                  this.#sendButtonLoader = null;
+            }
+      }
+
+      beginAttachmentLoad() {
+            this.#pendingAttachmentLoads += 1;
+            this.updateSendButtonLoadingState();
+      }
+
+      endAttachmentLoad() {
+            this.#pendingAttachmentLoads = Math.max(0, this.#pendingAttachmentLoads - 1);
+            this.updateSendButtonLoadingState();
       }
 
       createEffectRow(labelText, applyCallback) {
@@ -663,6 +749,7 @@ class OrderHome {
             }
 
             this.patchAttachmentHandling();
+            this.updateSendButtonLoadingState();
 
             const attachmentFiles = this.getDefaultAttachmentNames();
             const existingRemote = Array.isArray(cbEmailAttachment.remoteAttachments) ? cbEmailAttachment.remoteAttachments : [];
@@ -670,6 +757,7 @@ class OrderHome {
 
             if(missingFiles.length > 0) {
                   await Promise.all(missingFiles.map(async (fileName, index) => {
+                        this.beginAttachmentLoad();
                         try {
                               const response = await fetch(this.buildAttachmentUrl(fileName));
                               if(!response.ok) {
@@ -680,6 +768,8 @@ class OrderHome {
                               this.addRemoteAttachment(fileName, blob);
                         } catch(error) {
                               console.error("OrderHome attachment load error:", error);
+                        } finally {
+                              this.endAttachmentLoad();
                         }
                   }));
             }
@@ -756,6 +846,7 @@ class OrderHome {
                         return;
                   }
 
+                  this.beginAttachmentLoad();
                   try {
                         const response = await fetch(this.buildAttachmentUrl(name));
                         if(!response.ok) {
@@ -766,6 +857,8 @@ class OrderHome {
                         this.addRemoteAttachment(name, fetchedBlob);
                   } catch(error) {
                         console.error("OrderHome attachment toggle error:", error);
+                  } finally {
+                        this.endAttachmentLoad();
                   }
             } else {
                   this.removeRemoteAttachment(name);

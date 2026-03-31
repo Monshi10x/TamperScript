@@ -1,286 +1,463 @@
-<p>Hi <span id="customer-name">John</span>,</p>
+<div style="font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.4; color:#111;">
 
-<p>
-Thank you for the opportunity to assist with your signage project. <br>
-Please find your detailed quotation from <strong>SIGNARAMA SPRINGWOOD&nbsp;</strong>attached.
-</p>
+  <p style="margin:0 0 14px 0;">Hi <span id="customer-name">John</span>,</p>
 
-<div style="text-align:center; margin:26px 0 14px 0; font-family:Arial, Helvetica, sans-serif;">
-  <p style="
-    margin:0;
-    font-size:20px;
-    font-weight:700;
-    color:#111;
-  ">
-    Why choose us
+  <p style="margin:0 0 16px 0;">
+    Thank you for the opportunity to assist with your signage project.<br>
+    Please find your detailed quote from
+    <strong style="background-color:#d32f2f; color:#ffffff; padding:2px 4px; border-radius:10px; box-shadow: inset 0px 1px 2px rgba(255,255,255,0.5), 5px 8px 10px rgba(0,0,0,0.5), 0 0px 1px rgba(0,0,0,0.5);">
+      SIGNARAMA SPRINGWOOD
+    </strong>
+    attached.
   </p>
-  <div style="
-    width:60px;
-    height:4px;
-    background:#d32f2f;
-    margin:8px auto 0 auto;
-    border-radius:2px;
-  "></div>
-</div>
 
-<table width="100%" cellpadding="0" cellspacing="0" style="margin:22px 0; font-family:Arial, Helvetica, sans-serif;">
-  <tr>
-    <td align="center">
+  <!-- WHY CHOOSE US -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 18px 0;">
+    <tr>
+      <td align="left">
+        <table width="650" cellpadding="0" cellspacing="0" border="0" style="width:650px; max-width:650px; margin:0;">
+          <tr>
+            <td align="left" style="font-family:Arial, Helvetica, sans-serif;">
+              <div style="font-size:20px; font-weight:700; color:#111; line-height:1.2;">Why choose us</div>
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 12px 0;">
+                <tr>
+                  <td width="60" height="4" style="width:60px; height:4px; background:#d32f2f; font-size:1px; line-height:1px;">&nbsp;</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-      <table width="100%" cellpadding="0" cellspacing="0"
-             style="max-width:600px; border-collapse:separate; border-spacing:16px 16px;">
+          <tr>
+            <td style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
 
-        <!-- ROW 1 -->
-        <tr>
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
-            <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:140px;
-                          border:4px solid #d32f2f;
-                          background:#fff5f5;
-                          border-radius:12px;
-                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
-              <tr>
-                <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Quality</div>
-                  <div style="font-size:12px;color:#555;">Built to last</div>
-                </td>
-              </tr>
-            </table>
-          </td>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 10px 0;">
+                <tr>
+                  <td width="42" valign="middle" align="center" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+                    <span style="font-size:18px; color:#4caf50; font-weight:bold;">&#10003;</span>
+                  </td>
+                  <td valign="middle" style="padding:12px;">
+                    <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 4px 0;">Top Quality</div>
+                    <div style="font-size:12px; color:#555; margin:0;">Built to last</div>
+                  </td>
+                </tr>
+              </table>
 
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
-            <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:140px;
-                          border:4px solid #d32f2f;
-                          background:#fff5f5;
-                          border-radius:12px;
-                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
-              <tr>
-                <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Made In-House</div>
-                  <div style="font-size:12px;color:#555;">Manufactured locally</div>
-                </td>
-              </tr>
-            </table>
-          </td>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 10px 0;">
+                <tr>
+                  <td width="42" valign="middle" align="center" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+                    <span style="font-size:18px; color:#4caf50; font-weight:bold;">&#10003;</span>
+                  </td>
+                  <td valign="middle" style="padding:12px;">
+                    <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 4px 0;">95% Signage Made In-House</div>
+                    <div style="font-size:12px; color:#555; margin:0;">Manufactured locally</div>
+                  </td>
+                </tr>
+              </table>
 
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
-            <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:140px;
-                          border:4px solid #d32f2f;
-                          background:#fff5f5;
-                          border-radius:12px;
-                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
-              <tr>
-                <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Family Owned & Operated</div>
-                  <div style="font-size:12px;color:#555;">Trusted &amp; accountable</div>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 10px 0;">
+                <tr>
+                  <td width="42" valign="middle" align="center" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+                    <span style="font-size:18px; color:#4caf50; font-weight:bold;">&#10003;</span>
+                  </td>
+                  <td valign="middle" style="padding:12px;">
+                    <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 4px 0;">Family Owned &amp; Operated</div>
+                    <div style="font-size:12px; color:#555; margin:0;">Trusted &amp; accountable</div>
+                  </td>
+                </tr>
+              </table>
 
-        <!-- ROW 2 -->
-        <tr>
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
-            <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:140px;
-                          border:4px solid #d32f2f;
-                          background:#fff5f5;
-                          border-radius:12px;
-                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
-              <tr>
-                <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Qualified Installers</div>
-                  <div style="font-size:12px;color:#555;">Trained &amp; compliant</div>
-                </td>
-              </tr>
-            </table>
-          </td>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 10px 0;">
+                <tr>
+                  <td width="42" valign="middle" align="center" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+                    <span style="font-size:18px; color:#4caf50; font-weight:bold;">&#10003;</span>
+                  </td>
+                  <td valign="middle" style="padding:12px;">
+                    <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 4px 0;">Qualified Installers</div>
+                    <div style="font-size:12px; color:#555; margin:0;">Trained &amp; compliant</div>
+                  </td>
+                </tr>
+              </table>
 
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
-            <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:140px;
-                          border:4px solid #d32f2f;
-                          background:#fff5f5;
-                          border-radius:12px;
-                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
-              <tr>
-                <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Strict QA Checks</div>
-                  <div style="font-size:12px;color:#555;">Every job inspected</div>
-                </td>
-              </tr>
-            </table>
-          </td>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 10px 0;">
+                <tr>
+                  <td width="42" valign="middle" align="center" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+                    <span style="font-size:18px; color:#4caf50; font-weight:bold;">&#10003;</span>
+                  </td>
+                  <td valign="middle" style="padding:12px;">
+                    <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 4px 0;">Strict QA Checks</div>
+                    <div style="font-size:12px; color:#555; margin:0;">Every job inspected</div>
+                  </td>
+                </tr>
+              </table>
 
-          <td width="33.33%" align="center" valign="middle" height="120" style="height:140px;">
-            <table width="100%" cellpadding="0" cellspacing="0"
-                   style="height:140px;
-                          border:4px solid #d32f2f;
-                          background:#fff5f5;
-                          border-radius:12px;
-                          box-shadow:0 4px 10px rgba(0,0,0,0.5);">
-              <tr>
-                <td align="center" valign="middle" style="padding:14px;">
-                  <div style="font-weight:700;font-size:14px;color:#111;margin-bottom:6px;">Premium Materials</div>
-                  <div style="font-size:12px;color:#555;">Commercial-grade only</div>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 10px 0;">
+                <tr>
+                  <td width="42" valign="middle" align="center" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+                    <span style="font-size:18px; color:#4caf50; font-weight:bold;">&#10003;</span>
+                  </td>
+                  <td valign="middle" style="padding:12px;">
+                    <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 4px 0;">Premium Materials</div>
+                    <div style="font-size:12px; color:#555; margin:0;">Commercial-grade only</div>
+                  </td>
+                </tr>
+              </table>
 
-      </table>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 10px 0;">
+                <tr>
+                  <td width="42" valign="middle" align="center" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+                    <span style="font-size:18px; color:#4caf50; font-weight:bold;">&#10003;</span>
+                  </td>
+                  <td valign="middle" style="padding:12px;">
+                    <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 4px 0;">20+ Years In Business</div>
+                    <div style="font-size:12px; color:#555; margin:0;">&nbsp;</div>
+                  </td>
+                </tr>
+              </table>
 
-    </td>
-  </tr>
-</table>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 10px 0;">
+                <tr>
+                  <td width="42" valign="middle" align="center" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+                    <span style="font-size:18px; color:#4caf50; font-weight:bold;">&#10003;</span>
+                  </td>
+                  <td valign="middle" style="padding:12px;">
+                    <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 4px 0;">Top 10 Signarama Stores in Australia</div>
+                    <div style="font-size:12px; color:#555; margin:0;">Last 5 years running</div>
+                  </td>
+                </tr>
+              </table>
 
-<!-- Don't just take our word for it -->
-<table width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0; font-family:Arial, Helvetica, sans-serif;">
-  <tr>
-    <td align="center">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0;">
+                <tr>
+                  <td width="42" valign="middle" align="center" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+                    <span style="font-size:18px; color:#4caf50; font-weight:bold;">&#10003;</span>
+                  </td>
+                  <td valign="middle" style="padding:12px;">
+                    <div style="font-weight:700; font-size:14px; color:#111; margin:0 0 4px 0;">Multi-Award Winning Signs</div>
+                    <div style="font-size:12px; color:#555; margin:0;">&nbsp;</div>
+                  </td>
+                </tr>
+              </table>
 
-      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;">
-        <tr>
-          <td style="font-size:14px; font-weight:700; color:#111; padding-bottom:4px;">
-            Don’t just take our word for it
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <table cellpadding="0" cellspacing="0">
-              <tr>
-                <td valign="middle" style="font-size:13px; color:#111; padding-right:12px;">
-                  <strong>Google Reviews</strong>
-                  <span style="margin-left:6px; color:#f4b400; letter-spacing:1px;">★★★★★</span>
-                  <span style="font-weight:700; margin-left:4px;">4.9</span>
-                </td>
-                <td valign="middle">
-                  <a href="https://www.google.com/search?q=Signarama+Springwood&shndl=-1&source=sh/x/kp/local/m1/1&kgs=520b87ec57183f75&shem=shrtsdl&utm_source=shrtsdl,sh/x/kp/local/m1/1#mpd=~16019470226491169061/customers/reviews"
-                     style="display:inline-block; background:#d32f2f; color:#ffffff; text-decoration:none;
-                            padding:8px 14px; border-radius:6px; font-weight:700; font-size:13px;">
-                    View reviews
-                  </a>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 
-      </table>
+  <!-- GOOGLE REVIEWS -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 22px 0;">
+    <tr>
+      <td align="left">
+        <table width="650" cellpadding="0" cellspacing="0" border="0" style="width:650px; max-width:650px; margin:0;">
+          <tr>
+            <td style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px; text-align:center;">
 
-    </td>
-  </tr>
-</table>
-<br>
-<div style="text-align:center; margin:26px 0 14px 0; font-family:Arial, Helvetica, sans-serif;">
-  <p style="
-    margin:0;
-    font-size:20px;
-    font-weight:700;
-    color:#111;
-  ">
-    Next steps to proceed
+              <div style="font-size:14px; font-weight:700; margin:0 0 10px 0; text-align:center;">
+                Don’t just take our word for it
+              </div>
+
+              <div style="font-size:13px; margin:0 0 12px 0; text-align:center;">
+                <strong>Google Reviews</strong>
+                <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
+                <span style="font-weight:700;">4.9</span>
+              </div>
+
+              <table cellpadding="0" cellspacing="0" border="0" align="center">
+                <tr>
+                  <td bgcolor="#d32f2f" style="background:#d32f2f;">
+                    <a href="https://www.google.com/search?q=Signarama+Springwood#mpd=~16019470226491169061/customers/reviews" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 18px; border:1px solid #d32f2f;">
+                      View reviews
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <!-- NEXT STEPS -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 10px 0;">
+    <tr>
+      <td align="center" style="font-family:Arial, Helvetica, sans-serif;">
+        <div style="font-size:20px; font-weight:700; color:#111; line-height:1.2;">Next steps to proceed</div>
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:8px auto 0 auto;">
+          <tr>
+            <td width="60" height="4" style="width:60px; height:4px; background:#d32f2f; font-size:1px; line-height:1px;">&nbsp;</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 12px 0;">
+    <strong><span style="color:#d32f2f;">1. Approve Quote</span></strong><br>
+    Please confirm your acceptance of this quote by replying to this email.
   </p>
-  <div style="
-    width:60px;
-    height:4px;
-    background:#d32f2f;
-    margin:8px auto 0 auto;
-    border-radius:2px;
-  "></div>
+
+  <p style="margin:0 0 12px 0;">
+    <strong><span style="color:#d32f2f;">2. Arrange payment</span></strong><br>
+    To commence proofing and production, payment is required as follows:
+  </p>
+
+  <p style="margin:0 0 16px 15px;">
+    • Orders <u>under</u> <strong>$600.00</strong>: 100% payment upfront<br>
+    • Orders <u>over</u> <strong>$600.00</strong>: 50% deposit, with the balance payable <strong>before installation or supply</strong>
+  </p>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px 0;">
+    <tr>
+      <td style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
+        <div style="font-weight:700; margin:0 0 12px 0;">Payment options</div>
+
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 12px 0;">
+          <tr>
+            <td style="padding:12px;">
+              <div style="font-weight:700; margin:0 0 8px 0;">EFT (Bank Transfer)</div>
+              <div style="margin:0;">
+                Account Name: <strong>The Trustee for Cargill Investment Trust</strong><br>
+                BSB: <strong>014-218</strong><br>
+                Account Number: <strong>3064-70312</strong><br>
+                Reference: <strong>#QT-18778</strong><br>
+                <span style="color:#555;">(Please use this reference so we can match your payment)</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff;">
+          <tr>
+            <td style="padding:12px;">
+              <div style="font-weight:700; margin:0 0 8px 0;">Credit Card</div>
+              <div style="margin:0;">
+                We can take card payment over the phone or in person.<br>
+                <span style="color:#333;">(Card payments incur a 2.5% surcharge.)</span>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 12px 0;">
+    <strong><span style="color:#d32f2f;">3. Artwork and Design</span></strong><br>
+    After payment, please provide your high-res vector logos in:
+  </p>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 12px 0;">
+    <tr>
+      <td align="left">
+        <table width="650" cellpadding="0" cellspacing="0" border="0" style="width:650px; max-width:650px; margin:0; border:1px solid #cfcfcf; background:#ffffff;">
+          <tr>
+            <td style="padding:10px 14px; border-right:1px solid #e5e5e5; font-weight:700; text-align:center;">PDF</td>
+            <td style="padding:10px 14px; border-right:1px solid #e5e5e5; font-weight:700; text-align:center;">EPS</td>
+            <td style="padding:10px 14px; border-right:1px solid #e5e5e5; font-weight:700; text-align:center;">AI</td>
+            <td style="padding:10px 14px; border-right:1px solid #e5e5e5; font-weight:700; text-align:center;">SVG</td>
+            <td style="padding:10px 14px; border-right:1px solid #e5e5e5; font-weight:700; text-align:center;">DXF</td>
+            <td style="padding:10px 14px; font-weight:700; text-align:center;">DWG</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 12px 0;">
+    Please also include any brand guidelines and specific colours.
+    Following this, you will receive an artwork proof in 1–2 business days for your approval.
+  </p>
+
+  <p style="margin:0 0 12px 0;">
+    <strong><span style="color:#d32f2f;">4. Proof Approval and Production</span></strong>
+  </p>
+
+  <!-- LEAD-TIME TIMELINE MOVED BELOW HEADING 4 -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-family:Arial, Helvetica, sans-serif; color:#111; margin:0 0 24px 0;">
+    <tr>
+      <td align="left">
+
+        <table width="650" cellpadding="0" cellspacing="0" border="0" style="width:650px; max-width:650px; border:1px solid #e2e2e2; background:#f7f7f7; margin:0;">
+          <tr>
+            <td style="padding:14px 14px 10px 14px;">
+
+              <div style="font-size:18px; font-weight:bold; margin-bottom:6px;">
+                Lead-Time Timeline
+              </div>
+              <div style="font-size:13px; color:#333; margin-bottom:14px;">
+                Timeframes commence <strong>after proof approval</strong>.
+              </div>
+
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:18px;">
+                <tr>
+                  <td width="170" valign="top" style="padding-right:10px;">
+                    <div style="font-size:13px; font-weight:bold;">Basic signage</div>
+                    <div style="font-size:12px; color:#333;">3–5 business days</div>
+                  </td>
+
+                  <td valign="middle">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td height="16" bgcolor="#4caf50"></td>
+                        <td height="16" bgcolor="#4caf50"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                      </tr>
+                    </table>
+
+                    <div style="font-size:12px; color:#333; margin-top:6px;">
+                      Simple signs with minimal production time
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:18px;">
+                <tr>
+                  <td width="170" valign="top" style="padding-right:10px;">
+                    <div style="font-size:13px; font-weight:bold;">Standard production</div>
+                    <div style="font-size:12px; color:#333;">5–14 business days</div>
+                  </td>
+
+                  <td valign="middle">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td height="16" bgcolor="#d32f2f"></td>
+                        <td height="16" bgcolor="#d32f2f"></td>
+                        <td height="16" bgcolor="#d32f2f"></td>
+                        <td height="16" bgcolor="#d32f2f"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                      </tr>
+                    </table>
+
+                    <div style="font-size:12px; color:#333; margin-top:6px;">
+                      Shorter turnaround for standard signage
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="170" valign="top" style="padding-right:10px;">
+                    <div style="font-size:13px; font-weight:bold;">Fabricated / illuminated</div>
+                    <div style="font-size:12px; color:#333;">3–5 weeks</div>
+                  </td>
+
+                  <td valign="middle">
+                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td height="16" bgcolor="#111111"></td>
+                        <td height="16" bgcolor="#111111"></td>
+                        <td height="16" bgcolor="#111111"></td>
+                        <td height="16" bgcolor="#111111"></td>
+                        <td height="16" bgcolor="#111111"></td>
+                        <td height="16" bgcolor="#111111"></td>
+                        <td height="16" bgcolor="#111111"></td>
+                        <td height="16" bgcolor="#111111"></td>
+                        <td height="16" bgcolor="#111111"></td>
+                        <td height="16" bgcolor="#e5e5e5"></td>
+                      </tr>
+                    </table>
+
+                    <div style="font-size:12px; color:#333; margin-top:6px;">
+                      Longer lead-time due to fabrication and electrical components
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <div style="font-size:12px; color:#333; margin-top:14px;">
+                If you have a <strong>specific due date</strong>, please let us know as early as possible.
+              </div>
+
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 16px 0;">
+    <strong><span style="color:#d32f2f;">5. Install and Completion</span></strong><br>
+    Once your signs are nearing completion, we will reach out to book the install date or advise the completion ETA.
+  </p>
+
+  <p style="margin:0 0 12px 0;">
+    I’ll give you a call shortly to walk through the quote and answer any questions.<br>
+    We look forward to working with you on this project.
+  </p>
+
+  <p style="margin:0 0 16px 0;">If you need anything in the meantime, please don’t hesitate to contact us.</p>
+
+  <p style="margin:0 0 14px 0;">
+    Kind Regards,<br>
+    <span id="salesperson-name">Tristan Cargill</span>
+  </p>
+
+  <p style="margin:0 0 16px 0;">
+    <span id="salesperson-phone">M: 0490 768 751</span><br>
+    <span>Ph: 07 3804 3884</span><br>
+    <span id="salesperson-email">E: springwood@signarama.com.au</span><br>
+    <span>Signarama Springwood</span>
+  </p>
+
+  <p style="margin:0; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.3;">
+    <span style="font-weight:700;">Google</span>
+    <span aria-label="Rated 4.9 out of 5 stars" title="4.9 out of 5">
+      <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
+      <span style="font-weight:700;">4.9</span>
+    </span>
+    <span style="color:#666;">(47 reviews)</span>
+  </p>
+
+  <!-- 3 CTA BUTTONS LEFT -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0 18px 0;">
+    <tr>
+      <td align="left">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://signarama.com.au/" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See our projects
+              </a>
+            </td>
+            <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://signarama.com.au/" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See our work
+              </a>
+            </td>
+            <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://signarama.com.au/" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See our team
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:14px 0 0 0;">
+    <img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/EmailFooter.jpg" alt="Signarama Springwood" width="400" style="display:block; width:100%; max-width:400px; height:auto; border:0; outline:none; text-decoration:none;">
+  </p>
+
 </div>
-
-<p>
-<strong><span style="color: #d32f2f;">1. Approve Quote</span></strong><br>
-Please confirm your acceptance of this quote by replying to this email.
-</p>
-
-<p>
-<strong><span style="color: #d32f2f;">2. Arrange payment</span></strong><br>
-To commence proofing and production, payment is required as follows:
-</p>
-
-<p style="margin-left:15px;">
-• Orders <u>under</u> <strong>$600.00</strong>: 100% payment upfront<br>
-• Orders <u>over</u> <strong>$600.00</strong>: 50% deposit, with the balance payable <strong>before installation or supply</strong>
-</p>
-
-<div style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; padding:14px; background:#f6f6f6; border-radius:8px; margin:0 0 14px 0;">
-  <p style="margin:0 0 12px 0; font-weight:700;">Payment options</p>
-
-  <!-- EFT BLOCK -->
-  <div style="border:1px solid #cfcfcf; background:#ffffff; border-radius:6px; padding:12px; margin:0 0 12px 0;">
-    <p style="margin:0 0 8px 0; font-weight:700;">EFT (Bank Transfer)</p>
-    <p style="margin:0;">
-      Account Name: <strong>{%AccountName%}</strong><br>
-      BSB: <strong>{%BSB%}</strong><br>
-      Account Number: <strong>{%AccountNumber%}</strong><br>
-      Reference: <strong>{%Reference%}</strong><br>
-      <span style="color:#555;">(Please use this reference so we can match your payment)</span>
-    </p>
-  </div>
-
-  <!-- CREDIT CARD BLOCK -->
-  <div style="border:1px solid #cfcfcf; background:#ffffff; border-radius:6px; padding:12px;">
-    <p style="margin:0 0 8px 0; font-weight:700;">Credit Card</p>
-    <p style="margin:0;">
-      We can take card payment over the phone or in person.<br>
-      <span style="color:#333;">(Card payments incur a {%CardSurcharge%}% surcharge.)</span>
-    </p>
-  </div>
-</div>
-
-<p>
-<strong><span style="color: #d32f2f;">3. Artwork and Design</span></strong><br>
-After payment, please provide your high-res vector logos in PDF/EPS/AI/SVG, and any brand guidelines and specific colours.
-Following this, you will receive an artwork proof in 1–2 business days for your approval.
-</p>
-
-<p>
-<strong><span style="color: #d32f2f;">4. Proof Approval and Production</span></strong><br>
-After Proof approval, standard production timeframes are approximately <strong>5–14 business days</strong>, subject to current workload and sign type.<br>
-If you have a specific due date, please let us know as early as possible so we can try to accomodate you<br>
-Illuminated or fabricated signage typically requires <strong>3–5 weeks</strong>.
-</p>
-
-<p>
-<strong><span style="color: #d32f2f;">5. Install and Completion</span></strong><br>
-Once your signs are nearing completion, we will reach out to book the install date or advise the completion ETA. 
-</p>
-
-<p>
-I’ll give you a call shortly to walk through the quote and answer any questions.<br>
-We look forward to working with you on this project.
-</p>
-
-<p>If you need anything in the meantime, please don’t hesitate to contact us.</p>
-
-<p>
-Kind Regards,<br>
-<span id="salesperson-name">Pearl Cargill</span>
-</p>
-
-<p>
-<span id="salesperson-phone">0439 972 409</span><br>
-<span>Ph: 07 3804 3884</span><br>
-<span id="salesperson-email">springwood@signarama.com.au</span><br>
-<span>Signarama Springwood</span>
-</p>
-
-<p style="margin:0; font-family: Arial, sans-serif; font-size:14px; line-height:1.3;">
-  <span style="font-weight:700;">Google</span>
-  <span aria-label="Rated 4.9 out of 5 stars" title="4.9 out of 5">
-    <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
-    <span style="font-weight:700;">4.9</span>
-  </span>
-  <span style="color:#666;">(47 reviews)</span>
-</p>
-
-<img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/EmailFooter.jpg"
-     style="width:100%; height:auto; max-width:400px;"
-     width="300"
-     height="76">
