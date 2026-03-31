@@ -5,7 +5,7 @@
 window.addEventListener("load", () => new OrderHome());
 
 class OrderHome {
-      githubBranch = "OrderHome2";
+      githubBranch = "Features-30-03-26";
       //known static info:
       //BSB: 014-218
       //Account: 3064-70312
@@ -29,7 +29,90 @@ class OrderHome {
       #emailTemplates = {};
       #userInfo = null;
       #attachmentCache = new Map();
-      #defaultAttachmentFiles = ["Capabilities One Page 3D CUT LETTERS V2 (E).pdf"];
+      #defaultAttachmentFiles = [
+            {name: "Capabilities One Page 3D CUT LETTERS V2 (E).pdf", isDefault: true},
+            {name: "Capabilities One Page 3D FABRICATED LETTERS (E).pdf", isDefault: true},
+            {name: "Capabilities One Page 3D Illuminated Reception Sign (E).pdf", isDefault: false},
+            {name: "Capabilities One Page 3D Illuminated Sign (E).pdf", isDefault: false},
+            {name: "Capabilities One Page A Frames (E) 2.pdf", isDefault: false},
+            {name: "Capabilities One Page ACM Sign (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Braille Signs (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Builders Banner Mesh (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Bunting Flags (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Business Sign - Internal (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Business Sign -External (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Clear Acrylic and Glass Signs (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Commercial Business Signage External (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Commercial Business Signage Internal (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Container Signs (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Corflute (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Custom Whiteboard Graphics E.pdf", isDefault: false},
+            {name: "Capabilities One Page Custom Whiteboards & Magnets (E).pdf", isDefault: false},
+            {name: "Capabilities One Page CUT ACM Sign (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Directory Boards (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Door Signs (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Fabric arch - 2 (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Feather Flags (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Fence Banner (E) V2.pdf", isDefault: false},
+            {name: "Capabilities One Page Fence Banner PRINT (E) V3.pdf", isDefault: false},
+            {name: "Capabilities One Page Flag Bases (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Flag Sizes (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Flags (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Floor Graphics (E).pdf", isDefault: false},
+            {name: "Capabilities One Page LIGHTBOXES Acrylic Faces V2 (E).pdf", isDefault: false},
+            {name: "Capabilities One Page LIGHTBOXES Banner faces (E).pdf", isDefault: false},
+            {name: "Capabilities One Page LIGHTBOXES Fabric Faces (E).pdf", isDefault: false},
+            {name: "Capabilities One Page LIGHTBOXES Push Through (E).pdf", isDefault: false},
+            {name: "Capabilities One Page LIGHTBOXES Shaped (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Magnets (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Marquee (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Media Walls EMAIL.pdf", isDefault: false},
+            {name: "Capabilities One Page Neon and Faux Neon Signs (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Plaque (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Polyn Refurb (E).pdf", isDefault: false},
+            {name: "Capabilities One Page POST AND PANEL SIGNS (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Pull Up Banners (E).pdf", isDefault: false},
+            {name: "Capabilities One Page PVC Banners E.pdf", isDefault: false},
+            {name: "Capabilities One Page Pylon (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Reception Signs - Front Lit Resin Face (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Reception signs - non-illuminated (E)V1.pdf", isDefault: false},
+            {name: "Capabilities One Page Sailtrack Banners (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Schools - External (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Schools - Internal 3 (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Street and Road Signs (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Table Throws (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Teardrop Flags (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Trade Work - CNC Router Cutting (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Trade Work - Laser Cutting (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Trade Work - Painting (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Trade Work - Welding (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Bus (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Cars (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Cut Vinyl E 2.pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Fleet (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Full Wrap (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Partial and Full Wrap (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Spot Graphics (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Trailer (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Truck - Cut Graphics (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Truck (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Truck Warp (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Utes (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Utes with Trays (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Utes with Trays + spot (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Vehicle Graphics - Vans (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Wall Graphics (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Warehouse Signs (E).pdf", isDefault: false},
+            {name: "Capabilities One Page WHS Boards & Display Boards (E).pdf", isDefault: false},
+            {name: "Capabilities One Page WHS Signs (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Window Graphics - Cut Frosting (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Window Graphics - Oneway (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Window Graphics - Plain Frosting E.pdf", isDefault: false},
+            {name: "Capabilities One Page Window Graphics - Printed Frosting (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Window Graphics - Safety Strip (E).pdf", isDefault: false},
+            {name: "Capabilities One Page Window Graphics - Vinyl PRINT-01.jpg", isDefault: false},
+            {name: "Vehicle Graphics - Spot Graphics - Basic (E).pdf", isDefault: false}
+      ];
       #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/" + this.githubBranch + "/OrderHome/EmailAttachments/";
 
       constructor() {
@@ -144,19 +227,35 @@ class OrderHome {
             this.#emailTemplateContainer.style = [
                   "position:absolute",
                   "top:0",
-                  "right:-325px",
-                  "width:300px",
+                  "right:-650px",
+                  "width:624px",
                   "height:100%",
                   "background-color:#111827",
                   "color:#e5e7eb",
                   "display:flex",
-                  "flex-direction:column",
+                  "flex-direction:row",
                   "gap:12px",
                   "padding:12px",
                   "box-shadow:0 10px 30px rgba(0,0,0,0.35)",
                   "border-radius:8px",
                   "z-index:2010"
             ].join(";");
+
+            const templateColumn = document.createElement("div");
+            templateColumn.style.display = "flex";
+            templateColumn.style.flexDirection = "column";
+            templateColumn.style.gap = "12px";
+            templateColumn.style.width = "300px";
+            templateColumn.style.minWidth = "300px";
+
+            const attachmentColumn = document.createElement("div");
+            attachmentColumn.style.display = "flex";
+            attachmentColumn.style.flexDirection = "column";
+            attachmentColumn.style.width = "300px";
+            attachmentColumn.style.minWidth = "300px";
+            attachmentColumn.style.paddingLeft = "12px";
+            attachmentColumn.style.borderLeft = "1px solid #1f2937";
+            attachmentColumn.style.overflowY = "auto";
 
             const header = document.createElement("div");
             header.innerText = "Email Templates";
@@ -178,10 +277,14 @@ class OrderHome {
             const effectsContainer = this.buildTextEffects(contentArea);
             const attachmentsContainer = this.buildAttachmentSelector();
 
-            this.#emailTemplateContainer.appendChild(header);
-            this.#emailTemplateContainer.appendChild(buttonContainer);
-            this.#emailTemplateContainer.appendChild(effectsContainer);
-            this.#emailTemplateContainer.appendChild(attachmentsContainer);
+            templateColumn.appendChild(header);
+            templateColumn.appendChild(buttonContainer);
+            templateColumn.appendChild(effectsContainer);
+
+            attachmentColumn.appendChild(attachmentsContainer);
+
+            this.#emailTemplateContainer.appendChild(templateColumn);
+            this.#emailTemplateContainer.appendChild(attachmentColumn);
 
             overlayContainer.appendChild(this.#emailTemplateContainer);
 
@@ -260,21 +363,27 @@ class OrderHome {
             wrapper.style.display = "flex";
             wrapper.style.flexDirection = "column";
             wrapper.style.gap = "6px";
-            wrapper.style.borderTop = "1px solid #1f2937";
-            wrapper.style.paddingTop = "10px";
+            wrapper.style.minHeight = "0";
 
             const header = document.createElement("div");
             header.innerText = "Attachments";
             header.style.fontWeight = "600";
-            header.style.fontSize = "14px";
+            header.style.fontSize = "16px";
+
+            const helperText = document.createElement("div");
+            helperText.innerText = "Tick attachments to include with the email.";
+            helperText.style.fontSize = "12px";
+            helperText.style.color = "#9ca3af";
 
             const selectContainer = document.createElement("div");
             selectContainer.style.display = "flex";
             selectContainer.style.flexDirection = "column";
             selectContainer.style.gap = "4px";
+            selectContainer.style.overflowY = "auto";
+            selectContainer.style.paddingRight = "4px";
 
-            const attachmentFiles = window.ORDER_HOME_ATTACHMENT_FILES || this.#defaultAttachmentFiles;
-            attachmentFiles.forEach((fileName) => {
+            const attachmentFiles = this.getAttachmentDefinitions();
+            attachmentFiles.forEach(({name, isDefault}) => {
                   const row = document.createElement("label");
                   row.style.display = "flex";
                   row.style.alignItems = "center";
@@ -283,15 +392,15 @@ class OrderHome {
 
                   const checkbox = document.createElement("input");
                   checkbox.type = "checkbox";
-                  checkbox.checked = true;
-                  checkbox.dataset.attachmentName = fileName;
+                  checkbox.checked = isDefault;
+                  checkbox.dataset.attachmentName = name;
                   checkbox.addEventListener("change", async (e) => {
                         const shouldInclude = e.target.checked;
-                        await this.toggleRemoteAttachment(fileName, shouldInclude);
+                        await this.toggleRemoteAttachment(name, shouldInclude);
                   });
 
                   const text = document.createElement("span");
-                  text.innerText = fileName;
+                  text.innerText = this.formatAttachmentDisplayName(name);
                   text.style.fontSize = "12px";
 
                   row.appendChild(checkbox);
@@ -300,8 +409,41 @@ class OrderHome {
             });
 
             wrapper.appendChild(header);
+            wrapper.appendChild(helperText);
             wrapper.appendChild(selectContainer);
             return wrapper;
+      }
+
+      formatAttachmentDisplayName(fileName) {
+            return fileName
+                  .replace(/^Capabilities One Page /, "")
+                  .replace(/ \(E\)\.pdf$/i, "")
+                  .replace(/\.jpg$/i, "");
+      }
+
+      getAttachmentDefinitions() {
+            const attachmentFiles = window.ORDER_HOME_ATTACHMENT_FILES || this.#defaultAttachmentFiles;
+            return attachmentFiles.map((attachment) => {
+                  if(typeof attachment === "string") {
+                        return {name: attachment, isDefault: true};
+                  }
+
+                  return {
+                        name: attachment.name,
+                        isDefault: Boolean(attachment.isDefault)
+                  };
+            }).filter((attachment) => typeof attachment.name === "string" && attachment.name.length > 0);
+      }
+
+      getDefaultAttachmentNames() {
+            return this.getAttachmentDefinitions()
+                  .filter((attachment) => attachment.isDefault)
+                  .map((attachment) => attachment.name);
+      }
+
+      buildAttachmentUrl(fileName) {
+            const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
+            return `${attachmentBaseUrl}${encodeURIComponent(fileName)}`;
       }
 
       createEffectRow(labelText, applyCallback) {
@@ -522,16 +664,14 @@ class OrderHome {
 
             this.patchAttachmentHandling();
 
-            const attachmentFiles = window.ORDER_HOME_ATTACHMENT_FILES || this.#defaultAttachmentFiles;
-            const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
-
+            const attachmentFiles = this.getDefaultAttachmentNames();
             const existingRemote = Array.isArray(cbEmailAttachment.remoteAttachments) ? cbEmailAttachment.remoteAttachments : [];
             const missingFiles = attachmentFiles.filter((fileName) => !existingRemote.some((item) => item.name === fileName));
 
             if(missingFiles.length > 0) {
                   await Promise.all(missingFiles.map(async (fileName, index) => {
                         try {
-                              const response = await fetch(`${attachmentBaseUrl}${fileName}`);
+                              const response = await fetch(this.buildAttachmentUrl(fileName));
                               if(!response.ok) {
                                     throw new Error(`Failed to load attachment ${fileName}`);
                               }
@@ -616,9 +756,8 @@ class OrderHome {
                         return;
                   }
 
-                  const attachmentBaseUrl = window.ORDER_HOME_ATTACHMENT_BASE_URL || this.#defaultAttachmentBaseUrl;
                   try {
-                        const response = await fetch(`${attachmentBaseUrl}${name}`);
+                        const response = await fetch(this.buildAttachmentUrl(name));
                         if(!response.ok) {
                               throw new Error(`Failed to load attachment ${name}`);
                         }
