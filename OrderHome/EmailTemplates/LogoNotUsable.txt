@@ -1,0 +1,184 @@
+<div style="font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.4; color:#111;">
+
+  <!-- INTRO -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+        <p style="margin:0 0 14px 0;">Hi <span id="customer-name">John</span>,</p>
+
+        <p style="margin:0 0 16px 0;">
+          Our design team have checked your logo.
+		  <br>
+		  Unfortunately, <strong style="color:red;font-weight:bold">it is not of the quality or filetype we require.</strong>
+          <br><br>
+          This can be solved 2 easy ways:
+		  <ol>
+		  <li>Our sales team can quote to redraw your logo in vector format</li>
+		  <!-- BUTTON -->
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td bgcolor="#d32f2f" style="background:#d32f2f;">
+                  <a href="mailto:springwood@signarama.com.au?subject=Redraw%20Required%20for%20<%QuoteNumber%>&body=Hi,%0D%0A%0D%0AWe%20need%20a%20logo%20redraw%20quote%20please.%20We%20are%20unable%20to%20supply%20the%20vector%20formats%20you%20require.%0D%0A%0D%0AMany%20Thanks,%0D%0A<%CustomerName%>"
+                     style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:10px 16px; border:1px solid #d32f2f;">
+                    Request Logo Redraw
+                  </a>
+                </td>
+              </tr>
+            </table>
+			<br>
+		  <li>You provide the logo in one of the below formats:</li>
+		  </ol>
+		  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 12px 0; border:1px solid #cfcfcf; background:#ffffff;">
+  <tr>
+
+    <td style="padding:10px 14px; border-right:1px solid #e5e5e5; text-align:center;">
+      <div style="color:#4caf50; font-weight:bold; font-size:16px;">✓</div>
+      <div style="font-weight:700;">.PDF</div>
+    </td>
+
+    <td style="padding:10px 14px; border-right:1px solid #e5e5e5; text-align:center;">
+      <div style="color:#4caf50; font-weight:bold; font-size:16px;">✓</div>
+      <div style="font-weight:700;">.EPS</div>
+    </td>
+
+    <td style="padding:10px 14px; border-right:1px solid #e5e5e5; text-align:center;">
+      <div style="color:#4caf50; font-weight:bold; font-size:16px;">✓</div>
+      <div style="font-weight:700;">.AI</div>
+    </td>
+
+    <td style="padding:10px 14px; border-right:1px solid #e5e5e5; text-align:center;">
+      <div style="color:#4caf50; font-weight:bold; font-size:16px;">✓</div>
+      <div style="font-weight:700;">.SVG</div>
+    </td>
+
+    <td style="padding:10px 14px; border-right:1px solid #e5e5e5; text-align:center;">
+      <div style="color:#4caf50; font-weight:bold; font-size:16px;">✓</div>
+      <div style="font-weight:700;">.DXF</div>
+    </td>
+
+    <td style="padding:10px 14px; text-align:center;">
+      <div style="color:#4caf50; font-weight:bold; font-size:16px;">✓</div>
+      <div style="font-weight:700;">.DWG</div>
+    </td>
+
+  </tr>
+</table>
+        </p>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+<br>
+<!-- WHY IS THIS NECESSARY -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0;">
+  <tr>
+    <td>&nbsp;</td>
+    <td width="650" style="width:650px;">
+
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
+
+            <div style="font-weight:700; margin-bottom:8px;">
+              Why is this necessary?
+            </div>
+
+            <div style="margin-bottom:10px; color:#333;">
+              We don’t want your signs to be printed blurry, with pixelation or at a low resolution.
+            </div>
+
+            <div style="color:#333;">
+              The vector file types we request allow us to scale your artwork to any size while keeping it crisp and sharp.
+            </div>
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+<br>
+
+  <!-- STEP 5 + CLOSING -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+        <p style="margin:0 0 16px 0;">If you need anything in the meantime, please don’t hesitate to contact us.</p>
+
+        <p style="margin:0 0 14px 0;">
+          Kind Regards,<br>
+          <span id="salesperson-name">Tristan Cargill</span>
+        </p>
+
+        <p style="margin:0 0 16px 0;">
+          <span id="salesperson-phone">M: 0490 768 751</span><br>
+          <span>Ph: 07 3804 3884</span><br>
+          <span id="salesperson-email">E: springwood@signarama.com.au</span><br>
+          <span>Signarama Springwood</span>
+        </p>
+
+        <p style="margin:0; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.3;">
+          <span style="font-weight:700;">Google</span>
+          <span aria-label="Rated 4.9 out of 5 stars" title="4.9 out of 5">
+            <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
+            <span style="font-weight:700;">4.9</span>
+          </span>
+          <span style="color:#666;">(49 reviews)</span>
+        </p>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- CTA BUTTONS -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0 18px 0;">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://www.signarama.com.au/store/springwood/gallery" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See finished pictures
+              </a>
+            </td>
+            <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://www.signarama.com.au/store/springwood/our-work" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See our work
+              </a>
+            </td>
+            <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://www.signarama.com.au/store/springwood/team" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See our team
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- FOOTER IMAGE -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td>&nbsp;</td>
+    <td width="650" style="width:650px;">
+      <p style="margin:14px 0 0 0;">
+        <img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/EmailFooter.jpg"
+             alt="Signarama Springwood"
+             style="display:block; width:100%; height:auto; border:0; outline:none; text-decoration:none;">
+      </p>
+    </td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+</div>

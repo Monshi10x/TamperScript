@@ -88,16 +88,16 @@
                 </td>
                 <td style="padding:12px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
                   <strong>Qualified Signwriters</strong><br>
-                  <span style="font-size:12px; color:#555;">Trained & compliant</span>
+                  <span style="font-size:12px; color:#555;">Accredited</span>
                 </td>
-
-                <td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
+				<td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
                   <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
                 </td>
-                <td style="padding:12px; border-bottom:1px solid #e5e5e5;">
-                  <strong>Strict QA Checks</strong><br>
-                  <span style="font-size:12px; color:#555;">Every job inspected</span>
+                <td style="padding:12px; border-right:1px solid #e5e5e5;">
+                  <strong>Exceptional Customer Service</strong><br>
+                  <span style="font-size:12px; color:#555;">Dedicated Team</span>
                 </td>
+                
               </tr>
 
               <!-- ROW 4 -->
@@ -128,13 +128,12 @@
                   <strong>Family Owned & Operated</strong><br>
                   <span style="font-size:12px; color:#555;">Trusted & accountable</span>
                 </td>
-
-                <td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
+				<td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
                   <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
                 </td>
-                <td style="padding:12px; border-right:1px solid #e5e5e5;">
-                  <strong>Exceptional Customer Service</strong><br>
-                  <span style="font-size:12px; color:#555;">Dedicated Team</span>
+                <td style="padding:12px; border-bottom:1px solid #e5e5e5;">
+                  <strong>Strict QA Checks</strong><br>
+                  <span style="font-size:12px; color:#555;">Every job inspected</span>
                 </td>
               </tr>
 
@@ -162,7 +161,7 @@
               </div>
 
               <div style="font-size:13px; margin:0 0 12px 0; text-align:center;">
-                <strong>50+ Google Reviews</strong>
+                <strong>49 Google Reviews</strong>
                 <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
                 <span style="font-weight:700;">4.95</span>
               </div>
@@ -240,8 +239,8 @@
                           Account Name: <strong>The Trustee for Cargill Investment Trust</strong><br>
                           BSB: <strong>014 218</strong><br>
                           Account Number: <strong>3064 70312</strong><br>
-                          Reference: <strong id="quote-number">QT-18778</strong><br>
-                          <span style="color:#555;">(Please use this reference so we can match your payment)</span>
+                          Reference: <strong id="quote-number">QT-18778</strong>
+                          <span style="color:#555;font-size:14px;">(So we can match your payment)</span>
                         </div>
                       </td>
                     </tr>
@@ -433,7 +432,7 @@
                           </tr>
                         </table>
                         <div style="font-size:12px; color:#333; margin-top:6px;">
-                          Simple Signs like: Panel Signs, Stickers
+                          Panel Signs, Stickers, Aframes, 
                         </div>
                       </td>
                     </tr>
@@ -448,10 +447,10 @@
                       <td valign="middle">
                         <table width="100%" cellpadding="0" cellspacing="0" border="0">
                           <tr>
-                            <td height="16" bgcolor="#d32f2f"></td>
-                            <td height="16" bgcolor="#d32f2f"></td>
-                            <td height="16" bgcolor="#d32f2f"></td>
-                            <td height="16" bgcolor="#d32f2f"></td>
+                            <td height="16" bgcolor="blue"></td>
+                            <td height="16" bgcolor="blue"></td>
+                            <td height="16" bgcolor="blue"></td>
+                            <td height="16" bgcolor="blue"></td>
                             <td height="16" bgcolor="#e5e5e5"></td>
                             <td height="16" bgcolor="#e5e5e5"></td>
                             <td height="16" bgcolor="#e5e5e5"></td>
@@ -467,7 +466,7 @@
                     </tr>
                   </table>
 
-                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0"style="margin-bottom:18px;">
                     <tr>
                       <td width="170" valign="top" style="padding-right:10px;">
                         <div style="font-size:13px; font-weight:bold;">Fabricated / Illuminated / 3D</div>
@@ -494,6 +493,39 @@
                       </td>
                     </tr>
                   </table>
+				  
+				  
+				  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td width="170" valign="top" style="padding-right:10px;">
+                        <div style="font-size:13px; font-weight:bold;">Rush Jobs</div>
+                        <div style="font-size:12px; color:#333;"></div>
+                      </td>
+                      <td valign="middle">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                          <tr>
+                            <td height="16" bgcolor="red"></td>
+                            <td height="16" bgcolor="#e5e5e5"></td>
+                            <td height="16" bgcolor="#e5e5e5"></td>
+                            <td height="16" bgcolor="#e5e5e5"></td>
+                            <td height="16" bgcolor="#e5e5e5"></td>
+                            <td height="16" bgcolor="#e5e5e5"></td>
+                            <td height="16" bgcolor="#e5e5e5"></td>
+                            <td height="16" bgcolor="#e5e5e5"></td>
+                            <td height="16" bgcolor="#e5e5e5"></td>
+                            <td height="16" bgcolor="#e5e5e5"></td>
+                          </tr>
+                        </table>
+                        <div style="font-size:12px; color:#333; margin-top:6px;">
+                          Jobs needed in 1-2 Days
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+				  
+				  <div style="font-size:13px; color:#333; margin-top:14px;">
+                    <strong style = "background-color:red;color:white;font-weight:bold">&nbsp;&nbsp;Please note, rush jobs incur a surcharge up to 20%&nbsp;&nbsp;</strong>.
+                  </div>
 
                   <div style="font-size:12px; color:#333; margin-top:14px;">
                     If you have a specific due date, <strong style = "color:red;font-weight:bold">please let us know as early as possible</strong>.
@@ -554,7 +586,7 @@
             <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
             <span style="font-weight:700;">4.9</span>
           </span>
-          <span style="color:#666;">(47 reviews)</span>
+          <span style="color:#666;">(49 reviews)</span>
         </p>
       </td>
       <td>&nbsp;</td>

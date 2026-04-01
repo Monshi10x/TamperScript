@@ -24,7 +24,8 @@ class OrderHome {
             {key: "OrderAcknowledgement", label: "Order Acknowledgement", file: "OrderAcknowledgementWording.txt"},
             {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt"},
             {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt"},
-            {key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt"}
+            {key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt"},
+            {key: "LogoNotSuitable", label: "Logo Not Suitable", file: "LogoNotUsable.txt"}
       ];
       #emailTemplates = {};
       #userInfo = null;
