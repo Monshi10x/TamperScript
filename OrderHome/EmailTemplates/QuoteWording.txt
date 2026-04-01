@@ -374,7 +374,7 @@
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td bgcolor="#d32f2f" style="background:#d32f2f;">
-                  <a href="mailto:springwood@signarama.com.au?subject=Redraw%20Required%20for%20QT-18778<%QuoteNumber%>&body=Hi,%0D%0A%0D%0AWe%20need%20a%20logo%20redraw%20quote%20please.%20We%20are%20unable%20to%20supply%20the%20vector%20formats%20you%20require.%0D%0A%0D%0AMany%20Thanks,%0D%0A<%CustomerName%>"
+                  <a href="mailto:springwood@signarama.com.au?subject=Redraw%20Required%20for%20<%QuoteNumber%>&body=Hi,%0D%0A%0D%0AWe%20need%20a%20logo%20redraw%20quote%20please.%20We%20are%20unable%20to%20supply%20the%20vector%20formats%20you%20require.%0D%0A%0D%0AMany%20Thanks,%0D%0A<%CustomerName%>"
                      style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:10px 16px; border:1px solid #d32f2f;">
                     Request Logo Redraw
                   </a>
