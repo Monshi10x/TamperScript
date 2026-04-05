@@ -4,6 +4,7 @@
     "module": "commonjs",
     "checkJs": false,
     "allowJs": true,
+    "ignoreDeprecations": "6.0",
     "baseUrl": "./",
     "paths": {
       "*": ["*", "./*"]
