@@ -32,8 +32,8 @@ class OrderHome {
       #pendingAttachmentLoads = 0;
       #sendButtonLoader = null;
       #defaultAttachmentFiles = [
-            {name: "Capabilities One Page 3D CUT LETTERS V2 (E).pdf", isDefault: true},
-            {name: "Capabilities One Page 3D FABRICATED LETTERS (E).pdf", isDefault: true},
+            {name: "Capabilities One Page 3D CUT LETTERS V2 (E).pdf", isDefault: false},
+            {name: "Capabilities One Page 3D FABRICATED LETTERS (E).pdf", isDefault: false},
             {name: "Capabilities One Page 3D Illuminated Reception Sign (E).pdf", isDefault: false},
             {name: "Capabilities One Page 3D Illuminated Sign (E).pdf", isDefault: false},
             {name: "Capabilities One Page A Frames (E) 2.pdf", isDefault: false},
