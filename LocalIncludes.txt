@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.568
+// @version      10.572
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -48,9 +48,9 @@
 // @resource     Icon_Bin https://github.com/Monshi10x/TamperScript/raw/main/Images/BinIcon.svg
 // @resource     Icon_Bin2 https://github.com/Monshi10x/TamperScript/raw/main/Images/BinIcon2.svg
 // @resource     Icon_Select https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Select.svg
-// @resource     Icon_Rectangle https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Rectangle.svg
-// @resource     Icon_Circle https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Circle.svg
-// @resource     Icon_Grab https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Grab.svg
+// @resource     Icon_AddRectangle https://github.com/Monshi10x/TamperScript/raw/main/Images/Add-Rectangle.svg
+// @resource     Icon_AddCircle https://github.com/Monshi10x/TamperScript/raw/main/Images/Add-Circle.svg
+// @resource     Icon_Grab https://github.com/Monshi10x/TamperScript/raw/main/Images/Grab.svg
 // @resource     Icon_Map https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Map.svg
 // @resource     Icon_Capral https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Capral.svg
 // @resource     IMPORTED_CSS file://C:\Users\monsh\Documents\TamperScript\Styles\Styles_Sales.css

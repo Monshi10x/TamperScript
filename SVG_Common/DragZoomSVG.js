@@ -354,20 +354,28 @@ class DragZoomSVG {
       }
 
       initPathElement(element) {
-            if(!element || element.dataset.tmPathInitialised === "true") return;
+            if(!element || element.__tmPathInitialised === true) return;
 
-            element.dataset.tmPathInitialised = "true";
+            element.__tmPathInitialised = true;
+            if(element.dataset?.tmPathInitialised) {
+                  delete element.dataset.tmPathInitialised;
+            }
             element.setAttribute('stroke-miterlimit', `0`);
 
             element.addEventListener("mouseover", () => {
                   if(element.classList.contains("innerPath")) return;
                   element.classList.add("SVGHover");
-                  element.dataset.previousHoverFill = element.style.fill || "";
+                  element.dataset.previousHoverFill = element.style.fill || element.getAttribute("fill") || window.getComputedStyle(element)?.fill || "#fffffe";
                   element.style.fill = this.getHoverFillForElement(element);
             });
             element.addEventListener("mouseout", () => {
+                  if(element.classList.contains("innerPath")) return;
                   element.classList.remove("SVGHover");
-                  element.style.fill = element.dataset.previousHoverFill || "";
+                  if(element.dataset.previousHoverFill) {
+                        element.style.fill = element.dataset.previousHoverFill;
+                  } else {
+                        element.style.removeProperty("fill");
+                  }
                   delete element.dataset.previousHoverFill;
             });
             element.addEventListener("mouseup", (event) => {

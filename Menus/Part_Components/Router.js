@@ -284,7 +284,7 @@ class Router extends SubMenu {
 		if(thickness != null && this.fieldHasOption(thicknessField, thickness)) {
 			dropdownSetSelectedValue(thicknessField, thickness);
 		} else {
-			//if(thickness == null) this.notifyProfileMissing(`Router thickness not found for ${material}. Default being used`);
+			this.notifyProfileMissing(`Router thickness profile missing for ${material}.`);
 			// populate thickness options but avoid forcing a default when unknown
 			thicknessField.selectedIndex = -1;
 			row.suppressAutoDetectionFlag = false;

@@ -210,12 +210,12 @@ class ModalSVG extends Modal {
                   this.#deleteToolButton = deleteTool;
             }
 
-            rectangleTool = createIconButton(GM_getResourceURL("Icon_Rectangle"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey + ";margin:0px auto;", () => {
+            rectangleTool = createIconButton(GM_getResourceURL("Icon_AddRectangle"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey + ";margin:0px auto;", () => {
                   this.toggleTool("Rectangle Tool");
             }, this.#toolColumnContainer, true);
             this.#rectangleToolButton = rectangleTool;
 
-            circleTool = createIconButton(GM_getResourceURL("Icon_Circle"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey + ";margin:0px auto;", () => {
+            circleTool = createIconButton(GM_getResourceURL("Icon_AddCircle"), null, "width:60px;height:50px;background-color:" + COLOUR.DarkGrey + ";margin:0px auto;", () => {
                   this.toggleTool("Circle Tool");
             }, this.#toolColumnContainer, true);
             this.#circleToolButton = circleTool;

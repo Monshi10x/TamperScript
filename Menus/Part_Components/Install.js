@@ -61,9 +61,9 @@ class Install extends SubMenu {
 		}
 
 		///Install Times
-		this.#install_InstallMinutes = createInput_Infield("Install Minutes", null, "width:25%;display:block;margin-left:40px;", () => {/*this.Update();*/}, this.#timeContainer[1], false, 10);
-		this.#install_InstallHours = createInput_Infield("Install Hours", null, "width:25%;display:block", () => {/*this.Update();*/}, this.#timeContainer[1], false, 1);
-		this.#install_InstallDays = createInput_Infield("Install Days (8h)", null, "width:25%;display:block", () => {/*this.Update();*/}, this.#timeContainer[1], false, 1);
+		this.#install_InstallMinutes = createInput_Infield("Install Minutes", 0, "width:25%;display:block;margin-left:40px;", () => {/*this.Update();*/}, this.#timeContainer[1], false, 10);
+		this.#install_InstallHours = createInput_Infield("Install Hours", 0, "width:25%;display:block", () => {/*this.Update();*/}, this.#timeContainer[1], false, 1);
+		this.#install_InstallDays = createInput_Infield("Install Days (8h)", 0, "width:25%;display:block", () => {/*this.Update();*/}, this.#timeContainer[1], false, 1);
 
 
 		///Quick Lookup
