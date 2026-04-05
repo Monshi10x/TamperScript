@@ -9,7 +9,7 @@
               <p style="margin:0 0 14px 0;">Hi <%CustomerName%>,</p>
 
               <p style="margin:0 0 14px 0;">
-                Please find attached <strong>{%InvoiceOrQuoteNumber%}</strong> with an outstanding balance for payment.
+                Please find attached <strong>{%InvoiceOrQuoteNumber%}</strong> with a balance due for payment.
               </p>
 
               <!-- AMOUNT DUE -->
@@ -27,51 +27,44 @@
               </p>
 
               <!-- PAYMENT OPTIONS -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate; width:100%; margin:0 0 14px 0;">
-                <tr>
-                  <td style="border:1px solid #d7d7d7; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
-                    <p style="margin:0 0 12px 0; font-weight:700; color:#1a1a1a;">Payment options</p>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0;">
+              <tr>
+                <td style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
+                  <div style="font-weight:700; margin:0 0 12px 0;">Payment options</div>
 
-                    <!-- EFT -->
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate; width:100%; margin:0 0 12px 0;">
-                      <tr>
-                        <td style="border:1px solid #cfcfcf; background:#ffffff; padding:12px;">
-                          <p style="margin:0 0 8px 0; font-weight:700; color:#1a1a1a;">EFT (Bank Transfer)</p>
-                          <p style="margin:0; color:#1a1a1a; line-height:1.5;">
-                            Account Name: <strong>The Trustee for Cargill Investment Trust</strong><br>
-                            BSB: <strong>014 218</strong><br>
-                            Account Number: <strong>3064 70312</strong><br>
-                            Reference: <strong>{%Reference%}</strong><br>
-                            <span style="color:#555555;">(So we can match your payment)</span>
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 12px 0;">
+                    <tr>
+                      <td style="padding:12px;">
+                        <div style="font-weight:700; margin:0 0 8px 0;">EFT (Bank Transfer)</div>
+                        <div style="margin:0;">
+                          Account Name: <strong>The Trustee for Cargill Investment Trust</strong><br>
+                          BSB: <strong>014 218</strong><br>
+                          Account Number: <strong>3064 70312</strong><br>
+                          Reference: <strong id="quote-number">QT-18778</strong>
+                          <span style="color:#555;font-size:14px;">(So we can match your payment)</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+<br>
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff;">
+                    <tr>
+                      <td style="padding:12px;">
+                        <div style="font-weight:700; margin:0 0 8px 0;">Credit Card</div>
+                        <div style="margin:0;">
+                          We can take card payment over the phone or in person.<br>
+                          <span style="color:#333;">(Card payments incur a 2.5% surcharge.)</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
 
-                    <!-- CARD -->
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate; width:100%;">
-                      <tr>
-                        <td style="border:1px solid #cfcfcf; background:#ffffff; padding:12px;">
-                          <p style="margin:0 0 8px 0; font-weight:700; color:#1a1a1a;">Credit Card</p>
-                          <p style="margin:0; color:#1a1a1a; line-height:1.5;">
-                            We can take card payment over the phone or in person.<br>
-                            <span style="color:#555555;">(Card payments incur a 2.5% surcharge.)</span>
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
-
-                  </td>
-                </tr>
-              </table>
-
+                </td>
+              </tr>
+            </table>
+<br>
               <p style="margin:0 0 14px 0;">
-                After payment is received, our team will progress to the next stage including artwork, proofing and install.
-              </p>
-
-              <p style="margin:0 0 12px 0;">
-                I’ll give you a call shortly to walk through the quote and answer any questions.<br>
-                We look forward to working with you on this project.
+                After payment is received, our team will progress to the next stage.
               </p>
 
               <p style="margin:0 0 14px 0;">
@@ -99,7 +92,7 @@
                       <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
                       <strong style="color:#1a1a1a;">4.9</strong>
                     </span>
-                    <span style="color:#666666;">(49 reviews)</span>
+                    <span style="color:#666666;">(50+ reviews)</span>
                   </td>
                 </tr>
               </table>

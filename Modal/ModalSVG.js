@@ -230,25 +230,8 @@ class ModalSVG extends Modal {
 
             ///Save Changes
             this.#f_saveSVG = createButton("Save Changes", "", () => {
-                  this.applyOriginalBoundsToSvgElement(this.#dragZoomSVG.svg);
                   if(callerObject instanceof SVGCutfile) {
-                        let groups = Array.from(this.#dragZoomSVG.svg.getElementsByTagName("g"));
-
-                        let pathGroup;
-
-                        for(let i = groups.length - 1; i >= 0; i--) {
-                              if(groups[i].id == "pathGroup") {
-                                    pathGroup = groups[i].outerHTML;
-                              }
-                              if(["overallMeasures", "itemMeasures", "shapeAreas", "shapeAreaPolygons", "partAreas", "shapeBoundingRects", "itemPoints"].includes(groups[i].id)) {
-                                    groups[i].remove();
-                                    groups.splice(i, 1);
-                              }
-                        }
-
-                        delete this.#dragZoomSVG.svg.__shapeAreaPolygons;
-
-                        callerObject.svgFile = this.#dragZoomSVG.svg.outerHTML;
+                        callerObject.svgFile = this.buildExportSvgMarkup();
                         callerObject.onFileChange();
                   }
                   this.hide();
@@ -299,6 +282,29 @@ class ModalSVG extends Modal {
             this.#dragZoomSVG.Close();
             //this.returnAllBorrowedFields();
             super.hide();
+      }
+
+      buildExportSvgMarkup() {
+            if(!this.#dragZoomSVG?.svg) return "";
+
+            let svgClone = this.#dragZoomSVG.svg.cloneNode(true);
+            this.applyOriginalBoundsToSvgElement(svgClone);
+
+            let mainGroup = svgClone.querySelector("#mainGcreatedByT");
+            if(mainGroup) {
+                  // Pan/zoom is a view-state concern and should not be exported as model geometry.
+                  mainGroup.setAttribute("transform", "matrix(1 0 0 1 0 0)");
+            }
+
+            let overlayGroupIds = ["overallMeasures", "itemMeasures", "shapeAreas", "shapeAreaPolygons", "partAreas", "shapeBoundingRects", "itemPoints"];
+            overlayGroupIds.forEach((groupId) => {
+                  let group = svgClone.querySelector(`#${groupId}`);
+                  if(group) group.remove();
+            });
+
+            delete svgClone.__shapeAreaPolygons;
+
+            return svgClone.outerHTML;
       }
 
       onWindowResize(event) {

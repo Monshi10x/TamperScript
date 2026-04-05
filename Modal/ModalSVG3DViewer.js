@@ -244,7 +244,7 @@ class ModalSVG3DViewer {
                   buttonStyle: "margin:5px;min-height:40px;height:40px;width:calc(50% - 10px);box-sizing:border-box;",
                   modalWidth: 900,
                   modalHeight: 650,
-                  backgroundColor: "#0a0a0c",
+                  backgroundColor: "#ffffff",
                   svgTextProvider: null,
                   startHidden: true
             };
@@ -266,28 +266,29 @@ class ModalSVG3DViewer {
             this.#settings = {
                   scale: 1,
                   depth: 10,
-                  curveSegments: 12,
+                  curveSegments: 50,
                   flipX: false,
                   flipY: false,
                   flipZ: false,
                   wireframe: false,
                   doubleSided: true,
-                  showGrid: true,
+                  showGrid: false,
                   bgColor: this.#options.backgroundColor,
                   showFPS: false,
-                  measuresEnabled: false,
+                  measuresEnabled: true,
                   measuresW: true,
                   measuresH: true,
                   measuresD: true,
+                  measureSize: 2.2,
                   measureDecimals: 2,
                   measureTextPx: 18,
                   measureLabelScale: 3,
-                  measureOffset: 25,
+                  measureOffset: 100,
                   measureExtOver: 8,
-                  measureArrowSize: 8,
-                  measureLabelBgColor: "#0a2a7a",
-                  measureLabelTextColor: "#b9d2ff",
-                  measureLabelBorderColor: "#2f7bff",
+                  measureArrowSize: 30,
+                  measureLabelBgColor: "#ff0000",
+                  measureLabelTextColor: "#ffffff",
+                  measureLabelBorderColor: "#000000",
                   mmPerUnit: svg_pixelToMM(1)
             };
       }
@@ -410,7 +411,7 @@ class ModalSVG3DViewer {
             dir2.position.set(-350, 400, -250);
             this.#scene.add(dir2);
 
-            this.#grid = new THREE.GridHelper(2000, 40, 0x4a4a4a, 0x2a2a2a);
+            this.#grid = new THREE.GridHelper(2000, 40, 0xff0000, 0xff0000);
             this.#grid.position.y = 0;
             this.#grid.visible = !!this.#settings.showGrid;
             this.#scene.add(this.#grid);
@@ -450,8 +451,47 @@ class ModalSVG3DViewer {
       }
 
       loadSvgText(svgText) {
-            this.#svgText = svgText;
+            this.#svgText = this.#normalizeSvgForExtrusion(svgText);
             this.#rebuildExtrude();
+      }
+
+      #normalizeSvgForExtrusion(svgText) {
+            if(!svgText || !String(svgText).includes("innerPath")) return svgText;
+
+            try {
+                  const parsed = new DOMParser().parseFromString(svgText, "image/svg+xml");
+                  const svgRoot = parsed.documentElement;
+                  if(!svgRoot || svgRoot.tagName?.toLowerCase() !== "svg") return svgText;
+
+                  const shapeGroups = Array.from(svgRoot.querySelectorAll("#pathGroup > g, g"));
+                  shapeGroups.forEach((group) => {
+                        const outerPath = group.querySelector(".outerPath");
+                        if(!outerPath) return;
+
+                        const outerId = outerPath.id || "";
+                        const innerPaths = Array.from(group.querySelectorAll(".innerPath")).filter((innerPath) => {
+                              const parentId = innerPath.getAttribute("data-outerPathParent");
+                              return !parentId || !outerId || parentId === outerId;
+                        });
+                        if(!innerPaths.length) return;
+
+                        const combinedPathData = [outerPath.getAttribute("d") || ""]
+                              .concat(innerPaths.map((innerPath) => innerPath.getAttribute("d") || ""))
+                              .filter(Boolean)
+                              .join(" ");
+                        if(!combinedPathData) return;
+
+                        outerPath.setAttribute("d", combinedPathData);
+                        outerPath.setAttribute("fill-rule", "evenodd");
+                        outerPath.setAttribute("clip-rule", "evenodd");
+                        innerPaths.forEach((innerPath) => innerPath.remove());
+                  });
+
+                  return new XMLSerializer().serializeToString(svgRoot);
+            } catch(error) {
+                  console.warn("Unable to normalize SVG compound paths for 3D extrusion.", error);
+                  return svgText;
+            }
       }
 
       #buildSidebar() {
@@ -625,6 +665,12 @@ class ModalSVG3DViewer {
             decimalsRow.appendChild(measureDecimals);
             measureSection.appendChild(decimalsRow);
 
+            const measureSizeRow = makeRow();
+            measureSizeRow.appendChild(makeLabel("Measure size"));
+            const measureSize = makeNumber(0.1, 10, 0.1, this.#settings.measureSize);
+            measureSizeRow.appendChild(measureSize);
+            measureSection.appendChild(measureSizeRow);
+
             const textPxRow = makeRow();
             textPxRow.appendChild(makeLabel("Label px"));
             const measureTextPx = makeNumber(8, 64, 1, this.#settings.measureTextPx);
@@ -778,6 +824,10 @@ class ModalSVG3DViewer {
             });
             measureDecimals.addEventListener("input", () => {
                   this.#settings.measureDecimals = svg3dViewerClamp(Number(measureDecimals.value), 0, 4);
+                  this.#updateMeasures();
+            });
+            measureSize.addEventListener("input", () => {
+                  this.#settings.measureSize = svg3dViewerClamp(Number(measureSize.value), 0.1, 10);
                   this.#updateMeasures();
             });
             measureTextPx.addEventListener("input", () => {
@@ -946,12 +996,14 @@ class ModalSVG3DViewer {
             const hMM = size.y * mmPerUnit;
             const dMM = size.z * mmPerUnit;
 
-            const base = Math.max(size.x, size.y, size.z);
-            const offset = this.#settings.measureOffset;
-            const extOver = this.#settings.measureExtOver;
-            const arrowSize = this.#settings.measureArrowSize;
+            const scaleAbs = Math.max(Math.abs(this.#settings.scale || 1), 0.0001);
+            const measureSize = Math.max(this.#settings.measureSize || 1, 0.1);
+            const base = Math.max(size.x, size.y, size.z) / scaleAbs;
+            const offset = (this.#settings.measureOffset * measureSize) / scaleAbs;
+            const extOver = (this.#settings.measureExtOver * measureSize) / scaleAbs;
+            const arrowSize = (this.#settings.measureArrowSize * measureSize) / scaleAbs;
 
-            const worldTextSize = svg3dViewerClamp(base * 0.12, 30, 260);
+            const worldTextSize = svg3dViewerClamp(base * 0.12, 30, 260) * measureSize;
 
             const offW = new THREE.Vector3(0, 1, 0).normalize();
             const offH = new THREE.Vector3(1, 0, 0).normalize();
@@ -984,7 +1036,7 @@ class ModalSVG3DViewer {
                   labelBgColor: this.#settings.measureLabelBgColor,
                   labelTextColor: this.#settings.measureLabelTextColor,
                   labelBorderColor: this.#settings.measureLabelBorderColor,
-                  color: 0xffffff
+                  color: 0xff0000
             };
 
             if(this.#settings.measuresW) {
