@@ -5,11 +5,11 @@
     <tr>
       <td>&nbsp;</td>
       <td width="650" style="width:650px;">
-        <p style="margin:0 0 14px 0;">Hi <span id="customer-name">John</span>,</p>
+        <p style="margin:0 0 14px 0;font-size:14px;">Hi <span id="customer-name">John</span>,</p>
 
-        <p style="margin:0 0 16px 0;">
+        <p style="margin:0 0 16px 0;font-size:14px;">
           Please find your detailed quote from
-          <strong style="color:#d32f2f; font-weight:bold;">
+          <strong style="color:#d32f2f; font-weight:bold;font-size:14px;">
             SIGNARAMA SPRINGWOOD
           </strong>
           attached.
@@ -46,16 +46,16 @@
 
               <!-- ROW 1 -->
               <tr>
-                <td width="42" align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900; line-height:1;">✔</span>
+                <td width="42" align="center" valign="top" style="padding:12px 10px;  border-bottom:1px solid #e5e5e5;">
+                  <span style="color:green; font-size:18px; font-weight:900; line-height:1;">✔</span>
                 </td>
                 <td style="padding:12px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
                   <strong>95% Signage Made In-House</strong><br>
                   <span style="font-size:12px; color:#555;">Manufactured locally</span>
                 </td>
 
-                <td width="42" align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900; line-height:1;">✔</span>
+                <td width="42" align="center" valign="top" style="padding:12px 10px;  border-bottom:1px solid #e5e5e5;">
+                  <span style="color:green; font-size:18px; font-weight:900; line-height:1;">✔</span>
                 </td>
                 <td style="padding:12px; border-bottom:1px solid #e5e5e5;">
                   <strong>20+ Years In Business</strong>
@@ -64,16 +64,16 @@
 
               <!-- ROW 2 -->
               <tr>
-                <td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
+                <td align="center" valign="top" style="padding:12px 10px;  border-bottom:1px solid #e5e5e5;">
+                  <span style="color:green; font-size:18px; font-weight:900;">✔</span>
                 </td>
                 <td style="padding:12px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
                   <strong>Top 10 Signarama Stores</strong><br>
                   <span style="font-size:12px; color:#555;">Last 5 years running</span>
                 </td>
 
-                <td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
+                <td align="center" valign="top" style="padding:12px 10px; border-bottom:1px solid #e5e5e5;">
+                  <span style="color:green; font-size:18px; font-weight:900;">✔</span>
                 </td>
                 <td style="padding:12px; border-bottom:1px solid #e5e5e5;">
                   <strong>Multi-Award Winning</strong><br>
@@ -83,35 +83,35 @@
 
               <!-- ROW 3 -->
               <tr>
-                <td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
+                <td align="center" valign="top" style="padding:12px 10px;  border-bottom:1px solid #e5e5e5;">
+                  <span style="color:green; font-size:18px; font-weight:900;">✔</span>
                 </td>
                 <td style="padding:12px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
                   <strong>Qualified Signwriters</strong><br>
                   <span style="font-size:12px; color:#555;">Accredited</span>
                 </td>
-				<td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
+				<td align="center" valign="top" style="padding:12px 10px; border-bottom:1px solid #e5e5e5;">
+                  <span style="color:green; font-size:18px; font-weight:900;">✔</span>
                 </td>
-                <td style="padding:12px; border-right:1px solid #e5e5e5;">
+                <td style="padding:12px; border-bottom:1px solid #e5e5e5;">
                   <strong>Exceptional Customer Service</strong><br>
-                  <span style="font-size:12px; color:#555;">Dedicated Team</span>
+                  <span style="font-size:12px; color:#555;">Dedicated and Hard-working Team</span>
                 </td>
                 
               </tr>
 
               <!-- ROW 4 -->
               <tr>
-                <td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
+                <td align="center" valign="top" style="padding:12px 10px; border-bottom:1px solid #e5e5e5;">
+                  <span style="color:green; font-size:18px; font-weight:900;">✔</span>
                 </td>
                 <td style="padding:12px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
                   <strong>Premium Materials</strong><br>
                   <span style="font-size:12px; color:#555;">Commercial-grade only</span>
                 </td>
 
-                <td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
+                <td align="center" valign="top" style="padding:12px 10px;  border-bottom:1px solid #e5e5e5;">
+                  <span style="color:green; font-size:18px; font-weight:900;">✔</span>
                 </td>
                 <td style="padding:12px; border-bottom:1px solid #e5e5e5;">
                   <strong>Top Quality</strong><br>
@@ -121,15 +121,15 @@
 
               <!-- LAST ROW -->
               <tr>
-                <td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
+                <td align="center" valign="top" style="padding:12px 10px; ">
+                  <span style="color:green; font-size:18px; font-weight:900;">✔</span>
                 </td>
                 <td style="padding:12px; border-right:1px solid #e5e5e5;">
                   <strong>Family Owned & Operated</strong><br>
                   <span style="font-size:12px; color:#555;">Trusted & accountable</span>
                 </td>
-				<td align="center" valign="top" style="padding:12px 10px; border-right:1px solid #e5e5e5; border-bottom:1px solid #e5e5e5;">
-                  <span style="color:#2e7d32; font-size:18px; font-weight:900;">✔</span>
+				<td align="center" valign="top" style="padding:12px 10px; ">
+                  <span style="color:green; font-size:18px; font-weight:900;">✔</span>
                 </td>
                 <td style="padding:12px; border-bottom:1px solid #e5e5e5;">
                   <strong>Strict QA Checks</strong><br>
@@ -156,7 +156,7 @@
         <table width="650" cellpadding="0" cellspacing="0" border="0" style="width:650px;">
           <tr>
             <td style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px; text-align:center;">
-              <div style="font-size:14px; font-weight:700; margin:0 0 10px 0; text-align:center;">
+              <div style="font-size:18px; font-weight:700; margin:0 0 10px 0; text-align:center;">
                 Don’t just take our word for it
               </div>
 
@@ -230,6 +230,7 @@
               <tr>
                 <td style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
                   <div style="font-weight:700; margin:0 0 12px 0;">Payment options</div>
+                  <div style="font-weight:700; margin:0 0 12px 0;">Deposit Amount: ${%AmountDue%}</div>
 
                   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 12px 0;">
                     <tr>
@@ -245,7 +246,7 @@
                       </td>
                     </tr>
                   </table>
-<br>
+                  <br>
                   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff;">
                     <tr>
                       <td style="padding:12px;">
@@ -373,7 +374,7 @@
             <table cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td bgcolor="#d32f2f" style="background:#d32f2f;">
-                  <a href="mailto:springwood@signarama.com.au?subject=Redraw%20Required%20for%20<%QuoteNumber%>&body=Hi,%0D%0A%0D%0AWe%20need%20a%20logo%20redraw%20quote%20please.%20We%20are%20unable%20to%20supply%20the%20vector%20formats%20you%20require.%0D%0A%0D%0AMany%20Thanks,%0D%0A<%CustomerName%>"
+                  <a href="mailto:springwood@signarama.com.au?subject=Redraw%20Required%20for%20{%QuoteNumber%}&body=Hi,%0D%0A%0D%0AWe%20need%20a%20logo%20redraw%20quote%20please.%20We%20are%20unable%20to%20supply%20the%20vector%20formats%20you%20require.%0D%0A%0D%0AMany%20Thanks,%0D%0A{%CustomerName%}"
                      style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:10px 16px; border:1px solid #d32f2f;">
                     Request Logo Redraw
                   </a>

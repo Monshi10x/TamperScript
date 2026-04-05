@@ -703,11 +703,11 @@ class OrderHome {
                   cardSurcharge: "2.5"
             };
 
-            let content = templateContent.replaceAll("<%CustomerName%>", customerFirstName);
-            content = content.replaceAll("<%QuoteNumber%>", safeQuoteNumber);
-            content = content.replaceAll("<%SalesPersonName%>", userName);
-            content = content.replaceAll("<%SalesPersonPhone%>", userPhone);
-            content = content.replaceAll("<%SalesPersonEmail%>", userEmail);
+            let content = templateContent.replaceAll("{%CustomerName%}", customerFirstName);
+            content = content.replaceAll("{%QuoteNumber%}", safeQuoteNumber);
+            content = content.replaceAll("{%SalesPersonName%}", userName);
+            content = content.replaceAll("{%SalesPersonPhone%}", userPhone);
+            content = content.replaceAll("{%SalesPersonEmail%}", userEmail);
             content = content.replaceAll("{%InvoiceOrQuoteNumber%}", paymentReference || safeQuoteNumber);
             content = content.replaceAll("{%AmountDue%}", this.formatCurrency(amountDue));
             content = content.replaceAll("{%AccountName%}", staticPaymentDetails.accountName);

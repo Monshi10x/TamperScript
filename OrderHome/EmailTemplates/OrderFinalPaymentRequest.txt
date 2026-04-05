@@ -1,4 +1,4 @@
-Hi <%CustomerName%>,
+Hi {%CustomerName%},
 
 Please see the attached invoice for the final balance on your order. Once payment is received, we’ll schedule delivery and installation right away.
 

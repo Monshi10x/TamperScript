@@ -6,7 +6,7 @@
           <tr>
             <td style="padding:0 20px; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.45; color:#1a1a1a;">
 
-              <p style="margin:0 0 14px 0;">Hi <%CustomerName%>,</p>
+              <p style="margin:0 0 14px 0;">Hi {%CustomerName%},</p>
 
               <p style="margin:0 0 14px 0;">
                 Please find attached <strong>{%InvoiceOrQuoteNumber%}</strong> with a balance due for payment.
