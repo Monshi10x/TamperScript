@@ -21,11 +21,6 @@
     </tr>
   </table>
 
-
-
-
-
-
                 <!-- AMOUNT DUE -->
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate; width:100%; margin:0 0 14px 0;">
                 <tr>
@@ -35,9 +30,6 @@
                   </td>
                 </tr>
               </table>
-
-
-              
 
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0;">
                   <tr>
