@@ -1,5 +1,154 @@
-<p><span style="font-size: medium;"></span>Hi {%CustomerName%},</p><p>Thank-you for proceeding with this job.</p><p>To commence the job, can you please pay your first 50% deposit, making sure to metion the quote/invoice number during the payment.</p><p>EFT payments can be made to:<br>BSB # 014-218<br>ACC # 3064-70312</p><p>Alternatively we are able to accept payment by credit card.&nbsp;<span style="font-family: Arial, sans-serif; font-size: 10pt;">Payment by Credit Card incurs a 2.5%
-surcharge.</span></p><p class="MsoNormal"><span style="font-size:10.0pt;font-family:&quot;Arial&quot;,sans-serif;
-mso-fareast-font-family:&quot;Times New Roman&quot;"><o:p></o:p></span></p><p>Please email confirmation of payment to: admin.springwood@signarama.com.au and use quote number as reference.</p><p>Following this, our design team will be in-touch shortly regarding artwork and proofs.</p><p>Please feel free to contact us if you have any additional questions.</p><p>Kind Regards,</p><p>Tristan Cargill<br>p: 07 3804 3884 <br>m: 0490 768 751<br>springwood@signarama.com.au<br><strong>Signarama Springwood</strong></p>
-<img src="https://cdn.gorilladash.com/images/media/5193978/signarama-english.png
-" style="width:250px;height:50px" width="250" height="50"><p><img "<a="" href=" https://leda.inc/qrcode?q=02a30637-44dd-4c7b-aacf-f1f7105c6006" style="border:none;text-decoration:none;"></p>
+<div style="margin:0; padding:0; background:#ffffff;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; width:100%; background:#ffffff;">
+    <tr>
+      <td align="center" style="padding:0;">
+        <table role="presentation" width="650" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; width:650px; max-width:650px; background:#ffffff;">
+          <tr>
+            <td style="padding:0 20px; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.45; color:#1a1a1a;">
+
+              <p style="margin:0 0 14px 0;">Hi {%CustomerName%},</p>
+
+              <p style="margin:0 0 14px 0;">
+                Thanks for trusting 
+                 <strong style="color:#d32f2f; font-weight:bold;font-size:14px;">
+            SIGNARAMA SPRINGWOOD
+          </strong>
+          with your signage.
+              </p>
+
+              <p style="margin:0 0 14px 0;">
+                We are excited to start on your signage.
+              </p>
+
+              <p style="margin:0 0 14px 0;">
+                Please find attached <strong>{%InvoiceOrQuoteNumber%}</strong> with the deposit due for payment.
+              </p>
+
+              <!-- AMOUNT DUE -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate; width:100%; margin:0 0 14px 0;">
+                <tr>
+                  <td style="border:1px solid #d7d7d7; border-left:8px solid #d32f2f; background:#f7f7f7; padding:14px 16px;">
+                    <p style="margin:0 0 6px 0; font-size:13px; line-height:1.3; color:#666666;">Amount due</p>
+                    <p style="margin:0; font-size:24px; line-height:1.2; font-weight:700; color:#1a1a1a;">${%AmountDue%}</p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 14px 0;">
+                Can you please arrange payment so we can keep your job moving without delays.
+              </p>
+
+              <!-- PAYMENT OPTIONS -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0;">
+              <tr>
+                <td style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
+                  <div style="font-weight:700; margin:0 0 12px 0;">Payment options</div>
+
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff; margin:0 0 12px 0;">
+                    <tr>
+                      <td style="padding:12px;">
+                        <div style="font-weight:700; margin:0 0 8px 0;">EFT (Bank Transfer)</div>
+                        <div style="margin:0;">
+                          Account Name: <strong>The Trustee for Cargill Investment Trust</strong><br>
+                          BSB: <strong>014 218</strong><br>
+                          Account Number: <strong>3064 70312</strong><br>
+                          Reference: <strong id="quote-number">QT-18778</strong>
+                          <span style="color:#555;font-size:14px;">(So we can match your payment)</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+<br>
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #cfcfcf; background:#ffffff;">
+                    <tr>
+                      <td style="padding:12px;">
+                        <div style="font-weight:700; margin:0 0 8px 0;">Credit Card</div>
+                        <div style="margin:0;">
+                          We can take card payment over the phone or in person.<br>
+                          <span style="color:#333;">(Card payments incur a 2.5% surcharge.)</span>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+
+                </td>
+              </tr>
+            </table>
+<br>
+              <p style="margin:0 0 14px 0;">
+                After payment is received, our team will progress to the next stage.
+              </p>
+
+              <p style="margin:0 0 14px 0;">
+                If you need anything in the meantime, please don’t hesitate to contact us.
+              </p>
+
+              <p style="margin:0 0 14px 0;">
+                Kind Regards,<br>
+                <strong id="salesperson-name">Tristan Cargill</strong>
+              </p>
+
+              <p style="margin:0 0 16px 0; line-height:1.5;">
+                <span id="salesperson-phone">M: 0490 768 751</span><br>
+                <span>Ph: 07 3804 3884</span><br>
+                <span id="salesperson-email">E: <a href="mailto:springwood@signarama.com.au" style="color:#1a1a1a; text-decoration:none;">springwood@signarama.com.au</a></span><br>
+                <span>Signarama Springwood</span>
+              </p>
+
+              <!-- GOOGLE REVIEWS -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; margin:0 0 16px 0;">
+                <tr>
+                  <td style="font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.3; color:#1a1a1a;">
+                    <strong>Google</strong>
+                    <span aria-label="Rated 4.9 out of 5 stars" title="4.9 out of 5" style="white-space:nowrap;">
+                      <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
+                      <strong style="color:#1a1a1a;">4.9</strong>
+                    </span>
+                    <span style="color:#666666;">(50+ reviews)</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA BUTTONS -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; margin:0 0 18px 0;">
+                <tr>
+                  <td bgcolor="#d32f2f" style="background:#d32f2f;">
+                    <a href="https://www.signarama.com.au/store/springwood/gallery" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                      See finished pictures
+                    </a>
+                  </td>
+                  <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+                  <td bgcolor="#d32f2f" style="background:#d32f2f;">
+                    <a href="https://www.signarama.com.au/store/springwood/our-work" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                      See our work
+                    </a>
+                  </td>
+                  <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+                  <td bgcolor="#d32f2f" style="background:#d32f2f;">
+                    <a href="https://www.signarama.com.au/store/springwood/team" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                      See our team
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- FOOTER IMAGE -->
+          <tr>
+            <td style="padding:0 20px;">
+              <img
+                src="https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/EmailFooter.jpg"
+                alt="Signarama Springwood"
+                width="610"
+                style="display:block; width:100%; max-width:610px; height:auto; border:0; outline:none; text-decoration:none;"
+              >
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
