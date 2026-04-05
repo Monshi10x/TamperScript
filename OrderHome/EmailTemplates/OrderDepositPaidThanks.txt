@@ -1,8 +1,112 @@
-Hi {%CustomerName%},
+<div style="font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.4; color:#111;">
+      <!-- INTRO -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                  <td>&nbsp;</td>
+                  <td width="650" style="width:650px;">
+                        <p style="margin:0 0 14px 0;">Hi {%CustomerName%},</p>
+                        <p style="margin:0 0 14px 0;">
+                              Thanks for making the deposit payment.
+                        </p>
+                        <!-- PAYMENT OPTIONS -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0;">
+                              <tr>
+                                    <td
+                                          style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
+                                          <div style="font-weight:700; margin:0 0  0;">Please find attached your receipt
+                                          </div>
+                                    </td>
+                              </tr>
+                        </table>
+                        <br>
+                        <p style="margin:0 0 14px 0;">
+                              Our team will be in contact shortly with the next stage, typically artwork & proofing.
+                        </p>
+                  </td>
+                  <td>&nbsp;</td>
+            </tr>
+      </table>
 
-Thanks for your deposit payment. We’ve allocated the funds to your order and the team is moving ahead with the next steps.
+      <!--CLOSING -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                  <td>&nbsp;</td>
+                  <td width="650" style="width:650px;">
 
-If you have any questions, reply to this email and we’ll be happy to help.
+                        <p style="margin:0 0 16px 0;">If you need anything in the meantime, please don’t hesitate to
+                              contact us.</p>
 
-Thanks again,
-H2O Spa Team
+                        <p style="margin:0 0 14px 0;">
+                              Kind Regards,<br>
+                              <span id="salesperson-name">Tristan Cargill</span>
+                        </p>
+
+                        <p style="margin:0 0 16px 0;">
+                              <span id="salesperson-phone">M: 0490 768 751</span><br>
+                              <span>Ph: 07 3804 3884</span><br>
+                              <span id="salesperson-email">E: springwood@signarama.com.au</span><br>
+                              <span>Signarama Springwood</span>
+                        </p>
+
+                        <p style="margin:0; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.3;">
+                              <span style="font-weight:700;">Google</span>
+                              <span aria-label="Rated 4.9 out of 5 stars" title="4.9 out of 5">
+                                    <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
+                                    <span style="font-weight:700;">4.9</span>
+                              </span>
+                              <span style="color:#666;">(50+ reviews)</span>
+                        </p>
+                  </td>
+                  <td>&nbsp;</td>
+            </tr>
+      </table>
+
+      <!-- CTA BUTTONS -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0 18px 0;">
+            <tr>
+                  <td>&nbsp;</td>
+                  <td width="650" style="width:650px;">
+                        <table cellpadding="0" cellspacing="0" border="0">
+                              <tr>
+                                    <td bgcolor="#d32f2f" style="background:#d32f2f;">
+                                          <a href="https://www.signarama.com.au/store/springwood/gallery"
+                                                style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                                                See finished pictures
+                                          </a>
+                                    </td>
+                                    <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+                                    <td bgcolor="#d32f2f" style="background:#d32f2f;">
+                                          <a href="https://www.signarama.com.au/store/springwood/our-work"
+                                                style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                                                See our work
+                                          </a>
+                                    </td>
+                                    <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+                                    <td bgcolor="#d32f2f" style="background:#d32f2f;">
+                                          <a href="https://www.signarama.com.au/store/springwood/team"
+                                                style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                                                See our team
+                                          </a>
+                                    </td>
+                              </tr>
+                        </table>
+                  </td>
+                  <td>&nbsp;</td>
+            </tr>
+      </table>
+
+      <!-- FOOTER IMAGE -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                  <td>&nbsp;</td>
+                  <td width="650" style="width:650px;">
+                        <p style="margin:14px 0 0 0;">
+                              <img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/EmailFooter.jpg"
+                                    alt="Signarama Springwood"
+                                    style="display:block; width:100%; height:auto; border:0; outline:none; text-decoration:none;">
+                        </p>
+                  </td>
+                  <td>&nbsp;</td>
+            </tr>
+      </table>
+</div>
