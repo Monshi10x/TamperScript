@@ -19,13 +19,12 @@ class OrderHome {
       #templateBaseUrl;
       #templateDefinitions = [
             {key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt"},
-            {key: "PaymentDue", label: "Payment Due", file: "PaymentDue.txt"},
-            {key: "GoogleReview", label: "Google Review", file: "GoogleReview.txt"},
-            {key: "OrderAcknowledgement", label: "Order Acknowledgement", file: "OrderAcknowledgementWording.txt"},
+            {key: "QuoteFollowUp", label: "Quote Follow Up", file: "QuoteFollowUp.txt"},
             {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt"},
             {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt"},
+            {key: "OrderLogoNotSuitable", label: "Logo Not Suitable", file: "LogoNotUsable.txt"},
             {key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt"},
-            {key: "LogoNotSuitable", label: "Logo Not Suitable", file: "LogoNotUsable.txt"}
+            {key: "GoogleReview", label: "Google Review", file: "GoogleReview.txt"},
       ];
       #emailTemplates = {};
       #userInfo = null;
