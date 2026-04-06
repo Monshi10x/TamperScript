@@ -20,6 +20,7 @@ class OrderHome {
       #templateDefinitions = [
             {key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt", emailSubject: "Quote from Signarama Springwood {%InvoiceOrQuoteNumber%}"},
             {key: "QuoteFollowUp", label: "Quote Follow Up - Manual", file: "QuoteFollowUp.txt", emailSubject: "Quote Follow-up from Signarama Springwood"},
+            {key: "QuoteFollowUpSecondTime", label: "Quote Follow Up 2nd - Manual", file: "QuoteFollowUpSecondTime.txt", emailSubject: "Quote Follow-up from Signarama Springwood"},
             {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt", emailSubject: "Deposit Request from Signarama Springwood"},
             {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt", emailSubject: "Deposit Receipt from Signarama Springwood"},
             {key: "OrderLogoNotSuitable", label: "Logo Not Suitable", file: "LogoNotUsable.txt", emailSubject: "Logo Request from Signarama Springwood"},
