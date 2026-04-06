@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.554
+// @version      10.577
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -24,8 +24,8 @@
 // @grant        window.close
 // @grant        window.focus
 // @grant        window.onurlchange
-// @updateURL    https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
-// @downloadURL  https://github.com/Monshi10x/TamperScript/raw/main/TamperStart.js
+// @updateURL    file://C:/Users/monsh/Documents/TamperScript/TamperStart.js
+// @downloadURL  file://C:/Users/monsh/Documents/TamperScript/TamperStart.js
 // @resource     Icon_BoundingArea https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-BoundingArea.svg
 // @resource     Icon_ShapeArea https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-ShapeArea.svg
 // @resource     Icon_Download https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Download.svg
@@ -53,14 +53,14 @@
 // @resource     Icon_Grab https://github.com/Monshi10x/TamperScript/raw/main/Images/Grab.svg
 // @resource     Icon_Map https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Map.svg
 // @resource     Icon_Capral https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Capral.svg
-// @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_Sales.css
-// @resource     JSONTransformers https://github.com/Monshi10x/TamperScript/raw/main/External Files/Transformers.json
-// @resource     JSONPredefinedVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/PredefinedVehicleTemplates.json
-// @resource     JSONBlankVehicleTemplates https://github.com/Monshi10x/TamperScript/raw/main/External Files/BlankVehicleTemplates.json
-// @resource     JSONRouter https://github.com/Monshi10x/TamperScript/raw/main/External Files/RouterToolpathTimes.json
-// @resource     JSONLaser https://github.com/Monshi10x/TamperScript/raw/main/External Files/LaserToolpathTimes.json
-// @resource     JSONPartItems https://github.com/Monshi10x/TamperScript/raw/main/External Files/PartItems.json
-// @resource     JSONInstallTimes https://github.com/Monshi10x/TamperScript/raw/main/External Files/InstallTimes.json
+// @resource     IMPORTED_CSS file://C:/Users/monsh/Documents/TamperScript/Styles/Styles_Sales.css
+// @resource     JSONTransformers file://C:/Users/monsh/Documents/TamperScript/External Files/Transformers.json
+// @resource     JSONPredefinedVehicleTemplates file://C:/Users/monsh/Documents/TamperScript/External Files/PredefinedVehicleTemplates.json
+// @resource     JSONBlankVehicleTemplates file://C:/Users/monsh/Documents/TamperScript/External Files/BlankVehicleTemplates.json
+// @resource     JSONRouter file://C:/Users/monsh/Documents/TamperScript/External Files/RouterToolpathTimes.json
+// @resource     JSONLaser file://C:/Users/monsh/Documents/TamperScript/External Files/LaserToolpathTimes.json
+// @resource     JSONPartItems file://C:/Users/monsh/Documents/TamperScript/External Files/PartItems.json
+// @resource     JSONInstallTimes file://C:/Users/monsh/Documents/TamperScript/External Files/InstallTimes.json
 // @resource     Image_Corflute https://github.com/Monshi10x/TamperScript/raw/main/Images/Corflute-Resized.jpg
 // @resource     Image_Coil https://github.com/Monshi10x/TamperScript/raw/main/Images/Coil.jpg
 // @resource     Image_FrontLitLetters https://github.com/Monshi10x/TamperScript/raw/main/Images/FrontLitLetters.webp
@@ -71,8 +71,8 @@
 // @resource     Image_IsStocked https://github.com/Monshi10x/TamperScript/raw/main/Images/IsStockedImage.png
 // @resource     Image_SpiderBoom https://github.com/Monshi10x/TamperScript/raw/main/Images/SpiderBoomImage.png
 // @resource     Image_Scissor https://github.com/Monshi10x/TamperScript/raw/main/Images/ScissorImage.png
-// @resource     SVGWebWorker https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_WebWorker.js
-// @resource     GoogleScript https://github.com/Monshi10x/TamperScript/raw/main/GoogleMap/GoogleMap.js
+// @resource     SVGWebWorker file://C:/Users/monsh/Documents/TamperScript/SVG_Common/SVG_WebWorker.js
+// @resource     GoogleScript file://C:/Users/monsh/Documents/TamperScript/GoogleMap/GoogleMap.js
 // @require      https://cdn.plot.ly/plotly-3.0.1.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
@@ -81,110 +81,110 @@
 // @require      https://cdn.jsdelivr.net/npm/svg-path-commander/dist/svg-path-commander.js
 // @require      https://cdn.jsdelivr.net/npm/path-data-polyfill@1.0.6/path-data-polyfill.min.js
 // @require      https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Charts/Chart.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Loaders/Loader.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/DragAndDrop/DragAndDrop.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UI.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/UIContainerType3.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/TDropdown.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/TNode.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/Toast.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Async_Functions/Async_Functions.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Toggle.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/Common.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Subscription/SubscriptionManager.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/ObjectArray.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Common/TArray.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Console/Console.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/FileIO/FileIO.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Tables/Table.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_PathFunctions.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVGPathFunctions.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_Common.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/SVG_ShapeArea.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/DragZoomCanvas.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/SVG_Common/DragZoomSVG.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/LHSMenu.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/Windows.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/Billboard.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/Admin.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/ProductCompare.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/RouterBuilder.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/LightboxBuilder.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/LEDBuilder.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/CombinedLnm.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/ProductFinder.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/CombinedSqm.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/CreditSurchargeMenu.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/Menu3D.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/PanelSigns.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/ChartMenu.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/MenuPOS.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/MenuMap.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/OrderedVinyls.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/CapralMenu.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/LHS_Menu/ConsoleMenu.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/Modal.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalManageSubscriptions.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInput.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalProductPopOut.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSetOrder.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalMoveProduct.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInputText.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInputCheckbox.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSingleInputWithCalcResult.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalWidthHeightWithCalcResult.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalToggleTokens.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalWidthHeight.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalStandoffHelper.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSheetJoins.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalVinylJoins.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSVG.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/ModalSVG3DViewer.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Mouse/ContextMenu.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/SaveReminder.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/ProductComponents.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/TogglePartsMenu.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/SummaryHelper.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/CostAnalysisSummary.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/InstallSummary.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Images.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Colour.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/QWHD.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Powdercoat.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/SubMenu.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Material.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Size.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/SVGCutfile.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Artwork.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Baseplate.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Footing.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Frame.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Install.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/LED.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Leg.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Production.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Router.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Laser.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/ProductDetails.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/InstallSubscribable.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/ArtworkSubscribable.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/ProductionSubscribable.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Sheet.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Vinyl.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Coil.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Laminate.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Finishing.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Painting.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Sign.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Supplier.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/TotalQuantity.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/VehicleTemplate.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/HandTrimming.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/AppTaping.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/PrintMounting.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Transformer.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Polygon/Polygon.js
-// @require      https://github.com/Monshi10x/TamperScript/raw/main/Main.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Charts/Chart.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Loaders/Loader.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/DragAndDrop/DragAndDrop.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/UI/UI.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/UI/UIContainerType3.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/UI/TDropdown.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/UI/TNode.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/UI/Toast.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Async_Functions/Async_Functions.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Common/Toggle.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Common/Common.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Subscription/SubscriptionManager.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Common/ObjectArray.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Common/TArray.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Console/Console.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/FileIO/FileIO.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Tables/Table.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/SVG_Common/SVG_PathFunctions.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/SVG_Common/SVGPathFunctions.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/SVG_Common/SVG_Common.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/SVG_Common/SVG_ShapeArea.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/SVG_Common/DragZoomCanvas.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/SVG_Common/DragZoomSVG.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/LHSMenu.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/Windows.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/Billboard.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/Admin.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/ProductCompare.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/RouterBuilder.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/LightboxBuilder.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/LEDBuilder.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/CombinedLnm.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/ProductFinder.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/CombinedSqm.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/CreditSurchargeMenu.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/Menu3D.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/PanelSigns.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/ChartMenu.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/MenuPOS.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/MenuMap.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/OrderedVinyls.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/CapralMenu.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/LHS_Menu/ConsoleMenu.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/Modal.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalManageSubscriptions.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalSingleInput.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalProductPopOut.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalSetOrder.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalMoveProduct.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalSingleInputText.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalSingleInputCheckbox.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalSingleInputWithCalcResult.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalWidthHeightWithCalcResult.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalToggleTokens.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalWidthHeight.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalStandoffHelper.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalSheetJoins.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalVinylJoins.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalSVG.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Modal/ModalSVG3DViewer.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Mouse/ContextMenu.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Estimate_Supplementals/SaveReminder.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Estimate_Supplementals/ProductComponents.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Estimate_Supplementals/TogglePartsMenu.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Estimate_Supplementals/SummaryHelper.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Estimate_Supplementals/CostAnalysisSummary.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Estimate_Supplementals/InstallSummary.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Styles/Styles.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Styles/Images.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Styles/Colour.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/QWHD.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Powdercoat.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/SubMenu.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Material.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Size.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/SVGCutfile.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Artwork.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Baseplate.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Footing.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Frame.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Install.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/LED.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Leg.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Production.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Router.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Laser.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/ProductDetails.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/InstallSubscribable.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/ArtworkSubscribable.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/ProductionSubscribable.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Sheet.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Vinyl.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Coil.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Laminate.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Finishing.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Painting.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Sign.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Supplier.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/TotalQuantity.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/VehicleTemplate.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/HandTrimming.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/AppTaping.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/PrintMounting.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Menus/Part_Components/Transformer.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Polygon/Polygon.js
+// @require      file://C:/Users/monsh/Documents/TamperScript/Main.js
 // ==/UserScript==
