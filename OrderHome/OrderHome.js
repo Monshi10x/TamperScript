@@ -715,7 +715,49 @@ class OrderHome {
                   });
             });
 
+            container.querySelectorAll("a[href]").forEach((anchor) => {
+                  const href = anchor.getAttribute("href");
+                  anchor.setAttribute("href", this.normalizeMailtoHref(href));
+            });
+
             return container.innerHTML;
+      }
+
+      decodeUriComponentSafely(value) {
+            if(value === null || value === undefined) {
+                  return "";
+            }
+
+            try {
+                  return decodeURIComponent(value);
+            } catch {
+                  return value;
+            }
+      }
+
+      normalizeMailtoHref(href) {
+            if(!href || !href.toLowerCase().startsWith("mailto:") || !href.includes("?")) {
+                  return href;
+            }
+
+            const splitHref = href.split("?");
+            const emailPart = splitHref.shift();
+            const rawQuery = splitHref.join("?");
+            const normalizedParams = rawQuery
+                  .split("&")
+                  .filter((pair) => pair.length > 0)
+                  .map((pair) => {
+                        const splitPair = pair.split("=");
+                        const rawKey = splitPair.shift() || "";
+                        const rawValue = splitPair.join("=");
+                        const decodedKey = this.decodeUriComponentSafely(rawKey.replaceAll("+", "%20"));
+                        const decodedValue = this.decodeUriComponentSafely(rawValue.replaceAll("+", "%20"));
+
+                        return `${encodeURIComponent(decodedKey)}=${encodeURIComponent(decodedValue)}`;
+                  })
+                  .join("&");
+
+            return normalizedParams.length > 0 ? `${emailPart}?${normalizedParams}` : emailPart;
       }
 
       applyTemplateTokens(content, customerFirstName, quoteNumber) {
