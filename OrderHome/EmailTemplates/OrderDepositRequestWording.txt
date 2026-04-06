@@ -12,7 +12,7 @@
                               with your signage.
                         </p>
                         <p style="margin:0 0 14px 0;">
-                              We are excited to start on your signage.
+                              We are excited to start on it.
                         </p>
                         <p style="margin:0 0 14px 0;">
                               Please find attached <strong>{%InvoiceOrQuoteNumber%}</strong> with the deposit due for

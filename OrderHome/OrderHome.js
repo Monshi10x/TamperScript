@@ -18,13 +18,13 @@ class OrderHome {
       #emailModalIsOpen = false;
       #templateBaseUrl;
       #templateDefinitions = [
-            {key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt", emailSubject: null},
-            {key: "QuoteFollowUp", label: "Quote Follow Up - Manual", file: "QuoteFollowUp.txt", emailSubject: null},
-            {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt", emailSubject: null},
-            {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt", emailSubject: null},
-            {key: "OrderLogoNotSuitable", label: "Logo Not Suitable", file: "LogoNotUsable.txt", emailSubject: null},
-            {key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt", emailSubject: null},
-            {key: "GoogleReview", label: "Google Review", file: "GoogleReview.txt", emailSubject: null},
+            {key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt", emailSubject: "Quote from Signarama Springwood {%InvoiceOrQuoteNumber%}"},
+            {key: "QuoteFollowUp", label: "Quote Follow Up - Manual", file: "QuoteFollowUp.txt", emailSubject: "Quote Follow-up from Signarama Springwood"},
+            {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt", emailSubject: "Deposit Request from Signarama Springwood"},
+            {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt", emailSubject: "Deposit Receipt from Signarama Springwood"},
+            {key: "OrderLogoNotSuitable", label: "Logo Not Suitable", file: "LogoNotUsable.txt", emailSubject: "Logo Request from Signarama Springwood"},
+            {key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt", emailSubject: "Balance Due - Signarama Springwood"},
+            {key: "GoogleReview", label: "Google Review", file: "GoogleReview.txt", emailSubject: "Review Signarama Springwood"},
       ];
       #emailTemplates = {};
       #userInfo = null;
