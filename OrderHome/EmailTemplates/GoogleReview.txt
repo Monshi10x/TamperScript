@@ -1,66 +1,168 @@
-<p>Hi <span id="customer-name">John</span>,</p>
+<div style="font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.4; color:#111;">
 
-<p>
-Thank you again for choosing <strong>SIGNARAMA SPRINGWOOD</strong>.  
-We really appreciate the opportunity to work with you.
-</p>
+  <!-- INTRO -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+        <p style="margin:0 0 14px 0;">Hi <span id="customer-name">John</span>,</p>
 
-<p>
-If you were happy with your experience, we’d be grateful if you could take a minute to leave us a Google review.
-</p>
+        <p style="margin:0 0 14px 0;">
+          Thank you again for choosing 
+          <strong style="color:#d32f2f;">SIGNARAMA SPRINGWOOD</strong>.
+        </p>
 
-<div style="text-align:center; margin:20px 0;">
-  <a href="https://g.page/r/CXH4lU3AFjMHEAE/review"
-     style="display:inline-block; background:#1a73e8; color:#ffffff; text-decoration:none;
-            padding:12px 22px; border-radius:6px; font-weight:700; font-size:15px;">
-    Leave a Google Review
-  </a>
+        <p style="margin:0 0 16px 0;">
+          We really enjoyed the opportunity to work with you.
+        </p>
+
+        <p style="margin:0 0 16px 0;">
+          If you were happy with your experience, we’d appreciate you taking a minute to leave us a Google review.
+        </p>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- REVIEW CTA -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px 0;">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" align="center" style="width:650px;">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td bgcolor="#d32f2f" style="background:#2f7ed3;">
+              <a href="https://g.page/r/CXH4lU3AFjMHEAE/review"
+                 style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:14px; font-weight:700; color:#ffffff; text-decoration:none; padding:12px 22px; border:1px solid #2f00ff;">
+                Leave a Google Review
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- WHY IT MATTERS -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px 0;">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="border:1px solid #d1d1d1; border-left:8px solid #88bff9; background:#dcefff; padding:14px;">
+
+              <div style="font-weight:700; margin:0 0 10px 0;">
+                Why your review matters
+              </div>
+
+              <div style="margin:0;">
+                We currently have <strong>50+ Google reviews</strong> with an average rating of 
+                <strong>4.9 out of 5 stars</strong>.<br><br>
+
+                A large portion of our work comes from repeat and returning customers, so your feedback plays a big role in helping other businesses choose a reliable signage partner.
+              </div>
+
+            </td>
+          </tr>
+        </table>
+
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- SUPPORTING TEXT -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+
+        <p style="margin:0 0 14px 0;">
+          It only takes a minute, and we read every review personally.
+        </p>
+
+        <p style="margin:0 0 14px 0;">
+          If there’s anything you feel we could have done better, we’d appreciate hearing from you directly.
+        </p>
+
+        <p style="margin:0 0 14px 0;">
+          Thanks again for your support — we look forward to working with you again.
+        </p>
+
+        <p style="margin:0 0 14px 0;">
+          Kind Regards,<br>
+          <span id="salesperson-name">Pearl Cargill</span>
+        </p>
+
+        <p style="margin:0 0 16px 0;">
+          <span id="salesperson-phone">0439 972 409</span><br>
+          <span>Ph: 07 3804 3884</span><br>
+          <span id="salesperson-email">springwood@signarama.com.au</span><br>
+          <span>Signarama Springwood</span>
+        </p>
+
+        <!-- GOOGLE RATING LINE -->
+        <p style="margin:0; font-size:14px; line-height:1.3;">
+          <span style="font-weight:700;">Google</span>
+          <span aria-label="Rated 4.9 out of 5 stars">
+            <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
+            <span style="font-weight:700;">4.9</span>
+          </span>
+          <span style="color:#666;">(50+ reviews)</span>
+        </p>
+
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- CTA BUTTONS -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0 18px 0;">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://www.signarama.com.au/store/springwood/gallery" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See finished pictures
+              </a>
+            </td>
+            <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://www.signarama.com.au/store/springwood/our-work" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See our work
+              </a>
+            </td>
+            <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://www.signarama.com.au/store/springwood/team" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See our team
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- FOOTER IMAGE -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+        <p style="margin:14px 0 0 0;">
+          <img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/EmailFooter.jpg"
+               alt="Signarama Springwood"
+               style="display:block; width:100%; height:auto; border:0;">
+        </p>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
 </div>
-
-<div style="border:1px solid #d1d1d1; border-left:8px solid #1a73e8; padding:14px; background:#f6f9ff; border-radius:8px; margin:0 0 16px 0;">
-  <p style="margin:0 0 8px 0; font-weight:700;">Why your review matters</p>
-  <p style="margin:0;">
-    We currently have <strong>49 Google reviews</strong> with an average rating of
-    <strong>4.9 out of 5 stars</strong>, and a large portion of our work comes from
-    <strong>repeat and returning customers</strong>.<br><br>
-    Your feedback helps other businesses feel confident choosing us and supports our local team.
-  </p>
-</div>
-
-<p style="color:#555;">
-It only takes a minute, and we read every single review personally.
-</p>
-
-<p>
-If there’s anything you feel we could have done better, we’d genuinely appreciate hearing from you directly.
-</p>
-
-<p>
-Thanks again for your support — we look forward to working with you again.
-</p>
-
-<p>
-Kind Regards,<br>
-<span id="salesperson-name">Pearl Cargill</span>
-</p>
-
-<p>
-<span id="salesperson-phone">0439 972 409</span><br>
-<span>Ph: 07 3804 3884</span><br>
-<span id="salesperson-email">springwood@signarama.com.au</span><br>
-<span>Signarama Springwood</span>
-</p>
-
-<p style="margin:0; font-family: Arial, sans-serif; font-size:14px; line-height:1.3;">
-  <span style="font-weight:700;">Google</span>
-  <span aria-label="Rated 4.9 out of 5 stars" title="4.9 out of 5">
-    <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
-    <span style="font-weight:700;">4.9</span>
-  </span>
-  <span style="color:#666;">(47 reviews)</span>
-</p>
-
-<img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/EmailFooter.jpg"
-     style="width:100%; height:auto; max-width:400px;"
-     width="300"
-     height="76">
