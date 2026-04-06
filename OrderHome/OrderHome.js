@@ -18,13 +18,13 @@ class OrderHome {
       #emailModalIsOpen = false;
       #templateBaseUrl;
       #templateDefinitions = [
-            {key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt"},
-            {key: "QuoteFollowUp", label: "Quote Follow Up - Manual", file: "QuoteFollowUp.txt"},
-            {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt"},
-            {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt"},
-            {key: "OrderLogoNotSuitable", label: "Logo Not Suitable", file: "LogoNotUsable.txt"},
-            {key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt"},
-            {key: "GoogleReview", label: "Google Review", file: "GoogleReview.txt"},
+            {key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt", emailSubject: null},
+            {key: "QuoteFollowUp", label: "Quote Follow Up - Manual", file: "QuoteFollowUp.txt", emailSubject: null},
+            {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt", emailSubject: null},
+            {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt", emailSubject: null},
+            {key: "OrderLogoNotSuitable", label: "Logo Not Suitable", file: "LogoNotUsable.txt", emailSubject: null},
+            {key: "OrderFinalPaymentRequest", label: "Final Payment Request", file: "OrderFinalPaymentRequest.txt", emailSubject: null},
+            {key: "GoogleReview", label: "Google Review", file: "GoogleReview.txt", emailSubject: null},
       ];
       #emailTemplates = {};
       #userInfo = null;
@@ -311,6 +311,7 @@ class OrderHome {
 
                   const personalizedContent = this.personalizeTemplate(templateContent, customerFirstName, quoteNumber);
                   contentArea.innerHTML = personalizedContent;
+                  this.applyTemplateEmailSubject(template, customerFirstName, quoteNumber);
 
                   // Trigger a synthetic keyup event because it wasn't saving
                   const event = new KeyboardEvent('keyup', {
@@ -688,32 +689,13 @@ class OrderHome {
       }
 
       personalizeTemplate(templateContent, customerFirstName, quoteNumber) {
-            const userName = `${this.#userInfo?.firstName || ""} ${this.#userInfo?.lastName || ""}`.trim();
-            const userPhone = this.#userInfo?.phone || "";
-            const userEmail = this.#userInfo?.email || "";
+            let content = this.applyTemplateTokens(templateContent, customerFirstName, quoteNumber);
 
             const safeQuoteNumber = quoteNumber || "";
             const paymentReference = this.buildPaymentReference(safeQuoteNumber);
-            const amountDue = this.calculateAmountDue();
-            const staticPaymentDetails = {
-                  accountName: "The Trustee for Cargill Investment Trust",
-                  bsb: "014-218",
-                  accountNumber: "3064-70312",
-                  cardSurcharge: "2.5"
-            };
-
-            let content = templateContent.replaceAll("{%CustomerName%}", customerFirstName);
-            content = content.replaceAll("{%QuoteNumber%}", safeQuoteNumber);
-            content = content.replaceAll("{%SalesPersonName%}", userName);
-            content = content.replaceAll("{%SalesPersonPhone%}", userPhone);
-            content = content.replaceAll("{%SalesPersonEmail%}", userEmail);
-            content = content.replaceAll("{%InvoiceOrQuoteNumber%}", paymentReference || safeQuoteNumber);
-            content = content.replaceAll("{%AmountDue%}", this.formatCurrency(amountDue));
-            content = content.replaceAll("{%AccountName%}", staticPaymentDetails.accountName);
-            content = content.replaceAll("{%BSB%}", staticPaymentDetails.bsb);
-            content = content.replaceAll("{%AccountNumber%}", staticPaymentDetails.accountNumber);
-            content = content.replaceAll("{%Reference%}", paymentReference);
-            content = content.replaceAll("{%CardSurcharge%}", staticPaymentDetails.cardSurcharge);
+            const userName = `${this.#userInfo?.firstName || ""} ${this.#userInfo?.lastName || ""}`.trim();
+            const userPhone = this.#userInfo?.phone || "";
+            const userEmail = this.#userInfo?.email || "";
 
             // Allow swapping by tag ids in the template HTML
             const container = document.createElement("div");
@@ -734,6 +716,51 @@ class OrderHome {
             });
 
             return container.innerHTML;
+      }
+
+      applyTemplateTokens(content, customerFirstName, quoteNumber) {
+            const userName = `${this.#userInfo?.firstName || ""} ${this.#userInfo?.lastName || ""}`.trim();
+            const userPhone = this.#userInfo?.phone || "";
+            const userEmail = this.#userInfo?.email || "";
+
+            const safeQuoteNumber = quoteNumber || "";
+            const paymentReference = this.buildPaymentReference(safeQuoteNumber);
+            const amountDue = this.calculateAmountDue();
+            const staticPaymentDetails = {
+                  accountName: "The Trustee for Cargill Investment Trust",
+                  bsb: "014-218",
+                  accountNumber: "3064-70312",
+                  cardSurcharge: "2.5"
+            };
+
+            let transformedContent = (content || "").replaceAll("{%CustomerName%}", customerFirstName);
+            transformedContent = transformedContent.replaceAll("{%QuoteNumber%}", safeQuoteNumber);
+            transformedContent = transformedContent.replaceAll("{%SalesPersonName%}", userName);
+            transformedContent = transformedContent.replaceAll("{%SalesPersonPhone%}", userPhone);
+            transformedContent = transformedContent.replaceAll("{%SalesPersonEmail%}", userEmail);
+            transformedContent = transformedContent.replaceAll("{%InvoiceOrQuoteNumber%}", paymentReference || safeQuoteNumber);
+            transformedContent = transformedContent.replaceAll("{%AmountDue%}", this.formatCurrency(amountDue));
+            transformedContent = transformedContent.replaceAll("{%AccountName%}", staticPaymentDetails.accountName);
+            transformedContent = transformedContent.replaceAll("{%BSB%}", staticPaymentDetails.bsb);
+            transformedContent = transformedContent.replaceAll("{%AccountNumber%}", staticPaymentDetails.accountNumber);
+            transformedContent = transformedContent.replaceAll("{%Reference%}", paymentReference);
+            transformedContent = transformedContent.replaceAll("{%CardSurcharge%}", staticPaymentDetails.cardSurcharge);
+
+            return transformedContent;
+      }
+
+      applyTemplateEmailSubject(template, customerFirstName, quoteNumber) {
+            const subjectInput = document.querySelector("#txtClientEmailFormOneSubject");
+            if(!subjectInput || template?.emailSubject === null || template?.emailSubject === undefined) {
+                  return;
+            }
+
+            const personalizedSubject = this.applyTemplateTokens(template.emailSubject, customerFirstName, quoteNumber);
+            if(!personalizedSubject || personalizedSubject.trim().length === 0) {
+                  return;
+            }
+
+            subjectInput.value = personalizedSubject;
       }
 
       initPaymentModal() {
