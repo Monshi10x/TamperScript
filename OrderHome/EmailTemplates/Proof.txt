@@ -1,0 +1,207 @@
+<div style="font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:1.4; color:#111;">
+
+  <!-- INTRO -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+        <p style="margin:0 0 14px 0;">Hi <span id="customer-name">John</span>,</p>
+
+        <p style="margin:0 0 14px 0;">
+          Artwork Proofs are ready for your review:
+        </p>
+
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- REVIEW CTA / QR AREA -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px 0;">
+  <tr>
+    <td>&nbsp;</td>
+    <td width="650" style="width:650px;">
+
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="border:1px solid #ffffff; border-left:0px solid #d32f2f; background:#ffffff; padding:14px;">
+
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                
+                <!-- LEFT COLUMN -->
+                <td width="320" valign="middle" align="center" style="width:320px; padding:10px 12px 10px 0;">
+                  <table cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td bgcolor="#d32f2f" style="background:#d32f2f;">
+                        <a href="https://g.page/r/CXH4lU3AFjMHEAE/review"
+                           style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:14px; font-weight:700; color:#ffffff; text-decoration:none; padding:12px 22px; ">
+                          Click to View Proofs in Portal
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+
+              </tr>
+            </table>
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+  <!-- IT IS YOUR RESPONSIBILITY -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px 0;">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="border:1px solid #d7d7d7; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
+
+              <div style="font-weight:700; margin:0 0 10px 0;">
+                It is your responsibility to check...
+              </div>
+
+              <div style="margin:0;">
+                  <ul>
+                        <li>Spelling</li>
+                        <li>Content</li>
+                        <li>Size and Placement</li>
+                        <li>Logos</li>
+                        <li>Numbers, times and quantities</li>
+                  </ul>
+               </div>
+
+               <div style="font-weight:700; margin:0 0 10px 0;">
+                By approving proofs, you are confirming all details are correct. Signarama will <u>not</u> be responsible for costs incurred in the reproduction 
+                of signs that were approved with errors. <strong style="color:#d32f2f">CHECK CAREFULLY</strong>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- NOTE BLOCK - YELLOW STYLE -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0;">
+  <tr>
+    <td>&nbsp;</td>
+    <td width="650" style="width:650px;">
+
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="border:1px solid #d1d1d1; border-left:8px solid #dca101; background:#fff8e1; padding:14px;">
+
+            <div style="font-weight:700; margin:0 0 10px 0; color:#b88900;">
+              Note
+            </div>
+
+            <div style="margin:0; line-height:1.5;">
+              Proofs may have multiple pages.<br><br>
+
+              1 minor design change is included. Any additional revisions will be charged at 
+              <strong>$135/hour + GST</strong> (minimum <strong>$60 + GST</strong>).<br><br>
+
+              Proofs are a low-resolution version of your artwork (for faster viewing).
+            </div>
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+
+  <!-- SUPPORTING TEXT -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+
+        <p style="margin:0 0 14px 0;">
+          Kind Regards,<br>
+          <span id="salesperson-name">Pearl Cargill</span>
+        </p>
+
+        <p style="margin:0 0 16px 0;">
+          <span id="salesperson-phone">0439 972 409</span><br>
+          <span>Ph: 07 3804 3884</span><br>
+          <span id="salesperson-email">springwood@signarama.com.au</span><br>
+          <span>Signarama Springwood</span>
+        </p>
+
+        <!-- GOOGLE RATING LINE -->
+        <p style="margin:0; font-size:14px; line-height:1.3;">
+          <span style="font-weight:700;">Google</span>
+          <span aria-label="Rated 4.9 out of 5 stars">
+            <span style="color:#f4b400; letter-spacing:1px;">★★★★★</span>
+            <span style="font-weight:700;">4.9</span>
+          </span>
+          <span style="color:#666;">(50+ reviews)</span>
+        </p>
+
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- CTA BUTTONS -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0 18px 0;">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://www.signarama.com.au/store/springwood/gallery" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See finished pictures
+              </a>
+            </td>
+            <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://www.signarama.com.au/store/springwood/our-work" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See our work
+              </a>
+            </td>
+            <td width="10" style="font-size:1px; line-height:1px;">&nbsp;</td>
+            <td bgcolor="#d32f2f" style="background:#d32f2f;">
+              <a href="https://www.signarama.com.au/store/springwood/team" style="display:inline-block; font-family:Arial, Helvetica, sans-serif; font-size:13px; font-weight:700; color:#ffffff; text-decoration:none; padding:9px 12px; border:1px solid #d32f2f;">
+                See our team
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+  <!-- FOOTER IMAGE -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td>&nbsp;</td>
+      <td width="650" style="width:650px;">
+        <p style="margin:14px 0 0 0;">
+          <img src="https://raw.githubusercontent.com/Monshi10x/TamperScript/main/OrderHome/EmailTemplates/EmailFooter.jpg"
+               alt="Signarama Springwood"
+               style="display:block; width:100%; height:auto; border:0;">
+        </p>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+</div>
