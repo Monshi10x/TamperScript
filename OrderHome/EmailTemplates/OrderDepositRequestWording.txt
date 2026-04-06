@@ -18,6 +18,9 @@
                               Please find attached <strong>{%InvoiceOrQuoteNumber%}</strong> with the deposit due for
                               payment.
                         </p>
+                        <p style="margin:0 0 14px 0;">
+                              Once your deposit is received, your job will be moved to the next stage; usually Graphic Design and proofing.
+                        </p>
                   </td>
                   <td>&nbsp;</td>
             </tr>

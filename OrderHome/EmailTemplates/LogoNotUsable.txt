@@ -50,7 +50,7 @@
 
   </tr>
 </table>
-Please Do not 'Save As .PDF'
+Please Do Not <strong style="color:blue;">'Save As .PDF'</strong> as this does not improve the resolution.
 <br><br>
 		  <li>Our sales team can quote to redraw your logo in vector format</li>
 		  <!-- BUTTON -->

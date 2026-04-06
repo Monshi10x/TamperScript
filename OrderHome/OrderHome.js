@@ -19,7 +19,7 @@ class OrderHome {
       #templateBaseUrl;
       #templateDefinitions = [
             {key: "QuoteWording", label: "Quote Wording", file: "QuoteWording.txt"},
-            {key: "QuoteFollowUp", label: "Quote Follow Up", file: "QuoteFollowUp.txt"},
+            {key: "QuoteFollowUp", label: "Quote Follow Up - Manual", file: "QuoteFollowUp.txt"},
             {key: "OrderDepositRequest", label: "Deposit Request", file: "OrderDepositRequestWording.txt"},
             {key: "OrderDepositPaidThanks", label: "Deposit Paid Thanks", file: "OrderDepositPaidThanks.txt"},
             {key: "OrderLogoNotSuitable", label: "Logo Not Suitable", file: "LogoNotUsable.txt"},

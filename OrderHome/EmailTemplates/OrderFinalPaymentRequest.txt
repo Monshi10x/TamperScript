@@ -10,6 +10,11 @@
                               <strong style="color:#d32f2f; font-weight:bold;font-size:14px;">SIGNARAMA
                                     SPRINGWOOD</strong>
                         </p>
+                 
+                                    <p style="margin:0 0 12px 0;">
+                                          This is due <b>BEFORE</b> install or collection.
+                                    </p>
+                             
                   </td>
                   <td>&nbsp;</td>
             </tr>
@@ -37,7 +42,7 @@
                   <td>&nbsp;</td>
             </tr>
       </table>
-
+<br>
       <!-- PAYMENT -->
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
@@ -45,11 +50,7 @@
                   <td width="650" style="width:650px;">
 
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0;">
-                              <tr>
-                                    <div style="margin:0 0 12px 0;">
-                                          This is due before install or collection.
-                                    </div>
-                              </tr>
+                              
                               <tr>
                                     <td
                                           style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">

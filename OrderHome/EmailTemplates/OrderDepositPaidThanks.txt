@@ -13,7 +13,7 @@
                               <tr>
                                     <td
                                           style="border:1px solid #d1d1d1; border-left:8px solid #d32f2f; background:#f6f6f6; padding:14px;">
-                                          <div style="font-weight:700; margin:0 0  0;">Please find attached your receipt
+                                          <div style="font-weight:700; margin:0 0  0;">Please find attached your invoice showing deposit payment
                                           </div>
                                     </td>
                               </tr>
