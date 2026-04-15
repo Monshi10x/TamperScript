@@ -105,6 +105,10 @@ class VehicleMenu extends LHSMenuWindow {
             this.doesTick = false;
       }
 
+      getSerializationMenuType() {
+            return "vehicle";
+      }
+
       show() {
             super.show();
             super.clearPages();

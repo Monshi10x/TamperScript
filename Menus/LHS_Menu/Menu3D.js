@@ -132,6 +132,10 @@ class Menu3D extends LHSMenuWindow {
             this.footer.appendChild(this.#createProductBtn);
       }
 
+      getSerializationMenuType() {
+            return "menu3d";
+      }
+
       addQuickTemplate() {
             this.#numProducts++;
 
