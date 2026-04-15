@@ -23,6 +23,48 @@ function parseKOStorageVariable(koString) {
 	return koString.replaceAll(" ", "~").replaceAll('"', "^");
 }
 
+function isSerializationPartDescription(descriptionText) {
+	if(typeof descriptionText !== "string") return false;
+	return descriptionText.includes("Code [Serialization]") || descriptionText.includes("CODE [Automatic]");
+}
+
+function hideSerializationPartChrome(partRoot, partHeader, partDescriptionField) {
+	if(!partHeader || !partDescriptionField) return;
+
+	const directChildren = Array.from(partHeader.children);
+	for(let i = 0; i < directChildren.length; i++) {
+		const child = directChildren[i];
+		const keepChild = child.contains(partDescriptionField)
+			|| child === partDescriptionField
+			|| child.classList.contains("restoreStateButton")
+			|| child.classList.contains("seeSVGButton");
+		if(!keepChild) {
+			child.style.display = "none";
+		}
+	}
+
+	const descriptionWrapper = partDescriptionField.parentElement;
+	if(descriptionWrapper) {
+		descriptionWrapper.style.width = "50%";
+		descriptionWrapper.style.maxWidth = "50%";
+	}
+
+	partDescriptionField.style.width = "100%";
+	partDescriptionField.style.maxWidth = "100%";
+
+	if(partRoot) {
+		const viewModeWrappers = partRoot.querySelectorAll(".orderProductModelItemViewWrapper");
+		for(let i = 0; i < viewModeWrappers.length; i++) {
+			viewModeWrappers[i].style.display = "none";
+		}
+
+		const viewModePanels = partRoot.querySelectorAll("[id^='pnlViewModePanel_']");
+		for(let i = 0; i < viewModePanels.length; i++) {
+			viewModePanels[i].style.display = "none";
+		}
+	}
+}
+
 function tryParseSerializedMenuEnvelope(partText) {
 	if(typeof MenuStateSerializer === "undefined") return null;
 	try {
@@ -212,6 +254,7 @@ function partInfoTick() {
 			let koPartHeight = (koPart.Height()) * 25.4;
 			var partHasInstall = false;
 			let koPartDescription = koPart.PartDescription();
+			let isSerializationPart = isSerializationPartDescription(koPartDescription);
 			let partHeader = parts[part].querySelector(".ord-prod-part-header");
 			let partDescriptionField = parts[part].querySelector(".txtPartDescription");
 
@@ -283,7 +326,7 @@ function partInfoTick() {
 			}
 
 			let partDescriptionDisabled = false;
-			if(koPartDescription.includes("TRAVEL [Automatic]") || koPartDescription.includes("CODE [Automatic]")) {
+			if(koPartDescription.includes("TRAVEL [Automatic]") || isSerializationPart) {
 				let relevantPart = partDescriptionField;
 				relevantPart.disabled = true;
 				partDescriptionDisabled = true;
@@ -339,13 +382,19 @@ function partInfoTick() {
 			}
 			//}
 
+			if(isSerializationPart) {
+				hideSerializationPartChrome(parts[part], partHeader, partDescriptionField);
+			}
+
 			partPrice = koPartTotalPrice;
 
 			if(parts[part].querySelectorAll(".partPrice").length == 0) {
 				let label = createLabel("$" + partPrice, "color:blue;font-weight:bold;width:80px;height:30px;font-size:14px;float:right;", partHeader);
 				label.className = "partPrice";
 
-				partDescriptionField.style.cssText += "width:240px;";
+				if(!isSerializationPart) {
+					partDescriptionField.style.cssText += "width:240px;";
+				}
 			} else {
 				parts[part].querySelector(".partPrice").innerText = "$" + partPrice;
 			}

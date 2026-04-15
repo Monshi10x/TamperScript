@@ -349,7 +349,7 @@ class LHSMenuWindow {
 
         await AddPart("No Cost Part", productNo);
         partIndex++;
-        await setPartDescription(productNo, partIndex, "CODE [Automatic]");
+        await setPartDescription(productNo, partIndex, "Code [Serialization]");
         await setPartNotes(productNo, partIndex, serializedText);
         await savePart(productNo, partIndex);
         return partIndex;

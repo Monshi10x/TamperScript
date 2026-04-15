@@ -223,14 +223,17 @@ class MenuStateSerializer {
             if(!rootElement || !Array.isArray(state)) return;
             for(let i = 0; i < state.length; i++) {
                   const item = state[i];
-                  const selector = `[id="${CSS.escape(item.key)}"],[name="${CSS.escape(item.key)}"],[data-serialization-key="${CSS.escape(item.key)}"]`;
-                  let field = rootElement.querySelector(selector);
-                  if(!field && item.domPath) {
+                  let field = null;
+                  if(item.domPath) {
                         try {
                               field = rootElement.querySelector(item.domPath);
                         } catch(e) {
                               field = null;
                         }
+                  }
+                  if(!field && item.key) {
+                        const selector = `[id="${CSS.escape(item.key)}"],[name="${CSS.escape(item.key)}"],[data-serialization-key="${CSS.escape(item.key)}"]`;
+                        field = rootElement.querySelector(selector);
                   }
                   if(!field) continue;
                   if(field.type === "checkbox" || field.type === "radio") {
