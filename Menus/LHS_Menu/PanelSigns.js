@@ -132,6 +132,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 		this.footer.appendChild(this.#createProductBtn);
 	}
 
+	getSerializationMenuType() {
+		return "panelSigns";
+	}
+
 	#addQuickTemplate() {
 		this.#numProducts++;
 

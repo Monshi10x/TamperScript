@@ -276,6 +276,101 @@ class LHSMenuWindow {
         this.dragElement(parentContainerHeader, this.container);
     }
 
+    getSerializationMenuType() {
+        return (this.constructor?.name || "menu").toLowerCase();
+    }
+
+    buildSerializablePayload() {
+        const visiblePages = [];
+        const pages = this.getPages();
+        for(let i = 0; i < pages.length; i++) {
+            visiblePages.push(pages[i].style.display !== "none");
+        }
+
+        return {
+            currentPageIndex: this.currentPageIndex,
+            containerRect: {
+                left: this.container?.style?.left || null,
+                top: this.container?.style?.top || null,
+                width: this.container?.style?.width || null,
+                height: this.container?.style?.height || null,
+                display: this.container?.style?.display || null
+            },
+            visiblePages,
+            uiState: MenuStateSerializer.captureUiState(this.container)
+        };
+    }
+
+    applySerializedPayload(payload = {}) {
+        if(payload.containerRect) {
+            if(payload.containerRect.left !== null) this.container.style.left = payload.containerRect.left;
+            if(payload.containerRect.top !== null) this.container.style.top = payload.containerRect.top;
+        }
+
+        if(Number.isInteger(payload.currentPageIndex)) {
+            this.jumpToPage(payload.currentPageIndex);
+        }
+
+        if(Array.isArray(payload.uiState)) {
+            MenuStateSerializer.applyUiState(this.container, payload.uiState);
+        }
+    }
+
+    serializeMenuState(options = {}) {
+        if(typeof MenuStateSerializer === "undefined") {
+            throw new Error("MenuStateSerializer is not available.");
+        }
+
+        const assets = {};
+        const payload = {
+            ...this.buildSerializablePayload(),
+            ...(options.payload || {})
+        };
+
+        if(typeof options.captureAssets === "function") {
+            options.captureAssets(assets);
+        }
+
+        return MenuStateSerializer.createEnvelope({
+            menuType: this.getSerializationMenuType(),
+            payload,
+            assets,
+            schemaVersion: options.schemaVersion
+        });
+    }
+
+    deserializeMenuState(envelope) {
+        if(typeof MenuStateSerializer === "undefined") {
+            throw new Error("MenuStateSerializer is not available.");
+        }
+
+        if(!envelope || envelope.menuType !== this.getSerializationMenuType()) {
+            throw new Error("Menu type mismatch for restore.");
+        }
+
+        const validity = MenuStateSerializer.verifyEnvelopeIntegrity(envelope);
+        if(!validity.valid) {
+            throw new Error("Unable to restore state: " + validity.reason);
+        }
+
+        this.applySerializedPayload(envelope.payload || {});
+        return {missingAssets: this.reportMissingAssets(envelope)};
+    }
+
+    reportMissingAssets(envelope) {
+        const missing = [];
+        const assetRefs = envelope?.payload?.assetRefs;
+        if(!Array.isArray(assetRefs)) return missing;
+
+        for(let i = 0; i < assetRefs.length; i++) {
+            const assetRef = assetRefs[i];
+            if(!envelope.assets || !envelope.assets[assetRef]) {
+                missing.push(assetRef);
+            }
+        }
+        return missing;
+    }
+
     dragElement(element, parent) {
         var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         if(element) {

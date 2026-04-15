@@ -50,6 +50,10 @@ class BillboardMenu extends LHSMenuWindow {
             this.doesTick = false;
       }
 
+      getSerializationMenuType() {
+            return "billboard";
+      }
+
       show() {
             super.show();
 
