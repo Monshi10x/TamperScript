@@ -132,6 +132,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 		this.footer.appendChild(this.#createProductBtn);
 	}
 
+	getSerializationMenuType() {
+		return "panelSigns";
+	}
+
 	#addQuickTemplate() {
 		this.#numProducts++;
 
@@ -733,6 +737,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 			await AddBlankProduct();
 			productNo = getNumProducts();
 			partIndex = 0;
+
+			partIndex = await this.createSerializedStatePart(productNo, partIndex, {
+				payload: { sourceProductNumber: currentProductNumber }
+			});
 
 			for(let j = 0; j < this.#allMaterials.length; j++) {
 				let item = this.#allMaterials[j];

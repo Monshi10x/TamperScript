@@ -50,6 +50,27 @@ class BillboardMenu extends LHSMenuWindow {
             this.doesTick = false;
       }
 
+      getSerializationMenuType() {
+            return "billboard";
+      }
+
+      onStateRestored(payload = {}, assets = {}) {
+            if(typeof payload.showGround === "boolean") {
+                  this.#showGround = payload.showGround;
+                  if(this.#f_showGroundCkb?.[1]) this.#f_showGroundCkb[1].checked = payload.showGround;
+            }
+            if(payload.attachmentType) {
+                  attachmentType = payload.attachmentType;
+            }
+            if(Array.isArray(payload.assetRefs) && payload.assetRefs.length > 0) {
+                  const firstAsset = assets[payload.assetRefs[0]];
+                  if(firstAsset?.data && this.#dragZoomSVG) {
+                        this.#dragZoomSVG.unscaledSVGString = firstAsset.data;
+                  }
+            }
+            this.UpdateFromFields();
+      }
+
       show() {
             super.show();
 
@@ -208,11 +229,22 @@ class BillboardMenu extends LHSMenuWindow {
                   tempThis.#artwork.Description() +
                   tempThis.#install.Description());
 
-            await AddPart("No Cost Part", productNo);
-            partIndex++;
-            await setPartDescription(productNo, partIndex, "CODE [Automatic]");
-            partIndex = await setPartNotes(productNo, partIndex, this.#dragZoomSVG.unscaledSVGString);
-            await savePart(productNo, partIndex);
+            partIndex = await tempThis.createSerializedStatePart(productNo, partIndex, {
+                  payload: {
+                        attachmentType,
+                        showGround: tempThis.#showGround
+                  },
+                  captureAssets: (assets) => {
+                        if(!tempThis.#dragZoomSVG?.unscaledSVGString) return;
+                        const assetRef = MenuStateSerializer.registerAsset(assets, {
+                              type: "svg",
+                              mime: "image/svg+xml",
+                              encoding: "utf8",
+                              data: tempThis.#dragZoomSVG.unscaledSVGString
+                        });
+                        assets.__payload = {assetRefs: [assetRef]};
+                  }
+            });
 
             partIndex = await tempThis.#sign.Create(productNo, partIndex);
             partIndex = await tempThis.#leg.Create(productNo, partIndex);

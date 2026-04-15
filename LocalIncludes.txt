@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.577
+// @version      10.579
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -92,6 +92,7 @@
 // @require      file://C:\Users\monsh\Documents\TamperScript\Async_Functions\Async_Functions.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\Toggle.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\Common.js
+// @require      file://C:\Users\monsh\Documents\TamperScript\Serialization\MenuStateSerializer.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Subscription\SubscriptionManager.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\ObjectArray.js
 // @require      file://C:\Users\monsh\Documents\TamperScript\Common\TArray.js

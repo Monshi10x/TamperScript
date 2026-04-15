@@ -23,6 +23,55 @@ function parseKOStorageVariable(koString) {
 	return koString.replaceAll(" ", "~").replaceAll('"', "^");
 }
 
+function tryParseSerializedMenuEnvelope(partText) {
+	if(typeof MenuStateSerializer === "undefined") return null;
+	try {
+		return MenuStateSerializer.parseEnvelopeFromStorageText(partText);
+	} catch(error) {
+		console.warn("Failed to parse serialized menu state.", error);
+		return null;
+	}
+}
+
+async function restoreSerializedMenuState(partText) {
+	const envelope = tryParseSerializedMenuEnvelope(partText);
+	if(!envelope) {
+		Toast.warn("No serialized menu state found in this part.", 3000, {position: "top-right"});
+		return;
+	}
+
+	const menuLookup = {
+		billboard: {menuKey: "billboard", menuGetter: () => menu_Billboard},
+		menu3d: {menuKey: "3D", menuGetter: () => menu_3D},
+		panelSigns: {menuKey: "panel", menuGetter: () => menu_PanelSigns},
+		vehicle: {menuKey: "vehicle", menuGetter: () => menu_Vehicle}
+	};
+
+	const target = menuLookup[envelope.menuType];
+	if(!target) {
+		Toast.warn("Unsupported menu type: " + envelope.menuType, 4000, {position: "top-right"});
+		return;
+	}
+
+	openMenu(target.menuKey);
+
+	for(let attempt = 0; attempt < 10; attempt++) {
+		await sleep(150);
+		try {
+			const menu = target.menuGetter();
+			if(!menu || typeof menu.deserializeMenuState !== "function") continue;
+			menu.deserializeMenuState(envelope);
+			Toast.notify("Menu state restored.", 3000, {position: "top-right"});
+			return;
+		} catch(error) {
+			if(attempt === 9) {
+				console.error(error);
+				Toast.warn("Failed to restore serialized state.", 4000, {position: "top-right"});
+			}
+		}
+	}
+}
+
 function partInfoTick() {
 	products = document.querySelectorAll('div[class^="ord-prod-model-item"]');
 
@@ -265,6 +314,13 @@ function partInfoTick() {
 
 			//if(koPartDescription.includes("CODE [Automatic]")) {
 			let partText = koPart.PartNotes();
+			const serializedEnvelope = tryParseSerializedMenuEnvelope(partText);
+			if(serializedEnvelope && partHeader.querySelectorAll(".restoreStateButton").length == 0) {
+				let restoreBtn = createButton("LOAD", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
+					restoreSerializedMenuState(partText);
+				}, partHeader);
+				restoreBtn.classList.add('restoreStateButton');
+			}
 			if(partText.includes("svg") && partHeader.querySelectorAll(".seeSVGButton").length == 0) {
 				let btn = createButton("SVG", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
 					let modalSVG = new ModalSVG("SVG Modal", 1, () => { }, partText, null, {convertShapesToPaths: false, splitCompoundPaths: false, defaultStrokeWidth: 2, scaleStrokeOnScroll: !partText.includes('data-scaleStrokeOnScroll="false"')});
