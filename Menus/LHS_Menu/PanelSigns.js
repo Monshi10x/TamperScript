@@ -738,6 +738,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 			productNo = getNumProducts();
 			partIndex = 0;
 
+			partIndex = await this.createSerializedStatePart(productNo, partIndex, {
+				payload: { sourceProductNumber: currentProductNumber }
+			});
+
 			for(let j = 0; j < this.#allMaterials.length; j++) {
 				let item = this.#allMaterials[j];
 				if(item.productNumber != currentProductNumber) continue;

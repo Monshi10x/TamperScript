@@ -1,6 +1,7 @@
 class MenuStateSerializer {
       static SCHEMA_VERSION = 1;
       static MAX_STATE_BYTES = 1024 * 1024 * 2;
+      static STORAGE_PREFIX = "CB_STATE_V1:";
 
       static canonicalizeAssetText(text) {
             if(typeof text !== "string") return "";
@@ -178,13 +179,15 @@ class MenuStateSerializer {
             for(let i = 0; i < fields.length; i++) {
                   const field = fields[i];
                   const key = field.id || field.name || field.getAttribute("data-serialization-key");
-                  if(!key) continue;
+                  const domPath = MenuStateSerializer.getElementPath(field, rootElement);
+                  if(!key && !domPath) continue;
                   let value = field.value;
                   if(field.type === "checkbox" || field.type === "radio") {
                         value = field.checked;
                   }
                   state.push({
                         key,
+                        domPath,
                         tag: field.tagName,
                         type: field.type || null,
                         value
@@ -193,12 +196,42 @@ class MenuStateSerializer {
             return state;
       }
 
+      static getElementPath(element, rootElement) {
+            if(!element || !rootElement || !rootElement.contains(element)) return null;
+            const steps = [];
+            let current = element;
+            while(current && current !== rootElement) {
+                  const parent = current.parentElement;
+                  if(!parent) break;
+                  const siblings = parent.children;
+                  let index = 1;
+                  let count = 0;
+                  for(let i = 0; i < siblings.length; i++) {
+                        if(siblings[i].tagName === current.tagName) {
+                              count++;
+                              if(siblings[i] === current) index = count;
+                        }
+                  }
+                  steps.push(current.tagName.toLowerCase() + `:nth-of-type(${index})`);
+                  current = parent;
+            }
+            steps.reverse();
+            return steps.join(" > ");
+      }
+
       static applyUiState(rootElement, state = []) {
             if(!rootElement || !Array.isArray(state)) return;
             for(let i = 0; i < state.length; i++) {
                   const item = state[i];
                   const selector = `[id="${CSS.escape(item.key)}"],[name="${CSS.escape(item.key)}"],[data-serialization-key="${CSS.escape(item.key)}"]`;
-                  const field = rootElement.querySelector(selector);
+                  let field = rootElement.querySelector(selector);
+                  if(!field && item.domPath) {
+                        try {
+                              field = rootElement.querySelector(item.domPath);
+                        } catch(e) {
+                              field = null;
+                        }
+                  }
                   if(!field) continue;
                   if(field.type === "checkbox" || field.type === "radio") {
                         field.checked = !!item.value;
@@ -207,5 +240,17 @@ class MenuStateSerializer {
                   }
                   field.dispatchEvent(new Event("change", {bubbles: true}));
             }
+      }
+
+      static serializeEnvelopeToStorageText(envelope, options = {}) {
+            const packed = MenuStateSerializer.serializeForStorage(envelope, options);
+            return MenuStateSerializer.STORAGE_PREFIX + JSON.stringify(packed);
+      }
+
+      static parseEnvelopeFromStorageText(text) {
+            if(typeof text !== "string" || !text.startsWith(MenuStateSerializer.STORAGE_PREFIX)) return null;
+            const packedJson = text.slice(MenuStateSerializer.STORAGE_PREFIX.length);
+            const packed = JSON.parse(packedJson);
+            return MenuStateSerializer.reassembleChunks(packed.manifest, packed.chunks);
       }
 }

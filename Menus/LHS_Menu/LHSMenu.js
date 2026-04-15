@@ -330,6 +330,10 @@ class LHSMenuWindow {
         if(typeof options.captureAssets === "function") {
             options.captureAssets(assets);
         }
+        if(assets.__payload && typeof assets.__payload === "object") {
+            Object.assign(payload, assets.__payload);
+            delete assets.__payload;
+        }
 
         return MenuStateSerializer.createEnvelope({
             menuType: this.getSerializationMenuType(),
@@ -337,6 +341,18 @@ class LHSMenuWindow {
             assets,
             schemaVersion: options.schemaVersion
         });
+    }
+
+    async createSerializedStatePart(productNo, partIndex = 0, options = {}) {
+        const envelope = this.serializeMenuState(options);
+        const serializedText = MenuStateSerializer.serializeEnvelopeToStorageText(envelope, options);
+
+        await AddPart("No Cost Part", productNo);
+        partIndex++;
+        await setPartDescription(productNo, partIndex, "CODE [Automatic]");
+        await setPartNotes(productNo, partIndex, serializedText);
+        await savePart(productNo, partIndex);
+        return partIndex;
     }
 
     deserializeMenuState(envelope) {
@@ -354,6 +370,9 @@ class LHSMenuWindow {
         }
 
         this.applySerializedPayload(envelope.payload || {});
+        if(typeof this.onStateRestored === "function") {
+            this.onStateRestored(envelope.payload || {}, envelope.assets || {});
+        }
         return {missingAssets: this.reportMissingAssets(envelope)};
     }
 

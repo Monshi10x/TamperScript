@@ -109,6 +109,27 @@ class VehicleMenu extends LHSMenuWindow {
             return "vehicle";
       }
 
+      onStateRestored(payload = {}, assets = {}) {
+            if(payload.layoutOrientation) this.#layoutOrientation = payload.layoutOrientation;
+            if(typeof payload.showMeasures === "boolean") this.#showMeasures = payload.showMeasures;
+            if(typeof payload.showQuantity === "boolean") this.#showQuantity = payload.showQuantity;
+            if(typeof payload.showDescription === "boolean") this.#showDescription = payload.showDescription;
+            if(typeof payload.showBackground === "boolean") this.#showBackground = payload.showBackground;
+            if(typeof payload.showImages === "boolean") this.#showImages = payload.showImages;
+            if(typeof payload.showRectangles === "boolean") this.#showRectangles = payload.showRectangles;
+            if(typeof payload.showHandles === "boolean") this.#showHandles = payload.showHandles;
+            if(Array.isArray(payload.rects)) this.rects = JSON.parse(JSON.stringify(payload.rects));
+            if(Array.isArray(payload.images)) this.#images = JSON.parse(JSON.stringify(payload.images));
+            if(Array.isArray(payload.assetRefs) && payload.assetRefs.length > 0) {
+                  const firstAsset = assets[payload.assetRefs[0]];
+                  if(firstAsset?.data && this.#dragZoomSVG) {
+                        this.#dragZoomSVG.unscaledSVGString = firstAsset.data;
+                  }
+            }
+            this.#applyLayout();
+            this.refresh();
+      }
+
       show() {
             super.show();
             super.clearPages();
@@ -368,11 +389,30 @@ class VehicleMenu extends LHSMenuWindow {
                   this.#showMeasures = true;
                   try {measuresCkb[1].checked = true;} catch(e) { }
                   this.refresh();
-                  await AddPart("No Cost Part", productNo);
-                  partNo++;
-                  await setPartDescription(productNo, partNo, "CODE [Automatic]");
-                  partNo = await setPartNotes(productNo, partNo, this.#dragZoomSVG.unscaledSVGString);
-                  await savePart(productNo, partNo);
+                  partNo = await this.createSerializedStatePart(productNo, partNo, {
+                        payload: {
+                              layoutOrientation: this.#layoutOrientation,
+                              showMeasures: this.#showMeasures,
+                              showQuantity: this.#showQuantity,
+                              showDescription: this.#showDescription,
+                              showBackground: this.#showBackground,
+                              showImages: this.#showImages,
+                              showRectangles: this.#showRectangles,
+                              showHandles: this.#showHandles,
+                              rects: JSON.parse(JSON.stringify(this.rects || [])),
+                              images: JSON.parse(JSON.stringify(this.#images || []))
+                        },
+                        captureAssets: (assets) => {
+                              if(!this.#dragZoomSVG?.unscaledSVGString) return;
+                              const assetRef = MenuStateSerializer.registerAsset(assets, {
+                                    type: "svg",
+                                    mime: "image/svg+xml",
+                                    encoding: "utf8",
+                                    data: this.#dragZoomSVG.unscaledSVGString
+                              });
+                              assets.__payload = {assetRefs: [assetRef]};
+                        }
+                  });
                   await setProductName(productNo, "Vehicle Graphics");
                   partNo = await VehicleMenu_Template.Create(productNo, partNo);
                   partNo = await VehicleMenu_Production.Create(productNo, partNo);
