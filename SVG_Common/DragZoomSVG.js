@@ -90,6 +90,47 @@ class DragZoomSVG {
       set scale(value) {this.#scale = value;}
       set allowPanning(value) {this.#allowPanning = value;}
       set allowZoom(value) {this.#allowZoom = value;}
+      set unscaledSVGString(svgMarkup) {
+            if(typeof svgMarkup !== "string" || svgMarkup.trim().length === 0) {
+                  console.warn("Unable to set unscaledSVGString: input was empty");
+                  return;
+            }
+
+            const parser = new DOMParser();
+            const parsedDoc = parser.parseFromString(svgMarkup, "image/svg+xml");
+            const parserError = parsedDoc.querySelector("parsererror");
+            if(parserError) {
+                  console.warn("Unable to set unscaledSVGString: invalid SVG markup");
+                  return;
+            }
+
+            const parsedSvg = parsedDoc.querySelector("svg");
+            if(!parsedSvg) {
+                  console.warn("Unable to set unscaledSVGString: missing <svg> root");
+                  return;
+            }
+
+            const parsedGroup = parsedSvg.querySelector("#mainGcreatedByT");
+            if(parsedGroup) {
+                  parsedGroup.setAttribute("transform", "matrix(1 0 0 1 0 0)");
+            }
+
+            this.#f_svg.innerHTML = parsedSvg.innerHTML;
+            this.#f_svgG = this.#f_svg.querySelector("#mainGcreatedByT");
+
+            if(!this.#f_svgG) {
+                  this.#f_svgG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                  this.#f_svgG.id = "mainGcreatedByT";
+                  while(this.#f_svg.firstChild) {
+                        this.#f_svgG.appendChild(this.#f_svg.firstChild);
+                  }
+                  this.#f_svg.appendChild(this.#f_svgG);
+            }
+
+            setTimeout(() => {
+                  this.centerAndFitSVGContent(this.svg, this.#f_svgG, this.#panZoomInstance);
+            }, 1);
+      }
       /*
                         
       Start             */
@@ -206,16 +247,25 @@ class DragZoomSVG {
 
             const availableWidth = containerRect.width - margin * 2;
             const availableHeight = containerRect.height - margin * 2;
+            if(!Number.isFinite(availableWidth) || !Number.isFinite(availableHeight) || availableWidth <= 0 || availableHeight <= 0) {
+                  return console.warn("Unable to fit SVG: container size is not ready");
+            }
 
             const scaleX = availableWidth / bbox.width;
             const scaleY = availableHeight / bbox.height;
             const scale = Math.min(scaleX, scaleY);
+            if(!Number.isFinite(scale) || scale <= 0) {
+                  return console.warn("Unable to fit SVG: invalid scale", scale);
+            }
 
             const scaledWidth = bbox.width * scale;
             const scaledHeight = bbox.height * scale;
 
             const dx = (containerRect.width - scaledWidth) / 2 - bbox.x * scale;
             const dy = (containerRect.height - scaledHeight) / 2 - bbox.y * scale;
+            if(!Number.isFinite(dx) || !Number.isFinite(dy)) {
+                  return console.warn("Unable to fit SVG: invalid translation", {dx, dy});
+            }
 
             panzoomInstance.moveTo(0, 0);
             panzoomInstance.zoomAbs(0, 0, scale);
