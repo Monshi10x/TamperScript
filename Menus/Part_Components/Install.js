@@ -143,10 +143,11 @@ class Install extends SubMenu {
 
 	get qty() {return zeroIfNaNNullBlank(this.#qty[1].value);}
 
-	getSerializedState() {
-		return {
-			qty: this.qty,
-			installTotalEach: this.installTotalEach,
+		getSerializedState() {
+			return {
+				required: this.required,
+				qty: this.qty,
+				installTotalEach: this.installTotalEach,
 			installRate: this.installRate,
 			installMinutes: this.installMinutes,
 			installHours: this.installHours,
@@ -164,11 +165,14 @@ class Install extends SubMenu {
 		};
 	}
 
-	applySerializedState(state = {}) {
-		if(!state || typeof state !== "object") return;
+		applySerializedState(state = {}) {
+			if(!state || typeof state !== "object") return;
+			if(state.required !== undefined) {
+				this.required = !!state.required;
+			}
 
-		if(state.qty !== undefined) {
-			$(this.#qty[1]).val(state.qty).change();
+			if(state.qty !== undefined) {
+				$(this.#qty[1]).val(state.qty).change();
 		}
 		if(state.installTotalEach !== undefined) {
 			this.#installTimeTotalEach[1].value = state.installTotalEach;
