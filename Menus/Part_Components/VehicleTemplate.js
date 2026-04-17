@@ -70,6 +70,7 @@ class VehicleMenu extends LHSMenuWindow {
       #layoutOrientation = "vertical";
       #leftPane;
       #rightPane;
+      #canvasContainer;
       #rowFieldCache = [];
       #isDraggingRect = false;
       #state = {
@@ -176,7 +177,8 @@ class VehicleMenu extends LHSMenuWindow {
                         dataLength: firstAsset?.data?.length || 0
                   });
                   if(firstAsset?.data && this.#dragZoomSVG) {
-                        this.#dragZoomSVG.unscaledSVGString = firstAsset.data;
+                        this.#debugLog("onStateRestored:reinitDragZoomFromAsset", {length: firstAsset.data.length});
+                        this.#initDragZoom(this.#canvasContainer, firstAsset.data);
                         this.#initLayers();
                         if(this.#svgLayers.images) this.#svgLayers.images.innerHTML = "";
                         if(this.#svgLayers.rects) this.#svgLayers.rects.innerHTML = "";
@@ -266,6 +268,7 @@ class VehicleMenu extends LHSMenuWindow {
 
             const container = document.createElement('div');
             container.style = "width:100%;height:100%;display:block;background-color:white;position: relative;";
+            this.#canvasContainer = container;
 
             const menuContainer = document.createElement('div');
             menuContainer.style = "display:block; width:60px;background-color:" + COLOUR.Blue + ";height:100%;position:absolute;top:0px;right:0px;";
@@ -564,8 +567,12 @@ class VehicleMenu extends LHSMenuWindow {
             this.refresh();
       }
 
-      #initDragZoom(container) {
-            const svgTemplate = '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="8000mm" height="6000mm" viewBox="0 0 8000 6000"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)"></g></svg>';
+      #initDragZoom(container, optionalSvgMarkup = null) {
+            const svgTemplate = optionalSvgMarkup || '<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" width="8000mm" height="6000mm" viewBox="0 0 8000 6000"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)"></g></svg>';
+
+            if(this.#dragZoomSVG?.container && this.#dragZoomSVG.container.parentNode === container) {
+                  container.removeChild(this.#dragZoomSVG.container);
+            }
             this.#dragZoomSVG = new DragZoomSVG("calc(100% - 60px)", "100%", svgTemplate, container, {
                   convertShapesToPaths: false,
                   scaleStrokeOnScroll: false,
