@@ -198,23 +198,51 @@ class VehicleMenu extends LHSMenuWindow {
 
             setTimeout(() => {
                   const containerRect = this.#dragZoomSVG?.container?.getBoundingClientRect?.();
-                  if(containerRect && containerRect.width > 0 && containerRect.height > 0) {
-                        try {
-                              this.#dragZoomSVG.centerAndFitSVGContent(this.#dragZoomSVG.svg, this.#dragZoomSVG.svgG, this.#dragZoomSVG.panZoomInstance);
-                        } catch(error) {
-                              this.#debugLog("onStateRestored:centerAndFit:error", {message: error?.message || error});
-                        }
-                  }
                   this.#debugLog("onStateRestored:delayedFitCheck", {
                         containerRect,
                         svgRect: this.#dragZoomSVG?.svg?.getBoundingClientRect?.(),
                         scale: this.#dragZoomSVG?.scale,
                         rectCount: this.rects?.length || 0
                   });
-                  this.#suspendZoomRefresh = false;
-                  this.refresh();
-                  this.#flushDebugBlock("postRestore");
+                  this.#fitCanvasAfterRestore(0);
             }, 100);
+      }
+
+      #fitCanvasAfterRestore(retryCount = 0) {
+            const containerRect = this.#dragZoomSVG?.container?.getBoundingClientRect?.();
+            if(!containerRect) return;
+
+            const minReadyWidth = 300;
+            const maxRetries = 12;
+            if(containerRect.width < minReadyWidth && retryCount < maxRetries) {
+                  this.#debugLog("fitCanvasAfterRestore:retryingForWidth", {retryCount, width: containerRect.width});
+                  setTimeout(() => {this.#fitCanvasAfterRestore(retryCount + 1);}, 100);
+                  return;
+            }
+
+            try {
+                  const hasBackground = !!this.#svgLayers.background?.querySelector("image");
+                  const hasRects = (this.#svgLayers.rects?.childNodes?.length || 0) > 0;
+                  let fitTarget = this.#dragZoomSVG.svgG;
+                  if(hasBackground) fitTarget = this.#svgLayers.background;
+                  else if(hasRects) fitTarget = this.#svgLayers.rects;
+
+                  this.#debugLog("fitCanvasAfterRestore:fit", {
+                        retryCount,
+                        width: containerRect.width,
+                        height: containerRect.height,
+                        hasBackground,
+                        hasRects,
+                        targetId: fitTarget?.id || "svgG"
+                  });
+                  this.#dragZoomSVG.centerAndFitSVGContent(this.#dragZoomSVG.svg, fitTarget, this.#dragZoomSVG.panZoomInstance);
+            } catch(error) {
+                  this.#debugLog("fitCanvasAfterRestore:error", {message: error?.message || error});
+            }
+
+            this.#suspendZoomRefresh = false;
+            this.refresh();
+            this.#flushDebugBlock("postRestore");
       }
 
       show() {
