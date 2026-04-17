@@ -101,26 +101,11 @@ class VehicleMenu extends LHSMenuWindow {
       #suspendZoomRefresh = false;
 
       #onKeyDownHandler = (event) => {this.#handleKeyDown(event);};
-      #debugLines = [];
       #debugLog(...args) {
-            if(!VEHICLE_RESTORE_DEBUG) return;
-            console.log("[VehicleMenu Debug]", ...args);
-            const serialized = args.map((arg) => {
-                  if(typeof arg === "string") return arg;
-                  try {
-                        return JSON.stringify(arg);
-                  } catch(error) {
-                        return String(arg);
-                  }
-            }).join(" | ");
-            this.#debugLines.push(`[${new Date().toISOString()}] ${serialized}`);
+            return;
       }
       #flushDebugBlock(label = "snapshot") {
-            if(!VEHICLE_RESTORE_DEBUG) return;
-            const block = `--- VEHICLE DEBUG ${label} START ---\n${this.#debugLines.join("\n")}\n--- VEHICLE DEBUG ${label} END ---`;
-            window.__vehicleRestoreDebugBlock = block;
-            console.log(block);
-            console.log("[VehicleMenu Debug] Copy block from window.__vehicleRestoreDebugBlock");
+            return;
       }
 
       constructor(width, height, ID, windowTitle) {
@@ -134,7 +119,6 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       onStateRestored(payload = {}, assets = {}) {
-            this.#debugLines = [];
             this.#suspendZoomRefresh = true;
             this.#debugLog("onStateRestored:start", {
                   payloadKeys: Object.keys(payload || {}),
