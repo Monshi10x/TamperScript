@@ -118,12 +118,18 @@ class VehicleMenu extends LHSMenuWindow {
             if(typeof payload.showImages === "boolean") this.#showImages = payload.showImages;
             if(typeof payload.showRectangles === "boolean") this.#showRectangles = payload.showRectangles;
             if(typeof payload.showHandles === "boolean") this.#showHandles = payload.showHandles;
-            if(Array.isArray(payload.rects)) this.rects = JSON.parse(JSON.stringify(payload.rects));
+            if(Array.isArray(payload.rects)) {
+                  this.rects = JSON.parse(JSON.stringify(payload.rects)).map((rect) => {
+                        this.#ensureRectDefaults(rect);
+                        return rect;
+                  });
+            }
             if(Array.isArray(payload.images)) this.#images = JSON.parse(JSON.stringify(payload.images));
             if(Array.isArray(payload.assetRefs) && payload.assetRefs.length > 0) {
                   const firstAsset = assets[payload.assetRefs[0]];
                   if(firstAsset?.data && this.#dragZoomSVG) {
                         this.#dragZoomSVG.unscaledSVGString = firstAsset.data;
+                        this.#initLayers();
                   }
             }
             this.#applyLayout();
@@ -516,21 +522,29 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       #initLayers() {
-            this.#defs = vehicle_createSvgElement('defs');
-            this.#dragZoomSVG.svg.insertBefore(this.#defs, this.#dragZoomSVG.svg.firstChild);
-            this.#svgLayers.background = vehicle_createSvgElement('g', {id: 'vehicle-background-layer'});
-            this.#svgLayers.images = vehicle_createSvgElement('g', {id: 'vehicle-images-layer'});
-            this.#svgLayers.rects = vehicle_createSvgElement('g', {id: 'vehicle-rect-layer'});
-            this.#svgLayers.handles = vehicle_createSvgElement('g', {id: 'vehicle-handle-layer'});
-            this.#svgLayers.labels = vehicle_createSvgElement('g', {id: 'vehicle-label-layer'});
-            this.#svgLayers.measures = vehicle_createSvgElement('g', {id: 'vehicle-measure-layer'});
+            const svg = this.#dragZoomSVG.svg;
+            const svgG = this.#dragZoomSVG.svgG;
+            if(!svg || !svgG) return;
 
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.background);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.images);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.rects);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.measures);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.labels);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.handles);
+            this.#defs = svg.querySelector('#vehicle-defs');
+            if(!this.#defs) {
+                  this.#defs = vehicle_createSvgElement('defs', {id: 'vehicle-defs'});
+                  svg.insertBefore(this.#defs, svg.firstChild);
+            }
+
+            const getOrCreateLayer = (id) => {
+                  let layer = svgG.querySelector('#' + id);
+                  if(!layer) layer = vehicle_createSvgElement('g', {id});
+                  svgG.appendChild(layer);
+                  return layer;
+            };
+
+            this.#svgLayers.background = getOrCreateLayer('vehicle-background-layer');
+            this.#svgLayers.images = getOrCreateLayer('vehicle-images-layer');
+            this.#svgLayers.rects = getOrCreateLayer('vehicle-rect-layer');
+            this.#svgLayers.measures = getOrCreateLayer('vehicle-measure-layer');
+            this.#svgLayers.labels = getOrCreateLayer('vehicle-label-layer');
+            this.#svgLayers.handles = getOrCreateLayer('vehicle-handle-layer');
       }
 
       get rects() {
@@ -1148,9 +1162,15 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       #ensureRectDefaults(item) {
-            item.w = item.w || 100;
-            item.h = item.h || 100;
-            item.qty = item.qty || 1;
+            const toFiniteNumber = (value, fallback) => {
+                  const parsed = Number(value);
+                  return Number.isFinite(parsed) ? parsed : fallback;
+            };
+            item.x = toFiniteNumber(item.x, 0);
+            item.y = toFiniteNumber(item.y, 0);
+            item.w = toFiniteNumber(item.w, 100);
+            item.h = toFiniteNumber(item.h, 100);
+            item.qty = toFiniteNumber(item.qty, 1);
             item.description = item.description || "";
             item.colour = item.colour || COLOUR.Blue;
       }
