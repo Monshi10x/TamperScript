@@ -162,6 +162,10 @@ class VehicleMenu extends LHSMenuWindow {
             const buttonContainer = this.buttonContainer;
             let thisClass = this;
 
+            while(buttonContainer.hasChildNodes()) {
+                  buttonContainer.removeChild(buttonContainer.lastChild);
+            }
+
             page.innerHTML = "";
             page.style.display = "flex";
             page.style.flexDirection = "row";
