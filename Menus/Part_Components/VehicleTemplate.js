@@ -1,4 +1,5 @@
 const VEHICLE_HANDLE_TYPES = ['topleft', 'top', 'topright', 'right', 'bottomright', 'bottom', 'bottomleft', 'left', 'center'];
+const VEHICLE_RESTORE_DEBUG = true;
 
 function vehicle_createSvgElement(type, attributes = {}) {
       const el = document.createElementNS('http://www.w3.org/2000/svg', type);
@@ -96,8 +97,30 @@ class VehicleMenu extends LHSMenuWindow {
       #showImages = true;
       #showRectangles = true;
       #showHandles = true;
+      #suspendZoomRefresh = false;
 
       #onKeyDownHandler = (event) => {this.#handleKeyDown(event);};
+      #debugLines = [];
+      #debugLog(...args) {
+            if(!VEHICLE_RESTORE_DEBUG) return;
+            console.log("[VehicleMenu Debug]", ...args);
+            const serialized = args.map((arg) => {
+                  if(typeof arg === "string") return arg;
+                  try {
+                        return JSON.stringify(arg);
+                  } catch(error) {
+                        return String(arg);
+                  }
+            }).join(" | ");
+            this.#debugLines.push(`[${new Date().toISOString()}] ${serialized}`);
+      }
+      #flushDebugBlock(label = "snapshot") {
+            if(!VEHICLE_RESTORE_DEBUG) return;
+            const block = `--- VEHICLE DEBUG ${label} START ---\n${this.#debugLines.join("\n")}\n--- VEHICLE DEBUG ${label} END ---`;
+            window.__vehicleRestoreDebugBlock = block;
+            console.log(block);
+            console.log("[VehicleMenu Debug] Copy block from window.__vehicleRestoreDebugBlock");
+      }
 
       constructor(width, height, ID, windowTitle) {
             super(width, height, ID, windowTitle);
@@ -110,6 +133,13 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       onStateRestored(payload = {}, assets = {}) {
+            this.#debugLines = [];
+            this.#suspendZoomRefresh = true;
+            this.#debugLog("onStateRestored:start", {
+                  payloadKeys: Object.keys(payload || {}),
+                  assetKeys: Object.keys(assets || {}),
+                  assetRefs: payload?.assetRefs || []
+            });
             if(payload.layoutOrientation) this.#layoutOrientation = payload.layoutOrientation;
             if(typeof payload.showMeasures === "boolean") this.#showMeasures = payload.showMeasures;
             if(typeof payload.showQuantity === "boolean") this.#showQuantity = payload.showQuantity;
@@ -118,16 +148,71 @@ class VehicleMenu extends LHSMenuWindow {
             if(typeof payload.showImages === "boolean") this.#showImages = payload.showImages;
             if(typeof payload.showRectangles === "boolean") this.#showRectangles = payload.showRectangles;
             if(typeof payload.showHandles === "boolean") this.#showHandles = payload.showHandles;
-            if(Array.isArray(payload.rects)) this.rects = JSON.parse(JSON.stringify(payload.rects));
+            if(Array.isArray(payload.rects)) {
+                  this.#debugLog("onStateRestored:rects:incoming", {count: payload.rects.length, sample: payload.rects.slice(0, 3)});
+                  this.rects = JSON.parse(JSON.stringify(payload.rects)).map((rect) => {
+                        const before = {...rect};
+                        this.#ensureRectDefaults(rect);
+                        this.#debugLog("onStateRestored:rect:sanitized", {before, after: rect});
+                        return rect;
+                  });
+            }
             if(Array.isArray(payload.images)) this.#images = JSON.parse(JSON.stringify(payload.images));
+            if(payload.productionState && VehicleMenu_Production) {
+                  this.#applyProductionState(payload.productionState);
+            }
+            if(payload.installState && VehicleMenu_Install) {
+                  VehicleMenu_Install.applySerializedState(payload.installState);
+            }
+            if(payload.artworkState && VehicleMenu_Artwork) {
+                  this.#applyArtworkState(payload.artworkState);
+            }
             if(Array.isArray(payload.assetRefs) && payload.assetRefs.length > 0) {
                   const firstAsset = assets[payload.assetRefs[0]];
+                  this.#debugLog("onStateRestored:asset", {
+                        firstAssetRef: payload.assetRefs[0],
+                        firstAssetType: firstAsset?.type,
+                        hasData: !!firstAsset?.data,
+                        dataLength: firstAsset?.data?.length || 0
+                  });
                   if(firstAsset?.data && this.#dragZoomSVG) {
                         this.#dragZoomSVG.unscaledSVGString = firstAsset.data;
+                        this.#initLayers();
+                        if(this.#svgLayers.images) this.#svgLayers.images.innerHTML = "";
+                        if(this.#svgLayers.rects) this.#svgLayers.rects.innerHTML = "";
+                        if(this.#svgLayers.measures) this.#svgLayers.measures.innerHTML = "";
+                        if(this.#svgLayers.labels) this.#svgLayers.labels.innerHTML = "";
+                        if(this.#svgLayers.handles) this.#svgLayers.handles.innerHTML = "";
                   }
             }
             this.#applyLayout();
+            this.#debugLog("onStateRestored:postLayout", {
+                  orientation: this.#layoutOrientation,
+                  containerRect: this.#dragZoomSVG?.container?.getBoundingClientRect?.(),
+                  svgRect: this.#dragZoomSVG?.svg?.getBoundingClientRect?.(),
+                  scale: this.#dragZoomSVG?.scale
+            });
             this.refresh();
+
+            setTimeout(() => {
+                  const containerRect = this.#dragZoomSVG?.container?.getBoundingClientRect?.();
+                  if(containerRect && containerRect.width > 0 && containerRect.height > 0) {
+                        try {
+                              this.#dragZoomSVG.centerAndFitSVGContent(this.#dragZoomSVG.svg, this.#dragZoomSVG.svgG, this.#dragZoomSVG.panZoomInstance);
+                        } catch(error) {
+                              this.#debugLog("onStateRestored:centerAndFit:error", {message: error?.message || error});
+                        }
+                  }
+                  this.#debugLog("onStateRestored:delayedFitCheck", {
+                        containerRect,
+                        svgRect: this.#dragZoomSVG?.svg?.getBoundingClientRect?.(),
+                        scale: this.#dragZoomSVG?.scale,
+                        rectCount: this.rects?.length || 0
+                  });
+                  this.#suspendZoomRefresh = false;
+                  this.refresh();
+                  this.#flushDebugBlock("postRestore");
+            }, 100);
       }
 
       show() {
@@ -161,6 +246,10 @@ class VehicleMenu extends LHSMenuWindow {
             const footer = this.footer;
             const buttonContainer = this.buttonContainer;
             let thisClass = this;
+
+            while(buttonContainer.hasChildNodes()) {
+                  buttonContainer.removeChild(buttonContainer.lastChild);
+            }
 
             page.innerHTML = "";
             page.style.display = "flex";
@@ -399,16 +488,20 @@ class VehicleMenu extends LHSMenuWindow {
                               showImages: this.#showImages,
                               showRectangles: this.#showRectangles,
                               showHandles: this.#showHandles,
+                              productionState: this.#getProductionState(),
+                              installState: VehicleMenu_Install?.getSerializedState?.() || null,
+                              artworkState: this.#getArtworkState(),
                               rects: JSON.parse(JSON.stringify(this.rects || [])),
                               images: JSON.parse(JSON.stringify(this.#images || []))
                         },
                         captureAssets: (assets) => {
                               if(!this.#dragZoomSVG?.unscaledSVGString) return;
+                              const sanitizedSvgMarkup = this.#getSerializedBackgroundSvgMarkup();
                               const assetRef = MenuStateSerializer.registerAsset(assets, {
                                     type: "svg",
                                     mime: "image/svg+xml",
                                     encoding: "utf8",
-                                    data: this.#dragZoomSVG.unscaledSVGString
+                                    data: sanitizedSvgMarkup || this.#dragZoomSVG.unscaledSVGString
                               });
                               assets.__payload = {assetRefs: [assetRef]};
                         }
@@ -485,6 +578,7 @@ class VehicleMenu extends LHSMenuWindow {
             const baseOnZoom = this.#dragZoomSVG.onZoom.bind(this.#dragZoomSVG);
             this.#dragZoomSVG.onZoom = () => {
                   baseOnZoom();
+                  if(this.#suspendZoomRefresh) return;
                   this.refresh();
             };
 
@@ -512,21 +606,35 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       #initLayers() {
-            this.#defs = vehicle_createSvgElement('defs');
-            this.#dragZoomSVG.svg.insertBefore(this.#defs, this.#dragZoomSVG.svg.firstChild);
-            this.#svgLayers.background = vehicle_createSvgElement('g', {id: 'vehicle-background-layer'});
-            this.#svgLayers.images = vehicle_createSvgElement('g', {id: 'vehicle-images-layer'});
-            this.#svgLayers.rects = vehicle_createSvgElement('g', {id: 'vehicle-rect-layer'});
-            this.#svgLayers.handles = vehicle_createSvgElement('g', {id: 'vehicle-handle-layer'});
-            this.#svgLayers.labels = vehicle_createSvgElement('g', {id: 'vehicle-label-layer'});
-            this.#svgLayers.measures = vehicle_createSvgElement('g', {id: 'vehicle-measure-layer'});
+            const svg = this.#dragZoomSVG.svg;
+            const svgG = this.#dragZoomSVG.svgG;
+            if(!svg || !svgG) return;
 
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.background);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.images);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.rects);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.measures);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.labels);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.handles);
+            this.#defs = svg.querySelector('#vehicle-defs');
+            if(!this.#defs) {
+                  this.#defs = vehicle_createSvgElement('defs', {id: 'vehicle-defs'});
+                  svg.insertBefore(this.#defs, svg.firstChild);
+            }
+
+            const getOrCreateLayer = (id) => {
+                  let layer = svgG.querySelector('#' + id);
+                  if(!layer) layer = vehicle_createSvgElement('g', {id});
+                  svgG.appendChild(layer);
+                  this.#debugLog("initLayers:layer", {id, childCount: layer.childNodes?.length || 0});
+                  return layer;
+            };
+
+            this.#svgLayers.background = getOrCreateLayer('vehicle-background-layer');
+            this.#svgLayers.images = getOrCreateLayer('vehicle-images-layer');
+            this.#svgLayers.rects = getOrCreateLayer('vehicle-rect-layer');
+            this.#svgLayers.measures = getOrCreateLayer('vehicle-measure-layer');
+            this.#svgLayers.labels = getOrCreateLayer('vehicle-label-layer');
+            this.#svgLayers.handles = getOrCreateLayer('vehicle-handle-layer');
+            this.#debugLog("initLayers:complete", {
+                  hasDefs: !!this.#defs,
+                  svgChildCount: svg.childNodes?.length || 0,
+                  svgGChildCount: svgG.childNodes?.length || 0
+            });
       }
 
       get rects() {
@@ -594,6 +702,12 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       refresh() {
+                  this.#debugLog("refresh:start", {
+                  rectCount: this.rects?.length || 0,
+                  imageCount: this.#images?.length || 0,
+                  showMeasures: this.#showMeasures,
+                  scale: this.#dragZoomSVG?.scale
+            });
             this.#defs.innerHTML = "";
             this.#svgLayers.images.innerHTML = "";
             this.#svgLayers.rects.innerHTML = "";
@@ -605,6 +719,10 @@ class VehicleMenu extends LHSMenuWindow {
 
             if(this.#showImages) this.#renderImages();
             if(this.#showRectangles) this.#renderRects();
+            this.#debugLog("refresh:end", {
+                  rectLayerChildren: this.#svgLayers.rects?.childNodes?.length || 0,
+                  measureLayerChildren: this.#svgLayers.measures?.childNodes?.length || 0
+            });
       }
 
       #applyBackgroundScale(scaleW = 1, scaleH = 1) {
@@ -642,10 +760,22 @@ class VehicleMenu extends LHSMenuWindow {
 
       #renderRects() {
             const scale = this.#dragZoomSVG.scale || 1;
-            const handleRadius = 8 / scale;
-            const textSize = 14 / scale;
+            const renderScale = Math.max(scale, 0.2);
+            const handleRadius = 8 / renderScale;
+            const textSize = 14 / renderScale;
 
             this.rects.forEach((rect, index) => {
+                  this.#debugLog("renderRect:input", {
+                        index,
+                        rect,
+                        finite: {
+                              x: Number.isFinite(Number(rect?.x)),
+                              y: Number.isFinite(Number(rect?.y)),
+                              w: Number.isFinite(Number(rect?.w)),
+                              h: Number.isFinite(Number(rect?.h)),
+                              qty: Number.isFinite(Number(rect?.qty))
+                        }
+                  });
                   const rectEl = vehicle_createSvgElement('rect', {
                         x: rect.x,
                         y: rect.y,
@@ -654,16 +784,16 @@ class VehicleMenu extends LHSMenuWindow {
                         fill: rect.colour,
                         'fill-opacity': 0.65,
                         stroke: COLOUR.Black,
-                        'stroke-width': 1 / scale
+                        'stroke-width': 1 / renderScale
                   });
                   rectEl.addEventListener('mousedown', (e) => this.#startRectDrag(e, index, 'center'));
                   rectEl.addEventListener('click', (e) => {e.stopPropagation(); this.#selectRect(index);});
                   rectEl.addEventListener('mouseenter', () => {
-                        rectEl.setAttribute('stroke-width', 2 / scale);
+                        rectEl.setAttribute('stroke-width', 2 / renderScale);
                         this.#dragZoomSVG.svg.style.cursor = 'grab';
                   });
                   rectEl.addEventListener('mouseleave', () => {
-                        rectEl.setAttribute('stroke-width', 1 / scale);
+                        rectEl.setAttribute('stroke-width', 1 / renderScale);
                         this.#dragZoomSVG.svg.style.cursor = 'auto';
                   });
                   this.#svgLayers.rects.appendChild(rectEl);
@@ -697,6 +827,24 @@ class VehicleMenu extends LHSMenuWindow {
                   }
 
                   if(this.#showMeasures) {
+                        const invalidRect = !Number.isFinite(Number(rect?.x)) ||
+                              !Number.isFinite(Number(rect?.y)) ||
+                              !Number.isFinite(Number(rect?.w)) ||
+                              !Number.isFinite(Number(rect?.h));
+                        if(invalidRect) {
+                              this.#debugLog("renderRect:skipMeasurement-invalidRect", {index, rect});
+                              return;
+                        }
+                        this.#debugLog("renderRect:measurement", {
+                              index,
+                              rectBBox: {
+                                    x: rectEl.getAttribute("x"),
+                                    y: rectEl.getAttribute("y"),
+                                    width: rectEl.getAttribute("width"),
+                                    height: rectEl.getAttribute("height")
+                              },
+                              scale
+                        });
                         new TSVGMeasurement(this.#svgLayers.measures, {
                               target: rectEl,
                               direction: 'both',
@@ -705,14 +853,14 @@ class VehicleMenu extends LHSMenuWindow {
                               unit: 'mm',
                               scale: 1,
                               precision: 1,
-                              arrowSize: 10 / scale,
-                              textOffset: 15 / scale,
-                              lineWidth: 0.5 / scale,
-                              fontSize: `${14 / scale}px`,
-                              tickLength: 15 / scale,
-                              handleRadius: 6 / scale,
-                              offsetY: 20 / scale,
-                              offsetX: 20 / scale,
+                              arrowSize: 10 / renderScale,
+                              textOffset: 15 / renderScale,
+                              lineWidth: 0.5 / renderScale,
+                              fontSize: `${14 / renderScale}px`,
+                              tickLength: 15 / renderScale,
+                              handleRadius: 6 / renderScale,
+                              offsetY: 20 / renderScale,
+                              offsetX: 20 / renderScale,
                               textBackgroundColor: "yellow"
                         });
                   }
@@ -730,7 +878,7 @@ class VehicleMenu extends LHSMenuWindow {
                                     fill: baseFill,
                                     'fill-opacity': 0.8,
                                     stroke: COLOUR.Black,
-                                    'stroke-width': 1 / scale
+                                    'stroke-width': 1 / renderScale
                               });
                               handle.addEventListener('mousedown', (e) => this.#startRectDrag(e, index, handleType));
                               handle.addEventListener('mouseenter', () => {
@@ -751,7 +899,8 @@ class VehicleMenu extends LHSMenuWindow {
 
       #renderImages() {
             const scale = this.#dragZoomSVG.scale || 1;
-            const handleRadius = 8 / scale;
+            const renderScale = Math.max(scale, 0.2);
+            const handleRadius = 8 / renderScale;
 
             this.#images.forEach((imageObj, imgIndex) => {
                   const imgEl = vehicle_createSvgElement('image', {
@@ -771,7 +920,7 @@ class VehicleMenu extends LHSMenuWindow {
                         height: imageObj.h,
                         fill: 'none',
                         stroke: COLOUR.Black,
-                        'stroke-width': 1 / scale,
+                        'stroke-width': 1 / renderScale,
                         'stroke-dasharray': '6 4'
                   });
                   outline.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, 'center'));
@@ -817,7 +966,7 @@ class VehicleMenu extends LHSMenuWindow {
                                     r: baseRadius,
                                     fill: baseFill,
                                     stroke: COLOUR.Black,
-                                    'stroke-width': 1 / scale
+                                    'stroke-width': 1 / renderScale
                               });
                               handle.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, handleType));
                               handle.addEventListener('mouseenter', () => {
@@ -1144,11 +1293,82 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       #ensureRectDefaults(item) {
-            item.w = item.w || 100;
-            item.h = item.h || 100;
-            item.qty = item.qty || 1;
+            const toFiniteNumber = (value, fallback) => {
+                  const parsed = Number(value);
+                  return Number.isFinite(parsed) ? parsed : fallback;
+            };
+            const before = {x: item?.x, y: item?.y, w: item?.w, h: item?.h, qty: item?.qty, description: item?.description, colour: item?.colour};
+            item.x = toFiniteNumber(item.x, 0);
+            item.y = toFiniteNumber(item.y, 0);
+            item.w = toFiniteNumber(item.w, 100);
+            item.h = toFiniteNumber(item.h, 100);
+            item.qty = toFiniteNumber(item.qty, 1);
             item.description = item.description || "";
             item.colour = item.colour || COLOUR.Blue;
+            this.#debugLog("ensureRectDefaults", {before, after: item});
+      }
+
+      #getProductionState() {
+            return {
+                  required: !!VehicleMenu_Production?.required,
+                  qty: VehicleMenu_Production?.qty ?? 1,
+                  productionTotalEach: VehicleMenu_Production?.productionTotalEach ?? "Each",
+                  productionTimeMins: VehicleMenu_Production?.productionTimeMins ?? 0
+            };
+      }
+
+      #applyProductionState(state = {}) {
+            if(!VehicleMenu_Production || !state || typeof state !== "object") return;
+            if(state.required !== undefined) VehicleMenu_Production.required = !!state.required;
+            if(state.qty !== undefined) VehicleMenu_Production.qty = state.qty;
+            if(state.productionTotalEach !== undefined) VehicleMenu_Production.productionTotalEach = state.productionTotalEach;
+            if(state.productionTimeMins !== undefined) VehicleMenu_Production.productionTime = state.productionTimeMins;
+            this.#debugLog("applyProductionState", state);
+      }
+
+      #getArtworkState() {
+            return {
+                  required: !!VehicleMenu_Artwork?.required,
+                  artworkTimeMins: VehicleMenu_Artwork?.artworkTimeMins ?? 0,
+                  artworkCreateInNewItem: !!VehicleMenu_Artwork?.artworkCreateInNewItem
+            };
+      }
+
+      #getSerializedBackgroundSvgMarkup() {
+            const source = this.#dragZoomSVG?.unscaledSVGString;
+            if(!source || typeof source !== "string") return source;
+            try {
+                  const parser = new DOMParser();
+                  const parsedDoc = parser.parseFromString(source, "image/svg+xml");
+                  const parsedSvg = parsedDoc.querySelector("svg");
+                  const mainGroup = parsedSvg?.querySelector("#mainGcreatedByT");
+                  if(!parsedSvg || !mainGroup) return source;
+
+                  const removableLayerIds = [
+                        "vehicle-images-layer",
+                        "vehicle-rect-layer",
+                        "vehicle-measure-layer",
+                        "vehicle-label-layer",
+                        "vehicle-handle-layer"
+                  ];
+                  removableLayerIds.forEach((layerId) => {
+                        const layer = mainGroup.querySelector(`#${layerId}`);
+                        if(layer) layer.remove();
+                  });
+
+                  return parsedSvg.outerHTML;
+            } catch(error) {
+                  this.#debugLog("getSerializedBackgroundSvgMarkup:error", {message: error?.message || error});
+                  return source;
+            }
+      }
+
+      #applyArtworkState(state = {}) {
+            if(!VehicleMenu_Artwork || !state || typeof state !== "object") return;
+            if(state.required !== undefined) VehicleMenu_Artwork.required = !!state.required;
+            if(state.artworkTimeMins !== undefined) VehicleMenu_Artwork.artworkTime = state.artworkTimeMins;
+            if(state.artworkCreateInNewItem !== undefined) VehicleMenu_Artwork.artworkCreateInNewItem = !!state.artworkCreateInNewItem;
+            this.#debugLog("applyArtworkState", state);
       }
 
       #buildRowCache() {
