@@ -176,6 +176,11 @@ class VehicleMenu extends LHSMenuWindow {
                   if(firstAsset?.data && this.#dragZoomSVG) {
                         this.#dragZoomSVG.unscaledSVGString = firstAsset.data;
                         this.#initLayers();
+                        if(this.#svgLayers.images) this.#svgLayers.images.innerHTML = "";
+                        if(this.#svgLayers.rects) this.#svgLayers.rects.innerHTML = "";
+                        if(this.#svgLayers.measures) this.#svgLayers.measures.innerHTML = "";
+                        if(this.#svgLayers.labels) this.#svgLayers.labels.innerHTML = "";
+                        if(this.#svgLayers.handles) this.#svgLayers.handles.innerHTML = "";
                   }
             }
             this.#applyLayout();
@@ -487,11 +492,12 @@ class VehicleMenu extends LHSMenuWindow {
                         },
                         captureAssets: (assets) => {
                               if(!this.#dragZoomSVG?.unscaledSVGString) return;
+                              const sanitizedSvgMarkup = this.#getSerializedBackgroundSvgMarkup();
                               const assetRef = MenuStateSerializer.registerAsset(assets, {
                                     type: "svg",
                                     mime: "image/svg+xml",
                                     encoding: "utf8",
-                                    data: this.#dragZoomSVG.unscaledSVGString
+                                    data: sanitizedSvgMarkup || this.#dragZoomSVG.unscaledSVGString
                               });
                               assets.__payload = {assetRefs: [assetRef]};
                         }
@@ -1319,6 +1325,35 @@ class VehicleMenu extends LHSMenuWindow {
                   artworkTimeMins: VehicleMenu_Artwork?.artworkTimeMins ?? 0,
                   artworkCreateInNewItem: !!VehicleMenu_Artwork?.artworkCreateInNewItem
             };
+      }
+
+      #getSerializedBackgroundSvgMarkup() {
+            const source = this.#dragZoomSVG?.unscaledSVGString;
+            if(!source || typeof source !== "string") return source;
+            try {
+                  const parser = new DOMParser();
+                  const parsedDoc = parser.parseFromString(source, "image/svg+xml");
+                  const parsedSvg = parsedDoc.querySelector("svg");
+                  const mainGroup = parsedSvg?.querySelector("#mainGcreatedByT");
+                  if(!parsedSvg || !mainGroup) return source;
+
+                  const removableLayerIds = [
+                        "vehicle-images-layer",
+                        "vehicle-rect-layer",
+                        "vehicle-measure-layer",
+                        "vehicle-label-layer",
+                        "vehicle-handle-layer"
+                  ];
+                  removableLayerIds.forEach((layerId) => {
+                        const layer = mainGroup.querySelector(`#${layerId}`);
+                        if(layer) layer.remove();
+                  });
+
+                  return parsedSvg.outerHTML;
+            } catch(error) {
+                  this.#debugLog("getSerializedBackgroundSvgMarkup:error", {message: error?.message || error});
+                  return source;
+            }
       }
 
       #applyArtworkState(state = {}) {
