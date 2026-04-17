@@ -1,4 +1,5 @@
 const VEHICLE_HANDLE_TYPES = ['topleft', 'top', 'topright', 'right', 'bottomright', 'bottom', 'bottomleft', 'left', 'center'];
+const VEHICLE_RESTORE_DEBUG = true;
 
 function vehicle_createSvgElement(type, attributes = {}) {
       const el = document.createElementNS('http://www.w3.org/2000/svg', type);
@@ -98,6 +99,10 @@ class VehicleMenu extends LHSMenuWindow {
       #showHandles = true;
 
       #onKeyDownHandler = (event) => {this.#handleKeyDown(event);};
+      #debugLog(...args) {
+            if(!VEHICLE_RESTORE_DEBUG) return;
+            console.log("[VehicleMenu Debug]", ...args);
+      }
 
       constructor(width, height, ID, windowTitle) {
             super(width, height, ID, windowTitle);
@@ -110,6 +115,11 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       onStateRestored(payload = {}, assets = {}) {
+            this.#debugLog("onStateRestored:start", {
+                  payloadKeys: Object.keys(payload || {}),
+                  assetKeys: Object.keys(assets || {}),
+                  assetRefs: payload?.assetRefs || []
+            });
             if(payload.layoutOrientation) this.#layoutOrientation = payload.layoutOrientation;
             if(typeof payload.showMeasures === "boolean") this.#showMeasures = payload.showMeasures;
             if(typeof payload.showQuantity === "boolean") this.#showQuantity = payload.showQuantity;
@@ -118,16 +128,46 @@ class VehicleMenu extends LHSMenuWindow {
             if(typeof payload.showImages === "boolean") this.#showImages = payload.showImages;
             if(typeof payload.showRectangles === "boolean") this.#showRectangles = payload.showRectangles;
             if(typeof payload.showHandles === "boolean") this.#showHandles = payload.showHandles;
-            if(Array.isArray(payload.rects)) this.rects = JSON.parse(JSON.stringify(payload.rects));
+            if(Array.isArray(payload.rects)) {
+                  this.#debugLog("onStateRestored:rects:incoming", {count: payload.rects.length, sample: payload.rects.slice(0, 3)});
+                  this.rects = JSON.parse(JSON.stringify(payload.rects)).map((rect) => {
+                        const before = {...rect};
+                        this.#ensureRectDefaults(rect);
+                        this.#debugLog("onStateRestored:rect:sanitized", {before, after: rect});
+                        return rect;
+                  });
+            }
             if(Array.isArray(payload.images)) this.#images = JSON.parse(JSON.stringify(payload.images));
             if(Array.isArray(payload.assetRefs) && payload.assetRefs.length > 0) {
                   const firstAsset = assets[payload.assetRefs[0]];
+                  this.#debugLog("onStateRestored:asset", {
+                        firstAssetRef: payload.assetRefs[0],
+                        firstAssetType: firstAsset?.type,
+                        hasData: !!firstAsset?.data,
+                        dataLength: firstAsset?.data?.length || 0
+                  });
                   if(firstAsset?.data && this.#dragZoomSVG) {
                         this.#dragZoomSVG.unscaledSVGString = firstAsset.data;
+                        this.#initLayers();
                   }
             }
             this.#applyLayout();
+            this.#debugLog("onStateRestored:postLayout", {
+                  orientation: this.#layoutOrientation,
+                  containerRect: this.#dragZoomSVG?.container?.getBoundingClientRect?.(),
+                  svgRect: this.#dragZoomSVG?.svg?.getBoundingClientRect?.(),
+                  scale: this.#dragZoomSVG?.scale
+            });
             this.refresh();
+
+            setTimeout(() => {
+                  this.#debugLog("onStateRestored:delayedFitCheck", {
+                        containerRect: this.#dragZoomSVG?.container?.getBoundingClientRect?.(),
+                        svgRect: this.#dragZoomSVG?.svg?.getBoundingClientRect?.(),
+                        scale: this.#dragZoomSVG?.scale,
+                        rectCount: this.rects?.length || 0
+                  });
+            }, 100);
       }
 
       show() {
@@ -516,21 +556,35 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       #initLayers() {
-            this.#defs = vehicle_createSvgElement('defs');
-            this.#dragZoomSVG.svg.insertBefore(this.#defs, this.#dragZoomSVG.svg.firstChild);
-            this.#svgLayers.background = vehicle_createSvgElement('g', {id: 'vehicle-background-layer'});
-            this.#svgLayers.images = vehicle_createSvgElement('g', {id: 'vehicle-images-layer'});
-            this.#svgLayers.rects = vehicle_createSvgElement('g', {id: 'vehicle-rect-layer'});
-            this.#svgLayers.handles = vehicle_createSvgElement('g', {id: 'vehicle-handle-layer'});
-            this.#svgLayers.labels = vehicle_createSvgElement('g', {id: 'vehicle-label-layer'});
-            this.#svgLayers.measures = vehicle_createSvgElement('g', {id: 'vehicle-measure-layer'});
+            const svg = this.#dragZoomSVG.svg;
+            const svgG = this.#dragZoomSVG.svgG;
+            if(!svg || !svgG) return;
 
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.background);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.images);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.rects);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.measures);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.labels);
-            this.#dragZoomSVG.svgG.appendChild(this.#svgLayers.handles);
+            this.#defs = svg.querySelector('#vehicle-defs');
+            if(!this.#defs) {
+                  this.#defs = vehicle_createSvgElement('defs', {id: 'vehicle-defs'});
+                  svg.insertBefore(this.#defs, svg.firstChild);
+            }
+
+            const getOrCreateLayer = (id) => {
+                  let layer = svgG.querySelector('#' + id);
+                  if(!layer) layer = vehicle_createSvgElement('g', {id});
+                  svgG.appendChild(layer);
+                  this.#debugLog("initLayers:layer", {id, childCount: layer.childNodes?.length || 0});
+                  return layer;
+            };
+
+            this.#svgLayers.background = getOrCreateLayer('vehicle-background-layer');
+            this.#svgLayers.images = getOrCreateLayer('vehicle-images-layer');
+            this.#svgLayers.rects = getOrCreateLayer('vehicle-rect-layer');
+            this.#svgLayers.measures = getOrCreateLayer('vehicle-measure-layer');
+            this.#svgLayers.labels = getOrCreateLayer('vehicle-label-layer');
+            this.#svgLayers.handles = getOrCreateLayer('vehicle-handle-layer');
+            this.#debugLog("initLayers:complete", {
+                  hasDefs: !!this.#defs,
+                  svgChildCount: svg.childNodes?.length || 0,
+                  svgGChildCount: svgG.childNodes?.length || 0
+            });
       }
 
       get rects() {
@@ -598,6 +652,12 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       refresh() {
+            this.#debugLog("refresh:start", {
+                  rectCount: this.rects?.length || 0,
+                  imageCount: this.#images?.length || 0,
+                  showMeasures: this.#showMeasures,
+                  scale: this.#dragZoomSVG?.scale
+            });
             this.#defs.innerHTML = "";
             this.#svgLayers.images.innerHTML = "";
             this.#svgLayers.rects.innerHTML = "";
@@ -609,6 +669,10 @@ class VehicleMenu extends LHSMenuWindow {
 
             if(this.#showImages) this.#renderImages();
             if(this.#showRectangles) this.#renderRects();
+            this.#debugLog("refresh:end", {
+                  rectLayerChildren: this.#svgLayers.rects?.childNodes?.length || 0,
+                  measureLayerChildren: this.#svgLayers.measures?.childNodes?.length || 0
+            });
       }
 
       #applyBackgroundScale(scaleW = 1, scaleH = 1) {
@@ -650,6 +714,17 @@ class VehicleMenu extends LHSMenuWindow {
             const textSize = 14 / scale;
 
             this.rects.forEach((rect, index) => {
+                  this.#debugLog("renderRect:input", {
+                        index,
+                        rect,
+                        finite: {
+                              x: Number.isFinite(Number(rect?.x)),
+                              y: Number.isFinite(Number(rect?.y)),
+                              w: Number.isFinite(Number(rect?.w)),
+                              h: Number.isFinite(Number(rect?.h)),
+                              qty: Number.isFinite(Number(rect?.qty))
+                        }
+                  });
                   const rectEl = vehicle_createSvgElement('rect', {
                         x: rect.x,
                         y: rect.y,
@@ -701,6 +776,24 @@ class VehicleMenu extends LHSMenuWindow {
                   }
 
                   if(this.#showMeasures) {
+                        const invalidRect = !Number.isFinite(Number(rect?.x)) ||
+                              !Number.isFinite(Number(rect?.y)) ||
+                              !Number.isFinite(Number(rect?.w)) ||
+                              !Number.isFinite(Number(rect?.h));
+                        if(invalidRect) {
+                              this.#debugLog("renderRect:skipMeasurement-invalidRect", {index, rect});
+                              return;
+                        }
+                        this.#debugLog("renderRect:measurement", {
+                              index,
+                              rectBBox: {
+                                    x: rectEl.getAttribute("x"),
+                                    y: rectEl.getAttribute("y"),
+                                    width: rectEl.getAttribute("width"),
+                                    height: rectEl.getAttribute("height")
+                              },
+                              scale
+                        });
                         new TSVGMeasurement(this.#svgLayers.measures, {
                               target: rectEl,
                               direction: 'both',
@@ -1148,11 +1241,19 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       #ensureRectDefaults(item) {
-            item.w = item.w || 100;
-            item.h = item.h || 100;
-            item.qty = item.qty || 1;
+            const toFiniteNumber = (value, fallback) => {
+                  const parsed = Number(value);
+                  return Number.isFinite(parsed) ? parsed : fallback;
+            };
+            const before = {x: item?.x, y: item?.y, w: item?.w, h: item?.h, qty: item?.qty, description: item?.description, colour: item?.colour};
+            item.x = toFiniteNumber(item.x, 0);
+            item.y = toFiniteNumber(item.y, 0);
+            item.w = toFiniteNumber(item.w, 100);
+            item.h = toFiniteNumber(item.h, 100);
+            item.qty = toFiniteNumber(item.qty, 1);
             item.description = item.description || "";
             item.colour = item.colour || COLOUR.Blue;
+            this.#debugLog("ensureRectDefaults", {before, after: item});
       }
 
       #buildRowCache() {
