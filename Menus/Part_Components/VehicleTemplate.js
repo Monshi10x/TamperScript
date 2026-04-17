@@ -97,6 +97,7 @@ class VehicleMenu extends LHSMenuWindow {
       #showImages = true;
       #showRectangles = true;
       #showHandles = true;
+      #suspendZoomRefresh = false;
 
       #onKeyDownHandler = (event) => {this.#handleKeyDown(event);};
       #debugLines = [];
@@ -133,6 +134,7 @@ class VehicleMenu extends LHSMenuWindow {
 
       onStateRestored(payload = {}, assets = {}) {
             this.#debugLines = [];
+            this.#suspendZoomRefresh = true;
             this.#debugLog("onStateRestored:start", {
                   payloadKeys: Object.keys(payload || {}),
                   assetKeys: Object.keys(assets || {}),
@@ -207,6 +209,8 @@ class VehicleMenu extends LHSMenuWindow {
                         scale: this.#dragZoomSVG?.scale,
                         rectCount: this.rects?.length || 0
                   });
+                  this.#suspendZoomRefresh = false;
+                  this.refresh();
                   this.#flushDebugBlock("postRestore");
             }, 100);
       }
@@ -574,6 +578,7 @@ class VehicleMenu extends LHSMenuWindow {
             const baseOnZoom = this.#dragZoomSVG.onZoom.bind(this.#dragZoomSVG);
             this.#dragZoomSVG.onZoom = () => {
                   baseOnZoom();
+                  if(this.#suspendZoomRefresh) return;
                   this.refresh();
             };
 
@@ -755,8 +760,9 @@ class VehicleMenu extends LHSMenuWindow {
 
       #renderRects() {
             const scale = this.#dragZoomSVG.scale || 1;
-            const handleRadius = 8 / scale;
-            const textSize = 14 / scale;
+            const renderScale = Math.max(scale, 0.2);
+            const handleRadius = 8 / renderScale;
+            const textSize = 14 / renderScale;
 
             this.rects.forEach((rect, index) => {
                   this.#debugLog("renderRect:input", {
@@ -778,16 +784,16 @@ class VehicleMenu extends LHSMenuWindow {
                         fill: rect.colour,
                         'fill-opacity': 0.65,
                         stroke: COLOUR.Black,
-                        'stroke-width': 1 / scale
+                        'stroke-width': 1 / renderScale
                   });
                   rectEl.addEventListener('mousedown', (e) => this.#startRectDrag(e, index, 'center'));
                   rectEl.addEventListener('click', (e) => {e.stopPropagation(); this.#selectRect(index);});
                   rectEl.addEventListener('mouseenter', () => {
-                        rectEl.setAttribute('stroke-width', 2 / scale);
+                        rectEl.setAttribute('stroke-width', 2 / renderScale);
                         this.#dragZoomSVG.svg.style.cursor = 'grab';
                   });
                   rectEl.addEventListener('mouseleave', () => {
-                        rectEl.setAttribute('stroke-width', 1 / scale);
+                        rectEl.setAttribute('stroke-width', 1 / renderScale);
                         this.#dragZoomSVG.svg.style.cursor = 'auto';
                   });
                   this.#svgLayers.rects.appendChild(rectEl);
@@ -847,14 +853,14 @@ class VehicleMenu extends LHSMenuWindow {
                               unit: 'mm',
                               scale: 1,
                               precision: 1,
-                              arrowSize: 10 / scale,
-                              textOffset: 15 / scale,
-                              lineWidth: 0.5 / scale,
-                              fontSize: `${14 / scale}px`,
-                              tickLength: 15 / scale,
-                              handleRadius: 6 / scale,
-                              offsetY: 20 / scale,
-                              offsetX: 20 / scale,
+                              arrowSize: 10 / renderScale,
+                              textOffset: 15 / renderScale,
+                              lineWidth: 0.5 / renderScale,
+                              fontSize: `${14 / renderScale}px`,
+                              tickLength: 15 / renderScale,
+                              handleRadius: 6 / renderScale,
+                              offsetY: 20 / renderScale,
+                              offsetX: 20 / renderScale,
                               textBackgroundColor: "yellow"
                         });
                   }
@@ -872,7 +878,7 @@ class VehicleMenu extends LHSMenuWindow {
                                     fill: baseFill,
                                     'fill-opacity': 0.8,
                                     stroke: COLOUR.Black,
-                                    'stroke-width': 1 / scale
+                                    'stroke-width': 1 / renderScale
                               });
                               handle.addEventListener('mousedown', (e) => this.#startRectDrag(e, index, handleType));
                               handle.addEventListener('mouseenter', () => {
@@ -893,7 +899,8 @@ class VehicleMenu extends LHSMenuWindow {
 
       #renderImages() {
             const scale = this.#dragZoomSVG.scale || 1;
-            const handleRadius = 8 / scale;
+            const renderScale = Math.max(scale, 0.2);
+            const handleRadius = 8 / renderScale;
 
             this.#images.forEach((imageObj, imgIndex) => {
                   const imgEl = vehicle_createSvgElement('image', {
@@ -913,7 +920,7 @@ class VehicleMenu extends LHSMenuWindow {
                         height: imageObj.h,
                         fill: 'none',
                         stroke: COLOUR.Black,
-                        'stroke-width': 1 / scale,
+                        'stroke-width': 1 / renderScale,
                         'stroke-dasharray': '6 4'
                   });
                   outline.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, 'center'));
@@ -959,7 +966,7 @@ class VehicleMenu extends LHSMenuWindow {
                                     r: baseRadius,
                                     fill: baseFill,
                                     stroke: COLOUR.Black,
-                                    'stroke-width': 1 / scale
+                                    'stroke-width': 1 / renderScale
                               });
                               handle.addEventListener('mousedown', (e) => this.#startImageDrag(e, imgIndex, handleType));
                               handle.addEventListener('mouseenter', () => {
