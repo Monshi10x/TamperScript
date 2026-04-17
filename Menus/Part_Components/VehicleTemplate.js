@@ -99,9 +99,26 @@ class VehicleMenu extends LHSMenuWindow {
       #showHandles = true;
 
       #onKeyDownHandler = (event) => {this.#handleKeyDown(event);};
+      #debugLines = [];
       #debugLog(...args) {
             if(!VEHICLE_RESTORE_DEBUG) return;
             console.log("[VehicleMenu Debug]", ...args);
+            const serialized = args.map((arg) => {
+                  if(typeof arg === "string") return arg;
+                  try {
+                        return JSON.stringify(arg);
+                  } catch(error) {
+                        return String(arg);
+                  }
+            }).join(" | ");
+            this.#debugLines.push(`[${new Date().toISOString()}] ${serialized}`);
+      }
+      #flushDebugBlock(label = "snapshot") {
+            if(!VEHICLE_RESTORE_DEBUG) return;
+            const block = `--- VEHICLE DEBUG ${label} START ---\n${this.#debugLines.join("\n")}\n--- VEHICLE DEBUG ${label} END ---`;
+            window.__vehicleRestoreDebugBlock = block;
+            console.log(block);
+            console.log("[VehicleMenu Debug] Copy block from window.__vehicleRestoreDebugBlock");
       }
 
       constructor(width, height, ID, windowTitle) {
@@ -115,6 +132,7 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       onStateRestored(payload = {}, assets = {}) {
+            this.#debugLines = [];
             this.#debugLog("onStateRestored:start", {
                   payloadKeys: Object.keys(payload || {}),
                   assetKeys: Object.keys(assets || {}),
@@ -138,6 +156,15 @@ class VehicleMenu extends LHSMenuWindow {
                   });
             }
             if(Array.isArray(payload.images)) this.#images = JSON.parse(JSON.stringify(payload.images));
+            if(payload.productionState && VehicleMenu_Production) {
+                  this.#applyProductionState(payload.productionState);
+            }
+            if(payload.installState && VehicleMenu_Install) {
+                  VehicleMenu_Install.applySerializedState(payload.installState);
+            }
+            if(payload.artworkState && VehicleMenu_Artwork) {
+                  this.#applyArtworkState(payload.artworkState);
+            }
             if(Array.isArray(payload.assetRefs) && payload.assetRefs.length > 0) {
                   const firstAsset = assets[payload.assetRefs[0]];
                   this.#debugLog("onStateRestored:asset", {
@@ -161,12 +188,21 @@ class VehicleMenu extends LHSMenuWindow {
             this.refresh();
 
             setTimeout(() => {
+                  const containerRect = this.#dragZoomSVG?.container?.getBoundingClientRect?.();
+                  if(containerRect && containerRect.width > 0 && containerRect.height > 0) {
+                        try {
+                              this.#dragZoomSVG.centerAndFitSVGContent(this.#dragZoomSVG.svg, this.#dragZoomSVG.svgG, this.#dragZoomSVG.panZoomInstance);
+                        } catch(error) {
+                              this.#debugLog("onStateRestored:centerAndFit:error", {message: error?.message || error});
+                        }
+                  }
                   this.#debugLog("onStateRestored:delayedFitCheck", {
-                        containerRect: this.#dragZoomSVG?.container?.getBoundingClientRect?.(),
+                        containerRect,
                         svgRect: this.#dragZoomSVG?.svg?.getBoundingClientRect?.(),
                         scale: this.#dragZoomSVG?.scale,
                         rectCount: this.rects?.length || 0
                   });
+                  this.#flushDebugBlock("postRestore");
             }, 100);
       }
 
@@ -443,6 +479,9 @@ class VehicleMenu extends LHSMenuWindow {
                               showImages: this.#showImages,
                               showRectangles: this.#showRectangles,
                               showHandles: this.#showHandles,
+                              productionState: this.#getProductionState(),
+                              installState: VehicleMenu_Install?.getSerializedState?.() || null,
+                              artworkState: this.#getArtworkState(),
                               rects: JSON.parse(JSON.stringify(this.rects || [])),
                               images: JSON.parse(JSON.stringify(this.#images || []))
                         },
@@ -652,7 +691,7 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       refresh() {
-            this.#debugLog("refresh:start", {
+                  this.#debugLog("refresh:start", {
                   rectCount: this.rects?.length || 0,
                   imageCount: this.#images?.length || 0,
                   showMeasures: this.#showMeasures,
@@ -1254,6 +1293,40 @@ class VehicleMenu extends LHSMenuWindow {
             item.description = item.description || "";
             item.colour = item.colour || COLOUR.Blue;
             this.#debugLog("ensureRectDefaults", {before, after: item});
+      }
+
+      #getProductionState() {
+            return {
+                  required: !!VehicleMenu_Production?.required,
+                  qty: VehicleMenu_Production?.qty ?? 1,
+                  productionTotalEach: VehicleMenu_Production?.productionTotalEach ?? "Each",
+                  productionTimeMins: VehicleMenu_Production?.productionTimeMins ?? 0
+            };
+      }
+
+      #applyProductionState(state = {}) {
+            if(!VehicleMenu_Production || !state || typeof state !== "object") return;
+            if(state.required !== undefined) VehicleMenu_Production.required = !!state.required;
+            if(state.qty !== undefined) VehicleMenu_Production.qty = state.qty;
+            if(state.productionTotalEach !== undefined) VehicleMenu_Production.productionTotalEach = state.productionTotalEach;
+            if(state.productionTimeMins !== undefined) VehicleMenu_Production.productionTime = state.productionTimeMins;
+            this.#debugLog("applyProductionState", state);
+      }
+
+      #getArtworkState() {
+            return {
+                  required: !!VehicleMenu_Artwork?.required,
+                  artworkTimeMins: VehicleMenu_Artwork?.artworkTimeMins ?? 0,
+                  artworkCreateInNewItem: !!VehicleMenu_Artwork?.artworkCreateInNewItem
+            };
+      }
+
+      #applyArtworkState(state = {}) {
+            if(!VehicleMenu_Artwork || !state || typeof state !== "object") return;
+            if(state.required !== undefined) VehicleMenu_Artwork.required = !!state.required;
+            if(state.artworkTimeMins !== undefined) VehicleMenu_Artwork.artworkTime = state.artworkTimeMins;
+            if(state.artworkCreateInNewItem !== undefined) VehicleMenu_Artwork.artworkCreateInNewItem = !!state.artworkCreateInNewItem;
+            this.#debugLog("applyArtworkState", state);
       }
 
       #buildRowCache() {
