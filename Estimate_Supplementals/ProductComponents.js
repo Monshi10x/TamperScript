@@ -371,10 +371,12 @@ function partInfoTick() {
 					if(typeof asset.mime === "string" && asset.mime.includes("svg")) return true;
 					return false;
 				});
+				const previewSvgAssetRef = serializedEnvelope?.payload?.previewAssetRef;
+				const previewSvgAssetData = previewSvgAssetRef ? serializedEnvelope?.assets?.[previewSvgAssetRef]?.data : null;
 				const svgAssetData = svgAssetRef ? serializedEnvelope?.assets?.[svgAssetRef]?.data : null;
-				const canShowSvgButton = !!svgAssetData || partText.includes("svg");
+				const canShowSvgButton = !!previewSvgAssetData || !!svgAssetData || partText.includes("svg");
 				if(canShowSvgButton && partHeader.querySelectorAll(".seeSVGButton").length == 0) {
-					const svgSource = svgAssetData || partText;
+					const svgSource = previewSvgAssetData || svgAssetData || partText;
 					let btn = createButton("SVG", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
 						let modalSVG = new ModalSVG("SVG Modal", 1, () => { }, svgSource, null, {convertShapesToPaths: false, splitCompoundPaths: false, defaultStrokeWidth: 2, scaleStrokeOnScroll: !svgSource.includes('data-scaleStrokeOnScroll="false"')});
 					}, partHeader);

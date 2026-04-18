@@ -511,14 +511,21 @@ class VehicleMenu extends LHSMenuWindow {
                         },
                         captureAssets: (assets) => {
                               if(!this.#dragZoomSVG?.unscaledSVGString) return;
+                              const fullSvgMarkup = this.#dragZoomSVG.unscaledSVGString;
                               const sanitizedSvgMarkup = this.#getSerializedBackgroundSvgMarkup();
                               const assetRef = MenuStateSerializer.registerAsset(assets, {
                                     type: "svg",
                                     mime: "image/svg+xml",
                                     encoding: "utf8",
-                                    data: sanitizedSvgMarkup || this.#dragZoomSVG.unscaledSVGString
+                                    data: sanitizedSvgMarkup || fullSvgMarkup
                               });
-                              assets.__payload = {assetRefs: [assetRef]};
+                              const previewAssetRef = MenuStateSerializer.registerAsset(assets, {
+                                    type: "svg",
+                                    mime: "image/svg+xml",
+                                    encoding: "utf8",
+                                    data: fullSvgMarkup
+                              });
+                              assets.__payload = {assetRefs: [assetRef], previewAssetRef};
                         }
                   });
                   await setProductName(productNo, "Vehicle Graphics");
