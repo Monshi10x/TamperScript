@@ -356,30 +356,42 @@ function partInfoTick() {
 			}
 
 			//if(koPartDescription.includes("CODE [Automatic]")) {
-			let partText = koPart.PartNotes();
-			const serializedEnvelope = tryParseSerializedMenuEnvelope(partText);
-			if(serializedEnvelope && partHeader.querySelectorAll(".restoreStateButton").length == 0) {
-				let restoreBtn = createButton("LOAD", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
-					restoreSerializedMenuState(partText);
-				}, partHeader);
-				restoreBtn.classList.add('restoreStateButton');
-			}
-			if(partText.includes("svg") && partHeader.querySelectorAll(".seeSVGButton").length == 0) {
-				let btn = createButton("SVG", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
-					let modalSVG = new ModalSVG("SVG Modal", 1, () => { }, partText, null, {convertShapesToPaths: false, splitCompoundPaths: false, defaultStrokeWidth: 2, scaleStrokeOnScroll: !partText.includes('data-scaleStrokeOnScroll="false"')});
-				}, partHeader);
-				btn.classList.add('seeSVGButton');
-				let svgViewer;
-
-				window.addEventListener('quoteReview', (e) => {
-					console.log("Event received quoteReview");
-					if(!svgViewer) {
-						svgViewer = new DragZoomSVG("100%", "250px", partText, partHeader, {overrideCssStyles: "outline:none;"});
-						svgViewer.hide();
-					}
-					svgViewer.toggleShow();
+				let partText = koPart.PartNotes();
+				const serializedEnvelope = tryParseSerializedMenuEnvelope(partText);
+				if(serializedEnvelope && partHeader.querySelectorAll(".restoreStateButton").length == 0) {
+					let restoreBtn = createButton("RELOAD MENU", "height:27px;min-height:29px;width:95px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
+						restoreSerializedMenuState(partText);
+					}, partHeader);
+					restoreBtn.classList.add('restoreStateButton');
+				}
+				const svgAssetRef = serializedEnvelope?.payload?.assetRefs?.find((assetRef) => {
+					const asset = serializedEnvelope?.assets?.[assetRef];
+					if(!asset) return false;
+					if(asset.type === "svg") return true;
+					if(typeof asset.mime === "string" && asset.mime.includes("svg")) return true;
+					return false;
 				});
-			}
+				const previewSvgAssetRef = serializedEnvelope?.payload?.previewAssetRef;
+				const previewSvgAssetData = previewSvgAssetRef ? serializedEnvelope?.assets?.[previewSvgAssetRef]?.data : null;
+				const svgAssetData = svgAssetRef ? serializedEnvelope?.assets?.[svgAssetRef]?.data : null;
+				const canShowSvgButton = !!previewSvgAssetData || !!svgAssetData || partText.includes("svg");
+				if(canShowSvgButton && partHeader.querySelectorAll(".seeSVGButton").length == 0) {
+					const svgSource = previewSvgAssetData || svgAssetData || partText;
+					let btn = createButton("SVG", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
+						let modalSVG = new ModalSVG("SVG Modal", 1, () => { }, svgSource, null, {convertShapesToPaths: false, splitCompoundPaths: false, defaultStrokeWidth: 2, scaleStrokeOnScroll: !svgSource.includes('data-scaleStrokeOnScroll="false"')});
+					}, partHeader);
+					btn.classList.add('seeSVGButton');
+					let svgViewer;
+
+					window.addEventListener('quoteReview', (e) => {
+						console.log("Event received quoteReview");
+						if(!svgViewer) {
+							svgViewer = new DragZoomSVG("100%", "250px", svgSource, partHeader, {overrideCssStyles: "outline:none;"});
+							svgViewer.hide();
+						}
+						svgViewer.toggleShow();
+					});
+				}
 			//}
 
 			if(isSerializationPart) {

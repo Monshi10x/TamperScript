@@ -194,6 +194,37 @@ class Production extends SubMenu {
 		super.Update();
 	}
 
+	getSerializedState() {
+		const additionalFieldVisibility = {};
+		Object.keys(this.#otherItemFields).forEach((key) => {
+			additionalFieldVisibility[key] = !!this.#otherItemFields[key]?.show;
+		});
+		return {
+			required: !!this.required,
+			qty: this.qty,
+			productionTotalEach: this.productionTotalEach,
+			productionTimeMins: this.productionTimeMins,
+			additionalFieldVisibility
+		};
+	}
+
+	applySerializedState(state = {}) {
+		if(!state || typeof state !== "object") return;
+		if(state.required !== undefined) this.required = !!state.required;
+		if(state.qty !== undefined) this.qty = state.qty;
+		if(state.productionTotalEach !== undefined) this.productionTotalEach = state.productionTotalEach;
+		if(state.productionTimeMins !== undefined) this.productionTime = state.productionTimeMins;
+
+		if(state.additionalFieldVisibility && typeof state.additionalFieldVisibility === "object") {
+			Object.keys(state.additionalFieldVisibility).forEach((key) => {
+				if(this.#otherItemFields[key]) {
+					this.#otherItemFields[key].show = !!state.additionalFieldVisibility[key];
+				}
+			});
+			this.updateOtherItemFields();
+		}
+	}
+
 	async Create(productNo, partIndex) {
 		partIndex = await super.Create(productNo, partIndex);
 
