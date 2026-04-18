@@ -10,6 +10,14 @@ class LightboxMenu extends LHSMenuWindow {
     }
 
     onStateRestored(payload = {}, assets = {}) {
+        if(payload.lightboxState && this._lightboxFields) {
+            if(payload.lightboxState.boxDepth !== undefined) {
+                dropdownSetSelectedValue(this._lightboxFields.boxDepth[1], payload.lightboxState.boxDepth);
+            }
+            if(payload.lightboxState.sprayColour !== undefined) {
+                dropdownInfieldIconsSearchSetSelected(this._lightboxFields.sprayColour, payload.lightboxState.sprayColour, false, true);
+            }
+        }
         if(payload.productionState && this._lightboxProduction?.applySerializedState) {
             this._lightboxProduction.applySerializedState(payload.productionState);
         }
@@ -157,7 +165,18 @@ class LightboxMenu extends LHSMenuWindow {
             createDropdownOption("Satin", "Satin"),
             createDropdownOption("Matte", "Matte")], lightboxUpdate, c3);
 
-        var fieldSprayColour = createInput_Infield("Spray Colour", null, "width:30%", lightboxUpdate, c3);
+        var fieldSprayColour = createDropdown_Infield_Icons_Search("Spray Colour", 0, "width:30%", 100, true,
+            [["White", "#ffffff"],
+            ["Black", "#000000"],
+            ["Silver", "#c0c0c0"],
+            ["Charcoal", "#444444"],
+            ["Monument", "#3b3b3b"],
+            ["Red", "#ff0000"],
+            ["Blue", "#003cff"],
+            ["Green", "#0b8a28"],
+            ["Yellow", "#f5e642"],
+            ["Custom Colour", "linear-gradient(90deg, rgba(255,0,0,1) 0%, rgba(255,248,0,1) 18%, rgba(0,255,29,1) 35%, rgba(0,231,240,1) 52%, rgba(0,13,245,1) 69%, rgba(248,0,242,1) 85%, rgba(255,0,0,1) 100%)"]],
+            lightboxUpdate, c3);
 
         var fieldLightboxShape = createDropdown_Infield("Lightbox Shape", 0, "width:47%",
             [createDropdownOption("Rectangle or Square", "Rectangle or Square"),
@@ -211,6 +230,7 @@ class LightboxMenu extends LHSMenuWindow {
         lightboxContentContainer.appendChild(c4);
 
         let production = new Production(lightboxContentContainer, null, lightboxUpdate);
+        production.headerName = "WELDING PRODUCTION";
         this._lightboxProduction = production;
 
         let install = new Install(lightboxContentContainer, null, lightboxUpdate);
@@ -218,6 +238,10 @@ class LightboxMenu extends LHSMenuWindow {
 
         let artwork = new Artwork(lightboxContentContainer, null, lightboxUpdate);
         this._lightboxArtwork = artwork;
+        this._lightboxFields = {
+            boxDepth: fieldBoxDepth,
+            sprayColour: fieldSprayColour
+        };
 
         var fieldCreateLEDProduct = createButton('Create New Lightbox Product',
             "margin:0px;width:100%", function() {
@@ -398,6 +422,10 @@ class LightboxMenu extends LHSMenuWindow {
 
             partIndex = await thisClass.createSerializedStatePart(productIndex, partIndex, {
                 payload: {
+                    lightboxState: {
+                        boxDepth: fieldBoxDepth[1].value,
+                        sprayColour: fieldSprayColour[1].value
+                    },
                     productionState: thisClass._lightboxProduction?.getSerializedState?.() || null,
                     installState: thisClass._lightboxInstall?.getSerializedState?.() || null,
                     artworkState: thisClass._lightboxArtwork ? {
