@@ -99,6 +99,8 @@ class VehicleMenu extends LHSMenuWindow {
       #showRectangles = true;
       #showHandles = true;
       #suspendZoomRefresh = false;
+      #hasRestoredSerializedState = false;
+      #backgroundLoadToken = 0;
 
       #onKeyDownHandler = (event) => {this.#handleKeyDown(event);};
       #debugLog(...args) {
@@ -119,6 +121,8 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       onStateRestored(payload = {}, assets = {}) {
+            this.#hasRestoredSerializedState = true;
+            this.#backgroundLoadToken++;
             this.#suspendZoomRefresh = true;
             this.#debugLog("onStateRestored:start", {
                   payloadKeys: Object.keys(payload || {}),
@@ -256,6 +260,7 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       createContent() {
+            this.#hasRestoredSerializedState = false;
             const page = this.getPage(0);
             const footer = this.footer;
             const buttonContainer = this.buttonContainer;
@@ -705,6 +710,7 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       initBackground() {
+            const loadToken = ++this.#backgroundLoadToken;
             this.#svgLayers.background.innerHTML = "";
             this.#images = [];
 
@@ -713,6 +719,8 @@ class VehicleMenu extends LHSMenuWindow {
                   const tem = VehicleMenu_Template.templateData;
                   img.src = tem[1];
                   img.onload = () => {
+                        if(loadToken !== this.#backgroundLoadToken) return;
+                        if(this.#hasRestoredSerializedState) return;
                         const imageEl = vehicle_createSvgElement('image', {
                               href: img.src,
                               width: tem[2],

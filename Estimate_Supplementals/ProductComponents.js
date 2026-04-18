@@ -359,7 +359,7 @@ function partInfoTick() {
 				let partText = koPart.PartNotes();
 				const serializedEnvelope = tryParseSerializedMenuEnvelope(partText);
 				if(serializedEnvelope && partHeader.querySelectorAll(".restoreStateButton").length == 0) {
-					let restoreBtn = createButton("LOAD", "height:27px;min-height:29px;width:50px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
+					let restoreBtn = createButton("RELOAD MENU", "height:27px;min-height:29px;width:95px;padding:0px;margin:0px 5px;font-size:11px;background-color:" + COLOUR.Orange, () => {
 						restoreSerializedMenuState(partText);
 					}, partHeader);
 					restoreBtn.classList.add('restoreStateButton');
