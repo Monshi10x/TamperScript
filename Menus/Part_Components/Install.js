@@ -178,16 +178,20 @@ class Install extends SubMenu {
 			this.#installTimeTotalEach[1].value = state.installTotalEach;
 		}
 
-		setCheckboxChecked(!!state.isOutsourced, this.#isOutsourced[1]);
-		$(this.#outsourceCost[1]).val(state.outsourceCost ?? "").change();
-		$(this.#outsourceMarkup[1]).val(state.outsourceMarkup ?? "").change();
+			setCheckboxChecked(!!state.isOutsourced, this.#isOutsourced[1]);
+			setFieldHidden(!state.isOutsourced, this.#outsourceCost[0], this.#outsourceCost[0]);
+			setFieldHidden(!state.isOutsourced, this.#outsourceMarkup[0], this.#outsourceMarkup[0]);
+			$(this.#outsourceCost[1]).val(state.outsourceCost ?? "").change();
+			$(this.#outsourceMarkup[1]).val(state.outsourceMarkup ?? "").change();
 
 		if(state.quickItem) {
 			this.#quickItem[1].value = state.quickItem;
 			this.UpdateInstallLookup();
 		}
 
-		setCheckboxChecked(!!state.quickLookup, this.#quickLookup[1]);
+			setCheckboxChecked(!!state.quickLookup, this.#quickLookup[1]);
+			setFieldHidden(!state.quickLookup, this.#quickItem[0], this.#quickItem[0]);
+			setFieldHidden(!state.quickLookup, this.#quickInstall_sub[0], this.#quickInstall_sub[0]);
 
 		if(state.quickInstallSub) {
 			this.#quickInstall_sub[6]();

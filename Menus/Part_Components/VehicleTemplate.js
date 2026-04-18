@@ -1328,7 +1328,7 @@ class VehicleMenu extends LHSMenuWindow {
       }
 
       #getProductionState() {
-            return {
+            return VehicleMenu_Production?.getSerializedState?.() || {
                   required: !!VehicleMenu_Production?.required,
                   qty: VehicleMenu_Production?.qty ?? 1,
                   productionTotalEach: VehicleMenu_Production?.productionTotalEach ?? "Each",
@@ -1338,6 +1338,11 @@ class VehicleMenu extends LHSMenuWindow {
 
       #applyProductionState(state = {}) {
             if(!VehicleMenu_Production || !state || typeof state !== "object") return;
+            if(typeof VehicleMenu_Production.applySerializedState === "function") {
+                  VehicleMenu_Production.applySerializedState(state);
+                  this.#debugLog("applyProductionState", state);
+                  return;
+            }
             if(state.required !== undefined) VehicleMenu_Production.required = !!state.required;
             if(state.qty !== undefined) VehicleMenu_Production.qty = state.qty;
             if(state.productionTotalEach !== undefined) VehicleMenu_Production.productionTotalEach = state.productionTotalEach;
