@@ -1906,6 +1906,102 @@ function resetExecuted() {
     executed = false;
 }
 
+const SET_FUNCTION_RETRY_DELAYS_MS = [200, 500, 1000, 2000, 5000];
+function showSetFunctionRetryToast(message, isPermanent = false) {
+    if(typeof Toast !== "undefined" && Toast?.warn) {
+        Toast.warn(message, isPermanent ? 0 : 2500, {position: "top-right"});
+    } else {
+        console.warn(message);
+    }
+}
+
+function resolveNamedFunction(functionName) {
+    try {
+        if(typeof globalThis[functionName] === "function") {
+            return globalThis[functionName];
+        }
+    } catch(error) { }
+
+    try {
+        const scopedFn = eval(functionName);
+        if(typeof scopedFn === "function") return scopedFn;
+    } catch(error) { }
+
+    return null;
+}
+
+function assignNamedFunction(functionName, wrappedFn) {
+    let assigned = false;
+    try {
+        if(typeof globalThis[functionName] === "function") {
+            globalThis[functionName] = wrappedFn;
+            assigned = true;
+        }
+    } catch(error) { }
+
+    try {
+        eval(functionName + " = wrappedFn");
+        assigned = true;
+    } catch(error) { }
+
+    return assigned;
+}
+
+function wrapSetFunctionWithRetry(functionName) {
+    const originalFn = resolveNamedFunction(functionName);
+    if(typeof originalFn !== "function") return;
+    if(originalFn.__isSetRetryWrapped) return;
+
+    const wrappedFn = async function(...args) {
+        let lastError = null;
+        for(let attemptIndex = 0; attemptIndex < SET_FUNCTION_RETRY_DELAYS_MS.length; attemptIndex++) {
+            const attemptNo = attemptIndex + 1;
+            try {
+                return await originalFn(...args);
+            } catch(error) {
+                lastError = error;
+                const hasMoreAttempts = attemptIndex < SET_FUNCTION_RETRY_DELAYS_MS.length - 1;
+                if(hasMoreAttempts) {
+                    showSetFunctionRetryToast(functionName + " failed (attempt " + attemptNo + "/" + SET_FUNCTION_RETRY_DELAYS_MS.length + "). Retrying...");
+                    await sleep(SET_FUNCTION_RETRY_DELAYS_MS[attemptIndex]);
+                    continue;
+                }
+
+                const finalErrorMessage = functionName + " failed after " + SET_FUNCTION_RETRY_DELAYS_MS.length + " attempts. " + (error?.message || error || "");
+                showSetFunctionRetryToast(finalErrorMessage, true);
+                throw error;
+            }
+        }
+        throw lastError;
+    };
+
+    wrappedFn.__isSetRetryWrapped = true;
+    wrappedFn.__originalSetFn = originalFn;
+    assignNamedFunction(functionName, wrappedFn);
+}
+
+function initializeSetFunctionRetries() {
+    const setFunctionNames = [
+        "setPartWidth", "setPartHeight", "setPartQty", "setPartBorderColour", "setProductQty",
+        "setProductName", "setProductSummary", "setPartMarkup", "setPartMarkupEa", "setPartDescription",
+        "setPartText", "setPartNotes", "setPartVendorCostEa", "setPartPriceEa", "setPartPrice",
+        "setArtworkTime", "setArtworkTimeEa", "setProductionTime", "setInstallTime", "setInstallTimeEa",
+        "setInstallTimeMHD", "setInstallTimeMHDEa", "setInstallPartType", "setInstallPartTypeEa",
+        "setTravelTime", "setTravelTimeEa", "setTravelTimeMHD", "setTravelTimeMHDEa", "setTravelType",
+        "setTravelTypeEa", "setPaintLitresEach", "setPaintLitresTotal", "setPaintColourMatchTimeEach",
+        "setPaintColourMatchTimeTotal", "setPaintNumberCoatsEach", "setPaintNumberCoatsTotal",
+        "setPaintSetupTimeEach", "setPaintSetupTimeTotal", "setPaintFlashTimeEach", "setPaintFlashTimeTotal",
+        "setPaintSprayTimeEach", "setPaintSprayTimeTotal", "setRouterSetupTimeEach", "setRouterSetupTimeTotal",
+        "setRouterSetupOnceOff", "setRouterRunTimeEach", "setRouterRunTimeTotal", "setRouterPostJobTimeEach",
+        "setRouterPostJobTimeTotal"
+    ];
+
+    for(let i = 0; i < setFunctionNames.length; i++) {
+        wrapSetFunctionWithRetry(setFunctionNames[i]);
+    }
+}
+initializeSetFunctionRetries();
+
 async function LoopUntil(condition, intervalMS = 10) {
 
     await new Promise(resolve => {
