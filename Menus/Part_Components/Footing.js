@@ -524,6 +524,13 @@ class Footing {
             if(!this.l_lockButton_isLocked) this.updateSuggestedConcreteBags();
       }
 
+      syncVisibilityFromState() {
+            this.footingToggle();
+            if(this.footingRequired) {
+                  this.toggleConcreteTruckOptions();
+            }
+      }
+
       async Create(productNo, partIndex) {
             if(this.footingRequired) {
                   var numberBags = Math.ceil(this.suggestedBags);
