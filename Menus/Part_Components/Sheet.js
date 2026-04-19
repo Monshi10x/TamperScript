@@ -1047,19 +1047,19 @@ class Sheet extends Material {
             }
 
             let sheetMaterialDetails = this.getSheetMaterialDetails();
-            let effectiveNumberOfPaths = numberOfPaths == 0 ? this.#totalRouterNumberOfShapes : numberOfPaths;
-            let effectiveLaserPaths = numberOfPaths == 0 ? this.#totalLaserNumberOfShapes : numberOfPaths;
-            let routerCutPathLength = (this.#sheetPerimeterIsCut ? this.#totalRouterPerimeter : 0) + pathLength;
-            let laserCutPathLength = (this.#sheetPerimeterIsCut ? this.#totalLaserPerimeter : 0) + pathLength;
+            let totalCncShapes = this.#totalRouterNumberOfShapes + this.#totalLaserNumberOfShapes;
+            let effectiveNumberOfPaths = numberOfPaths == 0 ? totalCncShapes : numberOfPaths;
+            let totalCncPerimeter = this.#sheetPerimeterIsCut ? this.#totalRouterPerimeter + this.#totalLaserPerimeter : 0;
+            let cutPathLengthForCnc = totalCncPerimeter + pathLength;
 
             let cutDataEntry = {
                   sheetMaterial: sheetMaterialDetails.sheetMaterial,
                   material: sheetMaterialDetails.material,
                   thickness: sheetMaterialDetails.thickness,
                   cutData: {
-                        cutPathLength: routerCutPathLength,
+                        cutPathLength: cutPathLengthForCnc,
                         numberOfCutPaths: this.#sheetPerimeterIsCut ? effectiveNumberOfPaths : 0,
-                        numberOfSheets: this.#totalRouterNumberOfShapes,
+                        numberOfSheets: totalCncShapes,
                         lengthOfGroovesToCut: lengthOfGroovesToCut,
                         numberOfGroovePaths: numberOfGroovePaths,
                         numberOfPenStrokes: penMarkingQty,
