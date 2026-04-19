@@ -129,6 +129,7 @@ class Finishing extends Material {
                         });
                   });
                   this.#standOffHelper.setSizeArrays(...matrixSizeArrays);
+                  this.#standOffHelper.show();
             }, f_container_standOff, true);
             this.#standOffHelper = new ModalStandoffHelper2("Standoff Helper", 100, () => {
                   this.UpdateStandoffQty();
@@ -190,6 +191,7 @@ class Finishing extends Material {
                   console.log(matrixSizeArrays);
 
                   this.#eyeletsHelper.setSizeArrays(...matrixSizeArrays);
+                  this.#eyeletsHelper.show();
             }, f_container_eyelets, true);
             this.#eyeletsType = createDropdown_Infield("Eyelets Type", 0, "width:30%;display:none;margin-left:40px;",
                   [createDropdownOption("Eyelet - 20x10 Silver", "20,10")], () => {this.UpdateEyeletQty(); this.UpdateFromFields();}, f_container_eyelets);

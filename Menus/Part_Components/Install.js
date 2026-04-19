@@ -262,6 +262,15 @@ class Install extends SubMenu {
 		this.callback();
 	}
 
+	syncVisibilityFromState() {
+		const isOutsourced = !!this.#isOutsourced[1].checked;
+		const quickLookup = !!this.#quickLookup[1].checked;
+		setFieldHidden(!isOutsourced, this.#outsourceMarkup[0], this.#outsourceMarkup[0]);
+		setFieldHidden(!isOutsourced, this.#outsourceCost[0], this.#outsourceCost[0]);
+		setFieldHidden(!quickLookup, this.#quickItem[0], this.#quickItem[0]);
+		setFieldHidden(!quickLookup, this.#quickInstall_sub[0], this.#quickInstall_sub[0]);
+	}
+
 	async Create(productNo, partIndex) {
 		partIndex = await super.Create(productNo, partIndex);
 		if(this.required) {
