@@ -81,6 +81,7 @@ class InstallSummary {
         this.newPanelContent_MarkupContainer.appendChild(this.newPanelContent_MarkupContainer_Header);
         this.newPanelContent_MarkupContainer.appendChild(this.newPanelContent_MarkupContainer_TotalMarkup);
         this.newPanelContent.appendChild(this.newPanelContent_MarkupContainer);
+        this.newPanelContent.appendChild(this.reorderProductsBtn);
         this.newPanel.appendChild(this.newPanelContent);
         this.sidePanel.appendChild(this.newPanel);
         this.sidePanel.appendChild(this.reorderProductsBtn);
