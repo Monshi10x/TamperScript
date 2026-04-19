@@ -122,7 +122,7 @@ class Production extends SubMenu {
 		makeFieldGroup("Checkbox", this.#customRequired[1], true, this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0]);
 		this.#otherItemFields["Custom"]["linked field"] = this.#customRequired;
 
-		makeFieldGroup("Checkbox", this.requiredField[1], false,
+		makeFieldGroup("Checkbox", this.requiredField[1], true,
 			this.#qty[0],
 			this.#productionTimeMins[0],
 			this.#productionTimeHours[0],
@@ -133,6 +133,15 @@ class Production extends SubMenu {
 			this.#pinsRequired[0], this.#pinsQty[0],
 			this.#standOffRequired[0], this.#standOffQty[0], this.#standOffType[0], this.#standOffHelperBtn,
 			this.#customRequired[0], this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0]);
+		this.requiredField[1].addEventListener("change", () => {
+			this.updateOtherItemFields();
+		});
+
+		setFieldHidden(true, this.#eyeletsRequired[0]);
+		setFieldHidden(true, this.#pinsRequired[0]);
+		setFieldHidden(true, this.#standOffRequired[0]);
+		setFieldHidden(true, this.#customRequired[0]);
+		this.updateOtherItemFields();
 	}
 
 	updateOtherItemFields() {
@@ -192,6 +201,10 @@ class Production extends SubMenu {
 
 	Update() {
 		super.Update();
+	}
+
+	syncVisibilityFromState() {
+		this.updateOtherItemFields();
 	}
 
 	getSerializedState() {
