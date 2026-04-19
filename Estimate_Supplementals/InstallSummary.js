@@ -111,6 +111,18 @@ class InstallSummary {
             const productName = nameField?.value || ("Product " + (i + 1));
             products.push({id: String(i), productRef, productName});
         }
+
+        if(products.length === 0) {
+            const orderBody = document.querySelector(".ord-prod-body");
+            const orderContext = orderBody ? ko.contextFor(orderBody) : null;
+            const orderProducts = orderContext?.$parent?.OrderProducts ? orderContext.$parent.OrderProducts() : [];
+            for(let i = 0; i < orderProducts.length; i++) {
+                const productRef = orderProducts[i];
+                if(!productRef) continue;
+                const productName = productRef.ProductDescription ? productRef.ProductDescription() : ("Product " + (i + 1));
+                products.push({id: String(i), productRef, productName});
+            }
+        }
         return products;
     }
 
@@ -138,11 +150,16 @@ class InstallSummary {
 
     openReorderProductsModal() {
         const products = this.getCurrentProductsForModal();
-        if(products.length <= 1) return;
 
         const modal = new Modal("Re-Order Products", () => {});
-        modal.setContainerSize(900, 420);
+        modal.setContainerSize(900, 460);
         this.ensureSpinnerStyle();
+
+        if(products.length === 0) {
+            modal.addBodyElement(createText("No products found to reorder.", "width:100%;", null));
+            modal.addFooterElement(createButton("Close", "width:100px;float:right;", () => {modal.hide();}));
+            return;
+        }
 
         const productLookup = new Map();
         const sortableContainer = document.createElement("div");
