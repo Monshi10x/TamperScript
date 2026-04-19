@@ -146,7 +146,7 @@ class InstallSummary {
 
         const productLookup = new Map();
         const sortableContainer = document.createElement("div");
-        sortableContainer.style = "width:100%;min-height:180px;max-height:220px;display:block;overflow-y:auto;overflow-x:hidden;padding:8px;box-sizing:border-box;background-color:#f3f6fb;border:1px solid #d5dce8;";
+        sortableContainer.style = "width:100%;min-height:220px;max-height:260px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;overflow-x:hidden;padding:8px;box-sizing:border-box;background-color:#f3f6fb;border:1px solid #d5dce8;";
 
         for(let i = 0; i < products.length; i++) {
             const product = products[i];
@@ -154,7 +154,7 @@ class InstallSummary {
 
             const card = document.createElement("div");
             card.dataset.productId = product.id;
-            card.style = "width:calc(100% - 4px);min-height:48px;background-color:#ffffff;color:#1b2b44;padding:10px 14px;box-sizing:border-box;cursor:move;box-shadow:rgba(0,0,0,0.15) 0px 2px 6px;border-left:6px solid " + COLOUR.Blue + ";margin:6px 2px;";
+            card.style = "width:calc(100% - 4px);height:44px;min-height:44px;max-height:44px;background-color:#ffffff;color:#1b2b44;padding:10px 14px;box-sizing:border-box;cursor:move;box-shadow:rgba(0,0,0,0.15) 0px 2px 6px;border-left:6px solid " + COLOUR.Blue + ";margin:0px 2px;display:block;float:none;clear:both;";
             const productNo = document.createElement("div");
             productNo.style = "font-weight:bold;float:left;margin-right:12px;color:" + COLOUR.Blue + ";";
             productNo.innerText = "#" + (i + 1);
@@ -173,7 +173,7 @@ class InstallSummary {
         });
 
         const loadingContainer = document.createElement("div");
-        loadingContainer.style = "display:none;align-items:center;justify-content:flex-start;gap:10px;margin-top:10px;padding:8px;border:1px solid #d5dce8;background-color:#eef3ff;";
+        loadingContainer.style = "display:none;align-items:center;justify-content:flex-start;gap:10px;margin:0px;padding:6px 10px;border:1px solid #d5dce8;background-color:#eef3ff;float:left;";
         const loadingSpinner = document.createElement("div");
         loadingSpinner.className = "ts-reorder-spinner";
         loadingSpinner.style = "width:18px;height:18px;border:3px solid #b8c7e6;border-top-color:" + COLOUR.Blue + ";border-radius:50%;animation:ts-reorder-spin 0.8s linear infinite;";
@@ -184,7 +184,6 @@ class InstallSummary {
         loadingContainer.appendChild(loadingText);
 
         modal.addBodyElement(sortableContainer);
-        modal.addBodyElement(loadingContainer);
 
         const cancelBtn = createButton("Cancel", "width:100px;float:right;", () => {
             modal.hide();
@@ -203,6 +202,7 @@ class InstallSummary {
                 cancelBtn.disabled = false;
             }
         });
+        modal.addFooterElement(loadingContainer);
         modal.addFooterElement(applyBtn);
         modal.addFooterElement(cancelBtn);
     }
@@ -213,101 +213,6 @@ class InstallSummary {
         style.id = "tsReorderSpinnerStyle";
         style.innerHTML = "@keyframes ts-reorder-spin {from {transform: rotate(0deg);} to {transform: rotate(360deg);}}";
         document.head.appendChild(style);
-    }
-
-    getCurrentProductRefs() {
-        const productElements = document.querySelectorAll('div[class^="ord-prod-model-item"]');
-        const refs = [];
-        for(let i = 0; i < productElements.length; i++) {
-            const context = ko.contextFor(productElements[i]);
-            const productRef = context?.$data || null;
-            if(productRef) refs.push(productRef);
-        }
-        return refs;
-    }
-
-    getCurrentProductsForModal() {
-        const productElements = document.querySelectorAll('div[class^="ord-prod-model-item"]');
-        const products = [];
-        for(let i = 0; i < productElements.length; i++) {
-            const productElement = productElements[i];
-            const context = ko.contextFor(productElement);
-            const productRef = context?.$data || null;
-            if(!productRef) continue;
-
-            const nameField = productElement.querySelector("input[id^='productDescription']");
-            const productName = nameField?.value || ("Product " + (i + 1));
-            products.push({id: String(i), productRef, productName});
-        }
-        return products;
-    }
-
-    async applyProductOrder(orderedProductIds, productLookup) {
-        if(!Array.isArray(orderedProductIds) || orderedProductIds.length === 0) return;
-
-        const desiredRefs = orderedProductIds
-            .map((id) => productLookup.get(id))
-            .filter((productRef) => !!productRef);
-        if(desiredRefs.length === 0) return;
-
-        const currentRefs = this.getCurrentProductRefs();
-
-        for(let targetIndex = 0; targetIndex < desiredRefs.length; targetIndex++) {
-            const desiredRef = desiredRefs[targetIndex];
-            let currentIndex = currentRefs.findIndex((currentRef) => currentRef === desiredRef);
-            if(currentIndex < 0 || currentIndex === targetIndex) continue;
-
-            await MoveProduct(currentIndex, targetIndex);
-
-            const movedRef = currentRefs.splice(currentIndex, 1)[0];
-            currentRefs.splice(targetIndex, 0, movedRef);
-        }
-    }
-
-    openReorderProductsModal() {
-        const products = this.getCurrentProductsForModal();
-        if(products.length <= 1) return;
-
-        const modal = new Modal("Re-Order Products", () => {});
-        modal.setContainerSize(900, 420);
-
-        const productLookup = new Map();
-        const sortableContainer = document.createElement("div");
-        sortableContainer.style = "width:100%;min-height:180px;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:10px;box-sizing:border-box;background-color:#f3f6fb;border:1px solid #d5dce8;";
-
-        for(let i = 0; i < products.length; i++) {
-            const product = products[i];
-            productLookup.set(product.id, product.productRef);
-
-            const card = document.createElement("div");
-            card.dataset.productId = product.id;
-            card.style = "min-width:220px;max-width:220px;min-height:120px;background-color:" + COLOUR.Blue + ";color:white;padding:10px;box-sizing:border-box;cursor:move;box-shadow:rgba(0,0,0,0.2) 0px 2px 6px;";
-            const productNo = document.createElement("div");
-            productNo.style = "font-weight:bold;margin-bottom:6px;";
-            productNo.innerText = "#" + (i + 1);
-            const productName = document.createElement("div");
-            productName.style = "white-space:normal;word-break:break-word;";
-            productName.innerText = product.productName;
-            card.appendChild(productNo);
-            card.appendChild(productName);
-            sortableContainer.appendChild(card);
-        }
-
-        new Sortable(sortableContainer, {
-            animation: 120,
-            direction: "horizontal",
-            ghostClass: "sortable-ghost"
-        });
-
-        modal.addBodyElement(sortableContainer);
-        modal.addFooterElement(createButton("Apply", "width:100px;float:right;", async () => {
-            const orderedProductIds = [...sortableContainer.children].map((child) => child.dataset.productId);
-            await this.applyProductOrder(orderedProductIds, productLookup);
-            modal.hide();
-        }));
-        modal.addFooterElement(createButton("Cancel", "width:100px;float:right;", () => {
-            modal.hide();
-        }));
     }
 
     set price(value) {
