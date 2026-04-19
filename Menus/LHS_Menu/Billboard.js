@@ -54,19 +54,13 @@ class BillboardMenu extends LHSMenuWindow {
             return "billboard";
       }
 
-      onStateRestored(payload = {}, assets = {}) {
+      onStateRestored(payload = {}) {
             if(typeof payload.showGround === "boolean") {
                   this.#showGround = payload.showGround;
-                  if(this.#f_showGroundCkb?.[1]) this.#f_showGroundCkb[1].checked = payload.showGround;
+                  if(this.#f_showGroundCkb?.[1]) setCheckboxChecked(payload.showGround, this.#f_showGroundCkb[1]);
             }
             if(payload.attachmentType) {
                   attachmentType = payload.attachmentType;
-            }
-            if(Array.isArray(payload.assetRefs) && payload.assetRefs.length > 0) {
-                  const firstAsset = assets[payload.assetRefs[0]];
-                  if(firstAsset?.data && this.#dragZoomSVG) {
-                        this.#dragZoomSVG.unscaledSVGString = firstAsset.data;
-                  }
             }
             this.UpdateFromFields();
       }
@@ -236,13 +230,14 @@ class BillboardMenu extends LHSMenuWindow {
                   },
                   captureAssets: (assets) => {
                         if(!tempThis.#dragZoomSVG?.unscaledSVGString) return;
+                        const fullSvgMarkup = tempThis.#dragZoomSVG.unscaledSVGString;
                         const assetRef = MenuStateSerializer.registerAsset(assets, {
                               type: "svg",
                               mime: "image/svg+xml",
                               encoding: "utf8",
-                              data: tempThis.#dragZoomSVG.unscaledSVGString
+                              data: fullSvgMarkup
                         });
-                        assets.__payload = {assetRefs: [assetRef]};
+                        assets.__payload = {assetRefs: [assetRef], previewAssetRef: assetRef};
                   }
             });
 
