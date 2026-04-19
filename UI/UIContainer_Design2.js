@@ -424,6 +424,7 @@ class UIContainer_Design2 {
       ];
       modalIsOpen = false;
       #hasLoadedSecondaryData;
+      #loadSecondaryFieldsPromise;
       #numOfNotes_Type = {
             Design: 0,
             Sales: 0,
@@ -515,6 +516,7 @@ class UIContainer_Design2 {
       #f_addNoteInput;
       #f_illustratorDiv;
       #f_address;
+      #f_installAddressMissingBadge;
 
       /*Getter*/
       get container() {return this.#f_container;}
@@ -579,6 +581,11 @@ class UIContainer_Design2 {
             this.#f_container.style.cssText += "display:flex;flex-direction:column;border:1px solid rgb(0,0,0,0.6);cursor:auto;width: calc(100% - 40px);margin:10px 20px;position:relative;";
             this.#f_container.style.boxShadow = "rgb(0, 0, 0, 0.5) 0px 0px 20px 0px";
             this.#f_container.style.cssText += this.#overrideCssStyles;
+
+            this.#f_installAddressMissingBadge = document.createElement("div");
+            this.#f_installAddressMissingBadge.style.cssText = "display:none;position:absolute;top:6px;left:6px;width:12px;height:12px;border-radius:50%;background-color:#d00000;z-index:10;border:1px solid #ffffff;";
+            this.#f_installAddressMissingBadge.title = "install address missing";
+            this.#f_container.appendChild(this.#f_installAddressMissingBadge);
 
             if(this.#parentObjectToAppendTo != null) {
                   this.#parentObjectToAppendTo.appendChild(this.#f_container);
@@ -1037,11 +1044,24 @@ class UIContainer_Design2 {
       }
 
       async loadSecondaryFields() {
+            if(this.#loadSecondaryFieldsPromise) {
+                  await this.#loadSecondaryFieldsPromise;
+                  return;
+            }
             if(this.#hasLoadedSecondaryData && this.#installAddress != null) {
                   await this.borrowGoogleMap();
             }
             if(this.#hasLoadedSecondaryData) return;
 
+            this.#loadSecondaryFieldsPromise = this.loadSecondaryFieldsInner();
+            try {
+                  await this.#loadSecondaryFieldsPromise;
+            } finally {
+                  this.#loadSecondaryFieldsPromise = null;
+            }
+      }
+
+      async loadSecondaryFieldsInner() {
             //Load Email
             this.#f_customerEmail[1].value = await getCustomerEmail(this.#jobObject.OrderId, this.#jobObject.AccountId);
             this.#f_emailLoader.Delete();
@@ -1131,6 +1151,7 @@ class UIContainer_Design2 {
 
                   }
             }
+            this.updateInstallAddressMissingBadge(!this.#installAddress);
 
             function groupByPhrases(items, phrases) {
                   return items.reduce((acc, item) => {
@@ -1217,6 +1238,11 @@ class UIContainer_Design2 {
             await this.loadNotes();
 
             this.#hasLoadedSecondaryData = true;
+      }
+
+      updateInstallAddressMissingBadge(isMissing) {
+            if(!this.#f_installAddressMissingBadge) return;
+            this.#f_installAddressMissingBadge.style.display = isMissing ? "block" : "none";
       }
 
       async borrowGoogleMap() {
