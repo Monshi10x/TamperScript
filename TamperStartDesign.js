@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Design Board v2
 // @namespace    http://tampermonkey.net/
-// @version      2.6
+// @version      2.65
 // @description  try to take over the world!
 // @author       You
 // @match        https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx
@@ -45,6 +45,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Images.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Styles/Colour.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/UI/Toast.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/DragAndDrop/DragAndDrop.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Mouse/ContextMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Modal/Modal.js
