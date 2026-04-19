@@ -41,6 +41,7 @@ class BillboardMenu extends LHSMenuWindow {
       #install;
       #artwork;
       #f_showGroundCkb;
+      #settingsButton;
 
       #showGround = true;
 
@@ -62,6 +63,11 @@ class BillboardMenu extends LHSMenuWindow {
             if(payload.attachmentType) {
                   attachmentType = payload.attachmentType;
             }
+
+            if(this.#footing?.syncVisibilityFromState) this.#footing.syncVisibilityFromState();
+            if(this.#production?.syncVisibilityFromState) this.#production.syncVisibilityFromState();
+            if(this.#install?.syncVisibilityFromState) this.#install.syncVisibilityFromState();
+
             this.UpdateFromFields();
       }
 
@@ -80,12 +86,14 @@ class BillboardMenu extends LHSMenuWindow {
       createContent() {
             var page = this.getPage(0);
 
-            let settingsButton = createButton("", "width:30px;height:30px;margin:0px;padding:0;float:right;font-size:20px;min-height:30px;line-height:30px;", () => {
-                  this.openSettingsModal();
-            }, null);
-            this.add;
-            settingsButton.innerHTML = "&#9881";
-            this.header.appendChild(settingsButton);
+            if(!this.#settingsButton || !this.header.contains(this.#settingsButton)) {
+                  this.#settingsButton = createButton("", "width:30px;height:30px;margin:0px;padding:0;float:right;font-size:20px;min-height:30px;line-height:30px;", () => {
+                        this.openSettingsModal();
+                  }, null);
+                  this.#settingsButton.id = "billboardSettingsBtn";
+                  this.#settingsButton.innerHTML = "&#9881";
+                  this.header.appendChild(this.#settingsButton);
+            }
 
             this.#f_showGroundCkb = createCheckbox_Infield("Show Ground", true, null, () => {this.#showGround = this.#f_showGroundCkb[1].checked; this.UpdateFromFields();});
 
