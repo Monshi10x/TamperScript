@@ -11,7 +11,10 @@ class LightboxMenu extends LHSMenuWindow {
 
     onStateRestored(payload = {}, assets = {}) {
         if(payload.lightboxState && this._lightboxFields) {
-            if(payload.lightboxState.boxDepth !== undefined) {
+            if(Number.isInteger(payload.lightboxState.boxDepthSelectedIndex)) {
+                this._lightboxFields.boxDepth[1].selectedIndex = payload.lightboxState.boxDepthSelectedIndex;
+                $(this._lightboxFields.boxDepth[1]).change();
+            } else if(payload.lightboxState.boxDepth !== undefined) {
                 dropdownSetSelectedValue(this._lightboxFields.boxDepth[1], payload.lightboxState.boxDepth);
             }
             if(payload.lightboxState.sprayColour !== undefined) {
@@ -423,6 +426,7 @@ class LightboxMenu extends LHSMenuWindow {
             partIndex = await thisClass.createSerializedStatePart(productIndex, partIndex, {
                 payload: {
                     lightboxState: {
+                        boxDepthSelectedIndex: fieldBoxDepth[1].selectedIndex,
                         boxDepth: fieldBoxDepth[1].value,
                         sprayColour: fieldSprayColour[1].value
                     },
