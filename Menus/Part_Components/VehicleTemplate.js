@@ -1,4 +1,5 @@
 const VEHICLE_HANDLE_TYPES = ['topleft', 'top', 'topright', 'right', 'bottomright', 'bottom', 'bottomleft', 'left', 'center'];
+const VEHICLE_RESTORE_DEBUG = true;
 
 function vehicle_createSvgElement(type, attributes = {}) {
       const el = document.createElementNS('http://www.w3.org/2000/svg', type);
