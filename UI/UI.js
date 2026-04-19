@@ -1321,10 +1321,12 @@ function createToken(text, selectedTF, overrideCssStyles, parentObjectToAppendTo
     token.dataset.deselectedColor = COLOUR.DarkGrey;
     fakeValueContainer.value = selectedTF;
     token.onclick = function() {
-        fakeValueContainer.value = true;
-        token.dataset.selected = "true";
-        token.style.backgroundColor = token.dataset.selectedBackgroundColor;
-        token.style.color = token.dataset.selectedColor;
+        let selectedTF = token.dataset.selected == "true";
+        selectedTF = !selectedTF;
+        fakeValueContainer.value = selectedTF;
+        token.dataset.selected = selectedTF ? "true" : "false";
+        token.style.backgroundColor = selectedTF ? token.dataset.selectedBackgroundColor : token.dataset.deselectedBackgroundColor;
+        token.style.color = selectedTF ? token.dataset.selectedColor : token.dataset.deselectedColor;
     };
     token.onmouseover = function() {
         token.style.cssText += ";box-shadow: rgb(98 98 98) 5px 5px 10px -3px;";
