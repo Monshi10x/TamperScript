@@ -1915,8 +1915,40 @@ function showSetFunctionRetryToast(message, isPermanent = false) {
     }
 }
 
+function resolveNamedFunction(functionName) {
+    try {
+        if(typeof globalThis[functionName] === "function") {
+            return globalThis[functionName];
+        }
+    } catch(error) { }
+
+    try {
+        const scopedFn = eval(functionName);
+        if(typeof scopedFn === "function") return scopedFn;
+    } catch(error) { }
+
+    return null;
+}
+
+function assignNamedFunction(functionName, wrappedFn) {
+    let assigned = false;
+    try {
+        if(typeof globalThis[functionName] === "function") {
+            globalThis[functionName] = wrappedFn;
+            assigned = true;
+        }
+    } catch(error) { }
+
+    try {
+        eval(functionName + " = wrappedFn");
+        assigned = true;
+    } catch(error) { }
+
+    return assigned;
+}
+
 function wrapSetFunctionWithRetry(functionName) {
-    const originalFn = globalThis[functionName];
+    const originalFn = resolveNamedFunction(functionName);
     if(typeof originalFn !== "function") return;
     if(originalFn.__isSetRetryWrapped) return;
 
@@ -1945,7 +1977,7 @@ function wrapSetFunctionWithRetry(functionName) {
 
     wrappedFn.__isSetRetryWrapped = true;
     wrappedFn.__originalSetFn = originalFn;
-    globalThis[functionName] = wrappedFn;
+    assignNamedFunction(functionName, wrappedFn);
 }
 
 function initializeSetFunctionRetries() {
