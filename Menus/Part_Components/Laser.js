@@ -76,7 +76,7 @@ class Laser extends SubMenu {
             //makeFieldGroup("Checkbox", this.l_cleanMultiple[1], true, this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0]);
             makeFieldGroup("Checkbox", this.l_usePaths[1], true, this.l_cuttingTable.container, this.l_addRowBtn);
             makeFieldGroup("Checkbox",
-                  this.requiredField[1], false, this.l_qty[0], this.l_timeTE[0], this.l_setupTime[0], this.l_runTime[0], this.l_addRowBtn,
+                  this.requiredField[1], true, this.l_qty[0], this.l_timeTE[0], this.l_setupTime[0], this.l_runTime[0], this.l_addRowBtn,
                   this.l_cleanTime[0], this.l_usePaths[0], this.l_cuttingTable.container, this.l_setupNumberOfSheets[0], this.l_setupPerSheet[0],
                   this.l_cleanNumberOfSheets[0], this.l_cleanPerSheet[0], this.qtyContainer[0], this.setupContainer[0],
                   this.runContainer[0], this.cleanContainer[0]

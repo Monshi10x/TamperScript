@@ -63,6 +63,10 @@ class InstallSummary {
         this.newPanelContent_MarkupContainer_TotalMarkup.style = "text-align: right; float:right;width:100px;";
         this.newPanelContent_MarkupContainer_TotalMarkup.innerHTML = "0% / 0x";
 
+        this.reorderProductsBtn = createButton("Re-Order Products", "width:100%;margin-top:8px;background-color:" + COLOUR.Blue + ";color:white;min-height:32px;", () => {
+            this.openReorderProductsModal();
+        });
+
         //adds
         this.newPanel.appendChild(this.newPanelHeader);
         this.newPanelContent_CostContainer.appendChild(this.newPanelContent_CostContainer_Header);
@@ -79,6 +83,135 @@ class InstallSummary {
         this.newPanelContent.appendChild(this.newPanelContent_MarkupContainer);
         this.newPanel.appendChild(this.newPanelContent);
         this.sidePanel.appendChild(this.newPanel);
+        this.sidePanel.appendChild(this.reorderProductsBtn);
+    }
+
+    getCurrentProductRefs() {
+        const productElements = document.querySelectorAll('div[class^="ord-prod-model-item"]');
+        const refs = [];
+        for(let i = 0; i < productElements.length; i++) {
+            const context = ko.contextFor(productElements[i]);
+            const productRef = context?.$data || null;
+            if(productRef) refs.push(productRef);
+        }
+        return refs;
+    }
+
+    getCurrentProductsForModal() {
+        const productElements = document.querySelectorAll('div[class^="ord-prod-model-item"]');
+        const products = [];
+        for(let i = 0; i < productElements.length; i++) {
+            const productElement = productElements[i];
+            const context = ko.contextFor(productElement);
+            const productRef = context?.$data || null;
+            if(!productRef) continue;
+
+            const nameField = productElement.querySelector("input[id^='productDescription']");
+            const productName = nameField?.value || ("Product " + (i + 1));
+            products.push({id: String(i), productRef, productName});
+        }
+        return products;
+    }
+
+    async applyProductOrder(orderedProductIds, productLookup) {
+        if(!Array.isArray(orderedProductIds) || orderedProductIds.length === 0) return;
+
+        const desiredRefs = orderedProductIds
+            .map((id) => productLookup.get(id))
+            .filter((productRef) => !!productRef);
+        if(desiredRefs.length === 0) return;
+
+        const currentRefs = this.getCurrentProductRefs();
+
+        for(let targetIndex = 0; targetIndex < desiredRefs.length; targetIndex++) {
+            const desiredRef = desiredRefs[targetIndex];
+            let currentIndex = currentRefs.findIndex((currentRef) => currentRef === desiredRef);
+            if(currentIndex < 0 || currentIndex === targetIndex) continue;
+
+            await MoveProduct(currentIndex, targetIndex);
+
+            const movedRef = currentRefs.splice(currentIndex, 1)[0];
+            currentRefs.splice(targetIndex, 0, movedRef);
+        }
+    }
+
+    openReorderProductsModal() {
+        const products = this.getCurrentProductsForModal();
+        if(products.length <= 1) return;
+
+        const modal = new Modal("Re-Order Products", () => {});
+        modal.setContainerSize(900, 420);
+        this.ensureSpinnerStyle();
+
+        const productLookup = new Map();
+        const sortableContainer = document.createElement("div");
+        sortableContainer.style = "width:100%;min-height:180px;max-height:220px;display:block;overflow-y:auto;overflow-x:hidden;padding:8px;box-sizing:border-box;background-color:#f3f6fb;border:1px solid #d5dce8;";
+
+        for(let i = 0; i < products.length; i++) {
+            const product = products[i];
+            productLookup.set(product.id, product.productRef);
+
+            const card = document.createElement("div");
+            card.dataset.productId = product.id;
+            card.style = "width:calc(100% - 4px);min-height:48px;background-color:#ffffff;color:#1b2b44;padding:10px 14px;box-sizing:border-box;cursor:move;box-shadow:rgba(0,0,0,0.15) 0px 2px 6px;border-left:6px solid " + COLOUR.Blue + ";margin:6px 2px;";
+            const productNo = document.createElement("div");
+            productNo.style = "font-weight:bold;float:left;margin-right:12px;color:" + COLOUR.Blue + ";";
+            productNo.innerText = "#" + (i + 1);
+            const productName = document.createElement("div");
+            productName.style = "white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:24px;";
+            productName.innerText = product.productName;
+            card.appendChild(productNo);
+            card.appendChild(productName);
+            sortableContainer.appendChild(card);
+        }
+
+        new Sortable(sortableContainer, {
+            animation: 120,
+            direction: "vertical",
+            ghostClass: "sortable-ghost"
+        });
+
+        const loadingContainer = document.createElement("div");
+        loadingContainer.style = "display:none;align-items:center;justify-content:flex-start;gap:10px;margin-top:10px;padding:8px;border:1px solid #d5dce8;background-color:#eef3ff;";
+        const loadingSpinner = document.createElement("div");
+        loadingSpinner.className = "ts-reorder-spinner";
+        loadingSpinner.style = "width:18px;height:18px;border:3px solid #b8c7e6;border-top-color:" + COLOUR.Blue + ";border-radius:50%;animation:ts-reorder-spin 0.8s linear infinite;";
+        const loadingText = document.createElement("div");
+        loadingText.innerText = "Moves in progress";
+        loadingText.style = "font-weight:bold;color:" + COLOUR.Blue + ";";
+        loadingContainer.appendChild(loadingSpinner);
+        loadingContainer.appendChild(loadingText);
+
+        modal.addBodyElement(sortableContainer);
+        modal.addBodyElement(loadingContainer);
+
+        const cancelBtn = createButton("Cancel", "width:100px;float:right;", () => {
+            modal.hide();
+        });
+        const applyBtn = createButton("Apply", "width:100px;float:right;", async () => {
+            const orderedProductIds = [...sortableContainer.children].map((child) => child.dataset.productId);
+            loadingContainer.style.display = "flex";
+            applyBtn.disabled = true;
+            cancelBtn.disabled = true;
+            try {
+                await this.applyProductOrder(orderedProductIds, productLookup);
+                modal.hide();
+            } finally {
+                loadingContainer.style.display = "none";
+                applyBtn.disabled = false;
+                cancelBtn.disabled = false;
+            }
+        });
+        modal.addFooterElement(applyBtn);
+        modal.addFooterElement(cancelBtn);
+    }
+
+    ensureSpinnerStyle() {
+        if(document.getElementById("tsReorderSpinnerStyle")) return;
+        const style = document.createElement("style");
+        style.id = "tsReorderSpinnerStyle";
+        style.innerHTML = "@keyframes ts-reorder-spin {from {transform: rotate(0deg);} to {transform: rotate(360deg);}}";
+        document.head.appendChild(style);
     }
 
     set price(value) {
