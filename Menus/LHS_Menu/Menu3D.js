@@ -132,6 +132,145 @@ class Menu3D extends LHSMenuWindow {
             this.footer.appendChild(this.#createProductBtn);
       }
 
+      getSerializationMenuType() {
+            return "menu3d";
+      }
+
+      buildSerializablePayload() {
+            const classNameToIndex = new Map();
+            const serializedItems = this.#allMaterials.map((item, index) => {
+                  classNameToIndex.set(item, index);
+                  return {
+                        serializedId: "item-" + index,
+                        className: item.constructor?.name || "",
+                        productNumber: item.productNumber,
+                        typeLabel: item.typeLabel?.innerText || item.Type || "",
+                        itemUiState: MenuStateSerializer.captureUiState(item.container),
+                        itemState: typeof item.getSerializedState === "function" ? item.getSerializedState() : null
+                  };
+            });
+
+            for(let i = 0; i < this.#allMaterials.length; i++) {
+                  const item = this.#allMaterials[i];
+                  serializedItems[i].subscriptionRefs = (item.subscriptions || [])
+                        .map((subscription) => classNameToIndex.get(subscription))
+                        .filter((subscriptionIndex) => Number.isInteger(subscriptionIndex))
+                        .map((subscriptionIndex) => "item-" + subscriptionIndex);
+            }
+
+            return {
+                  ...super.buildSerializablePayload(),
+                  viewMode: this.#viewMode?.[1]?.value || null,
+                  items: serializedItems
+            };
+      }
+
+      applySerializedPayload(payload = {}) {
+            this.#restoreSerializedItems(payload);
+            this.#applyWindowPayload(payload);
+      }
+
+      #restoreSerializedItems(payload = {}) {
+            if(!Array.isArray(payload.items)) return;
+
+            this.#clearSerializedItems();
+
+            const classLookup = this.#getSerializableClassLookup();
+            const restoredItemsById = new Map();
+            let maxProductNumber = 0;
+
+            for(let i = 0; i < payload.items.length; i++) {
+                  const itemData = payload.items[i];
+                  const classType = classLookup[itemData.className];
+                  if(!classType) continue;
+
+                  const newItem = new classType(this.page1, this);
+                  if(Number.isFinite(itemData.productNumber)) {
+                        newItem.productNumber = itemData.productNumber;
+                        maxProductNumber = Math.max(maxProductNumber, itemData.productNumber);
+                  }
+                  if(itemData.typeLabel && newItem.typeLabel) {
+                        newItem.typeLabel.innerText = itemData.typeLabel;
+                  }
+
+                  this.#allMaterials.push(newItem);
+                  restoredItemsById.set(itemData.serializedId, newItem);
+            }
+
+            this.#numProducts = maxProductNumber;
+
+            for(let i = 0; i < payload.items.length; i++) {
+                  const itemData = payload.items[i];
+                  const restoredItem = restoredItemsById.get(itemData.serializedId);
+                  if(!restoredItem || !Array.isArray(itemData.subscriptionRefs)) continue;
+
+                  for(let s = 0; s < itemData.subscriptionRefs.length; s++) {
+                        const parentItem = restoredItemsById.get(itemData.subscriptionRefs[s]);
+                        if(parentItem) restoredItem.SubscribeTo(parentItem);
+                  }
+            }
+
+            if(payload.viewMode && this.#viewMode?.[1]) {
+                  this.#viewMode[1].value = payload.viewMode;
+            }
+
+            this.updateViewMode();
+
+            for(let i = 0; i < payload.items.length; i++) {
+                  const itemData = payload.items[i];
+                  const restoredItem = restoredItemsById.get(itemData.serializedId);
+                  if(!restoredItem || !Array.isArray(itemData.itemUiState)) continue;
+                  MenuStateSerializer.applyUiState(restoredItem.container, itemData.itemUiState);
+            }
+
+            for(let i = 0; i < payload.items.length; i++) {
+                  const itemData = payload.items[i];
+                  const restoredItem = restoredItemsById.get(itemData.serializedId);
+                  if(!restoredItem || !itemData.itemState || typeof restoredItem.applySerializedState !== "function") continue;
+                  restoredItem.applySerializedState(itemData.itemState);
+            }
+      }
+
+      #clearSerializedItems() {
+            while(this.#allMaterials.length > 0) {
+                  this.#allMaterials[0].Delete();
+            }
+            this.#numProducts = 0;
+      }
+
+      #getSerializableClassLookup() {
+            return {
+                  ProductDetails,
+                  Size,
+                  SVGCutfile,
+                  Coil,
+                  Sheet,
+                  LED,
+                  Transformer,
+                  Painting,
+                  Vinyl,
+                  Laminate,
+                  AppTaping,
+                  HandTrimming,
+                  PrintMounting,
+                  Finishing,
+                  ProductionSubscribable,
+                  ArtworkSubscribable,
+                  InstallSubscribable
+            };
+      }
+
+      #applyWindowPayload(payload = {}) {
+            if(payload.containerRect) {
+                  if(payload.containerRect.left !== null) this.container.style.left = payload.containerRect.left;
+                  if(payload.containerRect.top !== null) this.container.style.top = payload.containerRect.top;
+            }
+
+            if(Number.isInteger(payload.currentPageIndex)) {
+                  this.jumpToPage(payload.currentPageIndex);
+            }
+      }
+
       addQuickTemplate() {
             this.#numProducts++;
 
@@ -955,6 +1094,10 @@ class Menu3D extends LHSMenuWindow {
                   await AddBlankProduct();
                   productNo = getNumProducts();
                   partIndex = 0;
+
+                  partIndex = await this.createSerializedStatePart(productNo, partIndex, {
+                        payload: {sourceProductNumber: currentProductNumber}
+                  });
 
                   for(let j = 0; j < this.#allMaterials.length; j++) {
                         let item = this.#allMaterials[j];

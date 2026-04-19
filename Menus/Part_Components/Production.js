@@ -122,17 +122,26 @@ class Production extends SubMenu {
 		makeFieldGroup("Checkbox", this.#customRequired[1], true, this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0]);
 		this.#otherItemFields["Custom"]["linked field"] = this.#customRequired;
 
-		makeFieldGroup("Checkbox", this.requiredField[1], false,
+		makeFieldGroup("Checkbox", this.requiredField[1], true,
 			this.#qty[0],
 			this.#productionTimeMins[0],
 			this.#productionTimeHours[0],
 			this.#productionTimeDays[0],
 			this.#productionTimeTotalEach[0],
 			this.#toggleAdditionalFields,
-			this.#eyeletsRequired[0], this.#eyeletsQty[0], this.#eyeletsHelperBtn,
-			this.#pinsRequired[0], this.#pinsQty[0],
-			this.#standOffRequired[0], this.#standOffQty[0], this.#standOffType[0], this.#standOffHelperBtn,
-			this.#customRequired[0], this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0]);
+			this.#eyeletsRequired[0],
+			this.#pinsRequired[0],
+			this.#standOffRequired[0],
+			this.#customRequired[0]);
+		this.requiredField[1].addEventListener("change", () => {
+			this.updateOtherItemFields();
+		});
+
+		setFieldHidden(true, this.#eyeletsRequired[0]);
+		setFieldHidden(true, this.#pinsRequired[0]);
+		setFieldHidden(true, this.#standOffRequired[0]);
+		setFieldHidden(true, this.#customRequired[0]);
+		this.updateOtherItemFields();
 	}
 
 	updateOtherItemFields() {
@@ -192,6 +201,41 @@ class Production extends SubMenu {
 
 	Update() {
 		super.Update();
+	}
+
+	syncVisibilityFromState() {
+		this.updateOtherItemFields();
+	}
+
+	getSerializedState() {
+		const additionalFieldVisibility = {};
+		Object.keys(this.#otherItemFields).forEach((key) => {
+			additionalFieldVisibility[key] = !!this.#otherItemFields[key]?.show;
+		});
+		return {
+			required: !!this.required,
+			qty: this.qty,
+			productionTotalEach: this.productionTotalEach,
+			productionTimeMins: this.productionTimeMins,
+			additionalFieldVisibility
+		};
+	}
+
+	applySerializedState(state = {}) {
+		if(!state || typeof state !== "object") return;
+		if(state.required !== undefined) this.required = !!state.required;
+		if(state.qty !== undefined) this.qty = state.qty;
+		if(state.productionTotalEach !== undefined) this.productionTotalEach = state.productionTotalEach;
+		if(state.productionTimeMins !== undefined) this.productionTime = state.productionTimeMins;
+
+		if(state.additionalFieldVisibility && typeof state.additionalFieldVisibility === "object") {
+			Object.keys(state.additionalFieldVisibility).forEach((key) => {
+				if(this.#otherItemFields[key]) {
+					this.#otherItemFields[key].show = !!state.additionalFieldVisibility[key];
+				}
+			});
+			this.updateOtherItemFields();
+		}
 	}
 
 	async Create(productNo, partIndex) {

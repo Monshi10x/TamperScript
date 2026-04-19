@@ -1,4 +1,4 @@
-var sleepMS = 300;
+var sleepMS = 50;
 var menuXOffset = 160;
 var dayHours = 8;
 var widthText;

@@ -136,12 +136,83 @@ class Install extends SubMenu {
 	set travelHours(value) {$(this.#install_TravelHours[1]).val(value).change();}
 
 	get travelDays() {return zeroIfNaNNullBlank(this.#install_TravelDays[1].value);}
-	set travelHours(value) {$(this.#install_TravelDays[1]).val(value).change();}
+	set travelDays(value) {$(this.#install_TravelDays[1]).val(value).change();}
 
 	get travelRate() {return this.#install_TravelRate[1].value;}
 	set travelRate(value) {this.#install_TravelRate[1].value = value;}
 
 	get qty() {return zeroIfNaNNullBlank(this.#qty[1].value);}
+
+		getSerializedState() {
+			return {
+				required: this.required,
+				qty: this.qty,
+				installTotalEach: this.installTotalEach,
+			installRate: this.installRate,
+			installMinutes: this.installMinutes,
+			installHours: this.installHours,
+			installDays: this.installDays,
+			travelRate: this.travelRate,
+			travelMinutes: this.travelMinutes,
+			travelHours: this.travelHours,
+			travelDays: this.travelDays,
+			isOutsourced: this.#isOutsourced[1].checked,
+			outsourceCost: zeroIfNaNNullBlank(this.#outsourceCost[1].value),
+			outsourceMarkup: zeroIfNaNNullBlank(this.#outsourceMarkup[1].value),
+			quickLookup: this.#quickLookup[1].checked,
+			quickItem: this.#quickItem[1].value,
+			quickInstallSub: this.#quickInstall_sub[1].value
+		};
+	}
+
+		applySerializedState(state = {}) {
+			if(!state || typeof state !== "object") return;
+			if(state.required !== undefined) {
+				this.required = !!state.required;
+			}
+
+			if(state.qty !== undefined) {
+				$(this.#qty[1]).val(state.qty).change();
+		}
+		if(state.installTotalEach !== undefined) {
+			this.#installTimeTotalEach[1].value = state.installTotalEach;
+		}
+
+			setCheckboxChecked(!!state.isOutsourced, this.#isOutsourced[1]);
+			setFieldHidden(!state.isOutsourced, this.#outsourceCost[0], this.#outsourceCost[0]);
+			setFieldHidden(!state.isOutsourced, this.#outsourceMarkup[0], this.#outsourceMarkup[0]);
+			$(this.#outsourceCost[1]).val(state.outsourceCost ?? "").change();
+			$(this.#outsourceMarkup[1]).val(state.outsourceMarkup ?? "").change();
+
+		if(state.quickItem) {
+			this.#quickItem[1].value = state.quickItem;
+			this.UpdateInstallLookup();
+		}
+
+			setCheckboxChecked(!!state.quickLookup, this.#quickLookup[1]);
+			setFieldHidden(!state.quickLookup, this.#quickItem[0], this.#quickItem[0]);
+			setFieldHidden(!state.quickLookup, this.#quickInstall_sub[0], this.#quickInstall_sub[0]);
+
+		if(state.quickInstallSub) {
+			this.#quickInstall_sub[6]();
+			this.#quickInstall_sub[1].value = state.quickInstallSub;
+			this.#quickInstall_sub[7]();
+		}
+
+		if(state.installRate !== undefined) {
+			dropdownSetSelectedValue(this.#install_InstallRate[1], state.installRate);
+		}
+		if(state.travelRate !== undefined) {
+			dropdownSetSelectedValue(this.#install_TravelRate[1], state.travelRate);
+		}
+
+		this.installMinutes = state.installMinutes ?? 0;
+		this.installHours = state.installHours ?? 0;
+		this.installDays = state.installDays ?? 0;
+		this.travelMinutes = state.travelMinutes ?? 0;
+		this.travelHours = state.travelHours ?? 0;
+		this.travelDays = state.travelDays ?? 0;
+	}
 
 	UpdateInstallLookup() {
 		let chosenLookupType = this.#quickItem[1].value;
@@ -189,6 +260,15 @@ class Install extends SubMenu {
 
 	Update() {
 		this.callback();
+	}
+
+	syncVisibilityFromState() {
+		const isOutsourced = !!this.#isOutsourced[1].checked;
+		const quickLookup = !!this.#quickLookup[1].checked;
+		setFieldHidden(!isOutsourced, this.#outsourceMarkup[0], this.#outsourceMarkup[0]);
+		setFieldHidden(!isOutsourced, this.#outsourceCost[0], this.#outsourceCost[0]);
+		setFieldHidden(!quickLookup, this.#quickItem[0], this.#quickItem[0]);
+		setFieldHidden(!quickLookup, this.#quickInstall_sub[0], this.#quickInstall_sub[0]);
 	}
 
 	async Create(productNo, partIndex) {

@@ -79,6 +79,20 @@ class InstallSubscribable extends Material {
             }
       };
 
+      getSerializedState() {
+            if(typeof this.#installItem?.getSerializedState !== "function") return null;
+            return {
+                  installItem: this.#installItem.getSerializedState()
+            };
+      }
+
+      applySerializedState(state = {}) {
+            if(!state || typeof state !== "object") return;
+            if(state.installItem && typeof this.#installItem?.applySerializedState === "function") {
+                  this.#installItem.applySerializedState(state.installItem);
+            }
+      }
+
       async Create(productNo, partIndex) {
             partIndex = await super.Create(productNo, partIndex);
             partIndex = await this.#installItem.Create(productNo, partIndex);

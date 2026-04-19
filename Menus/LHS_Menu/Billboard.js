@@ -41,6 +41,7 @@ class BillboardMenu extends LHSMenuWindow {
       #install;
       #artwork;
       #f_showGroundCkb;
+      #settingsButton;
 
       #showGround = true;
 
@@ -48,6 +49,26 @@ class BillboardMenu extends LHSMenuWindow {
             super(width, height, ID, windowTitle);
             this.addPages(1);
             this.doesTick = false;
+      }
+
+      getSerializationMenuType() {
+            return "billboard";
+      }
+
+      onStateRestored(payload = {}) {
+            if(typeof payload.showGround === "boolean") {
+                  this.#showGround = payload.showGround;
+                  if(this.#f_showGroundCkb?.[1]) setCheckboxChecked(payload.showGround, this.#f_showGroundCkb[1]);
+            }
+            if(payload.attachmentType) {
+                  attachmentType = payload.attachmentType;
+            }
+
+            if(this.#footing?.syncVisibilityFromState) this.#footing.syncVisibilityFromState();
+            if(this.#production?.syncVisibilityFromState) this.#production.syncVisibilityFromState();
+            if(this.#install?.syncVisibilityFromState) this.#install.syncVisibilityFromState();
+
+            this.UpdateFromFields();
       }
 
       show() {
@@ -65,12 +86,14 @@ class BillboardMenu extends LHSMenuWindow {
       createContent() {
             var page = this.getPage(0);
 
-            let settingsButton = createButton("", "width:30px;height:30px;margin:0px;padding:0;float:right;font-size:20px;min-height:30px;line-height:30px;", () => {
-                  this.openSettingsModal();
-            }, null);
-            this.add;
-            settingsButton.innerHTML = "&#9881";
-            this.header.appendChild(settingsButton);
+            if(!this.#settingsButton || !this.header.contains(this.#settingsButton)) {
+                  this.#settingsButton = createButton("", "width:30px;height:30px;margin:0px;padding:0;float:right;font-size:20px;min-height:30px;line-height:30px;", () => {
+                        this.openSettingsModal();
+                  }, null);
+                  this.#settingsButton.id = "billboardSettingsBtn";
+                  this.#settingsButton.innerHTML = "&#9881";
+                  this.header.appendChild(this.#settingsButton);
+            }
 
             this.#f_showGroundCkb = createCheckbox_Infield("Show Ground", true, null, () => {this.#showGround = this.#f_showGroundCkb[1].checked; this.UpdateFromFields();});
 
@@ -208,11 +231,23 @@ class BillboardMenu extends LHSMenuWindow {
                   tempThis.#artwork.Description() +
                   tempThis.#install.Description());
 
-            await AddPart("No Cost Part", productNo);
-            partIndex++;
-            await setPartDescription(productNo, partIndex, "CODE [Automatic]");
-            partIndex = await setPartNotes(productNo, partIndex, this.#dragZoomSVG.unscaledSVGString);
-            await savePart(productNo, partIndex);
+            partIndex = await tempThis.createSerializedStatePart(productNo, partIndex, {
+                  payload: {
+                        attachmentType,
+                        showGround: tempThis.#showGround
+                  },
+                  captureAssets: (assets) => {
+                        if(!tempThis.#dragZoomSVG?.unscaledSVGString) return;
+                        const fullSvgMarkup = tempThis.#dragZoomSVG.unscaledSVGString;
+                        const assetRef = MenuStateSerializer.registerAsset(assets, {
+                              type: "svg",
+                              mime: "image/svg+xml",
+                              encoding: "utf8",
+                              data: fullSvgMarkup
+                        });
+                        assets.__payload = {assetRefs: [assetRef], previewAssetRef: assetRef};
+                  }
+            });
 
             partIndex = await tempThis.#sign.Create(productNo, partIndex);
             partIndex = await tempThis.#leg.Create(productNo, partIndex);
