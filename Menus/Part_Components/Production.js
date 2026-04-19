@@ -194,6 +194,10 @@ class Production extends SubMenu {
 		super.Update();
 	}
 
+	syncVisibilityFromState() {
+		this.updateOtherItemFields();
+	}
+
 	getSerializedState() {
 		const additionalFieldVisibility = {};
 		Object.keys(this.#otherItemFields).forEach((key) => {
