@@ -133,6 +133,12 @@ class Production extends SubMenu {
 			this.#pinsRequired[0], this.#pinsQty[0],
 			this.#standOffRequired[0], this.#standOffQty[0], this.#standOffType[0], this.#standOffHelperBtn,
 			this.#customRequired[0], this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0]);
+
+		setFieldHidden(true, this.#eyeletsRequired[0]);
+		setFieldHidden(true, this.#pinsRequired[0]);
+		setFieldHidden(true, this.#standOffRequired[0]);
+		setFieldHidden(true, this.#customRequired[0]);
+		this.updateOtherItemFields();
 	}
 
 	updateOtherItemFields() {
@@ -192,6 +198,10 @@ class Production extends SubMenu {
 
 	Update() {
 		super.Update();
+	}
+
+	syncVisibilityFromState() {
+		this.updateOtherItemFields();
 	}
 
 	getSerializedState() {
