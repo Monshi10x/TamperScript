@@ -111,6 +111,18 @@ class InstallSummary {
             const productName = nameField?.value || ("Product " + (i + 1));
             products.push({id: String(i), productRef, productName});
         }
+
+        if(products.length === 0) {
+            const orderBody = document.querySelector(".ord-prod-body");
+            const orderContext = orderBody ? ko.contextFor(orderBody) : null;
+            const orderProducts = orderContext?.$parent?.OrderProducts ? orderContext.$parent.OrderProducts() : [];
+            for(let i = 0; i < orderProducts.length; i++) {
+                const productRef = orderProducts[i];
+                if(!productRef) continue;
+                const productName = productRef.ProductDescription ? productRef.ProductDescription() : ("Product " + (i + 1));
+                products.push({id: String(i), productRef, productName});
+            }
+        }
         return products;
     }
 
@@ -138,15 +150,21 @@ class InstallSummary {
 
     openReorderProductsModal() {
         const products = this.getCurrentProductsForModal();
-        if(products.length <= 1) return;
 
         const modal = new Modal("Re-Order Products", () => {});
-        modal.setContainerSize(900, 420);
+        const modalHeight = Math.max(320, Math.floor(window.innerHeight * 0.8));
+        modal.setContainerSize(900, modalHeight);
         this.ensureSpinnerStyle();
+
+        if(products.length === 0) {
+            modal.addBodyElement(createText("No products found to reorder.", "width:100%;", null));
+            modal.addFooterElement(createButton("Close", "width:100px;float:right;", () => {modal.hide();}));
+            return;
+        }
 
         const productLookup = new Map();
         const sortableContainer = document.createElement("div");
-        sortableContainer.style = "width:100%;min-height:220px;max-height:260px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;overflow-x:hidden;padding:8px;box-sizing:border-box;background-color:#f3f6fb;border:1px solid #d5dce8;";
+        sortableContainer.style = "width:100%;height:calc(100% - 16px);min-height:calc(100% - 16px);display:flex;flex-direction:column;gap:8px;overflow-y:auto;overflow-x:hidden;padding:8px;box-sizing:border-box;background-color:#e6e6e6;border:1px solid #d5dce8;";
 
         for(let i = 0; i < products.length; i++) {
             const product = products[i];
