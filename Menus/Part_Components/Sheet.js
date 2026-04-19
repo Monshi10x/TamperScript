@@ -896,6 +896,8 @@ class Sheet extends Material {
 
                         let cuttingTypeDropDown = createDropdown_Infield("Panel Cutting Type", 0, ";width:-webkit-fill-available;", options, () => {
                               this.UpdateOutputTable();
+                              this.UpdateDataForSubscribers();
+                              this.PushToSubscribers();
                         }, null);
 
                         this.#dataForSubscribers.push({QWHD: new QWHD(qty, w, h, d), paintedArea: paintedArea});
