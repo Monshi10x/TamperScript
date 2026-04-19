@@ -585,6 +585,11 @@ class UIContainer_Design2 {
             this.#f_installAddressMissingBadge = document.createElement("div");
             this.#f_installAddressMissingBadge.style.cssText = "display:none;position:absolute;top:6px;left:6px;width:12px;height:12px;border-radius:50%;background-color:#d00000;z-index:10;border:1px solid #ffffff;";
             this.#f_installAddressMissingBadge.title = "install address missing";
+            this.#f_installAddressMissingBadge.addEventListener("click", async (event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  await this.openSetInstallAddressModal();
+            });
             this.#f_container.appendChild(this.#f_installAddressMissingBadge);
 
             if(this.#parentObjectToAppendTo != null) {
@@ -1243,6 +1248,102 @@ class UIContainer_Design2 {
       updateInstallAddressMissingBadge(isMissing) {
             if(!this.#f_installAddressMissingBadge) return;
             this.#f_installAddressMissingBadge.style.display = isMissing ? "block" : "none";
+      }
+
+      async openSetInstallAddressModal() {
+            let modal = new Modal("Set Install Address - " + this.#jobObject.OrderInvoiceNumber, null);
+            modal.shouldHideOnEnterKeyPress = false;
+            modal.setContainerSize(650, 260);
+
+            let bodyContainer = document.createElement("div");
+            bodyContainer.style.cssText = "padding:12px;display:flex;flex-direction:column;gap:10px;";
+            modal.addBodyElement(bodyContainer);
+
+            let searchField = createInput_Infield("Install Address", this.#installAddress || "", "width:calc(100% - 16px);", () => {}, bodyContainer, false, null);
+            searchField[1].style.cssText += "width:100%;";
+
+            let helperText = createText("Pick a valid address from the autocomplete list, then save to all items in this order.", "width:100%;color:#444;", bodyContainer);
+            helperText.style.cssText += STYLE.Text1;
+
+            let selectedAddress = null;
+            let placeAutocomplete = null;
+
+            try {
+                  await google.maps.importLibrary("places");
+                  placeAutocomplete = new google.maps.places.Autocomplete(searchField[1], {
+                        fields: ["formatted_address", "geometry", "name"],
+                        strictBounds: false
+                  });
+                  placeAutocomplete.addListener("place_changed", () => {
+                        let place = placeAutocomplete.getPlace();
+                        if(!place || !place.geometry || !place.geometry.location) {
+                              selectedAddress = null;
+                              return;
+                        }
+                        selectedAddress = place.formatted_address;
+                  });
+            } catch(error) {
+                  console.warn(error);
+                  Toast.warn("Google Places autocomplete is unavailable.", 4000, {position: "top-right"});
+            }
+
+            modal.addFooterElement(createButton("Save", "width:100px;float:right;", async () => {
+                  let formattedAddress = selectedAddress || searchField[1].value?.trim();
+                  if(!formattedAddress) {
+                        Toast.warn("Please choose a valid install address first.", 3000, {position: "top-right"});
+                        return;
+                  }
+
+                  let saveResult = await this.trySetOrderInstallAddressInKOStorage({formattedAddress});
+                  if(!saveResult.success) {
+                        Toast.warn(saveResult.message, 5000, {position: "top-right"});
+                        return;
+                  }
+
+                  this.updateInstallAddressForAllOrderItems({formattedAddress});
+                  Toast.notify("Install address updated for this order.", 3000, {position: "top-right"});
+                  modal.hide();
+            }));
+            modal.addFooterElement(createButton("Cancel", "width:100px;float:right;", () => {
+                  modal.hide();
+            }));
+      }
+
+      updateInstallAddressForAllOrderItems({formattedAddress} = {}) {
+            let pageContainers = document.querySelectorAll(".UIContainer_Design");
+            for(let i = 0; i < pageContainers.length; i++) {
+                  let containerObject = pageContainers[i].containerObject;
+                  if(!containerObject || containerObject.OrderId !== this.#jobObject.OrderId) continue;
+                  containerObject.setInstallAddressValue({formattedAddress});
+            }
+      }
+
+      setInstallAddressValue({formattedAddress} = {}) {
+            this.#installAddress = formattedAddress || null;
+            if(this.#f_address) {
+                  $(this.#f_address[1]).val(this.#installAddress || "");
+            }
+            this.updateInstallAddressMissingBadge(!this.#installAddress);
+      }
+
+      async trySetOrderInstallAddressInKOStorage({formattedAddress} = {}) {
+            let globalSetter = window.setOrderInstallAddressForOrder;
+            if(typeof globalSetter === "function") {
+                  try {
+                        await globalSetter({
+                              orderId: this.#jobObject.OrderId,
+                              accountId: this.#jobObject.AccountId,
+                              accountName: this.#jobObject.CompanyName,
+                              formattedInstallAddress: formattedAddress
+                        });
+                        return {success: true};
+                  } catch(error) {
+                        console.warn(error);
+                        return {success: false, message: "Unable to save install address to KO storage."};
+                  }
+            }
+
+            return {success: false, message: "Install address could not be persisted: missing async KOStorage setter on Design Board."};
       }
 
       async borrowGoogleMap() {
