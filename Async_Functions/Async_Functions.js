@@ -1906,7 +1906,8 @@ function resetExecuted() {
     executed = false;
 }
 
-const SET_FUNCTION_RETRY_DELAYS_MS = [200, 500, 1000, 2000, 5000];
+const SET_FUNCTION_RETRY_DELAYS_MS = [200, 500, 1000, 2000, 5000, 5000, 5000];
+const SET_FUNCTION_RETRY_ALERT_START_ATTEMPT = 4;
 function showSetFunctionRetryToast(message, isPermanent = false) {
     if(typeof Toast !== "undefined" && Toast?.warn) {
         Toast.warn(message, isPermanent ? 0 : 2500, {position: "top-right"});
@@ -1962,7 +1963,9 @@ function wrapSetFunctionWithRetry(functionName) {
                 lastError = error;
                 const hasMoreAttempts = attemptIndex < SET_FUNCTION_RETRY_DELAYS_MS.length - 1;
                 if(hasMoreAttempts) {
-                    showSetFunctionRetryToast(functionName + " failed (attempt " + attemptNo + "/" + SET_FUNCTION_RETRY_DELAYS_MS.length + "). Retrying...");
+                    if(attemptNo >= SET_FUNCTION_RETRY_ALERT_START_ATTEMPT) {
+                        showSetFunctionRetryToast(functionName + " failed (attempt " + attemptNo + "/" + SET_FUNCTION_RETRY_DELAYS_MS.length + "). Retrying...");
+                    }
                     await sleep(SET_FUNCTION_RETRY_DELAYS_MS[attemptIndex]);
                     continue;
                 }
