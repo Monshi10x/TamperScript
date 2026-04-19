@@ -129,10 +129,10 @@ class Production extends SubMenu {
 			this.#productionTimeDays[0],
 			this.#productionTimeTotalEach[0],
 			this.#toggleAdditionalFields,
-			this.#eyeletsRequired[0], this.#eyeletsQty[0], this.#eyeletsHelperBtn,
-			this.#pinsRequired[0], this.#pinsQty[0],
-			this.#standOffRequired[0], this.#standOffQty[0], this.#standOffType[0], this.#standOffHelperBtn,
-			this.#customRequired[0], this.#customQty[0], this.#customCost[0], this.#customMarkup[0], this.#customDescription[0]);
+			this.#eyeletsRequired[0],
+			this.#pinsRequired[0],
+			this.#standOffRequired[0],
+			this.#customRequired[0]);
 		this.requiredField[1].addEventListener("change", () => {
 			this.updateOtherItemFields();
 		});
