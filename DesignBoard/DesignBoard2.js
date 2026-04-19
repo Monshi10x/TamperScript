@@ -135,9 +135,18 @@ class DesignBoard2 extends JobBoard {
             await this.LoadJobsData();
             this.CreateJobColumns();
             await this.AddJobCardsToBoards();
+            await this.LoadSecondaryFieldsForAllCards();
             this.AddFiltersToHeader();
             this.ListenForWIPChanges();
             await this.AddPaymentButtonToCards();
+      }
+
+      async LoadSecondaryFieldsForAllCards() {
+            let secondaryFieldPromises = [];
+            for(let j = 0; j < this.#jobObjects.length; j++) {
+                  secondaryFieldPromises.push(this.#jobObjects[j].containerObject.loadSecondaryFields());
+            }
+            await Promise.allSettled(secondaryFieldPromises);
       }
 
       CreateBoards() {

@@ -111,9 +111,9 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
 
             this.modalOpaqueBackground.style.zIndex = "1004";
 
-            if(this.dragZoomSVG) {
+            if(this.#dragZoomSVG) {
                   setTimeout(() => {
-                        this.dragZoomSVG.centerAndFitSVGContent();
+                        this.#dragZoomSVG.centerAndFitSVGContent();
                   }, 1);
             }
       }
@@ -121,9 +121,9 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
       UpdateFromFields() {
             super.UpdateFromFields();
 
-            if(this.dragZoomSVG) {
+            if(this.#dragZoomSVG) {
                   this.draw();
-                  this.dragZoomSVG.UpdateFromFields();
+                  this.#dragZoomSVG.UpdateFromFields();
             }
       }
 
@@ -345,7 +345,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
 
       onWindowResize(event) {
             super.onWindowResize(event);
-            if(this.dragZoomSVG) this.dragZoomSVG.canvasWidth = this.container.getBoundingClientRect().width;
+            if(this.#dragZoomSVG) this.#dragZoomSVG.canvasWidth = this.container.getBoundingClientRect().width;
             this.UpdateFromFields();
       }
 }
