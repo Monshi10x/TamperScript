@@ -138,8 +138,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 	buildSerializablePayload() {
 		const classNameToIndex = new Map();
+		const serializedIdByItem = new Map();
 		const serializedItems = this.#allMaterials.map((item, index) => {
 			classNameToIndex.set(item, index);
+			serializedIdByItem.set(item, "item-" + index);
 			return {
 				serializedId: "item-" + index,
 				className: item.constructor?.name || "",
@@ -157,11 +159,24 @@ class MenuPanelSigns extends LHSMenuWindow {
 				.filter((subscriptionIndex) => Number.isInteger(subscriptionIndex))
 				.map((subscriptionIndex) => "item-" + subscriptionIndex);
 		}
+		const domOrderedItems = this.#allMaterials
+			.slice()
+			.sort((itemA, itemB) => {
+				if(itemA === itemB) return 0;
+				if(!itemA?.container || !itemB?.container) return 0;
+				const position = itemA.container.compareDocumentPosition(itemB.container);
+				if(position & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+				if(position & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+				return 0;
+			})
+			.map((item) => serializedIdByItem.get(item))
+			.filter((serializedId) => typeof serializedId === "string");
 
 		return {
 			...super.buildSerializablePayload(),
 			viewMode: this.#viewMode?.[1]?.value || null,
-			items: serializedItems
+			items: serializedItems,
+			itemOrder: domOrderedItems
 		};
 	}
 
@@ -209,6 +224,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 				if(parentItem) restoredItem.SubscribeTo(parentItem);
 			}
 		}
+		this.#applySerializedItemOrder(payload.itemOrder, restoredItemsById);
 
 		if(payload.viewMode && this.#viewMode?.[1]) {
 			this.#viewMode[1].value = payload.viewMode;
@@ -236,6 +252,28 @@ class MenuPanelSigns extends LHSMenuWindow {
 			this.#allMaterials[0].Delete();
 		}
 		this.#numProducts = 0;
+	}
+
+	#applySerializedItemOrder(serializedOrder = [], restoredItemsById = new Map()) {
+		if(!Array.isArray(serializedOrder) || serializedOrder.length === 0) return;
+
+		const orderedItems = [];
+		const usedItems = new Set();
+
+		for(let i = 0; i < serializedOrder.length; i++) {
+			const restoredItem = restoredItemsById.get(serializedOrder[i]);
+			if(!restoredItem || usedItems.has(restoredItem)) continue;
+			orderedItems.push(restoredItem);
+			usedItems.add(restoredItem);
+		}
+
+		for(let i = 0; i < this.#allMaterials.length; i++) {
+			const item = this.#allMaterials[i];
+			if(usedItems.has(item)) continue;
+			orderedItems.push(item);
+		}
+
+		this.#allMaterials.splice(0, this.#allMaterials.length, ...orderedItems);
 	}
 
 	#getSerializableClassLookup() {
