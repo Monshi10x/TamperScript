@@ -143,10 +143,11 @@ class Install extends SubMenu {
 
 	get qty() {return zeroIfNaNNullBlank(this.#qty[1].value);}
 
-	getSerializedState() {
-		return {
-			qty: this.qty,
-			installTotalEach: this.installTotalEach,
+		getSerializedState() {
+			return {
+				required: this.required,
+				qty: this.qty,
+				installTotalEach: this.installTotalEach,
 			installRate: this.installRate,
 			installMinutes: this.installMinutes,
 			installHours: this.installHours,
@@ -164,26 +165,33 @@ class Install extends SubMenu {
 		};
 	}
 
-	applySerializedState(state = {}) {
-		if(!state || typeof state !== "object") return;
+		applySerializedState(state = {}) {
+			if(!state || typeof state !== "object") return;
+			if(state.required !== undefined) {
+				this.required = !!state.required;
+			}
 
-		if(state.qty !== undefined) {
-			$(this.#qty[1]).val(state.qty).change();
+			if(state.qty !== undefined) {
+				$(this.#qty[1]).val(state.qty).change();
 		}
 		if(state.installTotalEach !== undefined) {
 			this.#installTimeTotalEach[1].value = state.installTotalEach;
 		}
 
-		setCheckboxChecked(!!state.isOutsourced, this.#isOutsourced[1]);
-		$(this.#outsourceCost[1]).val(state.outsourceCost ?? "").change();
-		$(this.#outsourceMarkup[1]).val(state.outsourceMarkup ?? "").change();
+			setCheckboxChecked(!!state.isOutsourced, this.#isOutsourced[1]);
+			setFieldHidden(!state.isOutsourced, this.#outsourceCost[0], this.#outsourceCost[0]);
+			setFieldHidden(!state.isOutsourced, this.#outsourceMarkup[0], this.#outsourceMarkup[0]);
+			$(this.#outsourceCost[1]).val(state.outsourceCost ?? "").change();
+			$(this.#outsourceMarkup[1]).val(state.outsourceMarkup ?? "").change();
 
 		if(state.quickItem) {
 			this.#quickItem[1].value = state.quickItem;
 			this.UpdateInstallLookup();
 		}
 
-		setCheckboxChecked(!!state.quickLookup, this.#quickLookup[1]);
+			setCheckboxChecked(!!state.quickLookup, this.#quickLookup[1]);
+			setFieldHidden(!state.quickLookup, this.#quickItem[0], this.#quickItem[0]);
+			setFieldHidden(!state.quickLookup, this.#quickInstall_sub[0], this.#quickInstall_sub[0]);
 
 		if(state.quickInstallSub) {
 			this.#quickInstall_sub[6]();
