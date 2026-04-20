@@ -5,12 +5,15 @@
 			"path": "."
 		},
 		{
-			"path": "../../../../Program Files (x86)/Common Files/Adobe/CEP/extensions/Signarama-Illustrator-Helper"
+			"name": "Signarama-Illustrator-Helper",
+			"path": "../Signarama-Illustrator-Helper"
 		},
 		{
+			"name": "SignScheduler",
 			"path": "../SignScheduler"
 		},
 		{
+			"name": "SignSchedulerServer2",
 			"path": "../SignSchedulerServer2"
 		}
 	],
