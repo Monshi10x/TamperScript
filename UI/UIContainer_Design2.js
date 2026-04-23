@@ -1259,7 +1259,7 @@ class UIContainer_Design2 {
             bodyContainer.style.cssText = "padding:12px;display:flex;flex-direction:column;gap:10px;";
             modal.addBodyElement(bodyContainer);
 
-            let searchField = createInput_Infield("Install Address", this.#installAddress || "", "width:calc(100% - 16px);", () => {}, bodyContainer, false, null);
+            let searchField = createInput_Infield("Install Address", this.#installAddress || "", "width:calc(100% - 16px);", () => { }, bodyContainer, false, null);
             searchField[1].style.cssText += "width:100%;";
 
             let helperText = createText("Pick a valid address from the autocomplete list, then save to all items in this order.", "width:100%;color:#444;", bodyContainer);

@@ -135,7 +135,7 @@ class DesignBoard2 extends JobBoard {
             await this.LoadJobsData();
             this.CreateJobColumns();
             await this.AddJobCardsToBoards();
-            await this.LoadSecondaryFieldsForAllCards();
+            // await this.LoadSecondaryFieldsForAllCards();
             this.AddFiltersToHeader();
             this.ListenForWIPChanges();
             await this.AddPaymentButtonToCards();
