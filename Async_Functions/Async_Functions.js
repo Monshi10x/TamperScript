@@ -592,6 +592,7 @@ async function MoveProduct(currentIndex, newIndex) {
 }
 async function AddPart(name, productNo) {
     console.log("Add Part " + name);
+    const initialPartCount = getNumPartsInProduct(productNo);
     var linkedId = $.grep(predefinedParts_Name_Id, function(obj) {return obj.key === name;})[0].value;
     var c = ko.contextFor(document.querySelector(Field.Product(productNo)));
     OrderStep2.SearchPartModal_PartSelectedHandler(linkedId, c.$data, null);
@@ -611,6 +612,18 @@ async function AddPart(name, productNo) {
             }
         }, sleepMS);
     });
+
+    await new Promise(resolve => {
+        var timer = setInterval(() => {
+            const currentPartCount = getNumPartsInProduct(productNo);
+            if(currentPartCount > initialPartCount) {
+                clearInterval(timer);
+                timer = undefined;
+                resolve();
+            }
+        }, sleepMS);
+    });
+
     console.log("successfully added part " + name + " to item " + productNo);
     await sleep(sleepMS);
 }

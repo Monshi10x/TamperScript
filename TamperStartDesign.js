@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Design Board v2
 // @namespace    http://tampermonkey.net/
-// @version      2.68
+// @version      2.681
 // @description  try to take over the world!
 // @author       You
 // @match        https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx
@@ -21,6 +21,8 @@
 // @grant        window.close
 // @grant        window.focus
 // @grant        window.onurlchange
+// @updateURL    https://github.com/Monshi10x/TamperScript/raw/main/TamperStartDesign.js
+// @downloadURL  https://github.com/Monshi10x/TamperScript/raw/main/TamperStartDesign.js
 // @resource     IMPORTED_CSS https://github.com/Monshi10x/TamperScript/raw/main/Styles/Styles_DesignBoard.css
 // @resource     GoogleScript https://github.com/Monshi10x/TamperScript/raw/main/GoogleMap/GoogleMap.js
 // @resource     Icon_AdobeIllustrator https://github.com/Monshi10x/TamperScript/raw/main/Images/IllustratorIcon.png
