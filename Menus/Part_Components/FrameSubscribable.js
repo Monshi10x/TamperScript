@@ -188,43 +188,37 @@ class FrameSubscribable extends Material {
             const height = frameEntry.QWHD.height;
             const face = Math.max(frameEntry.section.face, 1);
             const memberColor = frameEntry.materialType === "Aluminium" ? "#9eb7c7" : "#5f666c";
-            const indicatorColor = "#d84b3d";
             const dimensionColor = "#1f4f89";
 
             const verticalSpacing = frameEntry.verticals > 0 ? width / (frameEntry.verticals + 1) : 0;
             const horizontalSpacing = frameEntry.horizontals > 0 ? height / (frameEntry.horizontals + 1) : 0;
+            const memberThickness = Math.max(face, 1);
 
             let svgContent = [];
+            const addRect = (x, y, w, h) => {
+                  svgContent.push(`<rect x="${x}" y="${y}" width="${Math.max(w, 0)}" height="${Math.max(h, 0)}" fill="${memberColor}"/>`);
+            };
+
             if(frameEntry.cornerType !== FrameSubscribable.CORNER_TYPES.openCorners) {
-                  svgContent.push(`<line x1="0" y1="0" x2="${width}" y2="0" stroke="${memberColor}" stroke-width="${face}" stroke-linecap="square"/>`);
-                  svgContent.push(`<line x1="0" y1="${height}" x2="${width}" y2="${height}" stroke="${memberColor}" stroke-width="${face}" stroke-linecap="square"/>`);
-                  svgContent.push(`<line x1="0" y1="0" x2="0" y2="${height}" stroke="${memberColor}" stroke-width="${face}" stroke-linecap="square"/>`);
-                  svgContent.push(`<line x1="${width}" y1="0" x2="${width}" y2="${height}" stroke="${memberColor}" stroke-width="${face}" stroke-linecap="square"/>`);
+                  addRect(0, 0, width, memberThickness);
+                  addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
+                  addRect(0, 0, memberThickness, height);
+                  addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
             } else {
-                  svgContent.push(`<line x1="${face / 2}" y1="0" x2="${Math.max(width - face / 2, 0)}" y2="0" stroke="${memberColor}" stroke-width="${face}" stroke-linecap="square"/>`);
-                  svgContent.push(`<line x1="${face / 2}" y1="${height}" x2="${Math.max(width - face / 2, 0)}" y2="${height}" stroke="${memberColor}" stroke-width="${face}" stroke-linecap="square"/>`);
+                  addRect(memberThickness / 2, 0, Math.max(width - memberThickness, 0), memberThickness);
+                  addRect(memberThickness / 2, Math.max(height - memberThickness, 0), Math.max(width - memberThickness, 0), memberThickness);
             }
 
             for(let i = 0; i < frameEntry.verticals; i++) {
-                  const x = verticalSpacing * (i + 1);
-                  svgContent.push(`<line x1="${x}" y1="0" x2="${x}" y2="${height}" stroke="${memberColor}" stroke-width="${Math.max(face * 0.9, 1)}" stroke-linecap="square"/>`);
+                  const x = verticalSpacing * (i + 1) - memberThickness / 2;
+                  addRect(x, 0, memberThickness, height);
             }
             for(let i = 0; i < frameEntry.horizontals; i++) {
-                  const y = horizontalSpacing * (i + 1);
-                  svgContent.push(`<line x1="0" y1="${y}" x2="${width}" y2="${y}" stroke="${memberColor}" stroke-width="${Math.max(face * 0.9, 1)}" stroke-linecap="square"/>`);
+                  const y = horizontalSpacing * (i + 1) - memberThickness / 2;
+                  addRect(0, y, width, memberThickness);
             }
 
             const markers = frameEntry.joints;
-            for(let i = 0; i < markers.corners.length; i++) {
-                  svgContent.push(`<circle cx="${markers.corners[i].x}" cy="${markers.corners[i].y}" r="${Math.max(face * 0.2, 4)}" fill="${indicatorColor}"/>`);
-            }
-            for(let i = 0; i < markers.tees.length; i++) {
-                  svgContent.push(`<circle cx="${markers.tees[i].x}" cy="${markers.tees[i].y}" r="${Math.max(face * 0.16, 3.5)}" fill="#ff9f1c"/>`);
-            }
-            for(let i = 0; i < markers.crosses.length; i++) {
-                  svgContent.push(`<circle cx="${markers.crosses[i].x}" cy="${markers.crosses[i].y}" r="${Math.max(face * 0.16, 3.5)}" fill="#2a9d8f"/>`);
-            }
-
             const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}</g><g><text x="${width / 2}" y="${-height * 0.08}" fill="${dimensionColor}" font-size="${Math.max(width, height) * 0.04}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${-width * 0.11}" y="${height / 2}" fill="${dimensionColor}" font-size="${Math.max(width, height) * 0.04}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 ${-width * 0.11} ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + height * 0.14}" fill="#202020" font-size="${Math.max(width, height) * 0.036}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${-height * 0.14}" fill="#202020" font-size="${Math.max(width, height) * 0.032}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length} | Crosses ${markers.crosses.length}</text></g></svg>`;
 
             this.#visualiser = new DragZoomSVG("100%", "360px", svgText, this.#visualiserContainer, {
