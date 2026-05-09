@@ -496,14 +496,12 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_Lightbox"), "Lightbox", "lightbox", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_Billboard"), "Billboard", "billboard", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_Compare"), "Compare", "compare", {unlockListenEvent: "loadedPredefinedParts"});
-    addItem(GM_getResourceURL("Icon_Router"), "Router", "router", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_Window"), "Window", "window", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_Layers"), "Panel Signs", "panel", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_Vehicle"), "Vehicles", "vehicle", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_Admin"), "Admin", "admin");
     addItem(GM_getResourceURL("Icon_CreditCard"), "Surcharge", "surcharge");
     addItem(GM_getResourceURL("Icon_3D"), "3D Letters", "3D", {unlockListenEvent: "loadedPredefinedParts"});
-    addItem(GM_getResourceURL("Icon_Chart"), "Charts", "Charts", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_POS"), "POS", "POS");
     addItem(GM_getResourceURL("Icon_Map"), "Travel", "Travel");
     addItem("https://github.com/Monshi10x/TamperScript/raw/main/Images/Icon-Roll.svg", "Ord. Vinyls", "OrderedVinyls");

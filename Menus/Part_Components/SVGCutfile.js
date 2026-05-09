@@ -190,9 +190,14 @@ class SVGCutfile extends SubscriptionManager {
             });
 
             this.#f_visualiserBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 10px);display:none;height:40px;margin:5px;background-color:" + COLOUR.Orange + ";", () => {
-                  this.#f_visualiser = new ModalSVG("SVG", 100, () => {
-                        this.UpdateFromFields();
-                  }, this.#f_svgFile, this);
+                  try {
+                        this.#f_visualiser = new ModalSVG("SVG", 100, () => {
+                              this.UpdateFromFields();
+                        }, this.#f_svgFile, this);
+                  } catch(error) {
+                        console.error(error);
+                        alert(error?.message || "Unable to open SVG visualiser.");
+                  }
             }, f_container_fileChooser, true);
 
 

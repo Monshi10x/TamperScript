@@ -439,7 +439,7 @@ function addScrollToSVG(svg) {
       };
 }
 
-/*(function svg_convertShapesToPaths(svgElement) {
+function svg_convertShapesToPaths(svgElement) {
       let svgElements = svgElement.getElementsByTagName("*");
       console.log(svgElements);
 
@@ -449,7 +449,7 @@ function addScrollToSVG(svg) {
             }
       }
       return svgElement;
-}*/
+}
 
 function svg_getTotalPathLengths(svgElement) {
       let totalPathLength = 0;
@@ -466,10 +466,22 @@ function svg_getTotalPathLengths(svgElement) {
 }
 
 function svg_makeFromString(svgString) {
-      let empty = document.createElement("div");
-      empty.innerHTML += svgString;
+      let parser = new DOMParser();
+      let parsedDocument = parser.parseFromString(svgString, "image/svg+xml");
+      let parserError = parsedDocument.querySelector("parsererror");
+      if(parserError) {
+            throw new Error("Invalid SVG markup: " + parserError.textContent);
+      }
 
-      let svgElement = empty.querySelector("svg");
+      let svgElement = parsedDocument.documentElement;
+      if(!svgElement || svgElement.nodeName.toLowerCase() != "svg") {
+            svgElement = parsedDocument.querySelector("svg");
+      }
+      if(!svgElement) {
+            throw new Error("Invalid SVG markup: no <svg> root element found.");
+      }
+
+      svgElement = svgElement.cloneNode(true);
 
       let g = document.createElementNS('http://www.w3.org/2000/svg', "g");
       g.id = "mainGcreatedByT";
@@ -816,9 +828,11 @@ async function svg_getTotalPathArea_m2(svgStringOrObject, useShallowCopy = true)
 }
 
 function svg_getTotalSize(svgStringOrObject, useShallowCopy = true) {
-      let newSvg;
+      let newSvg = null;
+      let tempSvg = null;
       if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
             newSvg = svg_makeFromString(svgStringOrObject);
+            tempSvg = newSvg;
 
             svg_convertShapesToPaths(newSvg);
             svg_formatCompoundPaths(newSvg);
@@ -831,20 +845,22 @@ function svg_getTotalSize(svgStringOrObject, useShallowCopy = true) {
             newSvg = svgStringOrObject;
       }
 
-      let pathGroup = newSvg.querySelector("#pathGroup");
+      let pathGroup = newSvg?.querySelector ? newSvg.querySelector("#pathGroup") : null;
 
       let totalSize = {width: 0, height: 0};
       if(pathGroup) totalSize = {width: svg_pixelToMM(pathGroup.getBBox().width), height: svg_pixelToMM(pathGroup.getBBox().height)};
 
-      if(newSvg) deleteElement(newSvg);
+      if(tempSvg) deleteElement(tempSvg);
 
       return totalSize;
 }
 
 function svg_getTotalBoundingRectAreas_m2(svgStringOrObject, useShallowCopy = true) {
-      let newSvg;
+      let newSvg = null;
+      let tempSvg = null;
       if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
             newSvg = svg_makeFromString(svgStringOrObject);
+            tempSvg = newSvg;
 
             svg_convertShapesToPaths(newSvg);
             svg_formatCompoundPaths(newSvg);
@@ -853,8 +869,6 @@ function svg_getTotalBoundingRectAreas_m2(svgStringOrObject, useShallowCopy = tr
             newSvg.style = "display:block;visibility:hidden";
 
             svgStringOrObject = newSvg.querySelector("#pathGroup").querySelectorAll(".outerPath");
-      } else {
-            newSvg = svgStringOrObject;
       }
 
       let totalArea = 0;
@@ -874,17 +888,18 @@ function svg_getTotalBoundingRectAreas_m2(svgStringOrObject, useShallowCopy = tr
 
       totalArea /= 1000000;
 
-      console.log(newSvg);
-      // if(newSvg) deleteElement(newSvg);
+      if(tempSvg) deleteElement(tempSvg);
 
       return totalArea;
 }
 
 function svg_getPathQty(svgStringOrObject) {
-      let newSvg;
+      let newSvg = null;
+      let tempSvg = null;
       let useShallowCopy = true;
       if(useShallowCopy == true && typeof (svgStringOrObject) == "string") {
             newSvg = svg_makeFromString(svgStringOrObject);
+            tempSvg = newSvg;
 
             svg_convertShapesToPaths(newSvg);
             svg_formatCompoundPaths(newSvg);
@@ -893,10 +908,7 @@ function svg_getPathQty(svgStringOrObject) {
             newSvg.style = "display:block;visibility:hidden";
 
             svgStringOrObject = newSvg.querySelector("#pathGroup").getElementsByTagNameNS("http://www.w3.org/2000/svg", "path");
-      } else {
-            newSvg = svgStringOrObject;
       }
-
       let returnObject = {
             totalQty: 0,
             innerPaths: 0,
@@ -914,7 +926,7 @@ function svg_getPathQty(svgStringOrObject) {
             returnObject.totalQty++;
       }
 
-      if(newSvg) deleteElement(newSvg);
+      if(tempSvg) deleteElement(tempSvg);
 
       return returnObject;
 }
@@ -1009,6 +1021,7 @@ function svg_formatCompoundPaths(svgObject) {
 
       return svgObject;
 }
+
 
 function svg_copyPathPresentationAttributes(sourcePath, targetPath) {
       if(!sourcePath || !targetPath) return;
@@ -2154,3 +2167,4 @@ class TSVGMeasurement {
             }
       };
 }
+
