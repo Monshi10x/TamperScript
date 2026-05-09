@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.627
+// @version      10.628
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -162,6 +162,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Baseplate.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Footing.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Frame.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/FrameSubscribable.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Install.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/LED.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Menus/Part_Components/Leg.js

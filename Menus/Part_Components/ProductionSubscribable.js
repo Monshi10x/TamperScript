@@ -24,6 +24,7 @@ class ProductionSubscribable extends Material {
       #dataForSubscribers = [];
 
       #productionItem;
+      #autoPartDescription = null;
       get productionItem() {return this.#productionItem;}
 
       constructor(parentObject, sizeClass, type) {
@@ -66,6 +67,10 @@ class ProductionSubscribable extends Material {
       UpdateFromInheritedData = () => {
             this.#inheritedSizes = [];
             this.#inheritedSizeTable.deleteAllRows();
+            let autoProductionTimeMins = 0;
+            let hasAutoProductionTime = false;
+            let autoHeaderLabel = null;
+            this.#autoPartDescription = null;
 
             //Per Parent Subscription:
             for(let a = 0; a < this.SUBSCRIPTION_DATA.length; a++) {
@@ -74,13 +79,38 @@ class ProductionSubscribable extends Material {
                         if(!recievedInputSizes[i].QWHD) continue/**Only this iteration*/;
                         //this.#inheritedSizes.push(recievedInputSizes[i].QWHD);
                         //this.#inheritedSizeTable.addRow(recievedInputSizes[i].QWHD.qty, recievedInputSizes[i].QWHD.width, recievedInputSizes[i].QWHD.height);
+
+                        if(recievedInputSizes[i].productionTimeMins != null) {
+                              autoProductionTimeMins += zeroIfNaNNullBlank(recievedInputSizes[i].productionTimeMins);
+                              hasAutoProductionTime = true;
+                        }
+
+                        if(recievedInputSizes[i].productionLabel) {
+                              autoHeaderLabel = recievedInputSizes[i].productionLabel;
+                        }
+
+                        if(recievedInputSizes[i].productionPartDescription) {
+                              this.#autoPartDescription = recievedInputSizes[i].productionPartDescription;
+                        }
                   }
+            }
+
+            if(hasAutoProductionTime) {
+                  this.#productionItem.productionTime = roundNumber(autoProductionTimeMins, 2);
+                  this.#productionItem.productionTotalEach = "Total";
+                  this.#productionItem.qty = 1;
+                  this.#productionItem.required = true;
+                  this.#productionItem.headerName = autoHeaderLabel || "Production";
             }
       };
 
       async Create(productNo, partIndex) {
-            super.Create(productNo, partIndex);
-            partIndex = this.#productionItem.Create(productNo, partIndex);
+            await super.Create(productNo, partIndex);
+            let previousPartIndex = partIndex;
+            partIndex = await this.#productionItem.Create(productNo, partIndex);
+            if(this.#autoPartDescription && partIndex > previousPartIndex) {
+                  await setPartDescription(productNo, partIndex, this.#autoPartDescription);
+            }
             return partIndex;
       }
 }

@@ -3,7 +3,7 @@ class Menu3D extends LHSMenuWindow {
       /** @ViewMode */
       #viewMode;
       #numProducts = 0;
-      #creationOrder = [ProductDetails, Size, SVGCutfile, Coil, Sheet, LED, Transformer, Painting, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
+      #creationOrder = [ProductDetails, Size, SVGCutfile, Coil, Sheet, FrameSubscribable, LED, Transformer, Painting, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
 
 
       /** @QuickTemplate */
@@ -79,6 +79,7 @@ class Menu3D extends LHSMenuWindow {
                   Size: [],
                   Coil: [],
                   Sheet: [Size],
+                  FrameSubscribable: [Size],
                   LED: [],
                   Transformer: [],
                   Painting: [],
@@ -87,7 +88,7 @@ class Menu3D extends LHSMenuWindow {
                   AppTaping: [Vinyl],
                   HandTrimming: [Vinyl],
                   PrintMounting: [Sheet],
-                  ProductionSubscribable: [Sheet],
+                  ProductionSubscribable: [Sheet, FrameSubscribable],
                   ArtworkSubscribable: [Size],
                   InstallSubscribable: [Sheet]
             };
@@ -245,6 +246,7 @@ class Menu3D extends LHSMenuWindow {
                   SVGCutfile,
                   Coil,
                   Sheet,
+                  FrameSubscribable,
                   LED,
                   Transformer,
                   Painting,
