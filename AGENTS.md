@@ -21,7 +21,7 @@ This file tells coding agents (e.g., Codex) how to operate in this repo: how scr
 - camelCase is prefered for naming conventions
 - use classes and inheritance rather than the javascript prototype structure
 
-**Versioning:** increment `@version` by 0.001 for any functional change in LocalIncludes.txt
+**Versioning:** increment `@version` by 0.001 for any functional change in LocalIncludes.txt and TamperStart.js (ensure both are same version)
 
 ## Corebridge QuickPrice Page Notes
 - The quote page is an older server-rendered/Knockout-style page with legacy libraries including `jquery-1.7.2`, Bootstrap, jGrowl, and jQuery UI autocomplete.
