@@ -28,6 +28,7 @@ class FrameSubscribable extends Material {
       #totalLengthField;
       #productionTimeField;
       #summaryField;
+      #productionSpecsField;
       #visualiser;
       #visualiserContainer;
       #dataForSubscribers = [];
@@ -101,6 +102,10 @@ class FrameSubscribable extends Material {
             this.#visualiserContainer = createDivStyle5(null, "Visualiser", this.container)[1];
             this.#visualiserContainer.style.cssText += "padding:10px;";
 
+            const productionContainer = createDivStyle5(null, "Production Subscribable", this.container)[1];
+            this.#productionSpecsField = createTextarea("Production Specs", "", "width:calc(100% - 20px);margin:10px;height:120px;", () => {}, productionContainer);
+            setFieldDisabled(true, this.#productionSpecsField);
+
             const summaryContainer = createDivStyle5(null, "Cut Notes", this.container)[1];
             this.#summaryField = createTextarea("Cut Notes", "", "width:calc(100% - 20px);margin:10px;height:220px;", () => {}, summaryContainer);
             setFieldDisabled(true, this.#summaryField);
@@ -118,6 +123,7 @@ class FrameSubscribable extends Material {
             this.#renderInheritedSizes(frameEntries);
             this.#renderStats(frameEntries);
             this.#renderVisualiser(frameEntries[0] || null);
+            this.#renderProductionSpecs(frameEntries);
             this.#renderCutNotes(frameEntries);
             this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
@@ -161,6 +167,22 @@ class FrameSubscribable extends Material {
             this.#productionTimeField[1].value = roundNumber(totalProductionMins, 2);
       }
 
+
+      #renderProductionSpecs(frameEntries) {
+            if(frameEntries.length === 0) {
+                  this.#productionSpecsField.value = "";
+                  return;
+            }
+
+            const lines = [];
+            for(let i = 0; i < frameEntries.length; i++) {
+                  const entry = frameEntries[i];
+                  lines.push("Frame " + (i + 1) + ": " + entry.productionLabel + " x" + entry.QWHD.qty);
+                  lines.push("Part Description: " + entry.productionPartDescription);
+                  lines.push("Time: " + roundNumber(entry.productionTimeMins, 2) + " mins");
+            }
+            this.#productionSpecsField.value = lines.join("\n");
+      }
       #renderCutNotes(frameEntries) {
             if(frameEntries.length === 0) {
                   this.#summaryField.value = "";
