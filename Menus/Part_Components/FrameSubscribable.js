@@ -34,6 +34,7 @@ class FrameSubscribable extends Material {
       #visualiserContainer;
       #dataForSubscribers = [];
       #latestVisualiserSvgText = "";
+      #measurements = [];
 
       /*override*/get Type() {return "FRAME";}
       get backgroundColor() {return COLOUR.DarkGrey;}
@@ -207,6 +208,12 @@ class FrameSubscribable extends Material {
       }
 
       #renderVisualiser(frameEntry) {
+            if(this.#measurements?.length) {
+                  for(let i = this.#measurements.length - 1; i >= 0; i--) {
+                        this.#measurements[i]?.Delete?.();
+                  }
+                  this.#measurements = [];
+            }
             if(this.#visualiser?.Close) {
                   this.#visualiser.Close();
             }
@@ -252,15 +259,9 @@ class FrameSubscribable extends Material {
             }
 
             const markers = frameEntry.joints;
-            const measureStroke = Math.min(Math.max(Math.min(width, height) * 0.0015, 1.5), 3);
-            const tick = Math.min(Math.max(Math.min(width, height) * 0.01, 12), 24);
-            const measureOffset = Math.min(Math.max(Math.min(width, height) * 0.03, 10), 30);
-            const topMeasureY = -measureOffset;
-            const leftMeasureX = -measureOffset;
-            const dimFontSize = Math.min(Math.max(Math.min(width, height) * 0.015, 12), 22);
-            const metaFontSize = Math.min(Math.max(Math.min(width, height) * 0.012, 11), 18);
-
-            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}</g><g><line x1="0" y1="${topMeasureY}" x2="${width}" y2="${topMeasureY}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="0" y1="${topMeasureY - tick / 2}" x2="0" y2="${topMeasureY + tick / 2}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="${width}" y1="${topMeasureY - tick / 2}" x2="${width}" y2="${topMeasureY + tick / 2}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="${leftMeasureX}" y1="0" x2="${leftMeasureX}" y2="${height}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="${leftMeasureX - tick / 2}" y1="0" x2="${leftMeasureX + tick / 2}" y2="0" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="${leftMeasureX - tick / 2}" y1="${height}" x2="${leftMeasureX + tick / 2}" y2="${height}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><text x="${width / 2}" y="${topMeasureY - measureOffset * 0.25}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${leftMeasureX - measureOffset * 0.25}" y="${height / 2}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 ${leftMeasureX - measureOffset * 0.25} ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + measureOffset * 1.2}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${topMeasureY - measureOffset * 0.9}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length} | Crosses ${markers.crosses.length}</text></g></svg>`;
+            const dimFontSize = 14;
+            const metaFontSize = 12;
+            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}</g><g><text x="${width / 2}" y="${-12}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${-12}" y="${height / 2}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 -12 ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + 16}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${-28}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length} | Crosses ${markers.crosses.length}</text></g></svg>`;
 
             this.#visualiser = new DragZoomSVG("100%", "360px", svgText, this.#visualiserContainer, {
                   overrideCssStyles: "background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;",
@@ -268,6 +269,56 @@ class FrameSubscribable extends Material {
                   splitCompoundPaths: false
             });
             this.#visualiser.centerAndFitSVGContent();
+
+            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
+                  direction: "width",
+                  x1: 0,
+                  y1: 0,
+                  x2: width,
+                  y2: 0,
+                  autoLabel: true,
+                  text: roundNumber(width, 2) + " mm",
+                  deletable: true,
+                  unit: "mm",
+                  precision: 2,
+                  scale: 1,
+                  arrowSize: 10 / this.#visualiser.scale,
+                  textOffset: 10 / this.#visualiser.scale,
+                  stroke: "#000",
+                  sides: ["top"],
+                  lineWidth: 2 / this.#visualiser.scale,
+                  fontSize: 12 / this.#visualiser.scale + "px",
+                  tickLength: 20 / this.#visualiser.scale,
+                  handleRadius: 8 / this.#visualiser.scale,
+                  offsetX: 0,
+                  offsetY: -20 / this.#visualiser.scale
+            }));
+
+            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
+                  direction: "height",
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: height,
+                  autoLabel: true,
+                  text: roundNumber(height, 2) + " mm",
+                  deletable: true,
+                  unit: "mm",
+                  precision: 2,
+                  scale: 1,
+                  arrowSize: 10 / this.#visualiser.scale,
+                  textOffset: 10 / this.#visualiser.scale,
+                  stroke: "#000",
+                  sides: ["left"],
+                  lineWidth: 2 / this.#visualiser.scale,
+                  fontSize: 12 / this.#visualiser.scale + "px",
+                  tickLength: 20 / this.#visualiser.scale,
+                  handleRadius: 8 / this.#visualiser.scale,
+                  offsetX: -20 / this.#visualiser.scale,
+                  offsetY: 0,
+                  sideHint: "left"
+            }));
+
             this.#latestVisualiserSvgText = this.#visualiser.unscaledSVGString || svgText;
       }
 
