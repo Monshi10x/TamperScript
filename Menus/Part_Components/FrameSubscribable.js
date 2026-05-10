@@ -28,7 +28,9 @@ class FrameSubscribable extends Material {
       #totalLengthField;
       #productionTimeField;
       #summaryField;
+      #productionSpecsField;
       #visualiser;
+      #visualiserContainer;
       #dataForSubscribers = [];
 
       /*override*/get Type() {return "FRAME";}
@@ -97,12 +99,12 @@ class FrameSubscribable extends Material {
             setFieldDisabled(true, this.#totalLengthField[1], this.#totalLengthField[0]);
             setFieldDisabled(true, this.#productionTimeField[1], this.#productionTimeField[0]);
 
-            const visualiserContainer = createDivStyle5(null, "Visualiser", this.container)[1];
-            this.#visualiser = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            this.#visualiser.setAttribute("viewBox", "0 0 500 360");
-            this.#visualiser.setAttribute("preserveAspectRatio", "xMidYMid meet");
-            this.#visualiser.style.cssText = "display:block;width:100%;height:360px;background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;";
-            visualiserContainer.appendChild(this.#visualiser);
+            this.#visualiserContainer = createDivStyle5(null, "Visualiser", this.container)[1];
+            this.#visualiserContainer.style.cssText += "padding:10px;";
+
+            const productionContainer = createDivStyle5(null, "Production Subscribable", this.container)[1];
+            this.#productionSpecsField = createTextarea("Production Specs", "", "width:calc(100% - 20px);margin:10px;height:120px;", () => {}, productionContainer);
+            setFieldDisabled(true, this.#productionSpecsField);
 
             const summaryContainer = createDivStyle5(null, "Cut Notes", this.container)[1];
             this.#summaryField = createTextarea("Cut Notes", "", "width:calc(100% - 20px);margin:10px;height:220px;", () => {}, summaryContainer);
@@ -121,6 +123,7 @@ class FrameSubscribable extends Material {
             this.#renderInheritedSizes(frameEntries);
             this.#renderStats(frameEntries);
             this.#renderVisualiser(frameEntries[0] || null);
+            this.#renderProductionSpecs(frameEntries);
             this.#renderCutNotes(frameEntries);
             this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
@@ -164,6 +167,22 @@ class FrameSubscribable extends Material {
             this.#productionTimeField[1].value = roundNumber(totalProductionMins, 2);
       }
 
+
+      #renderProductionSpecs(frameEntries) {
+            if(frameEntries.length === 0) {
+                  this.#productionSpecsField.value = "";
+                  return;
+            }
+
+            const lines = [];
+            for(let i = 0; i < frameEntries.length; i++) {
+                  const entry = frameEntries[i];
+                  lines.push("Frame " + (i + 1) + ": " + entry.productionLabel + " x" + entry.QWHD.qty);
+                  lines.push("Part Description: " + entry.productionPartDescription);
+                  lines.push("Time: " + roundNumber(entry.productionTimeMins, 2) + " mins");
+            }
+            this.#productionSpecsField.value = lines.join("\n");
+      }
       #renderCutNotes(frameEntries) {
             if(frameEntries.length === 0) {
                   this.#summaryField.value = "";
@@ -180,113 +199,56 @@ class FrameSubscribable extends Material {
       }
 
       #renderVisualiser(frameEntry) {
-            while(this.#visualiser.firstChild) {
-                  this.#visualiser.removeChild(this.#visualiser.firstChild);
+            if(this.#visualiser?.Close) {
+                  this.#visualiser.Close();
             }
+            this.#visualiserContainer.innerHTML = "";
 
             if(!frameEntry || frameEntry.QWHD.width <= 0 || frameEntry.QWHD.height <= 0) return;
 
-            const svgNs = "http://www.w3.org/2000/svg";
             const width = frameEntry.QWHD.width;
             const height = frameEntry.QWHD.height;
             const face = Math.max(frameEntry.section.face, 1);
-            const margin = 55;
-            const drawWidth = 500 - margin * 2;
-            const drawHeight = 360 - margin * 2;
-            const scale = Math.min(drawWidth / width, drawHeight / height);
-            const ox = (500 - width * scale) / 2;
-            const oy = (360 - height * scale) / 2;
-            const stroke = Math.max(face * scale, 4);
-
-            const addLine = (x1, y1, x2, y2, color, lineWidth, dashArray = "") => {
-                  const line = document.createElementNS(svgNs, "line");
-                  line.setAttribute("x1", x1);
-                  line.setAttribute("y1", y1);
-                  line.setAttribute("x2", x2);
-                  line.setAttribute("y2", y2);
-                  line.setAttribute("stroke", color);
-                  line.setAttribute("stroke-width", lineWidth);
-                  line.setAttribute("stroke-linecap", "square");
-                  if(dashArray) line.setAttribute("stroke-dasharray", dashArray);
-                  this.#visualiser.appendChild(line);
-                  return line;
-            };
-            const addText = (textValue, x, y, fill, fontSize = 13, anchor = "middle") => {
-                  const text = document.createElementNS(svgNs, "text");
-                  text.setAttribute("x", x);
-                  text.setAttribute("y", y);
-                  text.setAttribute("fill", fill);
-                  text.setAttribute("font-size", fontSize);
-                  text.setAttribute("font-family", "Arial, sans-serif");
-                  text.setAttribute("text-anchor", anchor);
-                  text.textContent = textValue;
-                  this.#visualiser.appendChild(text);
-                  return text;
-            };
-            const addCircle = (cx, cy, r, fill) => {
-                  const circle = document.createElementNS(svgNs, "circle");
-                  circle.setAttribute("cx", cx);
-                  circle.setAttribute("cy", cy);
-                  circle.setAttribute("r", r);
-                  circle.setAttribute("fill", fill);
-                  this.#visualiser.appendChild(circle);
-                  return circle;
-            };
-
-            const left = ox;
-            const right = ox + width * scale;
-            const top = oy;
-            const bottom = oy + height * scale;
             const memberColor = frameEntry.materialType === "Aluminium" ? "#9eb7c7" : "#5f666c";
-            const indicatorColor = "#d84b3d";
             const dimensionColor = "#1f4f89";
-
-            if(frameEntry.cornerType !== FrameSubscribable.CORNER_TYPES.openCorners) {
-                  addLine(left, top, right, top, memberColor, stroke);
-                  addLine(left, bottom, right, bottom, memberColor, stroke);
-                  addLine(left, top, left, bottom, memberColor, stroke);
-                  addLine(right, top, right, bottom, memberColor, stroke);
-            } else {
-                  addLine(left + stroke / 2, top, right - stroke / 2, top, memberColor, stroke);
-                  addLine(left + stroke / 2, bottom, right - stroke / 2, bottom, memberColor, stroke);
-            }
 
             const verticalSpacing = frameEntry.verticals > 0 ? width / (frameEntry.verticals + 1) : 0;
             const horizontalSpacing = frameEntry.horizontals > 0 ? height / (frameEntry.horizontals + 1) : 0;
+            const memberThickness = Math.max(face, 1);
+
+            let svgContent = [];
+            const addRect = (x, y, w, h) => {
+                  svgContent.push(`<rect x="${x}" y="${y}" width="${Math.max(w, 0)}" height="${Math.max(h, 0)}" fill="${memberColor}"/>`);
+            };
+
+            if(frameEntry.cornerType !== FrameSubscribable.CORNER_TYPES.openCorners) {
+                  addRect(0, 0, width, memberThickness);
+                  addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
+                  addRect(0, 0, memberThickness, height);
+                  addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
+            } else {
+                  addRect(memberThickness / 2, 0, Math.max(width - memberThickness, 0), memberThickness);
+                  addRect(memberThickness / 2, Math.max(height - memberThickness, 0), Math.max(width - memberThickness, 0), memberThickness);
+            }
 
             for(let i = 0; i < frameEntry.verticals; i++) {
-                  const x = left + verticalSpacing * (i + 1) * scale;
-                  addLine(x, top, x, bottom, memberColor, stroke * 0.9);
+                  const x = verticalSpacing * (i + 1) - memberThickness / 2;
+                  addRect(x, 0, memberThickness, height);
             }
             for(let i = 0; i < frameEntry.horizontals; i++) {
-                  const y = top + horizontalSpacing * (i + 1) * scale;
-                  addLine(left, y, right, y, memberColor, stroke * 0.9, frameEntry.verticals > 0 ? "0" : "");
+                  const y = horizontalSpacing * (i + 1) - memberThickness / 2;
+                  addRect(0, y, width, memberThickness);
             }
 
             const markers = frameEntry.joints;
-            for(let i = 0; i < markers.corners.length; i++) {
-                  addCircle(markers.corners[i].x * scale + ox, markers.corners[i].y * scale + oy, 5, indicatorColor);
-            }
-            for(let i = 0; i < markers.tees.length; i++) {
-                  addCircle(markers.tees[i].x * scale + ox, markers.tees[i].y * scale + oy, 4, "#ff9f1c");
-            }
-            for(let i = 0; i < markers.crosses.length; i++) {
-                  addCircle(markers.crosses[i].x * scale + ox, markers.crosses[i].y * scale + oy, 4, "#2a9d8f");
-            }
+            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}</g><g><text x="${width / 2}" y="${-height * 0.08}" fill="${dimensionColor}" font-size="${Math.max(width, height) * 0.04}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${-width * 0.11}" y="${height / 2}" fill="${dimensionColor}" font-size="${Math.max(width, height) * 0.04}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 ${-width * 0.11} ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + height * 0.14}" fill="#202020" font-size="${Math.max(width, height) * 0.036}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${-height * 0.14}" fill="#202020" font-size="${Math.max(width, height) * 0.032}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length} | Crosses ${markers.crosses.length}</text></g></svg>`;
 
-            addLine(left, top - 28, right, top - 28, dimensionColor, 1.5);
-            addLine(left, top - 34, left, top - 20, dimensionColor, 1.5);
-            addLine(right, top - 34, right, top - 20, dimensionColor, 1.5);
-            addText(roundNumber(width, 2) + "mm", (left + right) / 2, top - 36, dimensionColor, 13);
-
-            addLine(left - 28, top, left - 28, bottom, dimensionColor, 1.5);
-            addLine(left - 34, top, left - 20, top, dimensionColor, 1.5);
-            addLine(left - 34, bottom, left - 20, bottom, dimensionColor, 1.5);
-            const heightLabel = addText(roundNumber(height, 2) + "mm", left - 38, (top + bottom) / 2, dimensionColor, 13);
-            heightLabel.setAttribute("transform", "rotate(-90 " + (left - 38) + " " + ((top + bottom) / 2) + ")");
-
-            addText(frameEntry.cornerType, 250, 340, "#202020", 13);
-            addText("Corners " + markers.corners.length + " | Tees " + markers.tees.length + " | Crosses " + markers.crosses.length, 250, 22, "#202020", 12);
+            this.#visualiser = new DragZoomSVG("100%", "360px", svgText, this.#visualiserContainer, {
+                  overrideCssStyles: "background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;",
+                  convertShapesToPaths: false,
+                  splitCompoundPaths: false
+            });
+            this.#visualiser.centerAndFitSVGContent();
       }
 
       #collectFrameEntries() {
