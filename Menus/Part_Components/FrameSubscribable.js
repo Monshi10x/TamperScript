@@ -2,10 +2,7 @@ class FrameSubscribable extends Material {
       static DISPLAY_NAME = "FRAME";
       static CORNER_TYPES = {
             mitred45: "Mitred 45",
-            buttWeld: "Butt Weld",
-            openCorners: "Open Corners",
-            squareCut: "Square Cut",
-            radiusCorners: "Radius Corners"
+            buttWeld: "Butt Weld"
       };
       static PRODUCTION_DEFAULTS = {
             setupMins: 12,
@@ -15,21 +12,34 @@ class FrameSubscribable extends Material {
             minsPerCross: 2
       };
       static FRAME_KEYWORDS = ["RHS - ", "SHS - ", "Angle - "];
+      static JOIN_PREFERENCES = {
+            verticalFull: "Verticals Full Length",
+            horizontalFull: "Horizontals Full Length"
+      };
 
       #inheritedSizeTable;
       #materialType;
       #partDropdown;
       #verticals;
       #horizontals;
+      #framePiecesX;
+      #framePiecesY;
       #cornerType;
+      #joinPreference;
+      #flipSection;
       #faceField;
       #depthField;
       #wallField;
       #totalLengthField;
       #productionTimeField;
       #summaryField;
+      #f_production;
+      #productionSubscribable;
       #visualiser;
+      #visualiserContainer;
       #dataForSubscribers = [];
+      #latestVisualiserSvgText = "";
+      #measurements = [];
 
       /*override*/get Type() {return "FRAME";}
       get backgroundColor() {return COLOUR.DarkGrey;}
@@ -53,9 +63,18 @@ class FrameSubscribable extends Material {
 
       get horizontals() {return zeroIfNaNNullBlank(this.#horizontals[1].value);}
       set horizontals(value) {$(this.#horizontals[1]).val(value).change();}
+      get framePiecesX() {return Math.max(1, zeroIfNaNNullBlank(this.#framePiecesX[1].value));}
+      set framePiecesX(value) {$(this.#framePiecesX[1]).val(value).change();}
+      get framePiecesY() {return Math.max(1, zeroIfNaNNullBlank(this.#framePiecesY[1].value));}
+      set framePiecesY(value) {$(this.#framePiecesY[1]).val(value).change();}
 
       get cornerType() {return this.#cornerType[1].value;}
       set cornerType(value) {$(this.#cornerType[1]).val(value).change();}
+
+      get joinPreference() {return this.#joinPreference[1].value;}
+      set joinPreference(value) {$(this.#joinPreference[1]).val(value).change();}
+      get flipSection() {return !!this.#flipSection[1].checked;}
+      set flipSection(value) {this.#flipSection[1].checked = !!value; $(this.#flipSection[1]).change();}
 
       constructor(parentContainer, lhsMenuWindow, options = {UPDATES_PAUSED: false}) {
             super(parentContainer, lhsMenuWindow, options);
@@ -75,14 +94,18 @@ class FrameSubscribable extends Material {
                   this.UpdateFromFields();
             }, frameContainer);
             this.#partDropdown = createDropdown_Infield("Section", 0, "width:48%;", [], () => {this.UpdateFromFields();}, frameContainer);
+            this.#flipSection = createCheckbox_Infield("Flip Section", false, "width:160px;", () => {this.UpdateFromFields();}, frameContainer);
             this.#verticals = createInput_Infield("Verticals", 0, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
             this.#horizontals = createInput_Infield("Horizontals", 0, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
+            this.#framePiecesX = createInput_Infield("Frame Pieces X", 1, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
+            this.#framePiecesY = createInput_Infield("Frame Pieces Y", 1, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
             this.#cornerType = createDropdown_Infield("Corner Type", 0, "width:180px;", [
                   createDropdownOption(FrameSubscribable.CORNER_TYPES.mitred45, FrameSubscribable.CORNER_TYPES.mitred45),
-                  createDropdownOption(FrameSubscribable.CORNER_TYPES.buttWeld, FrameSubscribable.CORNER_TYPES.buttWeld),
-                  createDropdownOption(FrameSubscribable.CORNER_TYPES.openCorners, FrameSubscribable.CORNER_TYPES.openCorners),
-                  createDropdownOption(FrameSubscribable.CORNER_TYPES.squareCut, FrameSubscribable.CORNER_TYPES.squareCut),
-                  createDropdownOption(FrameSubscribable.CORNER_TYPES.radiusCorners, FrameSubscribable.CORNER_TYPES.radiusCorners)
+                  createDropdownOption(FrameSubscribable.CORNER_TYPES.buttWeld, FrameSubscribable.CORNER_TYPES.buttWeld)
+            ], () => {this.UpdateFromFields();}, frameContainer);
+            this.#joinPreference = createDropdown_Infield("Join Preference", 0, "width:220px;", [
+                  createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.verticalFull, FrameSubscribable.JOIN_PREFERENCES.verticalFull),
+                  createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.horizontalFull, FrameSubscribable.JOIN_PREFERENCES.horizontalFull)
             ], () => {this.UpdateFromFields();}, frameContainer);
 
             const statsContainer = createDivStyle5(null, "Stats", this.container)[1];
@@ -97,12 +120,18 @@ class FrameSubscribable extends Material {
             setFieldDisabled(true, this.#totalLengthField[1], this.#totalLengthField[0]);
             setFieldDisabled(true, this.#productionTimeField[1], this.#productionTimeField[0]);
 
-            const visualiserContainer = createDivStyle5(null, "Visualiser", this.container)[1];
-            this.#visualiser = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            this.#visualiser.setAttribute("viewBox", "0 0 500 360");
-            this.#visualiser.setAttribute("preserveAspectRatio", "xMidYMid meet");
-            this.#visualiser.style.cssText = "display:block;width:100%;height:360px;background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;";
-            visualiserContainer.appendChild(this.#visualiser);
+            this.#visualiserContainer = createDivStyle5(null, "Visualiser", this.container)[1];
+            this.#visualiserContainer.style.cssText += "padding:10px;";
+
+            const productionContainer = createDivStyle5(null, "Frame Production", this.container)[1];
+            this.#f_production = new Production(productionContainer, null, function() { }, null);
+            this.#f_production.showContainerDiv = true;
+            this.#f_production.productionTime = 0;
+            this.#f_production.headerName = "Frame Production";
+            this.#f_production.required = true;
+            this.#f_production.showRequiredCkb = false;
+            this.#f_production.requiredName = "Required";
+            this.#productionSubscribable = this.#f_production;
 
             const summaryContainer = createDivStyle5(null, "Cut Notes", this.container)[1];
             this.#summaryField = createTextarea("Cut Notes", "", "width:calc(100% - 20px);margin:10px;height:220px;", () => {}, summaryContainer);
@@ -121,6 +150,7 @@ class FrameSubscribable extends Material {
             this.#renderInheritedSizes(frameEntries);
             this.#renderStats(frameEntries);
             this.#renderVisualiser(frameEntries[0] || null);
+            this.#renderProductionSpecs(frameEntries);
             this.#renderCutNotes(frameEntries);
             this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
@@ -164,6 +194,21 @@ class FrameSubscribable extends Material {
             this.#productionTimeField[1].value = roundNumber(totalProductionMins, 2);
       }
 
+
+
+      #renderProductionSpecs(frameEntries) {
+            if(!this.#f_production) return;
+            let totalProductionMins = 0;
+            let headerName = "Frame Production";
+            for(let i = 0; i < frameEntries.length; i++) {
+                  totalProductionMins += zeroIfNaNNullBlank(frameEntries[i].productionTimeMins);
+                  if(frameEntries[i].productionLabel) headerName = frameEntries[i].productionLabel;
+            }
+            this.#f_production.productionTime = roundNumber(totalProductionMins, 2);
+            this.#f_production.headerName = headerName;
+            this.#f_production.required = totalProductionMins > 0;
+      }
+
       #renderCutNotes(frameEntries) {
             if(frameEntries.length === 0) {
                   this.#summaryField.value = "";
@@ -180,113 +225,126 @@ class FrameSubscribable extends Material {
       }
 
       #renderVisualiser(frameEntry) {
-            while(this.#visualiser.firstChild) {
-                  this.#visualiser.removeChild(this.#visualiser.firstChild);
+            if(this.#measurements?.length) {
+                  for(let i = this.#measurements.length - 1; i >= 0; i--) this.#measurements[i]?.Delete?.();
+                  this.#measurements = [];
+            }
+            if(this.#visualiser?.Close) this.#visualiser.Close();
+            this.#visualiserContainer.innerHTML = "";
+
+            if(!frameEntry || frameEntry.QWHD.width <= 0 || frameEntry.QWHD.height <= 0) {
+                  this.#latestVisualiserSvgText = "";
+                  return;
             }
 
-            if(!frameEntry || frameEntry.QWHD.width <= 0 || frameEntry.QWHD.height <= 0) return;
-
-            const svgNs = "http://www.w3.org/2000/svg";
             const width = frameEntry.QWHD.width;
             const height = frameEntry.QWHD.height;
+            const piecesX = Math.max(1, frameEntry.piecesX || 1);
+            const piecesY = Math.max(1, frameEntry.piecesY || 1);
+            const pieceWidth = width / piecesX;
+            const pieceHeight = height / piecesY;
             const face = Math.max(frameEntry.section.face, 1);
-            const margin = 55;
-            const drawWidth = 500 - margin * 2;
-            const drawHeight = 360 - margin * 2;
-            const scale = Math.min(drawWidth / width, drawHeight / height);
-            const ox = (500 - width * scale) / 2;
-            const oy = (360 - height * scale) / 2;
-            const stroke = Math.max(face * scale, 4);
-
-            const addLine = (x1, y1, x2, y2, color, lineWidth, dashArray = "") => {
-                  const line = document.createElementNS(svgNs, "line");
-                  line.setAttribute("x1", x1);
-                  line.setAttribute("y1", y1);
-                  line.setAttribute("x2", x2);
-                  line.setAttribute("y2", y2);
-                  line.setAttribute("stroke", color);
-                  line.setAttribute("stroke-width", lineWidth);
-                  line.setAttribute("stroke-linecap", "square");
-                  if(dashArray) line.setAttribute("stroke-dasharray", dashArray);
-                  this.#visualiser.appendChild(line);
-                  return line;
-            };
-            const addText = (textValue, x, y, fill, fontSize = 13, anchor = "middle") => {
-                  const text = document.createElementNS(svgNs, "text");
-                  text.setAttribute("x", x);
-                  text.setAttribute("y", y);
-                  text.setAttribute("fill", fill);
-                  text.setAttribute("font-size", fontSize);
-                  text.setAttribute("font-family", "Arial, sans-serif");
-                  text.setAttribute("text-anchor", anchor);
-                  text.textContent = textValue;
-                  this.#visualiser.appendChild(text);
-                  return text;
-            };
-            const addCircle = (cx, cy, r, fill) => {
-                  const circle = document.createElementNS(svgNs, "circle");
-                  circle.setAttribute("cx", cx);
-                  circle.setAttribute("cy", cy);
-                  circle.setAttribute("r", r);
-                  circle.setAttribute("fill", fill);
-                  this.#visualiser.appendChild(circle);
-                  return circle;
-            };
-
-            const left = ox;
-            const right = ox + width * scale;
-            const top = oy;
-            const bottom = oy + height * scale;
+            const memberThickness = Math.max(face, 1);
             const memberColor = frameEntry.materialType === "Aluminium" ? "#9eb7c7" : "#5f666c";
-            const indicatorColor = "#d84b3d";
             const dimensionColor = "#1f4f89";
 
-            if(frameEntry.cornerType !== FrameSubscribable.CORNER_TYPES.openCorners) {
-                  addLine(left, top, right, top, memberColor, stroke);
-                  addLine(left, bottom, right, bottom, memberColor, stroke);
-                  addLine(left, top, left, bottom, memberColor, stroke);
-                  addLine(right, top, right, bottom, memberColor, stroke);
-            } else {
-                  addLine(left + stroke / 2, top, right - stroke / 2, top, memberColor, stroke);
-                  addLine(left + stroke / 2, bottom, right - stroke / 2, bottom, memberColor, stroke);
+            let svgContent = [];
+            let joinContent = [];
+            const joinStroke = Math.max(memberThickness * 0.15, 1);
+            const addRect = (x, y, w, h) => {
+                  svgContent.push(`<rect x="${x}" y="${y}" width="${Math.max(w, 0)}" height="${Math.max(h, 0)}" fill="${memberColor}"/>`);
+            };
+            const addJoinLine = (x1, y1, x2, y2) => {
+                  joinContent.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111" stroke-width="${joinStroke}" stroke-linecap="round"/>`);
+            };
+
+            const drawFrameInstance = (ox, oy, w, h) => {
+                  const verticalSpacing = frameEntry.verticals > 0 ? w / (frameEntry.verticals + 1) : 0;
+                  const horizontalSpacing = frameEntry.horizontals > 0 ? h / (frameEntry.horizontals + 1) : 0;
+
+                  if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
+                        if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.horizontalFull) {
+                              addRect(ox, oy, w, memberThickness);
+                              addRect(ox, oy + Math.max(h - memberThickness, 0), w, memberThickness);
+                              addRect(ox, oy + memberThickness, memberThickness, Math.max(h - memberThickness * 2, 0));
+                              addRect(ox + Math.max(w - memberThickness, 0), oy + memberThickness, memberThickness, Math.max(h - memberThickness * 2, 0));
+                              addJoinLine(ox, oy + memberThickness, ox + memberThickness, oy + memberThickness);
+                              addJoinLine(ox + w - memberThickness, oy + memberThickness, ox + w, oy + memberThickness);
+                              addJoinLine(ox, oy + h - memberThickness, ox + memberThickness, oy + h - memberThickness);
+                              addJoinLine(ox + w - memberThickness, oy + h - memberThickness, ox + w, oy + h - memberThickness);
+                        } else {
+                              addRect(ox, oy, memberThickness, h);
+                              addRect(ox + Math.max(w - memberThickness, 0), oy, memberThickness, h);
+                              addRect(ox + memberThickness, oy, Math.max(w - memberThickness * 2, 0), memberThickness);
+                              addRect(ox + memberThickness, oy + Math.max(h - memberThickness, 0), Math.max(w - memberThickness * 2, 0), memberThickness);
+                              addJoinLine(ox + memberThickness, oy, ox + memberThickness, oy + memberThickness);
+                              addJoinLine(ox + w - memberThickness, oy, ox + w - memberThickness, oy + memberThickness);
+                              addJoinLine(ox + memberThickness, oy + h - memberThickness, ox + memberThickness, oy + h);
+                              addJoinLine(ox + w - memberThickness, oy + h - memberThickness, ox + w - memberThickness, oy + h);
+                        }
+                  } else {
+                        addRect(ox, oy, w, memberThickness);
+                        addRect(ox, oy + Math.max(h - memberThickness, 0), w, memberThickness);
+                        addRect(ox, oy, memberThickness, h);
+                        addRect(ox + Math.max(w - memberThickness, 0), oy, memberThickness, h);
+                        const jl = memberThickness;
+                        addJoinLine(ox, oy, ox + jl, oy + jl);
+                        addJoinLine(ox + w, oy, ox + w - jl, oy + jl);
+                        addJoinLine(ox, oy + h, ox + jl, oy + h - jl);
+                        addJoinLine(ox + w, oy + h, ox + w - jl, oy + h - jl);
+                  }
+
+                  if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
+                        for(let i = 0; i < frameEntry.verticals; i++) {
+                              const x = ox + verticalSpacing * (i + 1) - memberThickness / 2;
+                              addRect(x, oy, memberThickness, h);
+                        }
+                        for(let i = 0; i < frameEntry.horizontals; i++) {
+                              const y = oy + horizontalSpacing * (i + 1) - memberThickness / 2;
+                              for(let seg = 0; seg < frameEntry.verticals + 1; seg++) {
+                                    const sx = seg === 0 ? ox : ox + verticalSpacing * seg + memberThickness / 2;
+                                    const ex = seg === frameEntry.verticals ? ox + w : ox + verticalSpacing * (seg + 1) - memberThickness / 2;
+                                    addRect(sx, y, Math.max(ex - sx, 0), memberThickness);
+                              }
+                        }
+                  } else {
+                        for(let i = 0; i < frameEntry.horizontals; i++) {
+                              const y = oy + horizontalSpacing * (i + 1) - memberThickness / 2;
+                              addRect(ox, y, w, memberThickness);
+                        }
+                        for(let i = 0; i < frameEntry.verticals; i++) {
+                              const x = ox + verticalSpacing * (i + 1) - memberThickness / 2;
+                              for(let seg = 0; seg < frameEntry.horizontals + 1; seg++) {
+                                    const sy = seg === 0 ? oy : oy + horizontalSpacing * seg + memberThickness / 2;
+                                    const ey = seg === frameEntry.horizontals ? oy + h : oy + horizontalSpacing * (seg + 1) - memberThickness / 2;
+                                    addRect(x, sy, memberThickness, Math.max(ey - sy, 0));
+                              }
+                        }
+                  }
+            };
+
+            for(let py = 0; py < piecesY; py++) {
+                  for(let px = 0; px < piecesX; px++) {
+                        drawFrameInstance(px * pieceWidth, py * pieceHeight, pieceWidth, pieceHeight);
+                  }
             }
 
-            const verticalSpacing = frameEntry.verticals > 0 ? width / (frameEntry.verticals + 1) : 0;
-            const horizontalSpacing = frameEntry.horizontals > 0 ? height / (frameEntry.horizontals + 1) : 0;
+            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}${joinContent.join("")}</g><g><text x="${width / 2}" y="-12" fill="${dimensionColor}" font-size="14" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="-12" y="${height / 2}" fill="${dimensionColor}" font-size="14" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 -12 ${height / 2})">${roundNumber(height, 2)}mm</text></g></svg>`;
 
-            for(let i = 0; i < frameEntry.verticals; i++) {
-                  const x = left + verticalSpacing * (i + 1) * scale;
-                  addLine(x, top, x, bottom, memberColor, stroke * 0.9);
-            }
-            for(let i = 0; i < frameEntry.horizontals; i++) {
-                  const y = top + horizontalSpacing * (i + 1) * scale;
-                  addLine(left, y, right, y, memberColor, stroke * 0.9, frameEntry.verticals > 0 ? "0" : "");
-            }
+            this.#visualiser = new DragZoomSVG("100%", "360px", svgText, this.#visualiserContainer, {
+                  overrideCssStyles: "background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;",
+                  convertShapesToPaths: false,
+                  splitCompoundPaths: false
+            });
+            this.#visualiser.centerAndFitSVGContent();
 
-            const markers = frameEntry.joints;
-            for(let i = 0; i < markers.corners.length; i++) {
-                  addCircle(markers.corners[i].x * scale + ox, markers.corners[i].y * scale + oy, 5, indicatorColor);
-            }
-            for(let i = 0; i < markers.tees.length; i++) {
-                  addCircle(markers.tees[i].x * scale + ox, markers.tees[i].y * scale + oy, 4, "#ff9f1c");
-            }
-            for(let i = 0; i < markers.crosses.length; i++) {
-                  addCircle(markers.crosses[i].x * scale + ox, markers.crosses[i].y * scale + oy, 4, "#2a9d8f");
-            }
+            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {direction: "width", x1: 0, y1: 0, x2: width, y2: 0, autoLabel: true, text: roundNumber(width, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1, arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["top"], lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale, handleRadius: 8 / this.#visualiser.scale, offsetX: 0, offsetY: -20 / this.#visualiser.scale}));
+            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {direction: "height", x1: 0, y1: 0, x2: 0, y2: height, autoLabel: true, text: roundNumber(height, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1, arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["left"], lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale, handleRadius: 8 / this.#visualiser.scale, offsetX: -20 / this.#visualiser.scale, offsetY: 0, sideHint: "left"}));
 
-            addLine(left, top - 28, right, top - 28, dimensionColor, 1.5);
-            addLine(left, top - 34, left, top - 20, dimensionColor, 1.5);
-            addLine(right, top - 34, right, top - 20, dimensionColor, 1.5);
-            addText(roundNumber(width, 2) + "mm", (left + right) / 2, top - 36, dimensionColor, 13);
+            if(piecesX > 1) this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {direction: "width", x1: 0, y1: height, x2: pieceWidth, y2: height, autoLabel: true, text: roundNumber(pieceWidth, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1, arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["bottom"], lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale, handleRadius: 8 / this.#visualiser.scale, offsetX: 0, offsetY: 20 / this.#visualiser.scale}));
+            if(piecesY > 1) this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {direction: "height", x1: width, y1: 0, x2: width, y2: pieceHeight, autoLabel: true, text: roundNumber(pieceHeight, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1, arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["right"], lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale, handleRadius: 8 / this.#visualiser.scale, offsetX: 20 / this.#visualiser.scale, offsetY: 0}));
 
-            addLine(left - 28, top, left - 28, bottom, dimensionColor, 1.5);
-            addLine(left - 34, top, left - 20, top, dimensionColor, 1.5);
-            addLine(left - 34, bottom, left - 20, bottom, dimensionColor, 1.5);
-            const heightLabel = addText(roundNumber(height, 2) + "mm", left - 38, (top + bottom) / 2, dimensionColor, 13);
-            heightLabel.setAttribute("transform", "rotate(-90 " + (left - 38) + " " + ((top + bottom) / 2) + ")");
-
-            addText(frameEntry.cornerType, 250, 340, "#202020", 13);
-            addText("Corners " + markers.corners.length + " | Tees " + markers.tees.length + " | Crosses " + markers.crosses.length, 250, 22, "#202020", 12);
+            this.#latestVisualiserSvgText = this.#visualiser.unscaledSVGString || svgText;
       }
 
       #collectFrameEntries() {
@@ -312,9 +370,15 @@ class FrameSubscribable extends Material {
             const face = Math.max(section.face, 0);
             const width = zeroIfNaNNullBlank(qwhd.width);
             const height = zeroIfNaNNullBlank(qwhd.height);
+            const piecesX = this.framePiecesX;
+            const piecesY = this.framePiecesY;
+            const pieceMultiplier = Math.max(1, piecesX * piecesY);
+            const pieceWidth = width / piecesX;
+            const pieceHeight = height / piecesY;
             const verticals = this.verticals;
             const horizontals = this.horizontals;
             const cornerType = this.cornerType;
+            const joinPreference = this.joinPreference;
 
             const members = [];
             const addMember = (qty, length, label, cutType) => {
@@ -324,38 +388,41 @@ class FrameSubscribable extends Material {
                   members.push({qty: safeQty, length: safeLength, label, cutType});
             };
 
-            let edgeVerticalLength = height;
+            let edgeVerticalLength = pieceHeight;
             let internalVerticalLength = height;
             let horizontalSegmentLength = width;
+            let outerHorizontalLength = pieceWidth;
             let outerVerticalQty = 2;
             let cornerJointCount = 4;
             let teeToOuterSides = horizontals * 2;
 
-            if(cornerType === FrameSubscribable.CORNER_TYPES.mitred45 || cornerType === FrameSubscribable.CORNER_TYPES.radiusCorners) {
-                  edgeVerticalLength = height;
-                  internalVerticalLength = Math.max(height - face * 2, 0);
-                  horizontalSegmentLength = Math.max((width - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
+            if(cornerType === FrameSubscribable.CORNER_TYPES.mitred45) {
+                  edgeVerticalLength = pieceHeight;
+                  internalVerticalLength = Math.max(pieceHeight - face * 2, 0);
+                  horizontalSegmentLength = Math.max((pieceWidth - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
             } else if(cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
-                  edgeVerticalLength = Math.max(height - face * 2, 0);
-                  internalVerticalLength = Math.max(height - face * 2, 0);
-                  horizontalSegmentLength = Math.max((width - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
-            } else if(cornerType === FrameSubscribable.CORNER_TYPES.squareCut) {
-                  edgeVerticalLength = height;
-                  internalVerticalLength = height;
-                  horizontalSegmentLength = Math.max((width - verticals * face) / Math.max(verticals + 1, 1), 0);
-            } else if(cornerType === FrameSubscribable.CORNER_TYPES.openCorners) {
-                  outerVerticalQty = 0;
-                  cornerJointCount = 0;
-                  teeToOuterSides = 0;
-                  edgeVerticalLength = 0;
-                  internalVerticalLength = height;
-                  horizontalSegmentLength = Math.max((width - verticals * face) / Math.max(verticals + 1, 1), 0);
+                  if(joinPreference === FrameSubscribable.JOIN_PREFERENCES.horizontalFull) {
+                        edgeVerticalLength = Math.max(pieceHeight - face * 2, 0);
+                        internalVerticalLength = Math.max((height - horizontals * face) / Math.max(horizontals + 1, 1), 0);
+                        outerHorizontalLength = pieceWidth;
+                        horizontalSegmentLength = Math.max(pieceWidth - face * 2, 0);
+                  } else {
+                        edgeVerticalLength = pieceHeight;
+                        internalVerticalLength = Math.max(pieceHeight - face * 2, 0);
+                        outerHorizontalLength = Math.max(pieceWidth - face * 2, 0);
+                        horizontalSegmentLength = Math.max((pieceWidth - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
+                  }
             }
 
-            addMember(2, width, "Outer Horizontal", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
-            addMember(outerVerticalQty, edgeVerticalLength, "Outer Vertical", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
-            addMember(verticals, internalVerticalLength, "Internal Vertical", "straight");
-            addMember(horizontals * Math.max(verticals + 1, 1), horizontalSegmentLength, "Internal Horizontal", "straight");
+            addMember(2 * pieceMultiplier, outerHorizontalLength, "Outer Horizontal", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
+            addMember(outerVerticalQty * pieceMultiplier, edgeVerticalLength, "Outer Vertical", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
+            if(joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
+                  addMember(verticals * pieceMultiplier, internalVerticalLength, "Internal Vertical", "straight");
+                  addMember(horizontals * Math.max(verticals + 1, 1) * pieceMultiplier, horizontalSegmentLength, "Internal Horizontal", "straight");
+            } else {
+                  addMember(verticals * Math.max(horizontals + 1, 1) * pieceMultiplier, Math.max((pieceHeight - horizontals * face) / Math.max(horizontals + 1, 1), 0), "Internal Vertical", "straight");
+                  addMember(horizontals * pieceMultiplier, Math.max(pieceWidth - face * 2, 0), "Internal Horizontal", "straight");
+            }
 
             let totalLengthMmPerFrame = 0;
             let totalPiecesPerFrame = 0;
@@ -365,7 +432,7 @@ class FrameSubscribable extends Material {
             }
 
             const teeJoints = verticals * 2 + teeToOuterSides;
-            const crossJoints = verticals * horizontals;
+            const crossJoints = 0;
             const totalProductionMins = roundNumber(
                   FrameSubscribable.PRODUCTION_DEFAULTS.setupMins +
                   totalPiecesPerFrame * FrameSubscribable.PRODUCTION_DEFAULTS.minsPerPiece +
@@ -392,6 +459,9 @@ class FrameSubscribable extends Material {
                   section,
                   verticals,
                   horizontals,
+                  joinPreference,
+                  piecesX,
+                  piecesY,
                   cornerType,
                   members,
                   totalLengthMmPerFrame,
@@ -425,10 +495,7 @@ class FrameSubscribable extends Material {
                         tees.push({x: 0, y});
                         tees.push({x: width, y});
                   }
-                  for(let v = 0; v < verticals; v++) {
-                        const x = verticalSpacing * (v + 1);
-                        crosses.push({x, y});
-                  }
+                  
             }
 
             return {corners, tees, crosses};
@@ -468,7 +535,11 @@ class FrameSubscribable extends Material {
 
             const parts = this.#getFrameCapableParts();
             for(let i = 0; i < parts.length; i++) {
-                  partField.add(createDropdownOption(parts[i].Name, parts[i].Name));
+                  const partName = parts[i].Name;
+                  let label = partName;
+                  if(partName.includes("RHS -") || partName.includes("SHS -")) label = "□ " + partName;
+                  if(partName.includes("Angle -")) label = "∟ " + partName;
+                  partField.add(createDropdownOption(label, partName));
             }
 
             if(parts.length === 0) {
@@ -487,9 +558,16 @@ class FrameSubscribable extends Material {
             const match = compactName.match(/(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)(?:x(\d+(?:\.\d+)?))?/);
             if(!match) return null;
 
+            let face = zeroIfNaNNullBlank(parseFloat(match[1]));
+            let depth = zeroIfNaNNullBlank(parseFloat(match[2]));
+            if(this.flipSection) {
+                  const temp = face;
+                  face = depth;
+                  depth = temp;
+            }
             return {
-                  face: zeroIfNaNNullBlank(parseFloat(match[1])),
-                  depth: zeroIfNaNNullBlank(parseFloat(match[2])),
+                  face,
+                  depth,
                   wall: zeroIfNaNNullBlank(parseFloat(match[3]))
             };
       }
@@ -500,7 +578,11 @@ class FrameSubscribable extends Material {
                   framePartName: this.framePartName,
                   verticals: this.verticals,
                   horizontals: this.horizontals,
-                  cornerType: this.cornerType
+                  cornerType: this.cornerType,
+                  joinPreference: this.joinPreference,
+                  framePiecesX: this.framePiecesX,
+                  framePiecesY: this.framePiecesY,
+                  flipSection: this.flipSection
             };
       }
 
@@ -511,6 +593,10 @@ class FrameSubscribable extends Material {
             if(state.verticals !== undefined) this.verticals = state.verticals;
             if(state.horizontals !== undefined) this.horizontals = state.horizontals;
             if(state.cornerType !== undefined) this.cornerType = state.cornerType;
+            if(state.joinPreference !== undefined) this.joinPreference = state.joinPreference;
+            if(state.framePiecesX !== undefined) this.framePiecesX = state.framePiecesX;
+            if(state.framePiecesY !== undefined) this.framePiecesY = state.framePiecesY;
+            if(state.flipSection !== undefined) this.flipSection = state.flipSection;
             this.UpdateFromFields();
       }
 
@@ -527,11 +613,13 @@ class FrameSubscribable extends Material {
                         entry.totalLengthMmPerFrame,
                         null,
                         "[FRAME] " + entry.partName,
-                        null,
+                        entry.cutNotes || "",
                         false,
-                        entry.cutNotes
+                        this.#latestVisualiserSvgText || ""
                   );
             }
+            if(this.#f_production) partIndex = await this.#f_production.Create(productNo, partIndex);
+            else if(this.#productionSubscribable?.Create) partIndex = await this.#productionSubscribable.Create(productNo, partIndex);
             return partIndex;
       }
 
