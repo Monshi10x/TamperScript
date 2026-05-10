@@ -305,20 +305,46 @@ class FrameSubscribable extends Material {
             }
 
             if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
-                  for(let i = 0; i < frameEntry.verticals; i++) {
-                        const x = verticalSpacing * (i + 1);
-                        for(let h = 0; h < frameEntry.horizontals; h++) {
-                              const y = horizontalSpacing * (h + 1);
-                              addJoinLine(x - memberThickness * 0.5, y, x + memberThickness * 0.5, y);
+                  for(let h = 0; h < frameEntry.horizontals; h++) {
+                        const y = horizontalSpacing * (h + 1);
+                        // left and right outer butts
+                        addJoinLine(memberThickness, y - joinLength * 0.35, memberThickness, y + joinLength * 0.35);
+                        addJoinLine(width - memberThickness, y - joinLength * 0.35, width - memberThickness, y + joinLength * 0.35);
+
+                        // internal vertical butts on both sides
+                        for(let i = 0; i < frameEntry.verticals; i++) {
+                              const x = verticalSpacing * (i + 1);
+                              addJoinLine(x - memberThickness * 0.5, y - joinLength * 0.35, x - memberThickness * 0.5, y + joinLength * 0.35);
+                              addJoinLine(x + memberThickness * 0.5, y - joinLength * 0.35, x + memberThickness * 0.5, y + joinLength * 0.35);
                         }
                   }
+
+                  // top and bottom contacts for internal vertical full-length members
+                  for(let i = 0; i < frameEntry.verticals; i++) {
+                        const x = verticalSpacing * (i + 1);
+                        addJoinLine(x - joinLength * 0.35, memberThickness, x + joinLength * 0.35, memberThickness);
+                        addJoinLine(x - joinLength * 0.35, height - memberThickness, x + joinLength * 0.35, height - memberThickness);
+                  }
             } else {
+                  for(let v = 0; v < frameEntry.verticals; v++) {
+                        const x = verticalSpacing * (v + 1);
+                        // top and bottom outer butts
+                        addJoinLine(x - joinLength * 0.35, memberThickness, x + joinLength * 0.35, memberThickness);
+                        addJoinLine(x - joinLength * 0.35, height - memberThickness, x + joinLength * 0.35, height - memberThickness);
+
+                        // internal horizontal butts on both sides
+                        for(let i = 0; i < frameEntry.horizontals; i++) {
+                              const y = horizontalSpacing * (i + 1);
+                              addJoinLine(x - joinLength * 0.35, y - memberThickness * 0.5, x + joinLength * 0.35, y - memberThickness * 0.5);
+                              addJoinLine(x - joinLength * 0.35, y + memberThickness * 0.5, x + joinLength * 0.35, y + memberThickness * 0.5);
+                        }
+                  }
+
+                  // left and right contacts for internal horizontal full-length members
                   for(let i = 0; i < frameEntry.horizontals; i++) {
                         const y = horizontalSpacing * (i + 1);
-                        for(let v = 0; v < frameEntry.verticals; v++) {
-                              const x = verticalSpacing * (v + 1);
-                              addJoinLine(x, y - memberThickness * 0.5, x, y + memberThickness * 0.5);
-                        }
+                        addJoinLine(memberThickness, y - joinLength * 0.35, memberThickness, y + joinLength * 0.35);
+                        addJoinLine(width - memberThickness, y - joinLength * 0.35, width - memberThickness, y + joinLength * 0.35);
                   }
             }
 
