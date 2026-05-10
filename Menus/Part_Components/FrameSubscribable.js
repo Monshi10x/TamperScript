@@ -123,6 +123,7 @@ class FrameSubscribable extends Material {
             this.#renderInheritedSizes(frameEntries);
             this.#renderStats(frameEntries);
             this.#renderVisualiser(frameEntries[0] || null);
+            this.#renderProductionSpecs(frameEntries);
             this.#renderCutNotes(frameEntries);
             this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
