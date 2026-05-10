@@ -33,6 +33,7 @@ class FrameSubscribable extends Material {
       #visualiser;
       #visualiserContainer;
       #dataForSubscribers = [];
+      #latestVisualiserSvgText = "";
 
       /*override*/get Type() {return "FRAME";}
       get backgroundColor() {return COLOUR.DarkGrey;}
@@ -211,7 +212,10 @@ class FrameSubscribable extends Material {
             }
             this.#visualiserContainer.innerHTML = "";
 
-            if(!frameEntry || frameEntry.QWHD.width <= 0 || frameEntry.QWHD.height <= 0) return;
+            if(!frameEntry || frameEntry.QWHD.width <= 0 || frameEntry.QWHD.height <= 0) {
+                  this.#latestVisualiserSvgText = "";
+                  return;
+            }
 
             const width = frameEntry.QWHD.width;
             const height = frameEntry.QWHD.height;
@@ -248,7 +252,12 @@ class FrameSubscribable extends Material {
             }
 
             const markers = frameEntry.joints;
-            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}</g><g><text x="${width / 2}" y="${-height * 0.08}" fill="${dimensionColor}" font-size="${Math.max(width, height) * 0.04}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${-width * 0.11}" y="${height / 2}" fill="${dimensionColor}" font-size="${Math.max(width, height) * 0.04}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 ${-width * 0.11} ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + height * 0.14}" fill="#202020" font-size="${Math.max(width, height) * 0.036}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${-height * 0.14}" fill="#202020" font-size="${Math.max(width, height) * 0.032}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length} | Crosses ${markers.crosses.length}</text></g></svg>`;
+            const measureStroke = Math.max(Math.min(width, height) * 0.004, 1);
+            const tick = Math.max(Math.min(width, height) * 0.02, 8);
+            const topMeasureY = -height * 0.1;
+            const leftMeasureX = -width * 0.1;
+
+            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}</g><g><line x1="0" y1="${topMeasureY}" x2="${width}" y2="${topMeasureY}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="0" y1="${topMeasureY - tick / 2}" x2="0" y2="${topMeasureY + tick / 2}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="${width}" y1="${topMeasureY - tick / 2}" x2="${width}" y2="${topMeasureY + tick / 2}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="${leftMeasureX}" y1="0" x2="${leftMeasureX}" y2="${height}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="${leftMeasureX - tick / 2}" y1="0" x2="${leftMeasureX + tick / 2}" y2="0" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><line x1="${leftMeasureX - tick / 2}" y1="${height}" x2="${leftMeasureX + tick / 2}" y2="${height}" stroke="${dimensionColor}" stroke-width="${measureStroke}"/><text x="${width / 2}" y="${-height * 0.08}" fill="${dimensionColor}" font-size="${Math.max(width, height) * 0.04}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${-width * 0.11}" y="${height / 2}" fill="${dimensionColor}" font-size="${Math.max(width, height) * 0.04}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 ${-width * 0.11} ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + height * 0.14}" fill="#202020" font-size="${Math.max(width, height) * 0.036}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${-height * 0.14}" fill="#202020" font-size="${Math.max(width, height) * 0.032}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length} | Crosses ${markers.crosses.length}</text></g></svg>`;
 
             this.#visualiser = new DragZoomSVG("100%", "360px", svgText, this.#visualiserContainer, {
                   overrideCssStyles: "background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;",
@@ -256,6 +265,7 @@ class FrameSubscribable extends Material {
                   splitCompoundPaths: false
             });
             this.#visualiser.centerAndFitSVGContent();
+            this.#latestVisualiserSvgText = this.#visualiser.unscaledSVGString || svgText;
       }
 
       #collectFrameEntries() {
@@ -498,7 +508,7 @@ class FrameSubscribable extends Material {
                         "[FRAME] " + entry.partName,
                         null,
                         false,
-                        entry.cutNotes
+                        (entry.cutNotes || "") + "\n\n" + (this.#latestVisualiserSvgText || "")
                   );
             }
             if(this.#f_production) partIndex = await this.#f_production.Create(productNo, partIndex);
