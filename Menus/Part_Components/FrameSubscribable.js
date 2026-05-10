@@ -223,14 +223,10 @@ class FrameSubscribable extends Material {
 
       #renderVisualiser(frameEntry) {
             if(this.#measurements?.length) {
-                  for(let i = this.#measurements.length - 1; i >= 0; i--) {
-                        this.#measurements[i]?.Delete?.();
-                  }
+                  for(let i = this.#measurements.length - 1; i >= 0; i--) this.#measurements[i]?.Delete?.();
                   this.#measurements = [];
             }
-            if(this.#visualiser?.Close) {
-                  this.#visualiser.Close();
-            }
+            if(this.#visualiser?.Close) this.#visualiser.Close();
             this.#visualiserContainer.innerHTML = "";
 
             if(!frameEntry || frameEntry.QWHD.width <= 0 || frameEntry.QWHD.height <= 0) {
@@ -240,149 +236,97 @@ class FrameSubscribable extends Material {
 
             const width = frameEntry.QWHD.width;
             const height = frameEntry.QWHD.height;
+            const piecesX = Math.max(1, frameEntry.piecesX || 1);
+            const piecesY = Math.max(1, frameEntry.piecesY || 1);
+            const pieceWidth = width / piecesX;
+            const pieceHeight = height / piecesY;
             const face = Math.max(frameEntry.section.face, 1);
+            const memberThickness = Math.max(face, 1);
             const memberColor = frameEntry.materialType === "Aluminium" ? "#9eb7c7" : "#5f666c";
             const dimensionColor = "#1f4f89";
 
-            const verticalSpacing = frameEntry.verticals > 0 ? width / (frameEntry.verticals + 1) : 0;
-            const horizontalSpacing = frameEntry.horizontals > 0 ? height / (frameEntry.horizontals + 1) : 0;
-            const memberThickness = Math.max(face, 1);
-
             let svgContent = [];
+            let joinContent = [];
+            const joinStroke = Math.max(memberThickness * 0.15, 1);
             const addRect = (x, y, w, h) => {
                   svgContent.push(`<rect x="${x}" y="${y}" width="${Math.max(w, 0)}" height="${Math.max(h, 0)}" fill="${memberColor}"/>`);
             };
-
-            if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
-                  if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.horizontalFull) {
-                        addRect(0, 0, width, memberThickness);
-                        addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
-                        addRect(0, memberThickness, memberThickness, Math.max(height - memberThickness * 2, 0));
-                        addRect(Math.max(width - memberThickness, 0), memberThickness, memberThickness, Math.max(height - memberThickness * 2, 0));
-                  } else {
-                        addRect(0, 0, memberThickness, height);
-                        addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
-                        addRect(memberThickness, 0, Math.max(width - memberThickness * 2, 0), memberThickness);
-                        addRect(memberThickness, Math.max(height - memberThickness, 0), Math.max(width - memberThickness * 2, 0), memberThickness);
-                  }
-            } else {
-                  addRect(0, 0, width, memberThickness);
-                  addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
-                  addRect(0, 0, memberThickness, height);
-                  addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
-            }
-
-            if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
-                  for(let i = 0; i < frameEntry.verticals; i++) {
-                        const x = verticalSpacing * (i + 1) - memberThickness / 2;
-                        addRect(x, 0, memberThickness, height);
-                  }
-                  for(let i = 0; i < frameEntry.horizontals; i++) {
-                        const y = horizontalSpacing * (i + 1) - memberThickness / 2;
-                        for(let seg = 0; seg < frameEntry.verticals + 1; seg++) {
-                              const sx = seg === 0 ? 0 : verticalSpacing * seg + memberThickness / 2;
-                              const ex = seg === frameEntry.verticals ? width : verticalSpacing * (seg + 1) - memberThickness / 2;
-                              addRect(sx, y, Math.max(ex - sx, 0), memberThickness);
-                        }
-                  }
-            } else {
-                  for(let i = 0; i < frameEntry.horizontals; i++) {
-                        const y = horizontalSpacing * (i + 1) - memberThickness / 2;
-                        addRect(0, y, width, memberThickness);
-                  }
-                  for(let i = 0; i < frameEntry.verticals; i++) {
-                        const x = verticalSpacing * (i + 1) - memberThickness / 2;
-                        for(let seg = 0; seg < frameEntry.horizontals + 1; seg++) {
-                              const sy = seg === 0 ? 0 : horizontalSpacing * seg + memberThickness / 2;
-                              const ey = seg === frameEntry.horizontals ? height : horizontalSpacing * (seg + 1) - memberThickness / 2;
-                              addRect(x, sy, memberThickness, Math.max(ey - sy, 0));
-                        }
-                  }
-            }
-
-            const markers = frameEntry.joints;
-            const joinStroke = Math.max(memberThickness * 0.15, 1);
-            const joinLength = memberThickness;
-            const joinContent = [];
             const addJoinLine = (x1, y1, x2, y2) => {
                   joinContent.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111" stroke-width="${joinStroke}" stroke-linecap="round"/>`);
             };
 
-            for(let px = 1; px < (frameEntry.piecesX || 1); px++) {
-                  const x = (width / frameEntry.piecesX) * px;
-                  addJoinLine(x, 0, x, height);
-            }
-            for(let py = 1; py < (frameEntry.piecesY || 1); py++) {
-                  const y = (height / frameEntry.piecesY) * py;
-                  addJoinLine(0, y, width, y);
-            }
+            const drawFrameInstance = (ox, oy, w, h) => {
+                  const verticalSpacing = frameEntry.verticals > 0 ? w / (frameEntry.verticals + 1) : 0;
+                  const horizontalSpacing = frameEntry.horizontals > 0 ? h / (frameEntry.horizontals + 1) : 0;
 
-            if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.mitred45) {
-                  addJoinLine(0, 0, joinLength, joinLength);
-                  addJoinLine(width, 0, width - joinLength, joinLength);
-                  addJoinLine(0, height, joinLength, height - joinLength);
-                  addJoinLine(width, height, width - joinLength, height - joinLength);
-            } else if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
-                  if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.horizontalFull) {
-                        addJoinLine(0, memberThickness, memberThickness, memberThickness);
-                        addJoinLine(width - memberThickness, memberThickness, width, memberThickness);
-                        addJoinLine(0, height - memberThickness, memberThickness, height - memberThickness);
-                        addJoinLine(width - memberThickness, height - memberThickness, width, height - memberThickness);
+                  if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
+                        if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.horizontalFull) {
+                              addRect(ox, oy, w, memberThickness);
+                              addRect(ox, oy + Math.max(h - memberThickness, 0), w, memberThickness);
+                              addRect(ox, oy + memberThickness, memberThickness, Math.max(h - memberThickness * 2, 0));
+                              addRect(ox + Math.max(w - memberThickness, 0), oy + memberThickness, memberThickness, Math.max(h - memberThickness * 2, 0));
+                              addJoinLine(ox, oy + memberThickness, ox + memberThickness, oy + memberThickness);
+                              addJoinLine(ox + w - memberThickness, oy + memberThickness, ox + w, oy + memberThickness);
+                              addJoinLine(ox, oy + h - memberThickness, ox + memberThickness, oy + h - memberThickness);
+                              addJoinLine(ox + w - memberThickness, oy + h - memberThickness, ox + w, oy + h - memberThickness);
+                        } else {
+                              addRect(ox, oy, memberThickness, h);
+                              addRect(ox + Math.max(w - memberThickness, 0), oy, memberThickness, h);
+                              addRect(ox + memberThickness, oy, Math.max(w - memberThickness * 2, 0), memberThickness);
+                              addRect(ox + memberThickness, oy + Math.max(h - memberThickness, 0), Math.max(w - memberThickness * 2, 0), memberThickness);
+                              addJoinLine(ox + memberThickness, oy, ox + memberThickness, oy + memberThickness);
+                              addJoinLine(ox + w - memberThickness, oy, ox + w - memberThickness, oy + memberThickness);
+                              addJoinLine(ox + memberThickness, oy + h - memberThickness, ox + memberThickness, oy + h);
+                              addJoinLine(ox + w - memberThickness, oy + h - memberThickness, ox + w - memberThickness, oy + h);
+                        }
                   } else {
-                        addJoinLine(memberThickness, 0, memberThickness, memberThickness);
-                        addJoinLine(width - memberThickness, 0, width - memberThickness, memberThickness);
-                        addJoinLine(memberThickness, height - memberThickness, memberThickness, height);
-                        addJoinLine(width - memberThickness, height - memberThickness, width - memberThickness, height);
+                        addRect(ox, oy, w, memberThickness);
+                        addRect(ox, oy + Math.max(h - memberThickness, 0), w, memberThickness);
+                        addRect(ox, oy, memberThickness, h);
+                        addRect(ox + Math.max(w - memberThickness, 0), oy, memberThickness, h);
+                        const jl = memberThickness;
+                        addJoinLine(ox, oy, ox + jl, oy + jl);
+                        addJoinLine(ox + w, oy, ox + w - jl, oy + jl);
+                        addJoinLine(ox, oy + h, ox + jl, oy + h - jl);
+                        addJoinLine(ox + w, oy + h, ox + w - jl, oy + h - jl);
                   }
-            }
 
-            if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
-                  for(let h = 0; h < frameEntry.horizontals; h++) {
-                        const y = horizontalSpacing * (h + 1);
-                        // left and right outer butts
-                        addJoinLine(memberThickness, y - memberThickness * 0.5, memberThickness, y + memberThickness * 0.5);
-                        addJoinLine(width - memberThickness, y - memberThickness * 0.5, width - memberThickness, y + memberThickness * 0.5);
-
-                        // internal vertical butts on both sides
+                  if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
                         for(let i = 0; i < frameEntry.verticals; i++) {
-                              const x = verticalSpacing * (i + 1);
-                              addJoinLine(x - memberThickness * 0.5, y - memberThickness * 0.5, x - memberThickness * 0.5, y + memberThickness * 0.5);
-                              addJoinLine(x + memberThickness * 0.5, y - memberThickness * 0.5, x + memberThickness * 0.5, y + memberThickness * 0.5);
+                              const x = ox + verticalSpacing * (i + 1) - memberThickness / 2;
+                              addRect(x, oy, memberThickness, h);
                         }
-                  }
-
-                  // top and bottom contacts for internal vertical full-length members
-                  for(let i = 0; i < frameEntry.verticals; i++) {
-                        const x = verticalSpacing * (i + 1);
-                        addJoinLine(x - memberThickness * 0.5, memberThickness, x + memberThickness * 0.5, memberThickness);
-                        addJoinLine(x - memberThickness * 0.5, height - memberThickness, x + memberThickness * 0.5, height - memberThickness);
-                  }
-            } else {
-                  for(let v = 0; v < frameEntry.verticals; v++) {
-                        const x = verticalSpacing * (v + 1);
-                        // top and bottom outer butts
-                        addJoinLine(x - memberThickness * 0.5, memberThickness, x + memberThickness * 0.5, memberThickness);
-                        addJoinLine(x - memberThickness * 0.5, height - memberThickness, x + memberThickness * 0.5, height - memberThickness);
-
-                        // internal horizontal butts on both sides
                         for(let i = 0; i < frameEntry.horizontals; i++) {
-                              const y = horizontalSpacing * (i + 1);
-                              addJoinLine(x - memberThickness * 0.5, y - memberThickness * 0.5, x + memberThickness * 0.5, y - memberThickness * 0.5);
-                              addJoinLine(x - memberThickness * 0.5, y + memberThickness * 0.5, x + memberThickness * 0.5, y + memberThickness * 0.5);
+                              const y = oy + horizontalSpacing * (i + 1) - memberThickness / 2;
+                              for(let seg = 0; seg < frameEntry.verticals + 1; seg++) {
+                                    const sx = seg === 0 ? ox : ox + verticalSpacing * seg + memberThickness / 2;
+                                    const ex = seg === frameEntry.verticals ? ox + w : ox + verticalSpacing * (seg + 1) - memberThickness / 2;
+                                    addRect(sx, y, Math.max(ex - sx, 0), memberThickness);
+                              }
+                        }
+                  } else {
+                        for(let i = 0; i < frameEntry.horizontals; i++) {
+                              const y = oy + horizontalSpacing * (i + 1) - memberThickness / 2;
+                              addRect(ox, y, w, memberThickness);
+                        }
+                        for(let i = 0; i < frameEntry.verticals; i++) {
+                              const x = ox + verticalSpacing * (i + 1) - memberThickness / 2;
+                              for(let seg = 0; seg < frameEntry.horizontals + 1; seg++) {
+                                    const sy = seg === 0 ? oy : oy + horizontalSpacing * seg + memberThickness / 2;
+                                    const ey = seg === frameEntry.horizontals ? oy + h : oy + horizontalSpacing * (seg + 1) - memberThickness / 2;
+                                    addRect(x, sy, memberThickness, Math.max(ey - sy, 0));
+                              }
                         }
                   }
+            };
 
-                  // left and right contacts for internal horizontal full-length members
-                  for(let i = 0; i < frameEntry.horizontals; i++) {
-                        const y = horizontalSpacing * (i + 1);
-                        addJoinLine(memberThickness, y - memberThickness * 0.5, memberThickness, y + memberThickness * 0.5);
-                        addJoinLine(width - memberThickness, y - memberThickness * 0.5, width - memberThickness, y + memberThickness * 0.5);
+            for(let py = 0; py < piecesY; py++) {
+                  for(let px = 0; px < piecesX; px++) {
+                        drawFrameInstance(px * pieceWidth, py * pieceHeight, pieceWidth, pieceHeight);
                   }
             }
 
-            const dimFontSize = 14;
-            const metaFontSize = 12;
-            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}${joinContent.join("")}</g><g><text x="${width / 2}" y="${-12}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${-12}" y="${height / 2}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 -12 ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + 16}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${-28}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length}</text></g></svg>`;
+            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}${joinContent.join("")}</g><g><text x="${width / 2}" y="-12" fill="${dimensionColor}" font-size="14" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="-12" y="${height / 2}" fill="${dimensionColor}" font-size="14" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 -12 ${height / 2})">${roundNumber(height, 2)}mm</text></g></svg>`;
 
             this.#visualiser = new DragZoomSVG("100%", "360px", svgText, this.#visualiserContainer, {
                   overrideCssStyles: "background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;",
@@ -391,76 +335,11 @@ class FrameSubscribable extends Material {
             });
             this.#visualiser.centerAndFitSVGContent();
 
-            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
-                  direction: "width",
-                  x1: 0,
-                  y1: 0,
-                  x2: width,
-                  y2: 0,
-                  autoLabel: true,
-                  text: roundNumber(width, 2) + " mm",
-                  deletable: true,
-                  unit: "mm",
-                  precision: 2,
-                  scale: 1,
-                  arrowSize: 10 / this.#visualiser.scale,
-                  textOffset: 10 / this.#visualiser.scale,
-                  stroke: "#000",
-                  sides: ["top"],
-                  lineWidth: 2 / this.#visualiser.scale,
-                  fontSize: 12 / this.#visualiser.scale + "px",
-                  tickLength: 20 / this.#visualiser.scale,
-                  handleRadius: 8 / this.#visualiser.scale,
-                  offsetX: 0,
-                  offsetY: -20 / this.#visualiser.scale
-            }));
+            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {direction: "width", x1: 0, y1: 0, x2: width, y2: 0, autoLabel: true, text: roundNumber(width, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1, arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["top"], lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale, handleRadius: 8 / this.#visualiser.scale, offsetX: 0, offsetY: -20 / this.#visualiser.scale}));
+            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {direction: "height", x1: 0, y1: 0, x2: 0, y2: height, autoLabel: true, text: roundNumber(height, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1, arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["left"], lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale, handleRadius: 8 / this.#visualiser.scale, offsetX: -20 / this.#visualiser.scale, offsetY: 0, sideHint: "left"}));
 
-            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
-                  direction: "height",
-                  x1: 0,
-                  y1: 0,
-                  x2: 0,
-                  y2: height,
-                  autoLabel: true,
-                  text: roundNumber(height, 2) + " mm",
-                  deletable: true,
-                  unit: "mm",
-                  precision: 2,
-                  scale: 1,
-                  arrowSize: 10 / this.#visualiser.scale,
-                  textOffset: 10 / this.#visualiser.scale,
-                  stroke: "#000",
-                  sides: ["left"],
-                  lineWidth: 2 / this.#visualiser.scale,
-                  fontSize: 12 / this.#visualiser.scale + "px",
-                  tickLength: 20 / this.#visualiser.scale,
-                  handleRadius: 8 / this.#visualiser.scale,
-                  offsetX: -20 / this.#visualiser.scale,
-                  offsetY: 0,
-                  sideHint: "left"
-            }));
-
-            
-            const pieceWidth = width / (frameEntry.piecesX || 1);
-            const pieceHeight = height / (frameEntry.piecesY || 1);
-            if((frameEntry.piecesX || 1) > 1) {
-                  this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
-                        direction: "width", x1: 0, y1: height, x2: pieceWidth, y2: height,
-                        autoLabel: true, text: roundNumber(pieceWidth, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1,
-                        arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["bottom"],
-                        lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale,
-                        handleRadius: 8 / this.#visualiser.scale, offsetX: 0, offsetY: 20 / this.#visualiser.scale
-                  }));
-            }
-            if((frameEntry.piecesY || 1) > 1) {
-                  this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
-                        direction: "height", x1: width, y1: 0, x2: width, y2: pieceHeight,
-                        autoLabel: true, text: roundNumber(pieceHeight, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1,
-                        arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["right"],
-                        lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale,
-                        handleRadius: 8 / this.#visualiser.scale, offsetX: 20 / this.#visualiser.scale, offsetY: 0
-                  }));
-            }
+            if(piecesX > 1) this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {direction: "width", x1: 0, y1: height, x2: pieceWidth, y2: height, autoLabel: true, text: roundNumber(pieceWidth, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1, arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["bottom"], lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale, handleRadius: 8 / this.#visualiser.scale, offsetX: 0, offsetY: 20 / this.#visualiser.scale}));
+            if(piecesY > 1) this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {direction: "height", x1: width, y1: 0, x2: width, y2: pieceHeight, autoLabel: true, text: roundNumber(pieceHeight, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1, arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["right"], lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale, handleRadius: 8 / this.#visualiser.scale, offsetX: 20 / this.#visualiser.scale, offsetY: 0}));
 
             this.#latestVisualiserSvgText = this.#visualiser.unscaledSVGString || svgText;
       }
