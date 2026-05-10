@@ -28,8 +28,13 @@ class FrameSubscribable extends Material {
       #totalLengthField;
       #productionTimeField;
       #summaryField;
+      #f_production;
+      #productionSubscribable;
       #visualiser;
+      #visualiserContainer;
       #dataForSubscribers = [];
+      #latestVisualiserSvgText = "";
+      #measurements = [];
 
       /*override*/get Type() {return "FRAME";}
       get backgroundColor() {return COLOUR.DarkGrey;}
@@ -97,12 +102,18 @@ class FrameSubscribable extends Material {
             setFieldDisabled(true, this.#totalLengthField[1], this.#totalLengthField[0]);
             setFieldDisabled(true, this.#productionTimeField[1], this.#productionTimeField[0]);
 
-            const visualiserContainer = createDivStyle5(null, "Visualiser", this.container)[1];
-            this.#visualiser = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-            this.#visualiser.setAttribute("viewBox", "0 0 500 360");
-            this.#visualiser.setAttribute("preserveAspectRatio", "xMidYMid meet");
-            this.#visualiser.style.cssText = "display:block;width:100%;height:360px;background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;";
-            visualiserContainer.appendChild(this.#visualiser);
+            this.#visualiserContainer = createDivStyle5(null, "Visualiser", this.container)[1];
+            this.#visualiserContainer.style.cssText += "padding:10px;";
+
+            const productionContainer = createDivStyle5(null, "Frame Production", this.container)[1];
+            this.#f_production = new Production(productionContainer, null, function() { }, null);
+            this.#f_production.showContainerDiv = true;
+            this.#f_production.productionTime = 0;
+            this.#f_production.headerName = "Frame Production";
+            this.#f_production.required = true;
+            this.#f_production.showRequiredCkb = false;
+            this.#f_production.requiredName = "Required";
+            this.#productionSubscribable = this.#f_production;
 
             const summaryContainer = createDivStyle5(null, "Cut Notes", this.container)[1];
             this.#summaryField = createTextarea("Cut Notes", "", "width:calc(100% - 20px);margin:10px;height:220px;", () => {}, summaryContainer);
@@ -121,6 +132,7 @@ class FrameSubscribable extends Material {
             this.#renderInheritedSizes(frameEntries);
             this.#renderStats(frameEntries);
             this.#renderVisualiser(frameEntries[0] || null);
+            this.#renderProductionSpecs(frameEntries);
             this.#renderCutNotes(frameEntries);
             this.DATA_FOR_SUBSCRIBERS = {
                   parent: this,
@@ -164,6 +176,21 @@ class FrameSubscribable extends Material {
             this.#productionTimeField[1].value = roundNumber(totalProductionMins, 2);
       }
 
+
+
+      #renderProductionSpecs(frameEntries) {
+            if(!this.#f_production) return;
+            let totalProductionMins = 0;
+            let headerName = "Frame Production";
+            for(let i = 0; i < frameEntries.length; i++) {
+                  totalProductionMins += zeroIfNaNNullBlank(frameEntries[i].productionTimeMins);
+                  if(frameEntries[i].productionLabel) headerName = frameEntries[i].productionLabel;
+            }
+            this.#f_production.productionTime = roundNumber(totalProductionMins, 2);
+            this.#f_production.headerName = headerName;
+            this.#f_production.required = totalProductionMins > 0;
+      }
+
       #renderCutNotes(frameEntries) {
             if(frameEntries.length === 0) {
                   this.#summaryField.value = "";
@@ -180,113 +207,143 @@ class FrameSubscribable extends Material {
       }
 
       #renderVisualiser(frameEntry) {
-            while(this.#visualiser.firstChild) {
-                  this.#visualiser.removeChild(this.#visualiser.firstChild);
+            if(this.#measurements?.length) {
+                  for(let i = this.#measurements.length - 1; i >= 0; i--) {
+                        this.#measurements[i]?.Delete?.();
+                  }
+                  this.#measurements = [];
+            }
+            if(this.#visualiser?.Close) {
+                  this.#visualiser.Close();
+            }
+            this.#visualiserContainer.innerHTML = "";
+
+            if(!frameEntry || frameEntry.QWHD.width <= 0 || frameEntry.QWHD.height <= 0) {
+                  this.#latestVisualiserSvgText = "";
+                  return;
             }
 
-            if(!frameEntry || frameEntry.QWHD.width <= 0 || frameEntry.QWHD.height <= 0) return;
-
-            const svgNs = "http://www.w3.org/2000/svg";
             const width = frameEntry.QWHD.width;
             const height = frameEntry.QWHD.height;
             const face = Math.max(frameEntry.section.face, 1);
-            const margin = 55;
-            const drawWidth = 500 - margin * 2;
-            const drawHeight = 360 - margin * 2;
-            const scale = Math.min(drawWidth / width, drawHeight / height);
-            const ox = (500 - width * scale) / 2;
-            const oy = (360 - height * scale) / 2;
-            const stroke = Math.max(face * scale, 4);
-
-            const addLine = (x1, y1, x2, y2, color, lineWidth, dashArray = "") => {
-                  const line = document.createElementNS(svgNs, "line");
-                  line.setAttribute("x1", x1);
-                  line.setAttribute("y1", y1);
-                  line.setAttribute("x2", x2);
-                  line.setAttribute("y2", y2);
-                  line.setAttribute("stroke", color);
-                  line.setAttribute("stroke-width", lineWidth);
-                  line.setAttribute("stroke-linecap", "square");
-                  if(dashArray) line.setAttribute("stroke-dasharray", dashArray);
-                  this.#visualiser.appendChild(line);
-                  return line;
-            };
-            const addText = (textValue, x, y, fill, fontSize = 13, anchor = "middle") => {
-                  const text = document.createElementNS(svgNs, "text");
-                  text.setAttribute("x", x);
-                  text.setAttribute("y", y);
-                  text.setAttribute("fill", fill);
-                  text.setAttribute("font-size", fontSize);
-                  text.setAttribute("font-family", "Arial, sans-serif");
-                  text.setAttribute("text-anchor", anchor);
-                  text.textContent = textValue;
-                  this.#visualiser.appendChild(text);
-                  return text;
-            };
-            const addCircle = (cx, cy, r, fill) => {
-                  const circle = document.createElementNS(svgNs, "circle");
-                  circle.setAttribute("cx", cx);
-                  circle.setAttribute("cy", cy);
-                  circle.setAttribute("r", r);
-                  circle.setAttribute("fill", fill);
-                  this.#visualiser.appendChild(circle);
-                  return circle;
-            };
-
-            const left = ox;
-            const right = ox + width * scale;
-            const top = oy;
-            const bottom = oy + height * scale;
             const memberColor = frameEntry.materialType === "Aluminium" ? "#9eb7c7" : "#5f666c";
-            const indicatorColor = "#d84b3d";
             const dimensionColor = "#1f4f89";
-
-            if(frameEntry.cornerType !== FrameSubscribable.CORNER_TYPES.openCorners) {
-                  addLine(left, top, right, top, memberColor, stroke);
-                  addLine(left, bottom, right, bottom, memberColor, stroke);
-                  addLine(left, top, left, bottom, memberColor, stroke);
-                  addLine(right, top, right, bottom, memberColor, stroke);
-            } else {
-                  addLine(left + stroke / 2, top, right - stroke / 2, top, memberColor, stroke);
-                  addLine(left + stroke / 2, bottom, right - stroke / 2, bottom, memberColor, stroke);
-            }
 
             const verticalSpacing = frameEntry.verticals > 0 ? width / (frameEntry.verticals + 1) : 0;
             const horizontalSpacing = frameEntry.horizontals > 0 ? height / (frameEntry.horizontals + 1) : 0;
+            const memberThickness = Math.max(face, 1);
+
+            let svgContent = [];
+            const addRect = (x, y, w, h) => {
+                  svgContent.push(`<rect x="${x}" y="${y}" width="${Math.max(w, 0)}" height="${Math.max(h, 0)}" fill="${memberColor}"/>`);
+            };
+
+            if(frameEntry.cornerType !== FrameSubscribable.CORNER_TYPES.openCorners) {
+                  addRect(0, 0, width, memberThickness);
+                  addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
+                  addRect(0, 0, memberThickness, height);
+                  addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
+            } else {
+                  addRect(memberThickness / 2, 0, Math.max(width - memberThickness, 0), memberThickness);
+                  addRect(memberThickness / 2, Math.max(height - memberThickness, 0), Math.max(width - memberThickness, 0), memberThickness);
+            }
 
             for(let i = 0; i < frameEntry.verticals; i++) {
-                  const x = left + verticalSpacing * (i + 1) * scale;
-                  addLine(x, top, x, bottom, memberColor, stroke * 0.9);
+                  const x = verticalSpacing * (i + 1) - memberThickness / 2;
+                  addRect(x, 0, memberThickness, height);
             }
             for(let i = 0; i < frameEntry.horizontals; i++) {
-                  const y = top + horizontalSpacing * (i + 1) * scale;
-                  addLine(left, y, right, y, memberColor, stroke * 0.9, frameEntry.verticals > 0 ? "0" : "");
+                  const y = horizontalSpacing * (i + 1) - memberThickness / 2;
+                  addRect(0, y, width, memberThickness);
             }
 
             const markers = frameEntry.joints;
-            for(let i = 0; i < markers.corners.length; i++) {
-                  addCircle(markers.corners[i].x * scale + ox, markers.corners[i].y * scale + oy, 5, indicatorColor);
+            const joinStroke = Math.max(memberThickness * 0.15, 1);
+            const joinLength = Math.max(memberThickness * 0.9, 6);
+            const joinContent = [];
+            const addJoinLine = (x1, y1, x2, y2) => {
+                  joinContent.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111" stroke-width="${joinStroke}" stroke-linecap="round"/>`);
+            };
+
+            if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.mitred45) {
+                  addJoinLine(0, 0, joinLength, joinLength);
+                  addJoinLine(width, 0, width - joinLength, joinLength);
+                  addJoinLine(0, height, joinLength, height - joinLength);
+                  addJoinLine(width, height, width - joinLength, height - joinLength);
             }
+
             for(let i = 0; i < markers.tees.length; i++) {
-                  addCircle(markers.tees[i].x * scale + ox, markers.tees[i].y * scale + oy, 4, "#ff9f1c");
+                  const tee = markers.tees[i];
+                  addJoinLine(tee.x - joinLength * 0.45, tee.y, tee.x + joinLength * 0.45, tee.y);
+                  addJoinLine(tee.x, tee.y - joinLength * 0.45, tee.x, tee.y + joinLength * 0.45);
             }
             for(let i = 0; i < markers.crosses.length; i++) {
-                  addCircle(markers.crosses[i].x * scale + ox, markers.crosses[i].y * scale + oy, 4, "#2a9d8f");
+                  const cross = markers.crosses[i];
+                  addJoinLine(cross.x - joinLength * 0.55, cross.y - joinLength * 0.55, cross.x + joinLength * 0.55, cross.y + joinLength * 0.55);
+                  addJoinLine(cross.x - joinLength * 0.55, cross.y + joinLength * 0.55, cross.x + joinLength * 0.55, cross.y - joinLength * 0.55);
             }
 
-            addLine(left, top - 28, right, top - 28, dimensionColor, 1.5);
-            addLine(left, top - 34, left, top - 20, dimensionColor, 1.5);
-            addLine(right, top - 34, right, top - 20, dimensionColor, 1.5);
-            addText(roundNumber(width, 2) + "mm", (left + right) / 2, top - 36, dimensionColor, 13);
+            const dimFontSize = 14;
+            const metaFontSize = 12;
+            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}${joinContent.join("")}</g><g><text x="${width / 2}" y="${-12}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${-12}" y="${height / 2}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 -12 ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + 16}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${-28}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length} | Crosses ${markers.crosses.length}</text></g></svg>`;
 
-            addLine(left - 28, top, left - 28, bottom, dimensionColor, 1.5);
-            addLine(left - 34, top, left - 20, top, dimensionColor, 1.5);
-            addLine(left - 34, bottom, left - 20, bottom, dimensionColor, 1.5);
-            const heightLabel = addText(roundNumber(height, 2) + "mm", left - 38, (top + bottom) / 2, dimensionColor, 13);
-            heightLabel.setAttribute("transform", "rotate(-90 " + (left - 38) + " " + ((top + bottom) / 2) + ")");
+            this.#visualiser = new DragZoomSVG("100%", "360px", svgText, this.#visualiserContainer, {
+                  overrideCssStyles: "background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;",
+                  convertShapesToPaths: false,
+                  splitCompoundPaths: false
+            });
+            this.#visualiser.centerAndFitSVGContent();
 
-            addText(frameEntry.cornerType, 250, 340, "#202020", 13);
-            addText("Corners " + markers.corners.length + " | Tees " + markers.tees.length + " | Crosses " + markers.crosses.length, 250, 22, "#202020", 12);
+            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
+                  direction: "width",
+                  x1: 0,
+                  y1: 0,
+                  x2: width,
+                  y2: 0,
+                  autoLabel: true,
+                  text: roundNumber(width, 2) + " mm",
+                  deletable: true,
+                  unit: "mm",
+                  precision: 2,
+                  scale: 1,
+                  arrowSize: 10 / this.#visualiser.scale,
+                  textOffset: 10 / this.#visualiser.scale,
+                  stroke: "#000",
+                  sides: ["top"],
+                  lineWidth: 2 / this.#visualiser.scale,
+                  fontSize: 12 / this.#visualiser.scale + "px",
+                  tickLength: 20 / this.#visualiser.scale,
+                  handleRadius: 8 / this.#visualiser.scale,
+                  offsetX: 0,
+                  offsetY: -20 / this.#visualiser.scale
+            }));
+
+            this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
+                  direction: "height",
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: height,
+                  autoLabel: true,
+                  text: roundNumber(height, 2) + " mm",
+                  deletable: true,
+                  unit: "mm",
+                  precision: 2,
+                  scale: 1,
+                  arrowSize: 10 / this.#visualiser.scale,
+                  textOffset: 10 / this.#visualiser.scale,
+                  stroke: "#000",
+                  sides: ["left"],
+                  lineWidth: 2 / this.#visualiser.scale,
+                  fontSize: 12 / this.#visualiser.scale + "px",
+                  tickLength: 20 / this.#visualiser.scale,
+                  handleRadius: 8 / this.#visualiser.scale,
+                  offsetX: -20 / this.#visualiser.scale,
+                  offsetY: 0,
+                  sideHint: "left"
+            }));
+
+            this.#latestVisualiserSvgText = this.#visualiser.unscaledSVGString || svgText;
       }
 
       #collectFrameEntries() {
@@ -529,9 +586,11 @@ class FrameSubscribable extends Material {
                         "[FRAME] " + entry.partName,
                         null,
                         false,
-                        entry.cutNotes
+                        (entry.cutNotes || "") + "\n\n" + (this.#latestVisualiserSvgText || "")
                   );
             }
+            if(this.#f_production) partIndex = await this.#f_production.Create(productNo, partIndex);
+            else if(this.#productionSubscribable?.Create) partIndex = await this.#productionSubscribable.Create(productNo, partIndex);
             return partIndex;
       }
 
