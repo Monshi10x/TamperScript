@@ -28,7 +28,7 @@ class FrameSubscribable extends Material {
       #totalLengthField;
       #productionTimeField;
       #summaryField;
-      #productionSubscribable;
+      #f_production;
       #visualiser;
       #visualiserContainer;
       #dataForSubscribers = [];
@@ -102,9 +102,14 @@ class FrameSubscribable extends Material {
             this.#visualiserContainer = createDivStyle5(null, "Visualiser", this.container)[1];
             this.#visualiserContainer.style.cssText += "padding:10px;";
 
-            const productionContainer = createDivStyle5(null, "Production Subscribable", this.container)[1];
-            this.#productionSubscribable = new ProductionSubscribable(productionContainer, lhsMenuWindow, options);
-            this.#productionSubscribable.SubscribeTo(this);
+            const productionContainer = createDivStyle5(null, "Frame Production", this.container)[1];
+            this.#f_production = new Production(productionContainer, null, function() { }, null);
+            this.#f_production.showContainerDiv = true;
+            this.#f_production.productionTime = 0;
+            this.#f_production.headerName = "Frame Production";
+            this.#f_production.required = true;
+            this.#f_production.showRequiredCkb = false;
+            this.#f_production.requiredName = "Required";
 
             const summaryContainer = createDivStyle5(null, "Cut Notes", this.container)[1];
             this.#summaryField = createTextarea("Cut Notes", "", "width:calc(100% - 20px);margin:10px;height:220px;", () => {}, summaryContainer);
@@ -171,7 +176,16 @@ class FrameSubscribable extends Material {
 
 
       #renderProductionSpecs(frameEntries) {
-            if(this.#productionSubscribable) this.#productionSubscribable.UpdateFromFields();
+            if(!this.#f_production) return;
+            let totalProductionMins = 0;
+            let headerName = "Frame Production";
+            for(let i = 0; i < frameEntries.length; i++) {
+                  totalProductionMins += zeroIfNaNNullBlank(frameEntries[i].productionTimeMins);
+                  if(frameEntries[i].productionLabel) headerName = frameEntries[i].productionLabel;
+            }
+            this.#f_production.productionTime = roundNumber(totalProductionMins, 2);
+            this.#f_production.headerName = headerName;
+            this.#f_production.required = totalProductionMins > 0;
       }
 
       #renderCutNotes(frameEntries) {
@@ -485,7 +499,7 @@ class FrameSubscribable extends Material {
                         entry.cutNotes
                   );
             }
-            if(this.#productionSubscribable) partIndex = await this.#productionSubscribable.Create(productNo, partIndex);
+            if(this.#f_production) partIndex = await this.#f_production.Create(productNo, partIndex);
             return partIndex;
       }
 
