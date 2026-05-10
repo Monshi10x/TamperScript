@@ -291,7 +291,7 @@ class FrameSubscribable extends Material {
 
             const markers = frameEntry.joints;
             const joinStroke = Math.max(memberThickness * 0.15, 1);
-            const joinLength = Math.max(memberThickness * 0.9, 6);
+            const joinLength = memberThickness;
             const joinContent = [];
             const addJoinLine = (x1, y1, x2, y2) => {
                   joinContent.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111" stroke-width="${joinStroke}" stroke-linecap="round"/>`);
@@ -304,15 +304,27 @@ class FrameSubscribable extends Material {
                   addJoinLine(width, height, width - joinLength, height - joinLength);
             }
 
-            for(let i = 0; i < markers.tees.length; i++) {
-                  const tee = markers.tees[i];
-                  addJoinLine(tee.x - joinLength * 0.45, tee.y, tee.x + joinLength * 0.45, tee.y);
-                  addJoinLine(tee.x, tee.y - joinLength * 0.45, tee.x, tee.y + joinLength * 0.45);
+            if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
+                  for(let i = 0; i < frameEntry.verticals; i++) {
+                        const x = verticalSpacing * (i + 1);
+                        for(let h = 0; h < frameEntry.horizontals; h++) {
+                              const y = horizontalSpacing * (h + 1);
+                              addJoinLine(x - memberThickness * 0.5, y, x + memberThickness * 0.5, y);
+                        }
+                  }
+            } else {
+                  for(let i = 0; i < frameEntry.horizontals; i++) {
+                        const y = horizontalSpacing * (i + 1);
+                        for(let v = 0; v < frameEntry.verticals; v++) {
+                              const x = verticalSpacing * (v + 1);
+                              addJoinLine(x, y - memberThickness * 0.5, x, y + memberThickness * 0.5);
+                        }
+                  }
             }
 
             const dimFontSize = 14;
             const metaFontSize = 12;
-            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}${joinContent.join("")}</g><g><text x="${width / 2}" y="${-12}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${-12}" y="${height / 2}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 -12 ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + 16}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${-28}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length} | Crosses ${markers.crosses.length}</text></g></svg>`;
+            const svgText = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="${-width * 0.15} ${-height * 0.18} ${width * 1.3} ${height * 1.36}"><g id="mainGcreatedByT" transform="matrix(1 0 0 1 0 0)">${svgContent.join("")}${joinContent.join("")}</g><g><text x="${width / 2}" y="${-12}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${roundNumber(width, 2)}mm</text><text x="${-12}" y="${height / 2}" fill="${dimensionColor}" font-size="${dimFontSize}" font-family="Arial, sans-serif" text-anchor="middle" transform="rotate(-90 -12 ${height / 2})">${roundNumber(height, 2)}mm</text><text x="${width / 2}" y="${height + 16}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">${frameEntry.cornerType}</text><text x="${width / 2}" y="${-28}" fill="#202020" font-size="${metaFontSize}" font-family="Arial, sans-serif" text-anchor="middle">Corners ${markers.corners.length} | Tees ${markers.tees.length}</text></g></svg>`;
 
             this.#visualiser = new DragZoomSVG("100%", "360px", svgText, this.#visualiserContainer, {
                   overrideCssStyles: "background:#f7f7f7;border:1px solid #d8d8d8;box-sizing:border-box;",
