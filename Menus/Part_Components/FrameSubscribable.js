@@ -95,6 +95,10 @@ class FrameSubscribable extends Material {
                   createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.verticalFull, FrameSubscribable.JOIN_PREFERENCES.verticalFull),
                   createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.horizontalFull, FrameSubscribable.JOIN_PREFERENCES.horizontalFull)
             ], () => {this.UpdateFromFields();}, frameContainer);
+            this.#joinPreference = createDropdown_Infield("Join Preference", 0, "width:220px;", [
+                  createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.verticalFull, FrameSubscribable.JOIN_PREFERENCES.verticalFull),
+                  createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.horizontalFull, FrameSubscribable.JOIN_PREFERENCES.horizontalFull)
+            ], () => {this.UpdateFromFields();}, frameContainer);
 
             const statsContainer = createDivStyle5(null, "Stats", this.container)[1];
             this.#faceField = createInput_Infield("Face", 0, "width:110px;", () => {}, statsContainer, false, 0.1, {postfix: "mm"});
@@ -146,6 +150,7 @@ class FrameSubscribable extends Material {
             };
             this.UpdateSubscribedLabel();
             this.PushToSubscribers();
+            if(this.#productionSubscribable) this.#productionSubscribable.UpdateFromFields();
       }
 
       #renderInheritedSizes(frameEntries) {
