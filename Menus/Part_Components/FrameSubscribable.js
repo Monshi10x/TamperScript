@@ -29,6 +29,7 @@ class FrameSubscribable extends Material {
       #productionTimeField;
       #summaryField;
       #f_production;
+      #productionSubscribable;
       #visualiser;
       #visualiserContainer;
       #dataForSubscribers = [];
@@ -110,6 +111,7 @@ class FrameSubscribable extends Material {
             this.#f_production.required = true;
             this.#f_production.showRequiredCkb = false;
             this.#f_production.requiredName = "Required";
+            this.#productionSubscribable = this.#f_production;
 
             const summaryContainer = createDivStyle5(null, "Cut Notes", this.container)[1];
             this.#summaryField = createTextarea("Cut Notes", "", "width:calc(100% - 20px);margin:10px;height:220px;", () => {}, summaryContainer);
@@ -500,6 +502,7 @@ class FrameSubscribable extends Material {
                   );
             }
             if(this.#f_production) partIndex = await this.#f_production.Create(productNo, partIndex);
+            else if(this.#productionSubscribable?.Create) partIndex = await this.#productionSubscribable.Create(productNo, partIndex);
             return partIndex;
       }
 
