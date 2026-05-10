@@ -169,6 +169,11 @@ class FrameSubscribable extends Material {
       }
 
 
+
+      #renderProductionSpecs(frameEntries) {
+            if(this.#productionSubscribable) this.#productionSubscribable.UpdateFromFields();
+      }
+
       #renderCutNotes(frameEntries) {
             if(frameEntries.length === 0) {
                   this.#summaryField.value = "";
