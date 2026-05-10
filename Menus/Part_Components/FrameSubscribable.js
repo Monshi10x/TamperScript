@@ -138,6 +138,7 @@ class FrameSubscribable extends Material {
             };
             this.UpdateSubscribedLabel();
             this.PushToSubscribers();
+            if(this.#productionSubscribable) this.#productionSubscribable.UpdateFromFields();
       }
 
       #renderInheritedSizes(frameEntries) {
