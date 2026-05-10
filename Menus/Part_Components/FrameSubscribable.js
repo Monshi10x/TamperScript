@@ -95,10 +95,6 @@ class FrameSubscribable extends Material {
                   createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.verticalFull, FrameSubscribable.JOIN_PREFERENCES.verticalFull),
                   createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.horizontalFull, FrameSubscribable.JOIN_PREFERENCES.horizontalFull)
             ], () => {this.UpdateFromFields();}, frameContainer);
-            this.#joinPreference = createDropdown_Infield("Join Preference", 0, "width:220px;", [
-                  createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.verticalFull, FrameSubscribable.JOIN_PREFERENCES.verticalFull),
-                  createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.horizontalFull, FrameSubscribable.JOIN_PREFERENCES.horizontalFull)
-            ], () => {this.UpdateFromFields();}, frameContainer);
 
             const statsContainer = createDivStyle5(null, "Stats", this.container)[1];
             this.#faceField = createInput_Infield("Face", 0, "width:110px;", () => {}, statsContainer, false, 0.1, {postfix: "mm"});
@@ -249,10 +245,24 @@ class FrameSubscribable extends Material {
                   svgContent.push(`<rect x="${x}" y="${y}" width="${Math.max(w, 0)}" height="${Math.max(h, 0)}" fill="${memberColor}"/>`);
             };
 
-            addRect(0, 0, width, memberThickness);
-            addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
-            addRect(0, 0, memberThickness, height);
-            addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
+            if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
+                  if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.horizontalFull) {
+                        addRect(0, 0, width, memberThickness);
+                        addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
+                        addRect(0, memberThickness, memberThickness, Math.max(height - memberThickness * 2, 0));
+                        addRect(Math.max(width - memberThickness, 0), memberThickness, memberThickness, Math.max(height - memberThickness * 2, 0));
+                  } else {
+                        addRect(0, 0, memberThickness, height);
+                        addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
+                        addRect(memberThickness, 0, Math.max(width - memberThickness * 2, 0), memberThickness);
+                        addRect(memberThickness, Math.max(height - memberThickness, 0), Math.max(width - memberThickness * 2, 0), memberThickness);
+                  }
+            } else {
+                  addRect(0, 0, width, memberThickness);
+                  addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
+                  addRect(0, 0, memberThickness, height);
+                  addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
+            }
 
             if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
                   for(let i = 0; i < frameEntry.verticals; i++) {
@@ -296,10 +306,17 @@ class FrameSubscribable extends Material {
                   addJoinLine(0, height, joinLength, height - joinLength);
                   addJoinLine(width, height, width - joinLength, height - joinLength);
             } else if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
-                  addJoinLine(memberThickness, 0, memberThickness, memberThickness);
-                  addJoinLine(width - memberThickness, 0, width - memberThickness, memberThickness);
-                  addJoinLine(memberThickness, height - memberThickness, memberThickness, height);
-                  addJoinLine(width - memberThickness, height - memberThickness, width - memberThickness, height);
+                  if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.horizontalFull) {
+                        addJoinLine(0, memberThickness, memberThickness, memberThickness);
+                        addJoinLine(width - memberThickness, memberThickness, width, memberThickness);
+                        addJoinLine(0, height - memberThickness, memberThickness, height - memberThickness);
+                        addJoinLine(width - memberThickness, height - memberThickness, width, height - memberThickness);
+                  } else {
+                        addJoinLine(memberThickness, 0, memberThickness, memberThickness);
+                        addJoinLine(width - memberThickness, 0, width - memberThickness, memberThickness);
+                        addJoinLine(memberThickness, height - memberThickness, memberThickness, height);
+                        addJoinLine(width - memberThickness, height - memberThickness, width - memberThickness, height);
+                  }
             }
 
             if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
@@ -448,6 +465,7 @@ class FrameSubscribable extends Material {
             let edgeVerticalLength = height;
             let internalVerticalLength = height;
             let horizontalSegmentLength = width;
+            let outerHorizontalLength = width;
             let outerVerticalQty = 2;
             let cornerJointCount = 4;
             let teeToOuterSides = horizontals * 2;
@@ -457,12 +475,20 @@ class FrameSubscribable extends Material {
                   internalVerticalLength = Math.max(height - face * 2, 0);
                   horizontalSegmentLength = Math.max((width - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
             } else if(cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
-                  edgeVerticalLength = Math.max(height - face * 2, 0);
-                  internalVerticalLength = Math.max(height - face * 2, 0);
-                  horizontalSegmentLength = Math.max((width - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
+                  if(joinPreference === FrameSubscribable.JOIN_PREFERENCES.horizontalFull) {
+                        edgeVerticalLength = Math.max(height - face * 2, 0);
+                        internalVerticalLength = Math.max((height - horizontals * face) / Math.max(horizontals + 1, 1), 0);
+                        outerHorizontalLength = width;
+                        horizontalSegmentLength = Math.max(width - face * 2, 0);
+                  } else {
+                        edgeVerticalLength = height;
+                        internalVerticalLength = Math.max(height - face * 2, 0);
+                        outerHorizontalLength = Math.max(width - face * 2, 0);
+                        horizontalSegmentLength = Math.max((width - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
+                  }
             }
 
-            addMember(2, width, "Outer Horizontal", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
+            addMember(2, outerHorizontalLength, "Outer Horizontal", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
             addMember(outerVerticalQty, edgeVerticalLength, "Outer Vertical", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
             if(joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
                   addMember(verticals, internalVerticalLength, "Internal Vertical", "straight");
