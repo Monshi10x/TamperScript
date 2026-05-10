@@ -2,10 +2,7 @@ class FrameSubscribable extends Material {
       static DISPLAY_NAME = "FRAME";
       static CORNER_TYPES = {
             mitred45: "Mitred 45",
-            buttWeld: "Butt Weld",
-            openCorners: "Open Corners",
-            squareCut: "Square Cut",
-            radiusCorners: "Radius Corners"
+            buttWeld: "Butt Weld"
       };
       static PRODUCTION_DEFAULTS = {
             setupMins: 12,
@@ -92,10 +89,11 @@ class FrameSubscribable extends Material {
             this.#horizontals = createInput_Infield("Horizontals", 0, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
             this.#cornerType = createDropdown_Infield("Corner Type", 0, "width:180px;", [
                   createDropdownOption(FrameSubscribable.CORNER_TYPES.mitred45, FrameSubscribable.CORNER_TYPES.mitred45),
-                  createDropdownOption(FrameSubscribable.CORNER_TYPES.buttWeld, FrameSubscribable.CORNER_TYPES.buttWeld),
-                  createDropdownOption(FrameSubscribable.CORNER_TYPES.openCorners, FrameSubscribable.CORNER_TYPES.openCorners),
-                  createDropdownOption(FrameSubscribable.CORNER_TYPES.squareCut, FrameSubscribable.CORNER_TYPES.squareCut),
-                  createDropdownOption(FrameSubscribable.CORNER_TYPES.radiusCorners, FrameSubscribable.CORNER_TYPES.radiusCorners)
+                  createDropdownOption(FrameSubscribable.CORNER_TYPES.buttWeld, FrameSubscribable.CORNER_TYPES.buttWeld)
+            ], () => {this.UpdateFromFields();}, frameContainer);
+            this.#joinPreference = createDropdown_Infield("Join Preference", 0, "width:220px;", [
+                  createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.verticalFull, FrameSubscribable.JOIN_PREFERENCES.verticalFull),
+                  createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.horizontalFull, FrameSubscribable.JOIN_PREFERENCES.horizontalFull)
             ], () => {this.UpdateFromFields();}, frameContainer);
             this.#joinPreference = createDropdown_Infield("Join Preference", 0, "width:220px;", [
                   createDropdownOption(FrameSubscribable.JOIN_PREFERENCES.verticalFull, FrameSubscribable.JOIN_PREFERENCES.verticalFull),
@@ -251,15 +249,10 @@ class FrameSubscribable extends Material {
                   svgContent.push(`<rect x="${x}" y="${y}" width="${Math.max(w, 0)}" height="${Math.max(h, 0)}" fill="${memberColor}"/>`);
             };
 
-            if(frameEntry.cornerType !== FrameSubscribable.CORNER_TYPES.openCorners) {
-                  addRect(0, 0, width, memberThickness);
-                  addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
-                  addRect(0, 0, memberThickness, height);
-                  addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
-            } else {
-                  addRect(memberThickness / 2, 0, Math.max(width - memberThickness, 0), memberThickness);
-                  addRect(memberThickness / 2, Math.max(height - memberThickness, 0), Math.max(width - memberThickness, 0), memberThickness);
-            }
+            addRect(0, 0, width, memberThickness);
+            addRect(0, Math.max(height - memberThickness, 0), width, memberThickness);
+            addRect(0, 0, memberThickness, height);
+            addRect(Math.max(width - memberThickness, 0), 0, memberThickness, height);
 
             if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
                   for(let i = 0; i < frameEntry.verticals; i++) {
@@ -302,6 +295,11 @@ class FrameSubscribable extends Material {
                   addJoinLine(width, 0, width - joinLength, joinLength);
                   addJoinLine(0, height, joinLength, height - joinLength);
                   addJoinLine(width, height, width - joinLength, height - joinLength);
+            } else if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
+                  addJoinLine(memberThickness, 0, memberThickness, memberThickness);
+                  addJoinLine(width - memberThickness, 0, width - memberThickness, memberThickness);
+                  addJoinLine(memberThickness, height - memberThickness, memberThickness, height);
+                  addJoinLine(width - memberThickness, height - memberThickness, width - memberThickness, height);
             }
 
             if(frameEntry.joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
@@ -454,7 +452,7 @@ class FrameSubscribable extends Material {
             let cornerJointCount = 4;
             let teeToOuterSides = horizontals * 2;
 
-            if(cornerType === FrameSubscribable.CORNER_TYPES.mitred45 || cornerType === FrameSubscribable.CORNER_TYPES.radiusCorners) {
+            if(cornerType === FrameSubscribable.CORNER_TYPES.mitred45) {
                   edgeVerticalLength = height;
                   internalVerticalLength = Math.max(height - face * 2, 0);
                   horizontalSegmentLength = Math.max((width - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
@@ -462,17 +460,6 @@ class FrameSubscribable extends Material {
                   edgeVerticalLength = Math.max(height - face * 2, 0);
                   internalVerticalLength = Math.max(height - face * 2, 0);
                   horizontalSegmentLength = Math.max((width - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
-            } else if(cornerType === FrameSubscribable.CORNER_TYPES.squareCut) {
-                  edgeVerticalLength = height;
-                  internalVerticalLength = height;
-                  horizontalSegmentLength = Math.max((width - verticals * face) / Math.max(verticals + 1, 1), 0);
-            } else if(cornerType === FrameSubscribable.CORNER_TYPES.openCorners) {
-                  outerVerticalQty = 0;
-                  cornerJointCount = 0;
-                  teeToOuterSides = 0;
-                  edgeVerticalLength = 0;
-                  internalVerticalLength = height;
-                  horizontalSegmentLength = Math.max((width - verticals * face) / Math.max(verticals + 1, 1), 0);
             }
 
             addMember(2, width, "Outer Horizontal", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
