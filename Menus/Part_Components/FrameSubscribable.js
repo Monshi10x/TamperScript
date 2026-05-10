@@ -26,6 +26,7 @@ class FrameSubscribable extends Material {
       #framePiecesY;
       #cornerType;
       #joinPreference;
+      #flipSection;
       #faceField;
       #depthField;
       #wallField;
@@ -72,6 +73,8 @@ class FrameSubscribable extends Material {
 
       get joinPreference() {return this.#joinPreference[1].value;}
       set joinPreference(value) {$(this.#joinPreference[1]).val(value).change();}
+      get flipSection() {return !!this.#flipSection[1].checked;}
+      set flipSection(value) {this.#flipSection[1].checked = !!value; $(this.#flipSection[1]).change();}
 
       constructor(parentContainer, lhsMenuWindow, options = {UPDATES_PAUSED: false}) {
             super(parentContainer, lhsMenuWindow, options);
@@ -91,6 +94,7 @@ class FrameSubscribable extends Material {
                   this.UpdateFromFields();
             }, frameContainer);
             this.#partDropdown = createDropdown_Infield("Section", 0, "width:48%;", [], () => {this.UpdateFromFields();}, frameContainer);
+            this.#flipSection = createCheckbox_Infield("Flip Section", false, "width:160px;", () => {this.UpdateFromFields();}, frameContainer);
             this.#verticals = createInput_Infield("Verticals", 0, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
             this.#horizontals = createInput_Infield("Horizontals", 0, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
             this.#framePiecesX = createInput_Infield("Frame Pieces X", 1, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
@@ -532,7 +536,11 @@ class FrameSubscribable extends Material {
 
             const parts = this.#getFrameCapableParts();
             for(let i = 0; i < parts.length; i++) {
-                  partField.add(createDropdownOption(parts[i].Name, parts[i].Name));
+                  const partName = parts[i].Name;
+                  let label = partName;
+                  if(partName.includes("RHS -") || partName.includes("SHS -")) label = "□ " + partName;
+                  if(partName.includes("Angle -")) label = "∟ " + partName;
+                  partField.add(createDropdownOption(label, partName));
             }
 
             if(parts.length === 0) {
@@ -551,9 +559,16 @@ class FrameSubscribable extends Material {
             const match = compactName.match(/(\d+(?:\.\d+)?)x(\d+(?:\.\d+)?)(?:x(\d+(?:\.\d+)?))?/);
             if(!match) return null;
 
+            let face = zeroIfNaNNullBlank(parseFloat(match[1]));
+            let depth = zeroIfNaNNullBlank(parseFloat(match[2]));
+            if(this.flipSection) {
+                  const temp = face;
+                  face = depth;
+                  depth = temp;
+            }
             return {
-                  face: zeroIfNaNNullBlank(parseFloat(match[1])),
-                  depth: zeroIfNaNNullBlank(parseFloat(match[2])),
+                  face,
+                  depth,
                   wall: zeroIfNaNNullBlank(parseFloat(match[3]))
             };
       }
@@ -567,7 +582,8 @@ class FrameSubscribable extends Material {
                   cornerType: this.cornerType,
                   joinPreference: this.joinPreference,
                   framePiecesX: this.framePiecesX,
-                  framePiecesY: this.framePiecesY
+                  framePiecesY: this.framePiecesY,
+                  flipSection: this.flipSection
             };
       }
 
@@ -581,6 +597,7 @@ class FrameSubscribable extends Material {
             if(state.joinPreference !== undefined) this.joinPreference = state.joinPreference;
             if(state.framePiecesX !== undefined) this.framePiecesX = state.framePiecesX;
             if(state.framePiecesY !== undefined) this.framePiecesY = state.framePiecesY;
+            if(state.flipSection !== undefined) this.flipSection = state.flipSection;
             this.UpdateFromFields();
       }
 
@@ -597,9 +614,9 @@ class FrameSubscribable extends Material {
                         entry.totalLengthMmPerFrame,
                         null,
                         "[FRAME] " + entry.partName,
-                        null,
+                        entry.cutNotes || "",
                         false,
-                        (entry.cutNotes || "") + "\n\n" + (this.#latestVisualiserSvgText || "")
+                        this.#latestVisualiserSvgText || ""
                   );
             }
             if(this.#f_production) partIndex = await this.#f_production.Create(productNo, partIndex);
