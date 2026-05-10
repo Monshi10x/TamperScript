@@ -22,6 +22,8 @@ class FrameSubscribable extends Material {
       #partDropdown;
       #verticals;
       #horizontals;
+      #framePiecesX;
+      #framePiecesY;
       #cornerType;
       #joinPreference;
       #faceField;
@@ -60,6 +62,10 @@ class FrameSubscribable extends Material {
 
       get horizontals() {return zeroIfNaNNullBlank(this.#horizontals[1].value);}
       set horizontals(value) {$(this.#horizontals[1]).val(value).change();}
+      get framePiecesX() {return Math.max(1, zeroIfNaNNullBlank(this.#framePiecesX[1].value));}
+      set framePiecesX(value) {$(this.#framePiecesX[1]).val(value).change();}
+      get framePiecesY() {return Math.max(1, zeroIfNaNNullBlank(this.#framePiecesY[1].value));}
+      set framePiecesY(value) {$(this.#framePiecesY[1]).val(value).change();}
 
       get cornerType() {return this.#cornerType[1].value;}
       set cornerType(value) {$(this.#cornerType[1]).val(value).change();}
@@ -87,6 +93,8 @@ class FrameSubscribable extends Material {
             this.#partDropdown = createDropdown_Infield("Section", 0, "width:48%;", [], () => {this.UpdateFromFields();}, frameContainer);
             this.#verticals = createInput_Infield("Verticals", 0, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
             this.#horizontals = createInput_Infield("Horizontals", 0, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
+            this.#framePiecesX = createInput_Infield("Frame Pieces X", 1, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
+            this.#framePiecesY = createInput_Infield("Frame Pieces Y", 1, "width:120px;", () => {this.UpdateFromFields();}, frameContainer, true, 1);
             this.#cornerType = createDropdown_Infield("Corner Type", 0, "width:180px;", [
                   createDropdownOption(FrameSubscribable.CORNER_TYPES.mitred45, FrameSubscribable.CORNER_TYPES.mitred45),
                   createDropdownOption(FrameSubscribable.CORNER_TYPES.buttWeld, FrameSubscribable.CORNER_TYPES.buttWeld)
@@ -293,6 +301,14 @@ class FrameSubscribable extends Material {
             }
 
             const markers = frameEntry.joints;
+            for(let px = 1; px < (frameEntry.piecesX || 1); px++) {
+                  const x = (width / frameEntry.piecesX) * px;
+                  addJoinLine(x, 0, x, height);
+            }
+            for(let py = 1; py < (frameEntry.piecesY || 1); py++) {
+                  const y = (height / frameEntry.piecesY) * py;
+                  addJoinLine(0, y, width, y);
+            }
             const joinStroke = Math.max(memberThickness * 0.15, 1);
             const joinLength = memberThickness;
             const joinContent = [];
@@ -423,6 +439,28 @@ class FrameSubscribable extends Material {
                   sideHint: "left"
             }));
 
+            
+            const pieceWidth = width / (frameEntry.piecesX || 1);
+            const pieceHeight = height / (frameEntry.piecesY || 1);
+            if((frameEntry.piecesX || 1) > 1) {
+                  this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
+                        direction: "width", x1: 0, y1: height, x2: pieceWidth, y2: height,
+                        autoLabel: true, text: roundNumber(pieceWidth, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1,
+                        arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["bottom"],
+                        lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale,
+                        handleRadius: 8 / this.#visualiser.scale, offsetX: 0, offsetY: 20 / this.#visualiser.scale
+                  }));
+            }
+            if((frameEntry.piecesY || 1) > 1) {
+                  this.#measurements.push(new TSVGMeasurement(this.#visualiser.svgG, {
+                        direction: "height", x1: width, y1: 0, x2: width, y2: pieceHeight,
+                        autoLabel: true, text: roundNumber(pieceHeight, 2) + " mm", deletable: true, unit: "mm", precision: 2, scale: 1,
+                        arrowSize: 10 / this.#visualiser.scale, textOffset: 10 / this.#visualiser.scale, stroke: "#000", sides: ["right"],
+                        lineWidth: 2 / this.#visualiser.scale, fontSize: 12 / this.#visualiser.scale + "px", tickLength: 20 / this.#visualiser.scale,
+                        handleRadius: 8 / this.#visualiser.scale, offsetX: 20 / this.#visualiser.scale, offsetY: 0
+                  }));
+            }
+
             this.#latestVisualiserSvgText = this.#visualiser.unscaledSVGString || svgText;
       }
 
@@ -449,6 +487,11 @@ class FrameSubscribable extends Material {
             const face = Math.max(section.face, 0);
             const width = zeroIfNaNNullBlank(qwhd.width);
             const height = zeroIfNaNNullBlank(qwhd.height);
+            const piecesX = this.framePiecesX;
+            const piecesY = this.framePiecesY;
+            const pieceMultiplier = Math.max(1, piecesX * piecesY);
+            const pieceWidth = width / piecesX;
+            const pieceHeight = height / piecesY;
             const verticals = this.verticals;
             const horizontals = this.horizontals;
             const cornerType = this.cornerType;
@@ -462,40 +505,40 @@ class FrameSubscribable extends Material {
                   members.push({qty: safeQty, length: safeLength, label, cutType});
             };
 
-            let edgeVerticalLength = height;
+            let edgeVerticalLength = pieceHeight;
             let internalVerticalLength = height;
             let horizontalSegmentLength = width;
-            let outerHorizontalLength = width;
+            let outerHorizontalLength = pieceWidth;
             let outerVerticalQty = 2;
             let cornerJointCount = 4;
             let teeToOuterSides = horizontals * 2;
 
             if(cornerType === FrameSubscribable.CORNER_TYPES.mitred45) {
-                  edgeVerticalLength = height;
-                  internalVerticalLength = Math.max(height - face * 2, 0);
-                  horizontalSegmentLength = Math.max((width - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
+                  edgeVerticalLength = pieceHeight;
+                  internalVerticalLength = Math.max(pieceHeight - face * 2, 0);
+                  horizontalSegmentLength = Math.max((pieceWidth - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
             } else if(cornerType === FrameSubscribable.CORNER_TYPES.buttWeld) {
                   if(joinPreference === FrameSubscribable.JOIN_PREFERENCES.horizontalFull) {
-                        edgeVerticalLength = Math.max(height - face * 2, 0);
+                        edgeVerticalLength = Math.max(pieceHeight - face * 2, 0);
                         internalVerticalLength = Math.max((height - horizontals * face) / Math.max(horizontals + 1, 1), 0);
-                        outerHorizontalLength = width;
-                        horizontalSegmentLength = Math.max(width - face * 2, 0);
+                        outerHorizontalLength = pieceWidth;
+                        horizontalSegmentLength = Math.max(pieceWidth - face * 2, 0);
                   } else {
-                        edgeVerticalLength = height;
-                        internalVerticalLength = Math.max(height - face * 2, 0);
-                        outerHorizontalLength = Math.max(width - face * 2, 0);
-                        horizontalSegmentLength = Math.max((width - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
+                        edgeVerticalLength = pieceHeight;
+                        internalVerticalLength = Math.max(pieceHeight - face * 2, 0);
+                        outerHorizontalLength = Math.max(pieceWidth - face * 2, 0);
+                        horizontalSegmentLength = Math.max((pieceWidth - face * 2 - verticals * face) / Math.max(verticals + 1, 1), 0);
                   }
             }
 
-            addMember(2, outerHorizontalLength, "Outer Horizontal", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
-            addMember(outerVerticalQty, edgeVerticalLength, "Outer Vertical", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
+            addMember(2 * pieceMultiplier, outerHorizontalLength, "Outer Horizontal", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
+            addMember(outerVerticalQty * pieceMultiplier, edgeVerticalLength, "Outer Vertical", cornerType === FrameSubscribable.CORNER_TYPES.mitred45 ? "mitred" : "straight");
             if(joinPreference === FrameSubscribable.JOIN_PREFERENCES.verticalFull) {
-                  addMember(verticals, internalVerticalLength, "Internal Vertical", "straight");
-                  addMember(horizontals * Math.max(verticals + 1, 1), horizontalSegmentLength, "Internal Horizontal", "straight");
+                  addMember(verticals * pieceMultiplier, internalVerticalLength, "Internal Vertical", "straight");
+                  addMember(horizontals * Math.max(verticals + 1, 1) * pieceMultiplier, horizontalSegmentLength, "Internal Horizontal", "straight");
             } else {
-                  addMember(verticals * Math.max(horizontals + 1, 1), Math.max((height - horizontals * face) / Math.max(horizontals + 1, 1), 0), "Internal Vertical", "straight");
-                  addMember(horizontals, Math.max(width - face * 2, 0), "Internal Horizontal", "straight");
+                  addMember(verticals * Math.max(horizontals + 1, 1) * pieceMultiplier, Math.max((pieceHeight - horizontals * face) / Math.max(horizontals + 1, 1), 0), "Internal Vertical", "straight");
+                  addMember(horizontals * pieceMultiplier, Math.max(pieceWidth - face * 2, 0), "Internal Horizontal", "straight");
             }
 
             let totalLengthMmPerFrame = 0;
@@ -534,6 +577,8 @@ class FrameSubscribable extends Material {
                   verticals,
                   horizontals,
                   joinPreference,
+                  piecesX,
+                  piecesY,
                   cornerType,
                   members,
                   totalLengthMmPerFrame,
@@ -640,7 +685,9 @@ class FrameSubscribable extends Material {
                   verticals: this.verticals,
                   horizontals: this.horizontals,
                   cornerType: this.cornerType,
-                  joinPreference: this.joinPreference
+                  joinPreference: this.joinPreference,
+                  framePiecesX: this.framePiecesX,
+                  framePiecesY: this.framePiecesY
             };
       }
 
@@ -652,6 +699,8 @@ class FrameSubscribable extends Material {
             if(state.horizontals !== undefined) this.horizontals = state.horizontals;
             if(state.cornerType !== undefined) this.cornerType = state.cornerType;
             if(state.joinPreference !== undefined) this.joinPreference = state.joinPreference;
+            if(state.framePiecesX !== undefined) this.framePiecesX = state.framePiecesX;
+            if(state.framePiecesY !== undefined) this.framePiecesY = state.framePiecesY;
             this.UpdateFromFields();
       }
 
