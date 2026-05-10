@@ -301,6 +301,13 @@ class FrameSubscribable extends Material {
             }
 
             const markers = frameEntry.joints;
+            const joinStroke = Math.max(memberThickness * 0.15, 1);
+            const joinLength = memberThickness;
+            const joinContent = [];
+            const addJoinLine = (x1, y1, x2, y2) => {
+                  joinContent.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111" stroke-width="${joinStroke}" stroke-linecap="round"/>`);
+            };
+
             for(let px = 1; px < (frameEntry.piecesX || 1); px++) {
                   const x = (width / frameEntry.piecesX) * px;
                   addJoinLine(x, 0, x, height);
@@ -309,12 +316,6 @@ class FrameSubscribable extends Material {
                   const y = (height / frameEntry.piecesY) * py;
                   addJoinLine(0, y, width, y);
             }
-            const joinStroke = Math.max(memberThickness * 0.15, 1);
-            const joinLength = memberThickness;
-            const joinContent = [];
-            const addJoinLine = (x1, y1, x2, y2) => {
-                  joinContent.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111" stroke-width="${joinStroke}" stroke-linecap="round"/>`);
-            };
 
             if(frameEntry.cornerType === FrameSubscribable.CORNER_TYPES.mitred45) {
                   addJoinLine(0, 0, joinLength, joinLength);
