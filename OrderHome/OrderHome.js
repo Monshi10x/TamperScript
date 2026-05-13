@@ -1022,8 +1022,9 @@ class OrderHome {
       }
 
       async ensurePdfLibrary() {
-            if(window.jspdf?.jsPDF) {
-                  return window.jspdf.jsPDF;
+            const existingJsPdf = this.getJsPdfConstructor();
+            if(existingJsPdf) {
+                  return existingJsPdf;
             }
             if(this.#pdfLibraryLoading) {
                   return this.#pdfLibraryLoading;
@@ -1031,11 +1032,35 @@ class OrderHome {
             this.#pdfLibraryLoading = new Promise((resolve, reject) => {
                   const script = document.createElement("script");
                   script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-                  script.onload = () => resolve(window.jspdf?.jsPDF || null);
+                  script.onload = () => {
+                        const loadedJsPdf = this.getJsPdfConstructor();
+                        if(loadedJsPdf) {
+                              resolve(loadedJsPdf);
+                              return;
+                        }
+                        reject(new Error("jsPDF loaded but constructor not found"));
+                  };
                   script.onerror = () => reject(new Error("Failed to load jsPDF"));
                   document.head.appendChild(script);
             });
             return this.#pdfLibraryLoading;
+      }
+
+      getJsPdfConstructor() {
+            const sources = [
+                  window,
+                  typeof unsafeWindow !== "undefined" ? unsafeWindow : null,
+                  globalThis
+            ].filter(Boolean);
+            for(const source of sources) {
+                  if(source.jspdf?.jsPDF) {
+                        return source.jspdf.jsPDF;
+                  }
+                  if(source.jsPDF) {
+                        return source.jsPDF;
+                  }
+            }
+            return null;
       }
 
       getCoverSheetData() {
