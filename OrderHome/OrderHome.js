@@ -1125,9 +1125,14 @@ class OrderHome {
       getProofUrlFromRow(row) {
             const proofAnchor = row.querySelector("#divProductProof a[title='Product Proof']");
             const onclickValue = proofAnchor?.getAttribute("onclick") || "";
-            const match = onclickValue.match(/LoadLocalProof=([^'")\s]+)/i);
-            if(match?.[1]) {
-                  return `${window.location.origin}/ShowImage.aspx?LoadLocalProof=${match[1]}`;
+            const directUrlMatch = onclickValue.match(/window\.open\(\s*['"]([^'"]*ShowImage\.aspx\?LoadLocalProof=[^'"]+)['"]/i);
+            if(directUrlMatch?.[1]) {
+                  return new URL(directUrlMatch[1], window.location.href).toString();
+            }
+            const proofFileMatch = onclickValue.match(/LoadLocalProof=([^'")\s&]+)/i);
+            if(proofFileMatch?.[1]) {
+                  const proofFile = decodeURIComponent(proofFileMatch[1]).trim();
+                  return `${window.location.origin}/ShowImage.aspx?LoadLocalProof=${proofFile}`;
             }
             return "";
       }
