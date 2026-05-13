@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Design Board v2
 // @namespace    http://tampermonkey.net/
-// @version      2.5
+// @version      2.682
 // @description  try to take over the world!
 // @author       You
 // @match        https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx
@@ -21,6 +21,8 @@
 // @grant        window.close
 // @grant        window.focus
 // @grant        window.onurlchange
+// @updateURL    file:\\C:\Users\Tristan PC\Documents\TamperScript\TamperStartDesign.js
+// @downloadURL  file:\\C:\Users\Tristan PC\Documents\TamperScript\TamperStartDesign.js
 // @resource     IMPORTED_CSS file:\\C:\Users\Tristan PC\Documents\TamperScript\Styles/Styles_DesignBoard.css
 // @resource     GoogleScript file:\\C:\Users\Tristan PC\Documents\TamperScript\GoogleMap/GoogleMap.js
 // @resource     Icon_AdobeIllustrator file:\\C:\Users\Tristan PC\Documents\TamperScript\Images/IllustratorIcon.png
@@ -45,6 +47,7 @@
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Styles/Styles.js
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Styles/Images.js
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Styles/Colour.js
+// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\UI/Toast.js
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\DragAndDrop/DragAndDrop.js
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Mouse/ContextMenu.js
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/Modal.js
