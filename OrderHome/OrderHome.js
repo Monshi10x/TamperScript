@@ -34,7 +34,6 @@ class OrderHome {
       #sendButtonLoader = null;
       #pdfFooter = null;
       #pdfLibraryLoading = null;
-      #qrLibraryLoading = null;
       #coverSheetOrientation = "landscape"; // Change to "portrait" if needed.
       #defaultAttachmentFiles = [
             {name: "Capabilities One Page 3D CUT LETTERS V2 (E).pdf", isDefault: false},
@@ -1048,29 +1047,6 @@ class OrderHome {
             return this.#pdfLibraryLoading;
       }
 
-      async ensureQrLibrary() {
-            if(typeof QRious === "function") {
-                  return QRious;
-            }
-            if(this.#qrLibraryLoading) {
-                  return this.#qrLibraryLoading;
-            }
-            this.#qrLibraryLoading = new Promise((resolve, reject) => {
-                  const script = document.createElement("script");
-                  script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js";
-                  script.onload = () => {
-                        if(typeof QRious === "function") {
-                              resolve(QRious);
-                              return;
-                        }
-                        reject(new Error("QRious loaded but constructor not found"));
-                  };
-                  script.onerror = () => reject(new Error("Failed to load QR library"));
-                  document.head.appendChild(script);
-            });
-            return this.#qrLibraryLoading;
-      }
-
       getJsPdfConstructor() {
             const sources = [
                   window,
@@ -1103,8 +1079,7 @@ class OrderHome {
                   return order.OrderProducts.map((item, index) => ({
                         lineNumber: item?.LineItemOrder ?? index + 1,
                         qty: item?.Qty ?? item?.Quantity ?? 0,
-                        productName: item?.Description || item?.ProductName || item?.Name || "",
-                        proofUrl: ""
+                        productName: item?.Description || item?.ProductName || item?.Name || ""
                   }));
             }
 
@@ -1116,34 +1091,9 @@ class OrderHome {
                   return {
                         lineNumber: Number.parseInt(lineNumberText, 10) || index + 1,
                         qty: Number.parseFloat(qtyText) || 0,
-                        productName,
-                        proofUrl: this.getProofUrlFromRow(row)
+                        productName
                   };
             }).filter((item) => item.productName);
-      }
-
-      getProofUrlFromRow(row) {
-            const proofAnchor = row.querySelector("#divProductProof a[title='Product Proof']");
-            const onclickValue = proofAnchor?.getAttribute("onclick") || "";
-            const directUrlMatch = onclickValue.match(/window\.open\(\s*['"]([^'"]*ShowImage\.aspx\?LoadLocalProof=[^'"]+)['"]/i);
-            if(directUrlMatch?.[1]) {
-                  return new URL(directUrlMatch[1], window.location.href).toString();
-            }
-            const proofFileMatch = onclickValue.match(/LoadLocalProof=([^'")\s&]+)/i);
-            if(proofFileMatch?.[1]) {
-                  const proofFile = decodeURIComponent(proofFileMatch[1]).trim();
-                  return `${window.location.origin}/ShowImage.aspx?LoadLocalProof=${proofFile}`;
-            }
-            return "";
-      }
-
-      async buildQrDataUrl(text) {
-            if(!text) {
-                  return "";
-            }
-            const QRClass = await this.ensureQrLibrary();
-            const qr = new QRClass({value: text, size: 84, level: "M", background: "white", foreground: "black"});
-            return qr.toDataURL("image/png");
       }
 
       async createProductionCoverSheetPdf() {
@@ -1168,8 +1118,8 @@ class OrderHome {
                   const pageWidth = pdf.internal.pageSize.getWidth();
                   const maxTableWidth = pageWidth - (startX * 2);
                   const widths = this.#coverSheetOrientation === "landscape"
-                        ? [60, 60, maxTableWidth - 60 - 60 - 120, 120]
-                        : [55, 55, maxTableWidth - 55 - 55 - 100, 100];
+                        ? [60, 60, maxTableWidth - 60 - 60]
+                        : [55, 55, maxTableWidth - 55 - 55];
                   const headerHeight = 22;
                   const drawCell = ({text, x, topY, width, height, isHeader = false, fillColor = null, align = "left"}) => {
                         if(fillColor) {
@@ -1188,32 +1138,21 @@ class OrderHome {
                   drawCell({text: "Line", x: startX, topY: tableY, width: widths[0], height: headerHeight, isHeader: true, fillColor: {r: 230, g: 230, b: 230}});
                   drawCell({text: "Qty", x: startX + widths[0], topY: tableY, width: widths[1], height: headerHeight, isHeader: true, fillColor: {r: 230, g: 230, b: 230}});
                   drawCell({text: "Product Name", x: startX + widths[0] + widths[1], topY: tableY, width: widths[2], height: headerHeight, isHeader: true, fillColor: {r: 230, g: 230, b: 230}});
-                  drawCell({text: "Proof QR", x: startX + widths[0] + widths[1] + widths[2], topY: tableY, width: widths[3], height: headerHeight, isHeader: true, fillColor: {r: 230, g: 230, b: 230}, align: "center"});
                   tableY += headerHeight;
                   for(let index = 0; index < data.lineItems.length; index += 1) {
                         const item = data.lineItems[index];
                         const wrappedName = pdf.splitTextToSize(String(item.productName || ""), widths[2] - 8);
                         const textHeight = Math.max(18, wrappedName.length * 12);
-                        const rowHeight = Math.max(24, textHeight + 8, item.proofUrl ? 92 : 24);
+                        const rowHeight = Math.max(24, textHeight + 8);
                         if(tableY + rowHeight > pdf.internal.pageSize.getHeight() - 30) {
                               pdf.addPage();
                               tableY = 50;
                         }
                         const fillColor = index % 2 === 0 ? {r: 250, g: 250, b: 250} : {r: 240, g: 245, b: 250};
                         drawCell({text: item.lineNumber, x: startX, topY: tableY, width: widths[0], height: rowHeight, fillColor});
-                        drawCell({text: item.qty, x: startX + widths[0], topY: tableY, width: widths[1], height: rowHeight, fillColor});
+                        drawCell({text: `x${item.qty}`, x: startX + widths[0], topY: tableY, width: widths[1], height: rowHeight, fillColor});
                         drawCell({text: "", x: startX + widths[0] + widths[1], topY: tableY, width: widths[2], height: rowHeight, fillColor});
-                        drawCell({text: "", x: startX + widths[0] + widths[1] + widths[2], topY: tableY, width: widths[3], height: rowHeight, fillColor});
                         pdf.text(wrappedName, startX + widths[0] + widths[1] + 4, tableY + 14);
-                        if(item.proofUrl) {
-                              const qrDataUrl = await this.buildQrDataUrl(item.proofUrl);
-                              if(qrDataUrl) {
-                                    const qrSize = 84;
-                                    const qrX = startX + widths[0] + widths[1] + widths[2] + ((widths[3] - qrSize) / 2);
-                                    const qrY = tableY + ((rowHeight - qrSize) / 2);
-                                    pdf.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
-                              }
-                        }
                         tableY += rowHeight;
                   }
                   const safeOrderNumber = (data.orderNumber || "cover-sheet").replace(/[^a-z0-9_-]+/gi, "-");
