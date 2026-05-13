@@ -1066,12 +1066,33 @@ class OrderHome {
       getCoverSheetData() {
             const order = window.orderObj || window.InitOrdersV2Data?.OrderObj || {};
             const orderNumber = order?.InvoiceNumber || order?.EstimateNumber || document.querySelector("#lblOrderNumber")?.textContent?.trim() || "";
-            const customerName = order?.CompanyName || document.querySelector(".eItem")?.childNodes?.[0]?.nodeValue?.trim() || "";
-            const orderDescription = order?.Description || "";
-            const salesperson = order?.PrimarySalesPersonName || order?.SalespersonFullName || "";
-            const orderProducts = Array.isArray(order?.OrderProducts) ? order.OrderProducts : [];
-            const lineItems = orderProducts.map((item, index) => ({lineNumber: index + 1, qty: item?.Quantity ?? item?.Qty ?? 0, productName: item?.ProductName || item?.Name || ""}));
+            const customerName = order?.CompanyName || document.querySelector("#hlCompany")?.textContent?.trim() || "";
+            const orderDescription = order?.Description || document.querySelector("#lblOrderDescription")?.textContent?.trim() || "";
+            const salesperson = order?.PrimarySalesPersonName || order?.SalespersonFullName || document.querySelector("#lblSalesperson1")?.textContent?.trim() || "";
+            const lineItems = this.getCoverSheetLineItems({order});
             return {customerName, orderNumber, orderDescription, salesperson, lineItems};
+      }
+
+      getCoverSheetLineItems({order}) {
+            if(Array.isArray(order?.OrderProducts) && order.OrderProducts.length > 0) {
+                  return order.OrderProducts.map((item, index) => ({
+                        lineNumber: item?.LineItemOrder ?? index + 1,
+                        qty: item?.Qty ?? item?.Quantity ?? 0,
+                        productName: item?.Description || item?.ProductName || item?.Name || ""
+                  }));
+            }
+
+            const rows = Array.from(document.querySelectorAll("#divProductsGroup .POItem"));
+            return rows.map((row, index) => {
+                  const lineNumberText = row.querySelector(".poNumber")?.textContent?.trim() || String(index + 1);
+                  const qtyText = row.querySelector(".QtyCell [data-bind*='Qty'], .QtyCell div")?.textContent?.trim() || "0";
+                  const productName = row.querySelector(".description-ellipsis")?.textContent?.trim() || "";
+                  return {
+                        lineNumber: Number.parseInt(lineNumberText, 10) || index + 1,
+                        qty: Number.parseFloat(qtyText) || 0,
+                        productName
+                  };
+            }).filter((item) => item.productName);
       }
 
       async createProductionCoverSheetPdf() {
