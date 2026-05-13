@@ -32,6 +32,10 @@ class OrderHome {
       #attachmentCache = new Map();
       #pendingAttachmentLoads = 0;
       #sendButtonLoader = null;
+      #pdfFooter = null;
+      #pdfLibraryLoading = null;
+      #qrLibraryLoading = null;
+      #coverSheetOrientation = "landscape"; // Change to "portrait" if needed.
       #defaultAttachmentFiles = [
             {name: "Capabilities One Page 3D CUT LETTERS V2 (E).pdf", isDefault: false},
             {name: "Capabilities One Page 3D FABRICATED LETTERS (E).pdf", isDefault: false},
@@ -134,6 +138,7 @@ class OrderHome {
 
       tick() {
             this.tickEmailModal();
+            this.tickPdfFooter();
       }
 
       async fetchEmailTemplates() {
@@ -998,4 +1003,225 @@ class OrderHome {
                   attachmentsContainer.appendChild(wrapper);
             });
       }
+
+      tickPdfFooter() {
+            if(!this.#pdfFooter) {
+                  this.createPdfFooter();
+            }
+      }
+
+      createPdfFooter() {
+            const footer = document.createElement("div");
+            footer.id = "order-home-pdf-footer";
+            footer.style = ["position:fixed","left:50%","bottom:14px","transform:translateX(-50%)","display:flex","gap:8px","padding:8px 10px","background:#111827","border:1px solid #374151","border-radius:10px","box-shadow:0 8px 24px rgba(0,0,0,0.25)","z-index:999999"].join(";");
+            const createCoverSheetButton = document.createElement("button");
+            createCoverSheetButton.textContent = "Create Cover Sheet";
+            createCoverSheetButton.style = "background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:600;";
+            createCoverSheetButton.addEventListener("click", () => this.createProductionCoverSheetPdf());
+            footer.appendChild(createCoverSheetButton);
+            document.body.appendChild(footer);
+            this.#pdfFooter = footer;
+      }
+
+      async ensurePdfLibrary() {
+            const existingJsPdf = this.getJsPdfConstructor();
+            if(existingJsPdf) {
+                  return existingJsPdf;
+            }
+            if(this.#pdfLibraryLoading) {
+                  return this.#pdfLibraryLoading;
+            }
+            this.#pdfLibraryLoading = new Promise((resolve, reject) => {
+                  const script = document.createElement("script");
+                  script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+                  script.onload = () => {
+                        const loadedJsPdf = this.getJsPdfConstructor();
+                        if(loadedJsPdf) {
+                              resolve(loadedJsPdf);
+                              return;
+                        }
+                        reject(new Error("jsPDF loaded but constructor not found"));
+                  };
+                  script.onerror = () => reject(new Error("Failed to load jsPDF"));
+                  document.head.appendChild(script);
+            });
+            return this.#pdfLibraryLoading;
+      }
+
+      async ensureQrLibrary() {
+            if(typeof QRious === "function") {
+                  return QRious;
+            }
+            if(this.#qrLibraryLoading) {
+                  return this.#qrLibraryLoading;
+            }
+            this.#qrLibraryLoading = new Promise((resolve, reject) => {
+                  const script = document.createElement("script");
+                  script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js";
+                  script.onload = () => {
+                        if(typeof QRious === "function") {
+                              resolve(QRious);
+                              return;
+                        }
+                        reject(new Error("QRious loaded but constructor not found"));
+                  };
+                  script.onerror = () => reject(new Error("Failed to load QR library"));
+                  document.head.appendChild(script);
+            });
+            return this.#qrLibraryLoading;
+      }
+
+      getJsPdfConstructor() {
+            const sources = [
+                  window,
+                  typeof unsafeWindow !== "undefined" ? unsafeWindow : null,
+                  globalThis
+            ].filter(Boolean);
+            for(const source of sources) {
+                  if(source.jspdf?.jsPDF) {
+                        return source.jspdf.jsPDF;
+                  }
+                  if(source.jsPDF) {
+                        return source.jsPDF;
+                  }
+            }
+            return null;
+      }
+
+      getCoverSheetData() {
+            const order = window.orderObj || window.InitOrdersV2Data?.OrderObj || {};
+            const orderNumber = order?.InvoiceNumber || order?.EstimateNumber || document.querySelector("#lblOrderNumber")?.textContent?.trim() || "";
+            const customerName = order?.CompanyName || document.querySelector("#hlCompany")?.textContent?.trim() || "";
+            const orderDescription = order?.Description || document.querySelector("#lblOrderDescription")?.textContent?.trim() || "";
+            const salesperson = order?.PrimarySalesPersonName || order?.SalespersonFullName || document.querySelector("#lblSalesperson1")?.textContent?.trim() || "";
+            const lineItems = this.getCoverSheetLineItems({order});
+            return {customerName, orderNumber, orderDescription, salesperson, lineItems};
+      }
+
+      getCoverSheetLineItems({order}) {
+            if(Array.isArray(order?.OrderProducts) && order.OrderProducts.length > 0) {
+                  return order.OrderProducts.map((item, index) => ({
+                        lineNumber: item?.LineItemOrder ?? index + 1,
+                        qty: item?.Qty ?? item?.Quantity ?? 0,
+                        productName: item?.Description || item?.ProductName || item?.Name || "",
+                        proofUrl: ""
+                  }));
+            }
+
+            const rows = Array.from(document.querySelectorAll("#divProductsGroup .POItem"));
+            return rows.map((row, index) => {
+                  const lineNumberText = row.querySelector(".poNumber")?.textContent?.trim() || String(index + 1);
+                  const qtyText = row.querySelector(".QtyCell [data-bind*='Qty'], .QtyCell div")?.textContent?.trim() || "0";
+                  const productName = row.querySelector(".description-ellipsis")?.textContent?.trim() || "";
+                  return {
+                        lineNumber: Number.parseInt(lineNumberText, 10) || index + 1,
+                        qty: Number.parseFloat(qtyText) || 0,
+                        productName,
+                        proofUrl: this.getProofUrlFromRow(row)
+                  };
+            }).filter((item) => item.productName);
+      }
+
+      getProofUrlFromRow(row) {
+            const proofAnchor = row.querySelector("#divProductProof a[title='Product Proof']");
+            const onclickValue = proofAnchor?.getAttribute("onclick") || "";
+            const directUrlMatch = onclickValue.match(/window\.open\(\s*['"]([^'"]*ShowImage\.aspx\?LoadLocalProof=[^'"]+)['"]/i);
+            if(directUrlMatch?.[1]) {
+                  return new URL(directUrlMatch[1], window.location.href).toString();
+            }
+            const proofFileMatch = onclickValue.match(/LoadLocalProof=([^'")\s&]+)/i);
+            if(proofFileMatch?.[1]) {
+                  const proofFile = decodeURIComponent(proofFileMatch[1]).trim();
+                  return `${window.location.origin}/ShowImage.aspx?LoadLocalProof=${proofFile}`;
+            }
+            return "";
+      }
+
+      async buildQrDataUrl(text) {
+            if(!text) {
+                  return "";
+            }
+            const QRClass = await this.ensureQrLibrary();
+            const qr = new QRClass({value: text, size: 84, level: "M", background: "white", foreground: "black"});
+            return qr.toDataURL("image/png");
+      }
+
+      async createProductionCoverSheetPdf() {
+            try {
+                  const jsPdfConstructor = await this.ensurePdfLibrary();
+                  if(!jsPdfConstructor) {
+                        throw new Error("jsPDF not available");
+                  }
+                  const data = this.getCoverSheetData();
+                  const pdf = new jsPdfConstructor({unit: "pt", format: "a4", orientation: this.#coverSheetOrientation});
+                  let y = 50;
+                  pdf.setFontSize(18);
+                  pdf.text("Production Cover Sheet", 40, y);
+                  y += 28;
+                  pdf.setFontSize(11);
+                  [["Customer", data.customerName],["Job Number", data.orderNumber],["Order Description", data.orderDescription],["Salesperson", data.salesperson]].forEach((row) => { pdf.text(`${row[0]}: ${row[1] || ""}`, 40, y); y += 18;});
+                  y += 14;
+                  pdf.setFontSize(12);
+                  pdf.text("Job Items", 40, y);
+                  y += 14;
+                  const startX = 40;
+                  const pageWidth = pdf.internal.pageSize.getWidth();
+                  const maxTableWidth = pageWidth - (startX * 2);
+                  const widths = this.#coverSheetOrientation === "landscape"
+                        ? [60, 60, maxTableWidth - 60 - 60 - 120, 120]
+                        : [55, 55, maxTableWidth - 55 - 55 - 100, 100];
+                  const headerHeight = 22;
+                  const drawCell = ({text, x, topY, width, height, isHeader = false, fillColor = null, align = "left"}) => {
+                        if(fillColor) {
+                              pdf.setFillColor(fillColor.r, fillColor.g, fillColor.b);
+                              pdf.rect(x, topY, width, height, "F");
+                        }
+                        pdf.rect(x, topY, width, height);
+                        pdf.setFont(undefined, isHeader ? "bold" : "normal");
+                        if(align === "center") {
+                              pdf.text(String(text ?? ""), x + (width / 2), topY + (height / 2) + 4, {align: "center"});
+                              return;
+                        }
+                        pdf.text(String(text ?? ""), x + 4, topY + 14);
+                  };
+                  let tableY = y;
+                  drawCell({text: "Line", x: startX, topY: tableY, width: widths[0], height: headerHeight, isHeader: true, fillColor: {r: 230, g: 230, b: 230}});
+                  drawCell({text: "Qty", x: startX + widths[0], topY: tableY, width: widths[1], height: headerHeight, isHeader: true, fillColor: {r: 230, g: 230, b: 230}});
+                  drawCell({text: "Product Name", x: startX + widths[0] + widths[1], topY: tableY, width: widths[2], height: headerHeight, isHeader: true, fillColor: {r: 230, g: 230, b: 230}});
+                  drawCell({text: "Proof QR", x: startX + widths[0] + widths[1] + widths[2], topY: tableY, width: widths[3], height: headerHeight, isHeader: true, fillColor: {r: 230, g: 230, b: 230}, align: "center"});
+                  tableY += headerHeight;
+                  for(let index = 0; index < data.lineItems.length; index += 1) {
+                        const item = data.lineItems[index];
+                        const wrappedName = pdf.splitTextToSize(String(item.productName || ""), widths[2] - 8);
+                        const textHeight = Math.max(18, wrappedName.length * 12);
+                        const rowHeight = Math.max(24, textHeight + 8, item.proofUrl ? 92 : 24);
+                        if(tableY + rowHeight > pdf.internal.pageSize.getHeight() - 30) {
+                              pdf.addPage();
+                              tableY = 50;
+                        }
+                        const fillColor = index % 2 === 0 ? {r: 250, g: 250, b: 250} : {r: 240, g: 245, b: 250};
+                        drawCell({text: item.lineNumber, x: startX, topY: tableY, width: widths[0], height: rowHeight, fillColor});
+                        drawCell({text: item.qty, x: startX + widths[0], topY: tableY, width: widths[1], height: rowHeight, fillColor});
+                        drawCell({text: "", x: startX + widths[0] + widths[1], topY: tableY, width: widths[2], height: rowHeight, fillColor});
+                        drawCell({text: "", x: startX + widths[0] + widths[1] + widths[2], topY: tableY, width: widths[3], height: rowHeight, fillColor});
+                        pdf.text(wrappedName, startX + widths[0] + widths[1] + 4, tableY + 14);
+                        if(item.proofUrl) {
+                              const qrDataUrl = await this.buildQrDataUrl(item.proofUrl);
+                              if(qrDataUrl) {
+                                    const qrSize = 84;
+                                    const qrX = startX + widths[0] + widths[1] + widths[2] + ((widths[3] - qrSize) / 2);
+                                    const qrY = tableY + ((rowHeight - qrSize) / 2);
+                                    pdf.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
+                              }
+                        }
+                        tableY += rowHeight;
+                  }
+                  const safeOrderNumber = (data.orderNumber || "cover-sheet").replace(/[^a-z0-9_-]+/gi, "-");
+                  pdf.save(`production-cover-sheet-${safeOrderNumber}.pdf`);
+            } catch(error) {
+                  console.error("Failed to create production cover sheet:", error);
+                  alert("Unable to create the production cover sheet PDF. Please try again.");
+            }
+      }
+
 }
