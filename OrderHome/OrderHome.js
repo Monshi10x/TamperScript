@@ -32,6 +32,8 @@ class OrderHome {
       #attachmentCache = new Map();
       #pendingAttachmentLoads = 0;
       #sendButtonLoader = null;
+      #pdfFooter = null;
+      #pdfLibraryLoading = null;
       #defaultAttachmentFiles = [
             {name: "Capabilities One Page 3D CUT LETTERS V2 (E).pdf", isDefault: false},
             {name: "Capabilities One Page 3D FABRICATED LETTERS (E).pdf", isDefault: false},
@@ -134,6 +136,7 @@ class OrderHome {
 
       tick() {
             this.tickEmailModal();
+            this.tickPdfFooter();
       }
 
       async fetchEmailTemplates() {
@@ -998,4 +1001,124 @@ class OrderHome {
                   attachmentsContainer.appendChild(wrapper);
             });
       }
+
+      tickPdfFooter() {
+            if(!this.#pdfFooter) {
+                  this.createPdfFooter();
+            }
+      }
+
+      createPdfFooter() {
+            const footer = document.createElement("div");
+            footer.id = "order-home-pdf-footer";
+            footer.style = ["position:fixed","left:50%","bottom:14px","transform:translateX(-50%)","display:flex","gap:8px","padding:8px 10px","background:#111827","border:1px solid #374151","border-radius:10px","box-shadow:0 8px 24px rgba(0,0,0,0.25)","z-index:999999"].join(";");
+            const createCoverSheetButton = document.createElement("button");
+            createCoverSheetButton.textContent = "Create Cover Sheet";
+            createCoverSheetButton.style = "background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:600;";
+            createCoverSheetButton.addEventListener("click", () => this.createProductionCoverSheetPdf());
+            footer.appendChild(createCoverSheetButton);
+            document.body.appendChild(footer);
+            this.#pdfFooter = footer;
+      }
+
+      async ensurePdfLibrary() {
+            const existingJsPdf = this.getJsPdfConstructor();
+            if(existingJsPdf) {
+                  return existingJsPdf;
+            }
+            if(this.#pdfLibraryLoading) {
+                  return this.#pdfLibraryLoading;
+            }
+            this.#pdfLibraryLoading = new Promise((resolve, reject) => {
+                  const script = document.createElement("script");
+                  script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+                  script.onload = () => {
+                        const loadedJsPdf = this.getJsPdfConstructor();
+                        if(loadedJsPdf) {
+                              resolve(loadedJsPdf);
+                              return;
+                        }
+                        reject(new Error("jsPDF loaded but constructor not found"));
+                  };
+                  script.onerror = () => reject(new Error("Failed to load jsPDF"));
+                  document.head.appendChild(script);
+            });
+            return this.#pdfLibraryLoading;
+      }
+
+      getJsPdfConstructor() {
+            const sources = [
+                  window,
+                  typeof unsafeWindow !== "undefined" ? unsafeWindow : null,
+                  globalThis
+            ].filter(Boolean);
+            for(const source of sources) {
+                  if(source.jspdf?.jsPDF) {
+                        return source.jspdf.jsPDF;
+                  }
+                  if(source.jsPDF) {
+                        return source.jsPDF;
+                  }
+            }
+            return null;
+      }
+
+      getCoverSheetData() {
+            const order = window.orderObj || window.InitOrdersV2Data?.OrderObj || {};
+            const orderNumber = order?.InvoiceNumber || order?.EstimateNumber || document.querySelector("#lblOrderNumber")?.textContent?.trim() || "";
+            const customerName = order?.CompanyName || document.querySelector(".eItem")?.childNodes?.[0]?.nodeValue?.trim() || "";
+            const orderDescription = order?.Description || "";
+            const salesperson = order?.PrimarySalesPersonName || order?.SalespersonFullName || "";
+            const orderProducts = Array.isArray(order?.OrderProducts) ? order.OrderProducts : [];
+            const lineItems = orderProducts.map((item, index) => ({lineNumber: index + 1, qty: item?.Quantity ?? item?.Qty ?? 0, productName: item?.ProductName || item?.Name || ""}));
+            return {customerName, orderNumber, orderDescription, salesperson, lineItems};
+      }
+
+      async createProductionCoverSheetPdf() {
+            try {
+                  const jsPdfConstructor = await this.ensurePdfLibrary();
+                  if(!jsPdfConstructor) {
+                        throw new Error("jsPDF not available");
+                  }
+                  const data = this.getCoverSheetData();
+                  const pdf = new jsPdfConstructor({unit: "pt", format: "a4"});
+                  let y = 50;
+                  pdf.setFontSize(18);
+                  pdf.text("Production Cover Sheet", 40, y);
+                  y += 28;
+                  pdf.setFontSize(11);
+                  [["Customer", data.customerName],["Job Number", data.orderNumber],["Order Description", data.orderDescription],["Salesperson", data.salesperson]].forEach((row) => { pdf.text(`${row[0]}: ${row[1] || ""}`, 40, y); y += 18;});
+                  y += 14;
+                  pdf.setFontSize(12);
+                  pdf.text("Job Items", 40, y);
+                  y += 14;
+                  const startX = 40;
+                  const widths = [80, 70, 380];
+                  const headerHeight = 22;
+                  const rowHeight = 20;
+                  const drawCell = (text, x, topY, width, height, isHeader = false) => {
+                        pdf.rect(x, topY, width, height);
+                        pdf.setFont(undefined, isHeader ? "bold" : "normal");
+                        pdf.text(String(text ?? ""), x + 4, topY + 14);
+                  };
+                  let tableY = y;
+                  drawCell("Line", startX, tableY, widths[0], headerHeight, true);
+                  drawCell("Qty", startX + widths[0], tableY, widths[1], headerHeight, true);
+                  drawCell("Product Name", startX + widths[0] + widths[1], tableY, widths[2], headerHeight, true);
+                  tableY += headerHeight;
+                  data.lineItems.forEach((item) => {
+                        if(tableY > 760) { pdf.addPage(); tableY = 50; }
+                        drawCell(item.lineNumber, startX, tableY, widths[0], rowHeight);
+                        drawCell(item.qty, startX + widths[0], tableY, widths[1], rowHeight);
+                        drawCell(item.productName, startX + widths[0] + widths[1], tableY, widths[2], rowHeight);
+                        tableY += rowHeight;
+                  });
+                  const safeOrderNumber = (data.orderNumber || "cover-sheet").replace(/[^a-z0-9_-]+/gi, "-");
+                  pdf.save(`production-cover-sheet-${safeOrderNumber}.pdf`);
+            } catch(error) {
+                  console.error("Failed to create production cover sheet:", error);
+                  alert("Unable to create the production cover sheet PDF. Please try again.");
+            }
+      }
+
 }
