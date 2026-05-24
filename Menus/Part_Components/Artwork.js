@@ -73,7 +73,7 @@ class Artwork extends SubMenu {
 	}
 
 	Description() {
-		if(!this.required) return "Artwork separately<br>";
-		return "Includes Artwork<br>";
+		if(!this.required) return "Artwork separately";
+		return "Includes Artwork and Proofing";
 	}
 }

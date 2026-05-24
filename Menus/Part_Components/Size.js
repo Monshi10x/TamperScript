@@ -371,7 +371,7 @@ class Size extends SubscriptionManager {
 
       Description() {
             let qwh = this.getQWHD();
-            if(this.#includeSizeInDescription) return "x" + qwh.qty + " @ " + qwh.width + "mmW x " + qwh.height + "mmH";
+            if(this.#includeSizeInDescription) return "Size: " + qwh.width + "mmW x " + qwh.height + "mmH";
             return "";
       }
 }
