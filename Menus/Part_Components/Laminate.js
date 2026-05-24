@@ -246,7 +246,7 @@ class Laminate extends Material {
       Description() {
             super.Description();
             let sheen = getPredefinedParts_Sheen(this.#f_material[1].value);
-            if(sheen[0]) return "Laminated in " + sheen[0];
+            if(sheen[0]) return "UV Protective " + sheen[0] + " Laminate";
             return ""; //"Sheen: " + sheen[0];//"Laminated in " + 'gloss' + " for UV protection and longevity";
       }
 }

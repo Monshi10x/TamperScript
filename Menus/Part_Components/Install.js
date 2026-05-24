@@ -322,8 +322,8 @@ class Install extends SubMenu {
 
 	Description() {
 		super.Description();
-		if(!this.required) return "Install separately<br>";
-		return "Includes Install<br>";
+		if(!this.required) return "Install separately";
+		return "Includes Install";
 	}
 }
 

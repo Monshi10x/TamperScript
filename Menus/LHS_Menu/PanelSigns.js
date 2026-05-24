@@ -338,7 +338,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 					UPDATES_PAUSED: true,
 					propertiesToAssign: {
 						productLocation: "",
-						productName: "ACM Panel",
+						productName: "ACM Panel Sign",
 						description: "3mm ACM Panel with Digitally Printed Vinyl"
 					}, itemUpdateOnCompletion: true
 				});
@@ -373,7 +373,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 					UPDATES_PAUSED: true,
 					propertiesToAssign: {
 						productLocation: "",
-						productName: "Aluminium",
+						productName: "Aluminium Panel Sign",
 						description: "3mm Aluminium Panel with Digitally Printed Vinyl"
 					}, itemUpdateOnCompletion: true
 				});
@@ -504,7 +504,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 					UPDATES_PAUSED: true,
 					propertiesToAssign: {
 						productLocation: "",
-						productName: "Foam PVC Panel",
+						productName: "Foam PVC Panel Sign",
 					}, itemUpdateOnCompletion: true
 				});
 
@@ -542,7 +542,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 					UPDATES_PAUSED: true,
 					propertiesToAssign: {
 						productLocation: "",
-						productName: "Signwhite Panel",
+						productName: "Signwhite Panel Sign",
 					}, itemUpdateOnCompletion: true
 				});
 
@@ -580,7 +580,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 					UPDATES_PAUSED: true,
 					propertiesToAssign: {
 						productLocation: "",
-						productName: "Corflute Panel",
+						productName: "Corflute Panel Sign",
 					}, itemUpdateOnCompletion: true
 				});
 
@@ -917,12 +917,21 @@ class MenuPanelSigns extends LHSMenuWindow {
 				payload: { sourceProductNumber: currentProductNumber }
 			});
 
+			let hasVinyl = false;
+			for(let j = 0; j < this.#allMaterials.length; j++) {
+				let item = this.#allMaterials[j];
+				if(item.productNumber != currentProductNumber) continue;
+				if(item instanceof Vinyl) hasVinyl = true;
+			}
+
 			for(let j = 0; j < this.#allMaterials.length; j++) {
 				let item = this.#allMaterials[j];
 				if(item.productNumber != currentProductNumber) continue;
 
 				partIndex = await item.Create(productNo, partIndex);
-				if(item.Description() != "") productDescription += item.Description() + "<br>";
+				let itemDescription = item.Description();
+				if(itemDescription && !hasVinyl) itemDescription = itemDescription.replace(" with Digitally Printed Vinyl", "");
+				if(itemDescription != "") productDescription += itemDescription + "<br>";
 			}
 
 			await setProductSummary(productNo, productDescription);
