@@ -626,6 +626,6 @@ class FrameSubscribable extends Material {
 
       Description() {
             if(!this.framePartName) return "";
-            return "[FRAME] " + this.framePartName;
+            return "Includes welded frame made from " + this.materialType;
       }
 }
