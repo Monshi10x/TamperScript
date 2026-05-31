@@ -11,3 +11,7 @@ https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generati
 4. Enter
 5. pbcopy < ~/.ssh/id_ed25519.pub
 6. Add ssh-key to github https://github.com/settings/keys
+
+If struggling to add a folder and not be recognized as repo do:
+In terminal cd into folder then
+ git clone https://github.com/Monshi10x/Signarama-Illustrator-Helper.git Signarama-Illustrator-Helper

@@ -5,16 +5,19 @@
 			"path": "."
 		},
 		{
-			"name": "Signarama-Illustrator-Helper",
-			"path": "../Signarama-Illustrator-Helper"
-		},
-		{
 			"name": "SignScheduler",
 			"path": "../SignScheduler"
 		},
 		{
 			"name": "SignSchedulerServer2",
 			"path": "../SignSchedulerServer2"
+		},
+		{
+			"name": "Atlas-Tools-CRM",
+			"path": "../Atlas-Tools-CRM"
+		},
+		{
+			"path": "../Signarama-Illustrator-Helper"
 		}
 	],
 	"settings": {
