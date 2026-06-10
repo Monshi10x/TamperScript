@@ -1131,9 +1131,9 @@ class OrderHome {
                   y += 14;
                   const productNameWidth = maxTableWidth * 0.5;
                   const widths = this.#coverSheetOrientation === "landscape"
-                        ? [50, 45, 70, productNameWidth, 95, 80, maxTableWidth - 50 - 45 - 70 - productNameWidth - 95 - 80]
-                        : [45, 40, 55, productNameWidth, 70, 70, maxTableWidth - 45 - 40 - 55 - productNameWidth - 70 - 70];
-                  const headerHeight = 24;
+                        ? [50, 45, 105, productNameWidth, 65, 62.85, maxTableWidth - 50 - 45 - 105 - productNameWidth - 65 - 62.85]
+                        : [35, 35, 82.5, productNameWidth, 42.5, 35, maxTableWidth - 35 - 35 - 82.5 - productNameWidth - 42.5 - 35];
+                  const headerHeight = 36;
                   const rowTextLineHeight = 12;
                   const drawCell = ({text, x, topY, width, height, isHeader = false, fillColor = null, align = "left"}) => {
                         if(fillColor) {
