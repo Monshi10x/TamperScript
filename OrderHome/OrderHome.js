@@ -1110,11 +1110,11 @@ class OrderHome {
                   const maxTableWidth = pageWidth - (startX * 2);
                   let y = 42;
                   pdf.setFont(undefined, "bold");
-                  pdf.setFontSize(24);
+                  pdf.setFontSize(32);
                   pdf.setTextColor(190, 0, 0);
                   pdf.text(data.customerName || "Customer", pageWidth / 2, y, {align: "center"});
                   pdf.setTextColor(0, 0, 0);
-                  y += 32;
+                  y += 42;
                   pdf.setFont(undefined, "normal");
                   pdf.setFontSize(11);
                   [["Job Number", data.orderNumber],["Order Description", data.orderDescription],["Salesperson", data.salesperson]].forEach((row) => {
@@ -1131,8 +1131,8 @@ class OrderHome {
                   y += 14;
                   const productNameWidth = maxTableWidth * 0.5;
                   const widths = this.#coverSheetOrientation === "landscape"
-                        ? [55, 55, productNameWidth, 120, maxTableWidth - 55 - 55 - productNameWidth - 120]
-                        : [45, 45, productNameWidth, 95, maxTableWidth - 45 - 45 - productNameWidth - 95];
+                        ? [50, 45, 70, productNameWidth, 95, 80, maxTableWidth - 50 - 45 - 70 - productNameWidth - 95 - 80]
+                        : [45, 40, 55, productNameWidth, 70, 70, maxTableWidth - 45 - 40 - 55 - productNameWidth - 70 - 70];
                   const headerHeight = 24;
                   const rowTextLineHeight = 12;
                   const drawCell = ({text, x, topY, width, height, isHeader = false, fillColor = null, align = "left"}) => {
@@ -1152,7 +1152,7 @@ class OrderHome {
                   };
                   const drawHeader = (topY) => {
                         let x = startX;
-                        ["Line", "Qty", "Product Name", "Time Allowance", "Ready"].forEach((heading, index) => {
+                        ["Line", "Qty", "Size", "Product Name", "Time Allowance", "Actual Time", "Ready"].forEach((heading, index) => {
                               drawCell({text: heading, x, topY, width: widths[index], height: headerHeight, isHeader: true, fillColor: {r: 230, g: 230, b: 230}, align: "center"});
                               x += widths[index];
                         });
@@ -1162,7 +1162,7 @@ class OrderHome {
                   tableY += headerHeight;
                   for(let index = 0; index < data.lineItems.length; index += 1) {
                         const item = data.lineItems[index];
-                        const wrappedName = pdf.splitTextToSize(String(item.productName || ""), widths[2] - 8);
+                        const wrappedName = pdf.splitTextToSize(String(item.productName || ""), widths[3] - 8);
                         const textHeight = Math.max(18, wrappedName.length * rowTextLineHeight);
                         const rowHeight = Math.max(26, textHeight + 10);
                         if(tableY + rowHeight > pageHeight - 30) {
@@ -1177,11 +1177,15 @@ class OrderHome {
                         x += widths[0];
                         drawCell({text: `x${item.qty}`, x, topY: tableY, width: widths[1], height: rowHeight, fillColor, align: "center"});
                         x += widths[1];
-                        drawCell({text: wrappedName, x, topY: tableY, width: widths[2], height: rowHeight, fillColor});
+                        drawCell({text: "", x, topY: tableY, width: widths[2], height: rowHeight, fillColor});
                         x += widths[2];
-                        drawCell({text: "", x, topY: tableY, width: widths[3], height: rowHeight, fillColor});
+                        drawCell({text: wrappedName, x, topY: tableY, width: widths[3], height: rowHeight, fillColor});
                         x += widths[3];
                         drawCell({text: "", x, topY: tableY, width: widths[4], height: rowHeight, fillColor});
+                        x += widths[4];
+                        drawCell({text: "", x, topY: tableY, width: widths[5], height: rowHeight, fillColor});
+                        x += widths[5];
+                        drawCell({text: "", x, topY: tableY, width: widths[6], height: rowHeight, fillColor});
                         tableY += rowHeight;
                   }
                   const safeOrderNumber = (data.orderNumber || "cover-sheet").replace(/[^a-z0-9_-]+/gi, "-");
