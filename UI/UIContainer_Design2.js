@@ -536,6 +536,13 @@ class UIContainer_Design2 {
       get designer() {return this.#f_designer[1].options[this.#f_designer[1].selectedIndex].text;}
       get CompanyName() {return this.#jobObject.CompanyName;}
 
+      hasAttachedProof() {
+            return typeof this.#jobObject.ProofFileName === "string" &&
+                  this.#jobObject.ProofFileName.trim() !== "" &&
+                  this.#jobObject.ProofFileName.trim().toLowerCase() !== "null" &&
+                  this.#jobObject.ProofFileName.trim().toLowerCase() !== "undefined";
+      }
+
       /*Setter*/
       set whenClosedReturnBorrowed(val) {
             this.#whenClosedReturnBorrowed = val;
@@ -689,8 +696,9 @@ class UIContainer_Design2 {
             }
             /*
             Proof*/
-            if(this.#jobObject.ProofFileName != "") {
-                  this.#f_proofLink = createLink("display: block; float: right; width: 30px; background-color: " + COLOUR.White + "; color:white;min-height: 30px; margin: 0px; border:0px solid " + COLOUR.Blue + ";cursor: pointer;font-size:10px;text-align:center;line-height:30px;", "", "../../ShowImage.aspx?LoadLocalProof=proof_" + this.#jobObject.OrderId + "_" + this.#jobObject.Id + "_0.pdf", "new window", this.#f_contentContainer);
+            if(this.hasAttachedProof()) {
+                  const proofFileName = this.#jobObject.ProofFileName.trim();
+                  this.#f_proofLink = createLink("display: block; float: right; width: 30px; background-color: " + COLOUR.White + "; color:white;min-height: 30px; margin: 0px; border:0px solid " + COLOUR.Blue + ";cursor: pointer;font-size:10px;text-align:center;line-height:30px;", "", "../../ShowImage.aspx?LoadLocalProof=" + encodeURIComponent(proofFileName), "new window", this.#f_contentContainer);
                   this.#f_proofLink.style.backgroundImage = "url(/Themes/Images/icon_view_proof.png)";
                   this.#f_proofLink.style.cssText += "background-repeat: no-repeat;background-size:100%;background-position:center center";
                   this.addHeadingButtons(this.#f_proofLink);
