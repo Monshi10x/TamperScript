@@ -1,7 +1,17 @@
 (function initialiseCorebridgeScrollHogMonitor() {
-    const injectedScript = document.createElement('script');
+    const pageWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+    const pageDocument = pageWindow.document || document;
 
-    injectedScript.textContent = `(${function runCorebridgeScrollHogMonitor() {
+    (function runCorebridgeScrollHogMonitor(pageWindow, pageDocument) {
+        const window = pageWindow;
+        const document = pageDocument;
+        const EventTarget = window.EventTarget;
+        const Element = window.Element;
+        const Node = window.Node;
+        const MutationObserver = window.MutationObserver;
+        const performance = window.performance;
+        const console = window.console;
+
         const config = {
             namespace: '[CB ScrollHog]',
             watchedEvents: new Set(['scroll', 'wheel', 'mousewheel', 'touchmove', 'touchstart', 'keydown', 'keyup']),
@@ -60,7 +70,7 @@
                 this.observeParts();
                 this.startHeartbeat();
                 this.exposeDebugApi();
-                console.info(config.namespace, 'installed. Reproduce the async part creation issue, then paste console output or run CorebridgeScrollHogDebug.report().');
+                console.warn(config.namespace, 'installed on page window. Reproduce the async part creation issue, then paste console output or run CorebridgeScrollHogDebug.report().');
             }
 
             exposeDebugApi() {
@@ -374,8 +384,5 @@
 
         const monitor = new ScrollHogMonitor();
         monitor.install();
-    }}).call(window);`;
-
-    (document.head || document.documentElement).appendChild(injectedScript);
-    injectedScript.remove();
+    }).call(pageWindow, pageWindow, pageDocument);
 })();
