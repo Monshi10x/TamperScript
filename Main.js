@@ -46,6 +46,8 @@ var saveReminder;
 (function() {
   "use strict";
 
+  installScrollHogMonitorFromMain();
+
   let head = document.head || document.documentElement;
 
   var script2 = document.createElement("script");
@@ -156,4 +158,16 @@ function keyboardTick() {
     if(e.which == 82) {
     }
   });
+}
+
+function installScrollHogMonitorFromMain() {
+  const pageWindow = typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+  const installScrollHogMonitor = globalThis.installCorebridgeScrollHogMonitor || pageWindow.installCorebridgeScrollHogMonitor;
+
+  if(typeof installScrollHogMonitor === "function") {
+    installScrollHogMonitor({ source: "Main.js" });
+  }
+  else {
+    console.warn("[CB ScrollHog] installer was not available when Main.js started");
+  }
 }
