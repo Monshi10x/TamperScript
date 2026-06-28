@@ -170,6 +170,30 @@ class DesignBoard2 extends JobBoard {
             for(let d = 0; d < awaitingApprovalJobs.length; d++) {
                   this.#jobObjects.push(awaitingApprovalJobs[d]);
             }
+
+            this.SortJobsBySavedQueuePriority();
+      }
+
+      SortJobsBySavedQueuePriority() {
+            this.#jobObjects.sort((a, b) => {
+                  let priorityA = Number(a.QueuePriority);
+                  let priorityB = Number(b.QueuePriority);
+
+                  if(!Number.isFinite(priorityA)) priorityA = Number.MAX_SAFE_INTEGER;
+                  if(!Number.isFinite(priorityB)) priorityB = Number.MAX_SAFE_INTEGER;
+
+                  if(priorityA !== priorityB) return priorityA - priorityB;
+
+                  let queueA = Number(a.QueuePrioritySettingId);
+                  let queueB = Number(b.QueuePrioritySettingId);
+                  if(Number.isFinite(queueA) && Number.isFinite(queueB) && queueA !== queueB) return queueA - queueB;
+
+                  let dueDateA = new Date(a.ProductDueDate || a.DesignDueDate || a.OrderDueDate || 0).getTime();
+                  let dueDateB = new Date(b.ProductDueDate || b.DesignDueDate || b.OrderDueDate || 0).getTime();
+                  if(Number.isFinite(dueDateA) && Number.isFinite(dueDateB) && dueDateA !== dueDateB) return dueDateA - dueDateB;
+
+                  return Number(a.Id) - Number(b.Id);
+            });
       }
 
       CreateJobColumns() {
@@ -224,7 +248,7 @@ class DesignBoard2 extends JobBoard {
                               jobObject.containerObject.container.classList.add("urgentPulse");
                         }
                   }
-                  this.UpdateJobsInContainer(this.columnContainers[b].containerObject.contentContainer);
+                  await this.UpdateJobsInContainer(this.columnContainers[b].containerObject.contentContainer);
             }
       }
 
