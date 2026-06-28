@@ -47,6 +47,7 @@ var saveReminder;
   "use strict";
 
   installScrollHogMonitorFromMain();
+  installCorebridgeScrollToViewGuardFromMain();
 
   let head = document.head || document.documentElement;
 
@@ -169,5 +170,14 @@ function installScrollHogMonitorFromMain() {
   }
   else {
     console.warn("[CB ScrollHog] installer was not available when Main.js started");
+  }
+}
+
+function installCorebridgeScrollToViewGuardFromMain() {
+  if(typeof installCorebridgeScrollToViewGuard === "function") {
+    installCorebridgeScrollToViewGuard();
+  }
+  else {
+    console.warn("[CB ScrollGuard] installer was not available when Main.js started");
   }
 }
