@@ -5,6 +5,55 @@ const event_loadedRHSList = new Event("loadedRHSList");
 const event_loadedBaseplateList = new Event("loadedBaseplateList");
 
 
+
+let corebridgeScrollToViewSuppressionCount = 0;
+let corebridgeScrollToViewGuardInstalled = false;
+let corebridgeOriginalScrollToView = null;
+
+function getCorebridgePageWindow() {
+    return typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+}
+
+function installCorebridgeScrollToViewGuard() {
+    const pageWindow = getCorebridgePageWindow();
+    if(corebridgeScrollToViewGuardInstalled || !pageWindow.Ordui || typeof pageWindow.Ordui.ScrollToView !== "function") {
+        return corebridgeScrollToViewGuardInstalled;
+    }
+
+    corebridgeOriginalScrollToView = pageWindow.Ordui.ScrollToView;
+    pageWindow.Ordui.ScrollToView = function guardedCorebridgeScrollToView(...args) {
+        if(corebridgeScrollToViewSuppressionCount > 0) {
+            console.warn("[CB ScrollGuard] suppressed Ordui.ScrollToView during async part creation", {args});
+            return null;
+        }
+
+        return corebridgeOriginalScrollToView.apply(this, args);
+    };
+
+    corebridgeScrollToViewGuardInstalled = true;
+    console.warn("[CB ScrollGuard] installed Ordui.ScrollToView guard");
+    return true;
+}
+
+function setCorebridgeScrollToViewSuppressed(isSuppressed) {
+    installCorebridgeScrollToViewGuard();
+    if(isSuppressed) {
+        corebridgeScrollToViewSuppressionCount++;
+        return;
+    }
+
+    corebridgeScrollToViewSuppressionCount = Math.max(0, corebridgeScrollToViewSuppressionCount - 1);
+}
+
+async function withCorebridgeScrollToViewSuppressed(callback) {
+    setCorebridgeScrollToViewSuppressed(true);
+    try {
+        return await callback();
+    } finally {
+        setTimeout(() => setCorebridgeScrollToViewSuppressed(false), 1500);
+    }
+}
+
 var predefinedQuickProducts_obj;
 var predefinedQuickProducts_Name_Id = [];
 async function loadPredefinedQuickProducts() {
@@ -595,9 +644,10 @@ async function AddPart(name, productNo) {
     const initialPartCount = getNumPartsInProduct(productNo);
     var linkedId = $.grep(predefinedParts_Name_Id, function(obj) {return obj.key === name;})[0].value;
     var c = ko.contextFor(document.querySelector(Field.Product(productNo)));
-    OrderStep2.SearchPartModal_PartSelectedHandler(linkedId, c.$data, null);
+    await withCorebridgeScrollToViewSuppressed(async () => {
+        OrderStep2.SearchPartModal_PartSelectedHandler(linkedId, c.$data, null);
 
-    await new Promise(resolve => {
+        await new Promise(resolve => {
         var resolvedStatus = 'reject';
         var pragmaOnce = true;
         var timer = setInterval(() => {
@@ -624,8 +674,9 @@ async function AddPart(name, productNo) {
         }, sleepMS);
     });
 
-    console.log("successfully added part " + name + " to item " + productNo);
-    await sleep(sleepMS);
+        console.log("successfully added part " + name + " to item " + productNo);
+        await sleep(sleepMS);
+    });
 }
 async function DeletePart(productNo, partNo) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo))).$data;
