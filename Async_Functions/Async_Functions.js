@@ -5,6 +5,163 @@ const event_loadedRHSList = new Event("loadedRHSList");
 const event_loadedBaseplateList = new Event("loadedBaseplateList");
 
 
+
+let corebridgeScrollToViewSuppressionCount = 0;
+let corebridgeScrollToViewGuardInstalled = false;
+let corebridgeOriginalScrollToView = null;
+let corebridgeScrollToViewGuardRetryId = null;
+
+function getCorebridgePageWindow() {
+    return typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
+}
+
+function installCorebridgeScrollToViewGuard() {
+    const pageWindow = getCorebridgePageWindow();
+    if(corebridgeScrollToViewGuardInstalled) {
+        return true;
+    }
+
+    if(!pageWindow.Ordui || typeof pageWindow.Ordui.ScrollToView !== "function") {
+        scheduleCorebridgeScrollToViewGuardInstallRetry();
+        return false;
+    }
+
+    if(corebridgeScrollToViewGuardRetryId) {
+        pageWindow.clearInterval(corebridgeScrollToViewGuardRetryId);
+        corebridgeScrollToViewGuardRetryId = null;
+    }
+
+    corebridgeOriginalScrollToView = pageWindow.Ordui.ScrollToView;
+    pageWindow.Ordui.ScrollToView = function guardedCorebridgeScrollToView(...args) {
+        if(corebridgeScrollToViewSuppressionCount > 0) {
+            console.warn("[CB ScrollGuard] suppressed Ordui.ScrollToView during async part creation", {args});
+            return null;
+        }
+
+        const didScroll = scrollToCorebridgeTargetFast({args});
+        if(didScroll) {
+            return null;
+        }
+
+        return corebridgeOriginalScrollToView.apply(this, args);
+    };
+
+    corebridgeScrollToViewGuardInstalled = true;
+    console.warn("[CB ScrollGuard] installed fast Ordui.ScrollToView override");
+    return true;
+}
+
+function scheduleCorebridgeScrollToViewGuardInstallRetry() {
+    if(corebridgeScrollToViewGuardRetryId) {
+        return;
+    }
+
+    const pageWindow = getCorebridgePageWindow();
+    corebridgeScrollToViewGuardRetryId = pageWindow.setInterval(() => {
+        installCorebridgeScrollToViewGuard();
+    }, 500);
+}
+
+function scrollToCorebridgeTargetFast({args}) {
+    const pageWindow = getCorebridgePageWindow();
+    const target = getCorebridgeScrollTarget(args);
+    if(!target || typeof target.getBoundingClientRect !== "function") {
+        return false;
+    }
+
+    const fixedHeaderOffset = 90;
+    const targetTop = Math.max(0, target.getBoundingClientRect().top + pageWindow.pageYOffset - fixedHeaderOffset);
+    const pageJQuery = pageWindow.jQuery || pageWindow.$;
+
+    if(pageJQuery) {
+        pageJQuery(pageWindow.document.documentElement).stop(true, true).animate({scrollTop: targetTop}, 10);
+        pageJQuery(pageWindow.document.body).stop(true, true).animate({scrollTop: targetTop}, 10);
+    }
+    else {
+        pageWindow.setTimeout(() => pageWindow.scrollTo(0, targetTop), 10);
+    }
+
+    console.warn("[CB ScrollGuard] fast Ordui.ScrollToView", {
+        target: describeCorebridgeScrollTarget(target),
+        targetTop,
+        durationMs: 10,
+    });
+    return true;
+}
+
+function getCorebridgeScrollTarget(args) {
+    for(const arg of args) {
+        const target = getCorebridgeScrollTargetFromArg(arg);
+        if(target) {
+            return target;
+        }
+    }
+
+    return null;
+}
+
+function getCorebridgeScrollTargetFromArg(arg) {
+    const pageWindow = getCorebridgePageWindow();
+    if(!arg) {
+        return null;
+    }
+
+    if(arg instanceof pageWindow.Element) {
+        return arg;
+    }
+
+    if(typeof arg === "string") {
+        return pageWindow.document.querySelector(arg);
+    }
+
+    if(arg.jquery && arg.length > 0 && arg[0] instanceof pageWindow.Element) {
+        return arg[0];
+    }
+
+    if(arg.target instanceof pageWindow.Element) {
+        return arg.target;
+    }
+
+    if(arg.element instanceof pageWindow.Element) {
+        return arg.element;
+    }
+
+    return null;
+}
+
+function describeCorebridgeScrollTarget(target) {
+    if(target === getCorebridgePageWindow().document.documentElement) {
+        return "html";
+    }
+
+    if(target === getCorebridgePageWindow().document.body) {
+        return "body";
+    }
+
+    const id = target.id ? `#${target.id}` : "";
+    const className = typeof target.className === "string" && target.className ? `.${target.className.trim().split(/\s+/).slice(0, 4).join(".")}` : "";
+    return `${target.tagName.toLowerCase()}${id}${className}`;
+}
+
+function setCorebridgeScrollToViewSuppressed(isSuppressed) {
+    installCorebridgeScrollToViewGuard();
+    if(isSuppressed) {
+        corebridgeScrollToViewSuppressionCount++;
+        return;
+    }
+
+    corebridgeScrollToViewSuppressionCount = Math.max(0, corebridgeScrollToViewSuppressionCount - 1);
+}
+
+async function withCorebridgeScrollToViewSuppressed(callback) {
+    setCorebridgeScrollToViewSuppressed(true);
+    try {
+        return await callback();
+    } finally {
+        setTimeout(() => setCorebridgeScrollToViewSuppressed(false), 1500);
+    }
+}
+
 var predefinedQuickProducts_obj;
 var predefinedQuickProducts_Name_Id = [];
 async function loadPredefinedQuickProducts() {
@@ -595,9 +752,10 @@ async function AddPart(name, productNo) {
     const initialPartCount = getNumPartsInProduct(productNo);
     var linkedId = $.grep(predefinedParts_Name_Id, function(obj) {return obj.key === name;})[0].value;
     var c = ko.contextFor(document.querySelector(Field.Product(productNo)));
-    OrderStep2.SearchPartModal_PartSelectedHandler(linkedId, c.$data, null);
+    await withCorebridgeScrollToViewSuppressed(async () => {
+        OrderStep2.SearchPartModal_PartSelectedHandler(linkedId, c.$data, null);
 
-    await new Promise(resolve => {
+        await new Promise(resolve => {
         var resolvedStatus = 'reject';
         var pragmaOnce = true;
         var timer = setInterval(() => {
@@ -624,8 +782,9 @@ async function AddPart(name, productNo) {
         }, sleepMS);
     });
 
-    console.log("successfully added part " + name + " to item " + productNo);
-    await sleep(sleepMS);
+        console.log("successfully added part " + name + " to item " + productNo);
+        await sleep(sleepMS);
+    });
 }
 async function DeletePart(productNo, partNo) {
     var productContext = ko.contextFor(document.querySelector(Field.Product(productNo))).$data;
