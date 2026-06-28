@@ -184,6 +184,7 @@ class SVGCutfile extends SubscriptionManager {
 
                   await this.onFileChange();
             }, f_container_fileChooser);
+            this.#f_fileChooser.setAttribute("data-serialization-skip", "true");
 
             this.#svg3dViewer = new ModalSVG3DViewer(f_container_fileChooser, {
                   svgTextProvider: () => this.#f_svgFile
@@ -395,6 +396,29 @@ class SVGCutfile extends SubscriptionManager {
             partIndex = await setPartNotes(productNo, partIndex, this.#f_svgFile);
             await savePart(productNo, partIndex);
             return partIndex;
+      }
+
+      getSerializedState() {
+            return {
+                  svgFile: this.#f_svgFile || "",
+                  includeSizeInDescription: this.#includeSizeInDescription,
+                  shapeAreas: this.#shapeAreas || 0,
+                  totalBoundingRectAreas: this.#totalBoundingRectAreas || 0,
+                  overallSize: this.#overallSize || null
+            };
+      }
+
+      async applySerializedState(state = {}) {
+            if(typeof state.svgFile === "string") {
+                  this.#f_svgFile = state.svgFile;
+                  this.#f_svgStringChooser.value = state.svgFile;
+                  await this.onFileChange();
+            }
+
+            if(typeof state.includeSizeInDescription === "boolean") {
+                  this.#includeSizeInDescription = state.includeSizeInDescription;
+                  this.#f_setting_IncludeSizeInDescription[1].checked = state.includeSizeInDescription;
+            }
       }
 
       Description() {

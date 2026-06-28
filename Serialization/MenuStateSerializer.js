@@ -182,6 +182,7 @@ class MenuStateSerializer {
             const state = [];
             for(let i = 0; i < fields.length; i++) {
                   const field = fields[i];
+                  if(field.getAttribute("data-serialization-skip") === "true") continue;
                   const key = field.id || field.name || field.getAttribute("data-serialization-key");
                   const domPath = MenuStateSerializer.getElementPath(field, rootElement);
                   if(!key && !domPath) continue;
