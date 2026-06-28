@@ -64,7 +64,8 @@ function scheduleCorebridgeScrollToViewGuardInstallRetry() {
 
 function scrollToCorebridgeTargetFast({args}) {
     const pageWindow = getCorebridgePageWindow();
-    const target = getCorebridgeScrollTarget(args);
+    const rawTarget = getCorebridgeScrollTarget(args);
+    const target = getCorebridgePartScrollTarget(rawTarget);
     if(!target || typeof target.getBoundingClientRect !== "function") {
         return false;
     }
@@ -88,12 +89,21 @@ function scrollToCorebridgeTargetFast({args}) {
 
     console.warn("[CB ScrollGuard] fast Ordui.ScrollToView", {
         target: describeCorebridgeScrollTarget(target),
+        rawTarget: describeCorebridgeScrollTarget(rawTarget),
         targetTop,
         targetHeight: targetRect.height,
         viewportHeight: pageWindow.innerHeight,
         durationMs: 10,
     });
     return true;
+}
+
+function getCorebridgePartScrollTarget(target) {
+    if(!target || typeof target.closest !== "function") {
+        return target;
+    }
+
+    return target.closest('div[id^="ord_prod_part_"]') || target;
 }
 
 function getCorebridgeScrollTarget(args) {
