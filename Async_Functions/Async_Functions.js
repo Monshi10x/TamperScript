@@ -10,6 +10,7 @@ let corebridgeScrollToViewSuppressionCount = 0;
 let corebridgeScrollToViewGuardInstalled = false;
 let corebridgeOriginalScrollToView = null;
 let corebridgeScrollToViewGuardRetryId = null;
+let corebridgeScrollPulseStyleInstalled = false;
 
 function getCorebridgePageWindow() {
     return typeof unsafeWindow !== "undefined" ? unsafeWindow : window;
@@ -87,6 +88,8 @@ function scrollToCorebridgeTargetFast({args}) {
         pageWindow.setTimeout(() => pageWindow.scrollTo(0, targetTop), 10);
     }
 
+    pulseCorebridgeScrollTarget(target);
+
     console.warn("[CB ScrollGuard] fast Ordui.ScrollToView", {
         target: describeCorebridgeScrollTarget(target),
         rawTarget: describeCorebridgeScrollTarget(rawTarget),
@@ -96,6 +99,40 @@ function scrollToCorebridgeTargetFast({args}) {
         durationMs: 10,
     });
     return true;
+}
+
+function pulseCorebridgeScrollTarget(target) {
+    if(!target || !target.classList) {
+        return;
+    }
+
+    installCorebridgeScrollPulseStyle();
+    target.classList.remove("cb-scroll-target-pulse");
+    void target.offsetWidth;
+    target.classList.add("cb-scroll-target-pulse");
+    setTimeout(() => target.classList.remove("cb-scroll-target-pulse"), 650);
+}
+
+function installCorebridgeScrollPulseStyle() {
+    if(corebridgeScrollPulseStyleInstalled) {
+        return;
+    }
+
+    const pageDocument = getCorebridgePageWindow().document;
+    const style = pageDocument.createElement("style");
+    style.textContent = `
+        @keyframes cb-scroll-target-blue-pulse {
+            0% { box-shadow: 0 0 0 rgba(0, 123, 255, 0); }
+            35% { box-shadow: 0 0 18px 5px rgba(0, 123, 255, 0.85); }
+            100% { box-shadow: 0 0 0 rgba(0, 123, 255, 0); }
+        }
+
+        .cb-scroll-target-pulse {
+            animation: cb-scroll-target-blue-pulse 0.6s ease-out 1;
+        }
+    `;
+    (pageDocument.head || pageDocument.documentElement).appendChild(style);
+    corebridgeScrollPulseStyleInstalled = true;
 }
 
 function getCorebridgePartScrollTarget(target) {
