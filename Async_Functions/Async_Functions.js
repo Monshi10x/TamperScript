@@ -70,7 +70,12 @@ function scrollToCorebridgeTargetFast({args}) {
     }
 
     const fixedHeaderOffset = 90;
-    const targetTop = Math.max(0, target.getBoundingClientRect().top + pageWindow.pageYOffset - fixedHeaderOffset);
+    const targetRect = target.getBoundingClientRect();
+    const availableViewportHeight = Math.max(0, pageWindow.innerHeight - fixedHeaderOffset);
+    const targetDocumentTop = targetRect.top + pageWindow.pageYOffset;
+    const centeredTargetTop = targetDocumentTop - fixedHeaderOffset - ((availableViewportHeight - targetRect.height) / 2);
+    const maxScrollTop = Math.max(0, pageWindow.document.documentElement.scrollHeight - pageWindow.innerHeight);
+    const targetTop = clamp(centeredTargetTop, 0, maxScrollTop);
     const pageJQuery = pageWindow.jQuery || pageWindow.$;
 
     if(pageJQuery) {
@@ -84,6 +89,8 @@ function scrollToCorebridgeTargetFast({args}) {
     console.warn("[CB ScrollGuard] fast Ordui.ScrollToView", {
         target: describeCorebridgeScrollTarget(target),
         targetTop,
+        targetHeight: targetRect.height,
+        viewportHeight: pageWindow.innerHeight,
         durationMs: 10,
     });
     return true;
