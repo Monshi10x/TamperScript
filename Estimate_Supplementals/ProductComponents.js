@@ -38,7 +38,7 @@ function hideSerializationPartChrome(partRoot, partHeader, partDescriptionField)
 			|| child === partDescriptionField
 			|| child.classList.contains("restoreStateButton")
 			|| child.classList.contains("seeSVGButton")
-			|| isPartMoveControl(child);
+			|| isPartMoveControl(child, i);
 		if(!keepChild) {
 			child.style.display = "none";
 		}
@@ -66,8 +66,9 @@ function hideSerializationPartChrome(partRoot, partHeader, partDescriptionField)
 	}
 }
 
-function isPartMoveControl(element) {
+function isPartMoveControl(element, childIndex) {
 	if(!element) return false;
+	if(childIndex === 0) return true;
 
 	const moveControl = element.matches?.('[title*=Move], [id*=Move], [class*=Move], [id*=move], [class*=move]')
 		|| element.querySelector?.('[title*=Move], [id*=Move], [class*=Move], [id*=move], [class*=move]');
