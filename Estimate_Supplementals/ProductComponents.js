@@ -37,7 +37,8 @@ function hideSerializationPartChrome(partRoot, partHeader, partDescriptionField)
 		const keepChild = child.contains(partDescriptionField)
 			|| child === partDescriptionField
 			|| child.classList.contains("restoreStateButton")
-			|| child.classList.contains("seeSVGButton");
+			|| child.classList.contains("seeSVGButton")
+			|| isPartMoveControl(child);
 		if(!keepChild) {
 			child.style.display = "none";
 		}
@@ -63,6 +64,17 @@ function hideSerializationPartChrome(partRoot, partHeader, partDescriptionField)
 			viewModePanels[i].style.display = "none";
 		}
 	}
+}
+
+function isPartMoveControl(element) {
+	if(!element) return false;
+
+	const moveControl = element.matches?.('[title*=Move], [id*=Move], [class*=Move], [id*=move], [class*=move]')
+		|| element.querySelector?.('[title*=Move], [id*=Move], [class*=Move], [id*=move], [class*=move]');
+	if(moveControl) return true;
+
+	const text = element.innerText || element.value || element.title || '';
+	return /move/i.test(text);
 }
 
 function tryParseSerializedMenuEnvelope(partText) {

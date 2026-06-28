@@ -46,6 +46,8 @@ var saveReminder;
 (function() {
   "use strict";
 
+  installCorebridgeScrollToViewGuardFromMain();
+
   let head = document.head || document.documentElement;
 
   var script2 = document.createElement("script");
@@ -156,4 +158,13 @@ function keyboardTick() {
     if(e.which == 82) {
     }
   });
+}
+
+function installCorebridgeScrollToViewGuardFromMain() {
+  if(typeof installCorebridgeScrollToViewGuard === "function") {
+    installCorebridgeScrollToViewGuard();
+  }
+  else {
+    console.warn("[CB ScrollGuard] installer was not available when Main.js started");
+  }
 }
