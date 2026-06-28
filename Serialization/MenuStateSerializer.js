@@ -173,6 +173,10 @@ class MenuStateSerializer {
       }
 
       static captureUiState(rootElement) {
+            return MenuStateSerializer.captureUiStateAsync(rootElement);
+      }
+
+      static async captureUiStateAsync(rootElement) {
             if(!rootElement) return [];
             const fields = rootElement.querySelectorAll("input, select, textarea");
             const state = [];
@@ -182,18 +186,67 @@ class MenuStateSerializer {
                   const domPath = MenuStateSerializer.getElementPath(field, rootElement);
                   if(!key && !domPath) continue;
                   let value = field.value;
+                  let files = null;
                   if(field.type === "checkbox" || field.type === "radio") {
                         value = field.checked;
+                  } else if(field.type === "file") {
+                        value = "";
+                        files = await MenuStateSerializer.captureFileInputState(field);
                   }
-                  state.push({
+                  const itemState = {
                         key,
                         domPath,
                         tag: field.tagName,
                         type: field.type || null,
                         value
-                  });
+                  };
+                  if(files) itemState.files = files;
+                  state.push(itemState);
             }
             return state;
+      }
+
+      static async captureFileInputState(field) {
+            if(!field?.files || field.files.length === 0) return [];
+            const files = [];
+            for(let i = 0; i < field.files.length; i++) {
+                  const file = field.files[i];
+                  files.push({
+                        name: file.name,
+                        type: file.type || "",
+                        size: file.size,
+                        lastModified: file.lastModified || Date.now(),
+                        dataUrl: await MenuStateSerializer.readFileAsDataUrl(file)
+                  });
+            }
+            return files;
+      }
+
+      static readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onload = () => resolve(reader.result);
+                  reader.onerror = () => reject(reader.error);
+                  reader.readAsDataURL(file);
+            });
+      }
+
+      static dataUrlToFile(fileState) {
+            const dataUrl = String(fileState?.dataUrl || "");
+            const parts = dataUrl.split(",");
+            const header = parts[0] || "";
+            const base64 = parts.slice(1).join(",");
+            const mimeMatch = header.match(/data:([^;]*)/);
+            const mime = fileState?.type || mimeMatch?.[1] || "application/octet-stream";
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for(let i = 0; i < binary.length; i++) {
+                  bytes[i] = binary.charCodeAt(i);
+            }
+            return new File([bytes], fileState?.name || "restored-file", {
+                  type: mime,
+                  lastModified: fileState?.lastModified || Date.now()
+            });
       }
 
       static getElementPath(element, rootElement) {
@@ -238,11 +291,24 @@ class MenuStateSerializer {
                   if(!field) continue;
                   if(field.type === "checkbox" || field.type === "radio") {
                         field.checked = !!item.value;
+                  } else if(field.type === "file") {
+                        MenuStateSerializer.applyFileInputState(field, item.files || []);
                   } else {
                         field.value = item.value;
                   }
                   field.dispatchEvent(new Event("change", {bubbles: true}));
             }
+      }
+
+      static applyFileInputState(field, files = []) {
+            field.value = "";
+            if(!Array.isArray(files) || files.length === 0 || typeof DataTransfer === "undefined") return;
+            const transfer = new DataTransfer();
+            for(let i = 0; i < files.length; i++) {
+                  if(!files[i]?.dataUrl) continue;
+                  transfer.items.add(MenuStateSerializer.dataUrlToFile(files[i]));
+            }
+            field.files = transfer.files;
       }
 
       static serializeEnvelopeToStorageText(envelope, options = {}) {

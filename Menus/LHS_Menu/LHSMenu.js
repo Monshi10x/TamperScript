@@ -280,7 +280,7 @@ class LHSMenuWindow {
         return (this.constructor?.name || "menu").toLowerCase();
     }
 
-    buildSerializablePayload() {
+    async buildSerializablePayload() {
         const visiblePages = [];
         const pages = this.getPages();
         for(let i = 0; i < pages.length; i++) {
@@ -297,7 +297,7 @@ class LHSMenuWindow {
                 display: this.container?.style?.display || null
             },
             visiblePages,
-            uiState: MenuStateSerializer.captureUiState(this.container)
+            uiState: await MenuStateSerializer.captureUiState(this.container)
         };
     }
 
@@ -316,14 +316,14 @@ class LHSMenuWindow {
         }
     }
 
-    serializeMenuState(options = {}) {
+    async serializeMenuState(options = {}) {
         if(typeof MenuStateSerializer === "undefined") {
             throw new Error("MenuStateSerializer is not available.");
         }
 
         const assets = {};
         const payload = {
-            ...this.buildSerializablePayload(),
+            ...await this.buildSerializablePayload(),
             ...(options.payload || {})
         };
 
@@ -344,7 +344,7 @@ class LHSMenuWindow {
     }
 
     async createSerializedStatePart(productNo, partIndex = 0, options = {}) {
-        const envelope = this.serializeMenuState(options);
+        const envelope = await this.serializeMenuState(options);
         const serializedText = MenuStateSerializer.serializeEnvelopeToStorageText(envelope, options);
 
         await AddPart("No Cost Part", productNo);
