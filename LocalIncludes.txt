@@ -188,5 +188,6 @@
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Menus/Part_Components/PrintMounting.js
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Menus/Part_Components/Transformer.js
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Polygon/Polygon.js
+// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Debug/ScrollHogMonitor.js
 // @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Main.js
 // ==/UserScript==
