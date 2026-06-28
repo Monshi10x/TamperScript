@@ -1,4 +1,4 @@
-(function initialiseCorebridgeScrollHogMonitor() {
+function installCorebridgeScrollHogMonitor({ source = 'auto' } = {}) {
     const pageWindow = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
     const pageDocument = pageWindow.document || document;
 
@@ -24,7 +24,7 @@
         };
 
         if (window.__corebridgeScrollHogMonitorInstalled) {
-            console.info(config.namespace, 'already installed');
+            console.warn(config.namespace, 'already installed', { source });
             return;
         }
 
@@ -70,7 +70,7 @@
                 this.observeParts();
                 this.startHeartbeat();
                 this.exposeDebugApi();
-                console.warn(config.namespace, 'installed on page window. Reproduce the async part creation issue, then paste console output or run CorebridgeScrollHogDebug.report().');
+                console.warn(config.namespace, 'installed on page window', { source, message: 'Reproduce the async part creation issue, then paste console output or run CorebridgeScrollHogDebug.report().' });
             }
 
             exposeDebugApi() {
@@ -385,4 +385,11 @@
         const monitor = new ScrollHogMonitor();
         monitor.install();
     }).call(pageWindow, pageWindow, pageDocument);
-})();
+}
+
+globalThis.installCorebridgeScrollHogMonitor = installCorebridgeScrollHogMonitor;
+if (typeof unsafeWindow !== 'undefined') {
+    unsafeWindow.installCorebridgeScrollHogMonitor = installCorebridgeScrollHogMonitor;
+}
+
+installCorebridgeScrollHogMonitor();
