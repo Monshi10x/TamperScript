@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Design Board v2
 // @namespace    http://tampermonkey.net/
-// @version      2.682
+// @version      2.683
 // @description  try to take over the world!
 // @author       You
 // @match        https://sar10686.corebridge.net/DesignModule/DesignMainQueue.aspx
@@ -21,47 +21,47 @@
 // @grant        window.close
 // @grant        window.focus
 // @grant        window.onurlchange
-// @updateURL    file:\\C:\Users\Tristan PC\Documents\TamperScript\TamperStartDesign.js
-// @downloadURL  file:\\C:\Users\Tristan PC\Documents\TamperScript\TamperStartDesign.js
-// @resource     IMPORTED_CSS file:\\C:\Users\Tristan PC\Documents\TamperScript\Styles/Styles_DesignBoard.css
-// @resource     GoogleScript file:\\C:\Users\Tristan PC\Documents\TamperScript\GoogleMap/GoogleMap.js
-// @resource     Icon_AdobeIllustrator file:\\C:\Users\Tristan PC\Documents\TamperScript\Images/IllustratorIcon.png
+// @updateURL    file:\\C:\Users\monsh\Documents\TamperScript\TamperStartDesign.js
+// @downloadURL  file:\\C:\Users\monsh\Documents\TamperScript\TamperStartDesign.js
+// @resource     IMPORTED_CSS file:\\C:\Users\monsh\Documents\TamperScript\Styles\Styles_DesignBoard.css
+// @resource     GoogleScript file:\\C:\Users\monsh\Documents\TamperScript\GoogleMap\GoogleMap.js
+// @resource     Icon_AdobeIllustrator file:\\C:\Users\monsh\Documents\TamperScript\Images\IllustratorIcon.png
 // @require      https://cdn.plot.ly/plotly-latest.min.js
 // @require      http://code.jquery.com/jquery-3.4.1.min.js
 // @require      https://code.createjs.com/1.0.0/createjs.min.js
 // @require      https://raw.githack.com/SortableJS/Sortable/master/Sortable.js
 // @require      https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Charts/Chart.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Async_Functions/Async_Functions_Design.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Async_Functions/WebWorker_load.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\UI/UI.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\UI/UIContainerType3.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\UI/UIContainer_Design.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\UI/UIContainer_Design2.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Loaders/Loader.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Common/Common.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Common/ObjectArray.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Console/Console.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\FileIO/FileIO.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Tables/Table.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Styles/Styles.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Styles/Images.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Styles/Colour.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\UI/Toast.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\DragAndDrop/DragAndDrop.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Mouse/ContextMenu.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/Modal.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/ModalSingleInput.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/ModalProductPopOut.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/ModalSetOrder.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/ModalSingleInputText.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/ModalSingleInputCheckbox.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/ModalSingleInputWithCalcResult.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/ModalWidthHeightWithCalcResult.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/ModalToggleTokens.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\Modal/ModalWidthHeight.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\SVG_Common/SVG_Common.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\SVG_Common/DragZoomCanvas.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\DesignBoard/JobBoard.js
-// @require      file:\\C:\Users\Tristan PC\Documents\TamperScript\DesignBoard/DesignBoard2.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Charts\Chart.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Async_Functions\Async_Functions_Design.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Async_Functions\WebWorker_load.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\UI\UI.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\UI\UIContainerType3.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\UI\UIContainer_Design.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\UI\UIContainer_Design2.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Loaders\Loader.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Common\Common.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Common\ObjectArray.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Console\Console.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\FileIO\FileIO.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Tables\Table.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Styles\Styles.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Styles\Images.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Styles\Colour.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\UI\Toast.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\DragAndDrop\DragAndDrop.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Mouse\ContextMenu.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\Modal.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInput.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\ModalProductPopOut.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\ModalSetOrder.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInputText.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInputCheckbox.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\ModalSingleInputWithCalcResult.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\ModalWidthHeightWithCalcResult.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\ModalToggleTokens.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\Modal\ModalWidthHeight.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\SVG_Common\SVG_Common.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\SVG_Common\DragZoomCanvas.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\DesignBoard\JobBoard.js
+// @require      file:\\C:\Users\monsh\Documents\TamperScript\DesignBoard\DesignBoard2.js
 // ==/UserScript==
