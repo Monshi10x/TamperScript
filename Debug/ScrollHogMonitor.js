@@ -162,7 +162,7 @@ function installCorebridgeScrollHogMonitor({ source = 'auto' } = {}) {
                     get: descriptor.get,
                     set(value) {
                         const beforeValue = descriptor.get.call(this);
-                        monitor.logProgrammaticScroll({ method: `${monitor.describeTarget(prototype)}.${propertyName}=`, args: [value], target: this });
+                        monitor.logProgrammaticScroll({ method: `${propertyName}=`, args: [value], target: this });
                         descriptor.set.call(this, value);
                         const afterValue = descriptor.get.call(this);
                         if (beforeValue !== afterValue && monitor.isMonitoring()) {
@@ -463,13 +463,17 @@ function installCorebridgeScrollHogMonitor({ source = 'auto' } = {}) {
                     return 'body';
                 }
 
-                if (target.nodeType === Node.ELEMENT_NODE) {
+                if (typeof target.tagName === 'string') {
                     const id = target.id ? `#${target.id}` : '';
                     const className = typeof target.className === 'string' && target.className ? `.${target.className.trim().split(/\s+/).slice(0, 4).join('.')}` : '';
                     return `${target.tagName.toLowerCase()}${id}${className}`;
                 }
 
-                return Object.prototype.toString.call(target);
+                if (target.constructor && target.constructor.name) {
+                    return `[object ${target.constructor.name}]`;
+                }
+
+                return typeof target;
             }
 
             serialiseArgs(args) {
