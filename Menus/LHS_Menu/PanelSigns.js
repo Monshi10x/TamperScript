@@ -137,21 +137,23 @@ class MenuPanelSigns extends LHSMenuWindow {
 		return "panelSigns";
 	}
 
-	buildSerializablePayload() {
+	async buildSerializablePayload() {
 		const classNameToIndex = new Map();
 		const serializedIdByItem = new Map();
-		const serializedItems = this.#allMaterials.map((item, index) => {
+		const serializedItems = [];
+		for(let index = 0; index < this.#allMaterials.length; index++) {
+			const item = this.#allMaterials[index];
 			classNameToIndex.set(item, index);
 			serializedIdByItem.set(item, "item-" + index);
-			return {
+			serializedItems.push({
 				serializedId: "item-" + index,
 				className: item.constructor?.name || "",
 				productNumber: item.productNumber,
 				typeLabel: item.typeLabel?.innerText || item.Type || "",
-				itemUiState: MenuStateSerializer.captureUiState(item.container),
+				itemUiState: await MenuStateSerializer.captureUiState(item.container),
 				itemState: typeof item.getSerializedState === "function" ? item.getSerializedState() : null
-			};
-		});
+			});
+		}
 
 		for(let i = 0; i < this.#allMaterials.length; i++) {
 			const item = this.#allMaterials[i];
@@ -174,7 +176,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 			.filter((serializedId) => typeof serializedId === "string");
 
 		return {
-			...super.buildSerializablePayload(),
+			...await super.buildSerializablePayload(),
 			viewMode: this.#viewMode?.[1]?.value || null,
 			items: serializedItems,
 			itemOrder: domOrderedItems
