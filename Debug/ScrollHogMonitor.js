@@ -55,10 +55,13 @@ function installCorebridgeScrollHogMonitor({ source = 'auto' } = {}) {
                 this.originalScrollTo = window.scrollTo;
                 this.originalScrollBy = window.scrollBy;
                 this.originalScrollIntoView = Element.prototype.scrollIntoView;
+                this.originalFocus = window.HTMLElement && window.HTMLElement.prototype.focus;
+                this.originalJQueryMethods = new Map();
                 this.listenerMap = new WeakMap();
                 this.listenerRecords = new RingBuffer(config.maxListenerRecords);
                 this.recentEvents = new RingBuffer(config.maxRecentEvents);
                 this.monitoringUntil = 0;
+                this.monitorWindowCompleteTimeoutId = null;
                 this.lastPartCount = this.getPartCount();
                 this.lastScroll = this.getScrollSnapshot();
                 this.installTime = performance.now();
@@ -67,6 +70,9 @@ function installCorebridgeScrollHogMonitor({ source = 'auto' } = {}) {
             install() {
                 this.patchEventListeners();
                 this.patchScrollMethods();
+                this.patchFocusMethods();
+                this.patchScrollAccessors();
+                this.patchJQueryScrollMethods();
                 this.observeParts();
                 this.startHeartbeat();
                 this.exposeDebugApi();
@@ -118,6 +124,98 @@ function installCorebridgeScrollHogMonitor({ source = 'auto' } = {}) {
                     monitor.logProgrammaticScroll({ method: 'Element.scrollIntoView', args, target: this });
                     return monitor.originalScrollIntoView.apply(this, args);
                 };
+            }
+
+
+
+            patchFocusMethods() {
+                if (!window.HTMLElement || !this.originalFocus) {
+                    return;
+                }
+
+                const monitor = this;
+                window.HTMLElement.prototype.focus = function patchedFocus(...args) {
+                    monitor.logProgrammaticScroll({ method: 'HTMLElement.focus', args, target: this });
+                    return monitor.originalFocus.apply(this, args);
+                };
+            }
+
+            patchScrollAccessors() {
+                this.patchScrollAccessor({ prototype: Element.prototype, propertyName: 'scrollTop' });
+                this.patchScrollAccessor({ prototype: Element.prototype, propertyName: 'scrollLeft' });
+                if (window.HTMLElement && window.HTMLElement.prototype !== Element.prototype) {
+                    this.patchScrollAccessor({ prototype: window.HTMLElement.prototype, propertyName: 'scrollTop' });
+                    this.patchScrollAccessor({ prototype: window.HTMLElement.prototype, propertyName: 'scrollLeft' });
+                }
+            }
+
+            patchScrollAccessor({ prototype, propertyName }) {
+                const descriptor = Object.getOwnPropertyDescriptor(prototype, propertyName);
+                if (!descriptor || !descriptor.configurable || typeof descriptor.set !== 'function' || typeof descriptor.get !== 'function') {
+                    return;
+                }
+
+                const monitor = this;
+                Object.defineProperty(prototype, propertyName, {
+                    configurable: true,
+                    enumerable: descriptor.enumerable,
+                    get: descriptor.get,
+                    set(value) {
+                        const beforeValue = descriptor.get.call(this);
+                        monitor.logProgrammaticScroll({ method: `${monitor.describeTarget(prototype)}.${propertyName}=`, args: [value], target: this });
+                        descriptor.set.call(this, value);
+                        const afterValue = descriptor.get.call(this);
+                        if (beforeValue !== afterValue && monitor.isMonitoring()) {
+                            console.warn(config.namespace, 'scroll property changed', {
+                                propertyName,
+                                target: monitor.describeTarget(this),
+                                beforeValue,
+                                afterValue,
+                                pageScroll: monitor.getScrollSnapshot(),
+                            });
+                        }
+                    },
+                });
+            }
+
+            patchJQueryScrollMethods() {
+                const patchWhenAvailable = () => {
+                    const pageJQuery = window.jQuery || window.$;
+                    if (!pageJQuery || !pageJQuery.fn || pageJQuery.fn.__corebridgeScrollHogPatched) {
+                        return Boolean(pageJQuery && pageJQuery.fn && pageJQuery.fn.__corebridgeScrollHogPatched);
+                    }
+
+                    ['scrollTop', 'scrollLeft'].forEach((methodName) => {
+                        const originalMethod = pageJQuery.fn[methodName];
+                        if (typeof originalMethod !== 'function') {
+                            return;
+                        }
+
+                        this.originalJQueryMethods.set(methodName, originalMethod);
+                        const monitor = this;
+                        pageJQuery.fn[methodName] = function patchedJQueryScrollMethod(...args) {
+                            if (args.length > 0) {
+                                monitor.logProgrammaticScroll({ method: `jQuery.fn.${methodName}`, args, target: this[0] || window });
+                            }
+
+                            return originalMethod.apply(this, args);
+                        };
+                    });
+
+                    pageJQuery.fn.__corebridgeScrollHogPatched = true;
+                    console.warn(config.namespace, 'patched jQuery scroll methods');
+                    return true;
+                };
+
+                if (patchWhenAvailable()) {
+                    return;
+                }
+
+                const retryHandle = window.setInterval(() => {
+                    if (patchWhenAvailable()) {
+                        window.clearInterval(retryHandle);
+                    }
+                }, 500);
             }
 
             observeParts() {
@@ -235,7 +333,14 @@ function installCorebridgeScrollHogMonitor({ source = 'auto' } = {}) {
                     activeElement: this.describeTarget(document.activeElement),
                 });
 
-                window.setTimeout(() => this.report({ reason: 'monitor-window-complete' }), milliseconds + config.scrollSettleMs);
+                if (this.monitorWindowCompleteTimeoutId) {
+                    window.clearTimeout(this.monitorWindowCompleteTimeoutId);
+                }
+
+                this.monitorWindowCompleteTimeoutId = window.setTimeout(() => {
+                    this.monitorWindowCompleteTimeoutId = null;
+                    this.report({ reason: 'monitor-window-complete' });
+                }, milliseconds + config.scrollSettleMs);
             }
 
             report({ reason }) {
