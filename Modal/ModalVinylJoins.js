@@ -182,11 +182,12 @@ class ModalVinylJoins extends ModalWidthHeight {
             /** @info Draw Each Sheet from matrixSizes, per parent */
             let distanceBetweenParentDraws = 1000;
 
-            //for(let i = 0; i < this.sizeArrays.length; i++) {//per parent subscriptions matrix (i.e. Sheet or Size Matrix)
+            // Each outer entry contains the complete inherited-size collection; additional
+            // entries mirror the subscription count and must not be drawn again.
             if(this.sizeArrays.length > 0) {
-                  let i = 0;
-                  for(let j = 0; j < this.sizeArrays[i].length; j++) {//per vinyl subscription matrix
-                        let matrixSize = this.sizeArrays[i][j];
+                  let inheritedSizeArrays = this.sizeArrays[0];
+                  for(let j = 0; j < inheritedSizeArrays.length; j++) {//per vinyl inherited-size matrix
+                        let matrixSize = inheritedSizeArrays[j];
 
                         let isFirstRow, isFirstColumn = false;
 
