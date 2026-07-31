@@ -104,7 +104,7 @@ class Finishing extends Material {
             this.#standOffRequired = createCheckbox_Infield("Stand-off", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateStandoffQty(); this.UpdateFromFields();}, f_container_standOff, true);
             this.#standOffQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:400px;", () => {this.UpdateFromFields();}, f_container_standOff, false, 1);
 
-            this.#standOffHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;display:none;margin-left:40px;margin-right:400px;", () => {
+            this.#standOffHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 20px);margin-right:55%;height:40px;display:none;background-color:" + COLOUR.Orange + ";", () => {
 
                   this.#modalIsOpen = true;
                   this.#standOffHelper.borrowFields(this.#standOffType[0], this.#standoff_offsetFromEdgeField[0],
@@ -159,7 +159,7 @@ class Finishing extends Material {
             this.#eyeletsRequired = createCheckbox_Infield("Eyelets", false, "width:30%;min-width:150px;margin-right:65%", () => {this.UpdateFromFields();}, f_container_eyelets, true);
             this.#eyeletsQty = createInput_Infield("Qty per Product", null, "width:25%;min-width:110px;margin-left:40px;display:none;margin-right:400px;", () => {this.UpdateFromFields();}, f_container_eyelets, false, 1);
             this.#eyeletsHelper;
-            this.#eyeletsHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:200px;height:40px;display:none;margin-left:40px;margin-right:400px;", () => {
+            this.#eyeletsHelperBtn = createIconButton("https://cdn.gorilladash.com/images/media/6195615/signarama-australia-searching-63ad3d8672602.png", "Visualiser", "width:calc(100% - 20px);margin-right:55%;height:40px;display:none;background-color:" + COLOUR.Orange + ";", () => {
                   this.#eyeletsHelper = new ModalStandoffHelper2("Eyelets Helper", 100, () => {
                         this.UpdateEyeletQty();
                         this.UpdateFromFields();

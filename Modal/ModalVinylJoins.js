@@ -178,6 +178,7 @@ class ModalVinylJoins extends ModalWidthHeight {
             this.measurements = [];
 
             let xo = 0, yo = 0;
+            let sheetNumber = 1;
 
             /** @info Draw Each Sheet from matrixSizes, per parent */
             let distanceBetweenParentDraws = 1000;
@@ -307,6 +308,8 @@ class ModalVinylJoins extends ModalWidthHeight {
                                                 });
                                           }
                                     }
+
+                                    this.shapes.push(createCenteredRectangleNumber(this.dragZoomSVG.svgG, sheetNumber++, xo, yo, rectWidth_Initial, rectHeight_Initial));
 
                                     let bo = this.#maintainGapBetweenBleed ? (this.bleedLeft + this.bleedRight) : 0;
 
