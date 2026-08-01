@@ -2,6 +2,7 @@ class Menu3D extends LHSMenuWindow {
 
       /** @ViewMode */
       #viewMode;
+      #groupMaterialDuringPartCreation;
       #numProducts = 0;
       #creationOrder = [ProductDetails, Size, SVGCutfile, Coil, Sheet, FrameSubscribable, LED, Transformer, Painting, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
 
@@ -113,6 +114,9 @@ class Menu3D extends LHSMenuWindow {
             this.page1 = this.getPage(0);
 
             document.addEventListener("loadedPredefinedParts", () => {
+                  this.#groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:100%;margin:0px;box-sizing:border-box;", () => {
+                        Material.groupMaterialDuringPartCreation = this.#groupMaterialDuringPartCreation[1].checked;
+                  }, this.page1, true);
                   /*
                   ToggleOpen */
                   let toggleOpenBtn = createButton("Open All", "width:20%;height:40px;margin:0px;", () => {this.toggleAllOpen();}, this.page1);
@@ -164,6 +168,7 @@ class Menu3D extends LHSMenuWindow {
             return {
                   ...await super.buildSerializablePayload(),
                   viewMode: this.#viewMode?.[1]?.value || null,
+                  groupMaterialDuringPartCreation: Material.groupMaterialDuringPartCreation,
                   items: serializedItems
             };
       }
@@ -265,6 +270,10 @@ class Menu3D extends LHSMenuWindow {
       }
 
       #applyWindowPayload(payload = {}) {
+            if(typeof payload.groupMaterialDuringPartCreation === "boolean") {
+                  Material.groupMaterialDuringPartCreation = payload.groupMaterialDuringPartCreation;
+                  if(this.#groupMaterialDuringPartCreation) setCheckboxChecked(payload.groupMaterialDuringPartCreation, this.#groupMaterialDuringPartCreation[1]);
+            }
             if(payload.containerRect) {
                   if(payload.containerRect.left !== null) this.container.style.left = payload.containerRect.left;
                   if(payload.containerRect.top !== null) this.container.style.top = payload.containerRect.top;

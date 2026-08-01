@@ -1114,10 +1114,8 @@ class Sheet extends Material {
             //var partFullName = getPredefinedParts_Name_FromLimitedName(name);
             var partFullName = this.#sheetMaterial[1].value;
 
-            for(let i = 0; i < this.#outputSizeTableData.length; i++) {
-                  let [partQty, partWidth, partHeight, aaa, aab, aac, aad] = this.#outputSizeTableData[i];
-                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, null, false, this.#visualiser.unscaledSVGString);
-            }
+            let sizeEntries = this.#outputSizeTableData.map(([qty, width, height]) => ({qty, width, height}));
+            partIndex = await this.createDimensionParts(productNo, partIndex, partFullName, sizeEntries, {svgString: this.#visualiser.unscaledSVGString});
 
             partIndex = await this.#guillotineProduction.Create(productNo, partIndex);
             partIndex = await this.#router.Create(productNo, partIndex);
