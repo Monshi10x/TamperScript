@@ -231,12 +231,10 @@ class Laminate extends Material {
 
             console.log(dataEntries);
 
-            for(let i = 0; i < dataEntries.length; i++) {
-                  if(dataEntries[i].finalRollSize && this.#useRollLength === true)
-                        partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, dataEntries[i].finalRollSize.qty, dataEntries[i].finalRollSize.width, dataEntries[i].finalRollSize.height, partFullName, "", false);
-                  else if(!dataEntries[i].finalRollSize && this.#useRollLength === false)
-                        partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, dataEntries[i].QWHD.qty, dataEntries[i].QWHD.width, dataEntries[i].QWHD.height, partFullName, "", false);
-            }
+            let sizeEntries = dataEntries
+                  .filter((entry) => (entry.finalRollSize && this.#useRollLength === true) || (!entry.finalRollSize && this.#useRollLength === false))
+                  .map((entry) => entry.finalRollSize || entry.QWHD);
+            partIndex = await this.createDimensionParts(productNo, partIndex, partFullName, sizeEntries);
 
             partIndex = await this.#f_production.Create(productNo, partIndex);
 

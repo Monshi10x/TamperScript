@@ -438,11 +438,8 @@ class Vinyl extends Material {      /*
 
             console.log(dataEntries);
 
-            //Must be done in stages because await doesnt work with foreach
-            for(let i = 0; i < dataEntries.length; i++) {
-                  if(dataEntries[i].finalRollSize) continue;
-                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, dataEntries[i].QWHD.qty, dataEntries[i].QWHD.width, dataEntries[i].QWHD.height, partFullName, null, false, this.#f_visualiser.unscaledSVGString);
-            }
+            let sizeEntries = dataEntries.filter((entry) => !entry.finalRollSize).map((entry) => entry.QWHD);
+            partIndex = await this.createDimensionParts(productNo, partIndex, partFullName, sizeEntries, {svgString: this.#f_visualiser.unscaledSVGString});
 
             partIndex = await this.#f_production.Create(productNo, partIndex);
 
