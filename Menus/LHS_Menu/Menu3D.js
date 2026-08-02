@@ -130,7 +130,13 @@ class Menu3D extends LHSMenuWindow {
                         this.page1, false
                   );
 
-                  this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.updateViewMode();}, this.page1);
+                  this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 42px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.updateViewMode();}, this.page1);
+
+                  this.#groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:450px;", () => {
+                        Material.groupMaterialDuringPartCreation = this.#groupMaterialDuringPartCreation[1].checked;
+                  });
+                  let settingsButton = createButton("", "width:40px;height:35px;margin:0px;font-size:20px;box-sizing:border-box;", () => {this.#openSettingsModal();}, this.page1);
+                  settingsButton.innerHTML = "&#9881";
             });
 
             this.#createProductBtn = createButton("Create Product   " + "\u25BA", "width:100%;margin:0px;", () => {this.CreateProduct(this);});
@@ -282,6 +288,13 @@ class Menu3D extends LHSMenuWindow {
             if(Number.isInteger(payload.currentPageIndex)) {
                   this.jumpToPage(payload.currentPageIndex);
             }
+      }
+
+      #openSettingsModal() {
+            let modal = new Modal("Settings", () => { });
+            modal.setContainerSize(500, 500);
+            modal.addBodyElement(this.#groupMaterialDuringPartCreation[0]);
+            modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {modal.hide();}));
       }
 
       addQuickTemplate() {

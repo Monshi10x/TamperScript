@@ -10,7 +10,7 @@ class Material extends SubscriptionManager {
       #backgroundColor = COLOUR.Black;
       #textColor = COLOUR.White;
       static DISPLAY_NAME = "MATERIAL";
-      static groupMaterialDuringPartCreation = false;
+      static groupMaterialDuringPartCreation = true;
       UPDATES_PAUSED = false;
       /*
                         
