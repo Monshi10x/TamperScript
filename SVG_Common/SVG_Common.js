@@ -1746,6 +1746,7 @@ class TSVGText {
 
       createText() {
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            this.textElement = text;
             // Set basic attributes first.
             this.updateAttributes(this.options);
             text.textContent = this.options.text;
@@ -1835,6 +1836,21 @@ class TSVGText {
             this.setAttribute("text-anchor", textAnchorValue);
             this.setAttribute("dominant-baseline", dominantBaselineValue);
       }
+
+      Delete() {
+            deleteElement(this.textElement);
+      }
+}
+
+function createCenteredRectangleNumber(parentToAppendTo, number, x, y, width, height) {
+      return new TSVGText(parentToAppendTo, {
+            x: x + width / 2,
+            y: y + height / 2,
+            text: number,
+            "font-size": Math.max(20, Math.min(width, height) * 0.2) + "px",
+            fill: COLOUR.Black,
+            anchor: "center"
+      });
 }
 
 function getRandomPointsInPath(pathElement, numberOfPoints) {
@@ -2167,4 +2183,3 @@ class TSVGMeasurement {
             }
       };
 }
-

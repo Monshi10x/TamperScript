@@ -10,6 +10,7 @@ class Material extends SubscriptionManager {
       #backgroundColor = COLOUR.Black;
       #textColor = COLOUR.White;
       static DISPLAY_NAME = "MATERIAL";
+      static groupMaterialDuringPartCreation = true;
       UPDATES_PAUSED = false;
       /*
                         
@@ -286,6 +287,31 @@ class Material extends SubscriptionManager {
        CorebridgeCreate*/
       async Create(productNo, partIndex) {
             return partIndex;
+      }
+
+      async createDimensionParts(productNo, partIndex, partFullName, sizeEntries, options = {}) {
+            let validEntries = sizeEntries.filter((entry) => entry && entry.qty > 0 && entry.width > 0 && entry.height > 0);
+            if(validEntries.length === 0) return partIndex;
+
+            let partDescription = options.partDescription ?? partFullName;
+            let partInnerText = options.partInnerText ?? "";
+            let tickSelected = options.tickSelected ?? false;
+            let svgString = options.svgString ?? null;
+
+            if(!Material.groupMaterialDuringPartCreation) {
+                  for(let i = 0; i < validEntries.length; i++) {
+                        let entry = validEntries[i];
+                        partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, entry.qty, entry.width, entry.height, partDescription, partInnerText, tickSelected, svgString);
+                  }
+                  return partIndex;
+            }
+
+            let totalAreaMm2 = validEntries.reduce((total, entry) => total + entry.qty * entry.width * entry.height, 0);
+            let averageSide = roundNumber(Math.sqrt(totalAreaMm2), 2);
+            let sizeList = validEntries.map((entry) => "x" + entry.qty + " @ " + roundNumber(entry.width, 2) + "mmW x " + roundNumber(entry.height, 2) + "mmH").join("\n");
+            let groupedPartText = [partInnerText, sizeList].filter((text) => text).join("\n");
+
+            return q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, 1, averageSide, averageSide, partDescription, groupedPartText, tickSelected, svgString);
       }
 
       Description() {
