@@ -190,6 +190,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
             // let canvasScale = this.#dragZoomCanvas.scale;
 
             let xo = 0, yo = 0;
+            let sheetNumber = 1;
 
             this.#totalNumber = 0;
             console.log(this.#sizeArrays);
@@ -219,6 +220,7 @@ class ModalStandoffHelper2 extends ModalWidthHeight {
                                           width: rectWidth,
                                           height: rectHeight
                                     });
+                                    this.rects.push(createCenteredRectangleNumber(this.#dragZoomSVG.svgG, sheetNumber++, xo, yo, rectWidth, rectHeight));
 
                                     //draw Measurements
                                     ///if(isFirstRow) drawMeasurement_Verbose(canvasCtx, xo, yo, rectWidth, 0, "T", roundNumber(rectWidth, 2), this.#textSize, COLOUR.Blue, this.#lineWidth, this.#crossScale, 20, true, "B", false, canvasScale);

@@ -2,6 +2,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 	/** @ViewMode */
 	#viewMode;
+	#groupMaterialDuringPartCreation;
 	#numProducts = 0;
 	#creationOrder = [ProductDetails, Size, SVGCutfile, Coil, Sheet, FrameSubscribable, LED, Transformer, Painting, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
 
@@ -126,7 +127,13 @@ class MenuPanelSigns extends LHSMenuWindow {
 				this.page1, false
 			);
 
-			this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.#updateViewMode();}, this.page1);
+			this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 42px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.#updateViewMode();}, this.page1);
+
+			this.#groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:450px;", () => {
+				Material.groupMaterialDuringPartCreation = this.#groupMaterialDuringPartCreation[1].checked;
+			});
+			let settingsButton = createButton("", "width:40px;height:35px;margin:0px;font-size:20px;box-sizing:border-box;", () => {this.#openSettingsModal();}, this.page1);
+			settingsButton.innerHTML = "&#9881";
 		});
 
 		this.#createProductBtn = createButton("Create Product   " + "\u25BA", "width:100%;margin:0px;", () => {this.CreateProduct(this);});
@@ -178,6 +185,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 		return {
 			...await super.buildSerializablePayload(),
 			viewMode: this.#viewMode?.[1]?.value || null,
+			groupMaterialDuringPartCreation: Material.groupMaterialDuringPartCreation,
 			items: serializedItems,
 			itemOrder: domOrderedItems
 		};
@@ -303,6 +311,10 @@ class MenuPanelSigns extends LHSMenuWindow {
 	}
 
 	#applyWindowPayload(payload = {}) {
+		if(typeof payload.groupMaterialDuringPartCreation === "boolean") {
+			Material.groupMaterialDuringPartCreation = payload.groupMaterialDuringPartCreation;
+			if(this.#groupMaterialDuringPartCreation) setCheckboxChecked(payload.groupMaterialDuringPartCreation, this.#groupMaterialDuringPartCreation[1]);
+		}
 		if(payload.containerRect) {
 			if(payload.containerRect.left !== null) this.container.style.left = payload.containerRect.left;
 			if(payload.containerRect.top !== null) this.container.style.top = payload.containerRect.top;
@@ -311,6 +323,13 @@ class MenuPanelSigns extends LHSMenuWindow {
 		if(Number.isInteger(payload.currentPageIndex)) {
 			this.jumpToPage(payload.currentPageIndex);
 		}
+	}
+
+	#openSettingsModal() {
+		let modal = new Modal("Settings", () => { });
+		modal.setContainerSize(500, 500);
+		modal.addBodyElement(this.#groupMaterialDuringPartCreation[0]);
+		modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {modal.hide();}));
 	}
 
 	#addQuickTemplate() {

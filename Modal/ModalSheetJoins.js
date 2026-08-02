@@ -200,6 +200,7 @@ class ModalSheetJoins extends ModalWidthHeight {
             this.measurements = [];
 
             let xo = 0, yo = 0;
+            let sheetNumber = 1;
 
             for(let i = 0; i < this.#sizeArrays.length; i++) {//per parent subscriptions matrix (i.e. Sheet or Size Matrix)
                   for(let j = 0; j < this.#sizeArrays[i].length; j++) {//per sheet subscription matrix
@@ -230,6 +231,7 @@ class ModalSheetJoins extends ModalWidthHeight {
                                           patternType: ((this.flipped && this.grainDirection == "With Short Side") || (!this.flipped && this.grainDirection == "With Long Side")) ? 'hatchHorizontal' : 'hatchVertical'
 
                                     });
+                                    this.shapes.push(createCenteredRectangleNumber(this.dragZoomSVG.svgG, sheetNumber++, xo, yo, rectWidth, rectHeight));
 
                                     if(isFirstRow) {
                                           this.measurements.push(new TSVGMeasurement(this.dragZoomSVG.svgG, {
