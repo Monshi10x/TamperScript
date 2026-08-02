@@ -1,12 +1,65 @@
 class LEDMenu extends LHSMenuWindow {
 
+    _ledFields = null;
+    _ledUpdate = null;
+    _pendingLEDState = null;
+
     constructor(width, height, ID, windowTitle) {
         super(width, height, ID, windowTitle);
         this.addPages(1);
     }
 
+    getSerializationMenuType() {
+        return "led";
+    }
+
+    async buildSerializablePayload() {
+        return {
+            ...await super.buildSerializablePayload(),
+            ledState: this.getLEDState()
+        };
+    }
+
+    getLEDState() {
+        if(!this._ledFields) return this._pendingLEDState;
+        return {
+            boxWidth: this._ledFields.boxWidth[1].value,
+            boxHeight: this._ledFields.boxHeight[1].value,
+            depthPerSide: this._ledFields.boxDepth[1].value,
+            numberOfSides: parseInt(this._ledFields.numberOfSides[1].value),
+            ledWatt: this._ledFields.ledWatt[1].value,
+            ledColour: this._ledFields.ledColour[1].value,
+            loading: this._ledFields.loading[1].value,
+            ampAllowance: this._ledFields.ampAllowance[1].value,
+            voltage: this._ledFields.voltage[1].value,
+            dimmable: this._ledFields.dimmable[1].checked
+        };
+    }
+
+    onStateRestored(payload = {}) {
+        this._pendingLEDState = payload.ledState || null;
+        this.applyLEDState();
+    }
+
+    applyLEDState() {
+        if(!this._ledFields || !this._pendingLEDState) return;
+        let state = this._pendingLEDState;
+        if(state.boxWidth !== undefined) this._ledFields.boxWidth[1].value = state.boxWidth;
+        if(state.boxHeight !== undefined) this._ledFields.boxHeight[1].value = state.boxHeight;
+        if(state.depthPerSide !== undefined) this._ledFields.boxDepth[1].value = state.depthPerSide;
+        if(state.numberOfSides !== undefined) this._ledFields.numberOfSides[1].value = state.numberOfSides;
+        if(state.ledWatt !== undefined) this._ledFields.ledWatt[1].value = state.ledWatt;
+        if(state.ledColour !== undefined) this._ledFields.ledColour[1].value = state.ledColour;
+        if(state.loading !== undefined) this._ledFields.loading[1].value = state.loading;
+        if(state.ampAllowance !== undefined) this._ledFields.ampAllowance[1].value = state.ampAllowance;
+        if(state.voltage !== undefined) this._ledFields.voltage[1].value = state.voltage;
+        if(state.dimmable !== undefined) this._ledFields.dimmable[1].checked = state.dimmable;
+        this._ledUpdate?.();
+    }
+
     show() {
 
+        if(this._ledFields) this._pendingLEDState = this.getLEDState();
         super.show();
         let thisClass = this;
 
@@ -46,12 +99,13 @@ class LEDMenu extends LHSMenuWindow {
         //********************************************//
         //                  DEPTH
         //********************************************//
-        var fieldBoxDepth = createInput_Infield("Depth to Face (Overall)", null, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, true, 10, {postfix: "mm"});
+        var fieldBoxDepth = createInput_Infield("Depth to Face (per side)", null, "width:30%", LEDUpdate, LEDBuilderContainer_Sub, true, 10, {postfix: "mm"});
 
         //********************************************//
-        //                  DOUBLE-SIDED
+        //                  NUMBER OF SIDES
         //********************************************//
-        var fieldIsDoubleSided = createCheckbox_Infield('Double-sided', null, "width:30%;margin-right:60%;", LEDUpdate, LEDBuilderContainer_Sub);
+        var fieldNumberOfSides = createDropdown_Infield("Number of Sides", 0, "width:30%;margin-right:60%;",
+            [createDropdownOption("1", "1"), createDropdownOption("2", "2")], LEDUpdate, LEDBuilderContainer_Sub);
 
         //********************************************//
         //                  LED WATT
@@ -138,16 +192,12 @@ class LEDMenu extends LHSMenuWindow {
         footer.appendChild(draggablePopulator);
 
         function LEDUpdate() {
-            var tempDTF = 0;
-            if(fieldIsDoubleSided[1].checked) {
-                tempDTF = parseFloat(fieldBoxDepth[1].value) / 2;//fieldVoltage[1].value
-            } else {
-                tempDTF = parseFloat(fieldBoxDepth[1].value);
-            }
+            var tempDTF = parseFloat(fieldBoxDepth[1].value);
+            var numberOfSides = parseInt(fieldNumberOfSides[1].value);
             distanceToOutsideBox = parseFloat(tempDTF) / 2;
             numberRows = Math.ceil(((parseFloat(fieldBoxHeight[1].value) - 2 * distanceToOutsideBox) / (tempDTF + ledAllowanceH)) + 1);
             numberColumns = Math.ceil((((parseFloat(fieldBoxWidth[1].value) - 2 * distanceToOutsideBox) - ledWidth) / (tempDTF + ledAllowanceW)) + 1);
-            totalLEDs = numberRows * numberColumns * (fieldIsDoubleSided[1].checked ? 2 : 1);
+            totalLEDs = numberRows * numberColumns * numberOfSides;
             totalAmp = ((totalLEDs * (parseFloat(fieldLEDWatt[1].value.replace(/[^0-9\.]+/g, "")) / (fieldLoading[1].value / 100))) / fieldVoltage[1].value);
             var transformerName = getCheapestTransformer(totalAmp, fieldAmpAllowance[1].value, fieldDimmable[1].checked, fieldVoltage[1].value).name;
             var transformerQty = getCheapestTransformer(totalAmp, fieldAmpAllowance[1].value, fieldDimmable[1].checked, fieldVoltage[1].value).i_totalComputedQuantity;
@@ -183,7 +233,7 @@ class LEDMenu extends LHSMenuWindow {
 
             if(totalLEDs != null) {
                 //ACM
-                await q_AddPart_DimensionWH(productNo, partIndex, true, ACMLookup["Standard White Gloss"], fieldIsDoubleSided[1].checked ? 2 : 1, fieldBoxWidth[1].value, fieldBoxHeight[1].value, "[LED] ACM Panel",
+                await q_AddPart_DimensionWH(productNo, partIndex, true, ACMLookup["Standard White Gloss"], parseInt(fieldNumberOfSides[1].value), fieldBoxWidth[1].value, fieldBoxHeight[1].value, "[LED] ACM Panel",
                     false);
                 partIndex++;
 
@@ -213,13 +263,29 @@ class LEDMenu extends LHSMenuWindow {
                 await setPartDescription(productNo, partIndex, "[LED] Production @ (" + (60 / productionMinsPerLED) + " LED/h) = " + ledMins + "mins");
                 await savePart(productNo, partIndex);
 
-
+                partIndex = await thisClass.createSerializedStatePart(productNo, partIndex);
             }
             if(!inExisting) {
-                await setProductSummary(productNo, "<div>LED light panels</div><div><ul><li>Single-Sided<br></li><li>6500K (Cool White) Bright LED Lighting</li><li>Outdoor use<br></li></ul></div><div>Includes supply of transformers and connectors.</div><div>Install price not included - see install item below if applicable.</div><div>Final connection to mains to be done by licenced electrician - see other information below.</div>");
+                let sideDescription = parseInt(fieldNumberOfSides[1].value) === 2 ? "Double-Sided" : "Single-Sided";
+                await setProductSummary(productNo, "<div>LED light panels</div><div><ul><li>" + sideDescription + "<br></li><li>6500K (Cool White) Bright LED Lighting</li><li>Outdoor use<br></li></ul></div><div>Includes supply of transformers and connectors.</div><div>Install price not included - see install item below if applicable.</div><div>Final connection to mains to be done by licenced electrician - see other information below.</div>");
             }
             Toast.notify("Done.", 3000, {position: "top-right"});
         }
+
+        this._ledFields = {
+            boxWidth: fieldBoxWidth,
+            boxHeight: fieldBoxHeight,
+            boxDepth: fieldBoxDepth,
+            numberOfSides: fieldNumberOfSides,
+            ledWatt: fieldLEDWatt,
+            ledColour: fieldLEDColour,
+            loading: fieldLoading,
+            ampAllowance: fieldAmpAllowance,
+            voltage: fieldVoltage,
+            dimmable: fieldDimmable
+        };
+        this._ledUpdate = LEDUpdate;
+        this.applyLEDState();
     }
 
     hide() {

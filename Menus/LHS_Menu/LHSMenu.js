@@ -499,7 +499,6 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_Window"), "Window", "window", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_Layers"), "Panel Signs", "panel", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_Vehicle"), "Vehicles", "vehicle", {unlockListenEvent: "loadedPredefinedParts"});
-    addItem(GM_getResourceURL("Icon_Admin"), "Admin", "admin");
     addItem(GM_getResourceURL("Icon_CreditCard"), "Surcharge", "surcharge");
     addItem(GM_getResourceURL("Icon_3D"), "3D Letters", "3D", {unlockListenEvent: "loadedPredefinedParts"});
     addItem(GM_getResourceURL("Icon_POS"), "POS", "POS");
@@ -508,6 +507,7 @@ async function initLHSMenu() {
     addItem(GM_getResourceURL("Icon_Capral"), "Capral", "Capral");
     const consoleItem = addItem(GM_getResourceURL("Icon_Find"), "Console", "console", {badgeType: "consoleErrors"});
     registerConsoleErrorBadge(consoleItem.querySelector(".lhsMenuBadge"));
+    addItem(GM_getResourceURL("Icon_Admin"), "Admin", "admin");
 
     function addItem(imageSrc, text, openMenuName, options = {}) {
         const {overrideCss, unlockListenEvent, badgeType} = options;

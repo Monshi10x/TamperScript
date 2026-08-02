@@ -63,7 +63,7 @@ class InstallSummary {
         this.newPanelContent_MarkupContainer_TotalMarkup.style = "text-align: right; float:right;width:100px;";
         this.newPanelContent_MarkupContainer_TotalMarkup.innerHTML = "0% / 0x";
 
-        this.reorderProductsBtn = createButton("Re-Order Products", "width:100%;margin-top:8px;background-color:" + COLOUR.Blue + ";color:white;min-height:32px;", () => {
+        this.reorderProductsBtn = createButton("Re-Order Products", "width:100%;background-color:" + COLOUR.Blue + ";color:white;min-height:32px;", () => {
             this.openReorderProductsModal();
         });
 
