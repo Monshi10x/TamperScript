@@ -2,6 +2,7 @@ class Menu3D extends LHSMenuWindow {
 
       /** @ViewMode */
       #viewMode;
+      #groupMaterialDuringPartCreation;
       #numProducts = 0;
       #creationOrder = [ProductDetails, Size, SVGCutfile, Coil, Sheet, FrameSubscribable, LED, Transformer, Painting, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
 
