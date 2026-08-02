@@ -291,8 +291,7 @@ class Menu3D extends LHSMenuWindow {
             modal.setContainerSize(500, 500);
             let groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:450px;", () => {
                   Material.groupMaterialDuringPartCreation = groupMaterialDuringPartCreation[1].checked;
-            });
-            modal.addBodyElement(groupMaterialDuringPartCreation[0]);
+            }, modal.getBodyElement());
             modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {modal.hide();}));
       }
 
