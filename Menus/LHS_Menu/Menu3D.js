@@ -132,9 +132,6 @@ class Menu3D extends LHSMenuWindow {
 
                   this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 42px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.updateViewMode();}, this.page1);
 
-                  this.#groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:450px;", () => {
-                        Material.groupMaterialDuringPartCreation = this.#groupMaterialDuringPartCreation[1].checked;
-                  });
                   let settingsButton = createButton("", "width:40px;height:35px;margin:0px;font-size:20px;box-sizing:border-box;", () => {this.#openSettingsModal();}, this.page1);
                   settingsButton.innerHTML = "&#9881";
             });
@@ -278,7 +275,6 @@ class Menu3D extends LHSMenuWindow {
       #applyWindowPayload(payload = {}) {
             if(typeof payload.groupMaterialDuringPartCreation === "boolean") {
                   Material.groupMaterialDuringPartCreation = payload.groupMaterialDuringPartCreation;
-                  if(this.#groupMaterialDuringPartCreation) setCheckboxChecked(payload.groupMaterialDuringPartCreation, this.#groupMaterialDuringPartCreation[1]);
             }
             if(payload.containerRect) {
                   if(payload.containerRect.left !== null) this.container.style.left = payload.containerRect.left;
@@ -293,7 +289,10 @@ class Menu3D extends LHSMenuWindow {
       #openSettingsModal() {
             let modal = new Modal("Settings", () => { });
             modal.setContainerSize(500, 500);
-            modal.addBodyElement(this.#groupMaterialDuringPartCreation[0]);
+            let groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:450px;", () => {
+                  Material.groupMaterialDuringPartCreation = groupMaterialDuringPartCreation[1].checked;
+            });
+            modal.addBodyElement(groupMaterialDuringPartCreation[0]);
             modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {modal.hide();}));
       }
 
