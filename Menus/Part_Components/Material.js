@@ -11,6 +11,14 @@ class Material extends SubscriptionManager {
       #textColor = COLOUR.White;
       static DISPLAY_NAME = "MATERIAL";
       static groupMaterialDuringPartCreation = true;
+
+      static removeGroupMaterialCheckboxesOutsideSettings() {
+            document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+                  let container = checkbox.parentElement;
+                  let isGroupMaterialCheckbox = container?.textContent?.trim() === "Group material during part creation";
+                  if(isGroupMaterialCheckbox && !container.closest(".modalContainerBody")) deleteElement(container);
+            });
+      }
       UPDATES_PAUSED = false;
       /*
                         

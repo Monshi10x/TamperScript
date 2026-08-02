@@ -114,9 +114,7 @@ class Menu3D extends LHSMenuWindow {
             this.page1 = this.getPage(0);
 
             document.addEventListener("loadedPredefinedParts", () => {
-                  this.#groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:100%;margin:0px;box-sizing:border-box;", () => {
-                        Material.groupMaterialDuringPartCreation = this.#groupMaterialDuringPartCreation[1].checked;
-                  }, this.page1, true);
+                  Material.removeGroupMaterialCheckboxesOutsideSettings();
                   /*
                   ToggleOpen */
                   let toggleOpenBtn = createButton("Open All", "width:20%;height:40px;margin:0px;", () => {this.toggleAllOpen();}, this.page1);
@@ -287,6 +285,7 @@ class Menu3D extends LHSMenuWindow {
       }
 
       #openSettingsModal() {
+            Material.removeGroupMaterialCheckboxesOutsideSettings();
             let modal = new Modal("Settings", () => { });
             modal.setContainerSize(500, 500);
             let groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:450px;", () => {
