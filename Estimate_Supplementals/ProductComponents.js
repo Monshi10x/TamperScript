@@ -100,6 +100,7 @@ async function restoreSerializedMenuState(partText) {
 		menu3d: {menuKey: "3D", menuGetter: () => menu_3D},
 		panelSigns: {menuKey: "panel", menuGetter: () => menu_PanelSigns},
 		lightbox: {menuKey: "lightbox", menuGetter: () => menu_Lightbox},
+		led: {menuKey: "LED", menuGetter: () => menu_LED},
 		vehicle: {menuKey: "vehicle", menuGetter: () => menu_Vehicle}
 	};
 
