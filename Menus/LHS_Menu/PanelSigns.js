@@ -2,6 +2,7 @@ class MenuPanelSigns extends LHSMenuWindow {
 
 	/** @ViewMode */
 	#viewMode;
+	#groupMaterialDuringPartCreation;
 	#numProducts = 0;
 	#creationOrder = [ProductDetails, Size, SVGCutfile, Coil, Sheet, FrameSubscribable, LED, Transformer, Painting, Vinyl, Laminate, AppTaping, HandTrimming, PrintMounting, Finishing, ProductionSubscribable, ArtworkSubscribable, InstallSubscribable];
 
@@ -113,6 +114,9 @@ class MenuPanelSigns extends LHSMenuWindow {
 		this.page1 = this.getPage(0);
 
 		document.addEventListener("loadedPredefinedParts", () => {
+			this.#groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:100%;margin:0px;box-sizing:border-box;", () => {
+				Material.groupMaterialDuringPartCreation = this.#groupMaterialDuringPartCreation[1].checked;
+			}, this.page1, true);
 			/*
 			ToggleOpen */
 			let toggleOpenBtn = createButton("Open All", "width:20%;height:40px;margin:0px;", () => {this.#toggleAllOpen();}, this.page1);
