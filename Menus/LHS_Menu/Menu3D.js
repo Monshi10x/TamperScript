@@ -113,6 +113,7 @@ class Menu3D extends LHSMenuWindow {
             this.page1 = this.getPage(0);
 
             document.addEventListener("loadedPredefinedParts", () => {
+                  Material.removeGroupMaterialCheckboxesOutsideSettings();
                   /*
                   ToggleOpen */
                   let toggleOpenBtn = createButton("Open All", "width:20%;height:40px;margin:0px;", () => {this.toggleAllOpen();}, this.page1);
@@ -126,7 +127,10 @@ class Menu3D extends LHSMenuWindow {
                         this.page1, false
                   );
 
-                  this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 2px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.updateViewMode();}, this.page1);
+                  this.#viewMode = createDropdown_Infield('View Mode', 1, "width:calc(20% - 42px);height:35px;margin:0px;box-sizing:border-box;", [createDropdownOption("Per Type", "Per Type"), createDropdownOption("Per Product", "Per Product"), createDropdownOption("Per Type2", "Per Type2")], () => {this.updateViewMode();}, this.page1);
+
+                  let settingsButton = createButton("", "width:40px;height:35px;margin:0px;font-size:20px;box-sizing:border-box;", () => {this.#openSettingsModal();}, this.page1);
+                  settingsButton.innerHTML = "&#9881";
             });
 
             this.#createProductBtn = createButton("Create Product   " + "\u25BA", "width:100%;margin:0px;", () => {this.CreateProduct(this);});
@@ -164,6 +168,7 @@ class Menu3D extends LHSMenuWindow {
             return {
                   ...await super.buildSerializablePayload(),
                   viewMode: this.#viewMode?.[1]?.value || null,
+                  groupMaterialDuringPartCreation: Material.groupMaterialDuringPartCreation,
                   items: serializedItems
             };
       }
@@ -265,6 +270,9 @@ class Menu3D extends LHSMenuWindow {
       }
 
       #applyWindowPayload(payload = {}) {
+            if(typeof payload.groupMaterialDuringPartCreation === "boolean") {
+                  Material.groupMaterialDuringPartCreation = payload.groupMaterialDuringPartCreation;
+            }
             if(payload.containerRect) {
                   if(payload.containerRect.left !== null) this.container.style.left = payload.containerRect.left;
                   if(payload.containerRect.top !== null) this.container.style.top = payload.containerRect.top;
@@ -273,6 +281,16 @@ class Menu3D extends LHSMenuWindow {
             if(Number.isInteger(payload.currentPageIndex)) {
                   this.jumpToPage(payload.currentPageIndex);
             }
+      }
+
+      #openSettingsModal() {
+            Material.removeGroupMaterialCheckboxesOutsideSettings();
+            let modal = new Modal("Settings", () => { });
+            modal.setContainerSize(500, 500);
+            let groupMaterialDuringPartCreation = createCheckbox_Infield("Group material during part creation", Material.groupMaterialDuringPartCreation, "width:450px;", () => {
+                  Material.groupMaterialDuringPartCreation = groupMaterialDuringPartCreation[1].checked;
+            }, modal.getBodyElement());
+            modal.addFooterElement(createButton("Ok", "width:100px;float:right;", () => {modal.hide();}));
       }
 
       addQuickTemplate() {

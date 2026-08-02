@@ -241,12 +241,8 @@ class AppTaping extends Material {
             var name = this.#material[1].value;
             var partFullName = getPredefinedParts_Name_FromLimitedName(name);
 
-            for(let i = 0; i < this.#dataForSubscribers.length; i++) {
-                  let partQty = this.#dataForSubscribers[i].QWHD.qty;
-                  let partWidth = this.#dataForSubscribers[i].QWHD.width;
-                  let partHeight = this.#dataForSubscribers[i].QWHD.height;
-                  partIndex = await q_AddPart_DimensionWH(productNo, partIndex, true, partFullName, partQty, partWidth, partHeight, partFullName, "", false);
-            }
+            let sizeEntries = this.#dataForSubscribers.map((entry) => entry.QWHD);
+            partIndex = await this.createDimensionParts(productNo, partIndex, partFullName, sizeEntries);
             partIndex = await this.#production.Create(productNo, partIndex);
 
             return partIndex;
