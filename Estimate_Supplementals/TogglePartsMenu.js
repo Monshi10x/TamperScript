@@ -1,4 +1,4 @@
-function createTogglePartsContainer() {
+function createTogglePartsContainer(options = {}) {
     sidePanel = document.getElementById('divLeftColumn');
     var newPanel = document.createElement('div');
     newPanel.className = "ord-box";
@@ -18,6 +18,32 @@ function createTogglePartsContainer() {
     togglePartsText.innerText = "Toggle All Parts";
 
     newPanelContent2.appendChild(togglePartsText);
+    let loadStatus = document.createElement('div');
+    loadStatus.style = "clear:both;width:190px;margin:0 5px 3px;text-align:center;font-size:11px;";
+    loadStatus.innerText = "Load full part details in advance";
+    let loadAllButton = createButton("Load all", "clear:both;width:190px;height:24px;font-size:12px;cursor:pointer;margin:2px 5px 5px;", async () => {
+        if(typeof options.onLoadAll !== "function" || loadAllButton.disabled) return;
+
+        loadAllButton.disabled = true;
+        loadAllButton.innerText = "Loading...";
+        try {
+            let result = await options.onLoadAll({onProgress: progress => {
+                loadStatus.innerText = progress.total === 0
+                    ? "All parts are already loaded"
+                    : "Loading " + progress.completed + " of " + progress.total + " parts";
+            }});
+            loadStatus.innerText = result.total === 0
+                ? "All parts are already loaded"
+                : "Loaded " + result.completed + " parts";
+        } catch(error) {
+            console.warn("[Corebridge preload] Load all failed.", error);
+            loadStatus.innerText = "Some parts could not be loaded";
+        } finally {
+            loadAllButton.disabled = false;
+            loadAllButton.innerText = "Load all";
+        }
+    }, newPanelContent2);
+    newPanelContent2.appendChild(loadStatus);
     var leftBtn = createButton("Open", "width: 90px; height: 20px;font-size:12px;cursor: pointer;margin:5px", togglePartsOpen, newPanelContent2);
     var rightBtn = createButton("Close", "width: 90px; height: 20px; font-size:12px;cursor: pointer;margin:5px", togglePartsClosed, newPanelContent2);
 

@@ -1,85 +1,92 @@
 class QuoteLoadAccelerator {
 	constructor(options = {}) {
-		this.concurrency = options.concurrency || 3;
+		this.batchSize = options.batchSize || 6;
 		this.minimumOpenMs = options.minimumOpenMs || 350;
 		this.maximumOpenMs = options.maximumOpenMs || 8000;
-		this.queue = [];
-		this.queued = new WeakSet();
-		this.activeCount = 0;
-		this.scanTimer = null;
-		this.observer = null;
-		this.started = false;
+		this.loadedExpanders = new WeakSet();
+		this.isLoading = false;
 	}
 
-	start() {
-		if(this.started) return;
-		this.started = true;
+	async loadAll(options = {}) {
+		if(this.isLoading) return {completed: 0, total: 0};
+		this.isLoading = true;
 
-		this.observer = new MutationObserver(() => this.scheduleScan());
-		this.observer.observe(document.body, {childList: true, subtree: true});
-		window.setTimeout(() => this.scan(), 1200);
+		let onProgress = typeof options.onProgress === 'function' ? options.onProgress : () => {};
+		let expanders = this.findUnloadedExpanders();
+		let completed = 0;
+		onProgress({completed, total: expanders.length});
+
+		try {
+			for(let index = 0; index < expanders.length; index += this.batchSize) {
+				let batch = expanders.slice(index, index + this.batchSize);
+				completed += await this.hydrateBatch(batch);
+				onProgress({completed, total: expanders.length});
+				await this.delay(100);
+			}
+		} finally {
+			this.isLoading = false;
+		}
+
+		return {completed, total: expanders.length};
 	}
 
-	scheduleScan() {
-		if(this.scanTimer !== null) return;
-		this.scanTimer = window.setTimeout(() => {
-			this.scanTimer = null;
-			this.scan();
-		}, 250);
-	}
-
-	scan() {
+	findUnloadedExpanders() {
+		let collapsedExpanders = [];
 		let products = document.querySelectorAll('div[class^="ord-prod-model-item"]');
 		for(let productIndex = 0; productIndex < products.length; productIndex++) {
 			let expanders = products[productIndex].querySelectorAll('.partExpander');
 			for(let partIndex = 0; partIndex < expanders.length; partIndex++) {
 				let expander = expanders[partIndex];
-				if(this.queued.has(expander)) continue;
+				if(expander.classList.contains('collapse')) {
+					this.loadedExpanders.add(expander);
+				} else if(!this.loadedExpanders.has(expander)) {
+					collapsedExpanders.push(expander);
+				}
+			}
+		}
+		return collapsedExpanders;
+	}
 
-				this.queued.add(expander);
-				// Expanded parts have already caused Corebridge to fetch their full data.
-				if(!expander.classList.contains('collapse')) this.queue.push(expander);
+	async hydrateBatch(expanders) {
+		let parts = [];
+		for(let index = 0; index < expanders.length; index++) {
+			let expander = expanders[index];
+			let part = expander.isConnected ? expander.closest('div[id^="ord_prod_part_"]') : null;
+			if(!part || expander.classList.contains('collapse')) continue;
+
+			let state = {expander, part, userChangedPart: false, noteUserChange: null, wasOpened: false};
+			state.noteUserChange = event => {
+				if(event.isTrusted) state.userChangedPart = true;
+			};
+			part.addEventListener('click', state.noteUserChange, true);
+			parts.push(state);
+		}
+
+		try {
+			// Clicking the complete batch first lets Chrome run several independent
+			// Corebridge requests in parallel without flooding the legacy page.
+			for(let index = 0; index < parts.length; index++) {
+				let state = parts[index];
+				state.expander.click();
+				state.wasOpened = true;
+			}
+			await this.waitForCorebridgeRequests();
+			for(let index = 0; index < parts.length; index++) {
+				let state = parts[index];
+				let closeExpander = state.part.querySelector('.partExpander.collapse');
+				if(!state.userChangedPart && closeExpander) closeExpander.click();
+			}
+		} finally {
+			for(let index = 0; index < parts.length; index++) {
+				let state = parts[index];
+				state.part.removeEventListener('click', state.noteUserChange, true);
+			}
+			for(let index = 0; index < parts.length; index++) {
+				if(parts[index].wasOpened) this.loadedExpanders.add(parts[index].expander);
 			}
 		}
 
-		this.runQueue();
-	}
-
-	runQueue() {
-		while(this.activeCount < this.concurrency && this.queue.length > 0) {
-			let expander = this.queue.shift();
-			if(!expander.isConnected || expander.classList.contains('collapse')) continue;
-
-			this.activeCount++;
-			this.hydratePart(expander).catch(error => {
-				console.warn('[Corebridge preload] Could not preload a part.', error);
-			}).finally(() => {
-				this.activeCount--;
-				window.setTimeout(() => this.runQueue(), 100);
-			});
-		}
-	}
-
-	async hydratePart(expander) {
-		let part = expander.closest('div[id^="ord_prod_part_"]');
-		if(!part) return;
-
-		let userChangedPart = false;
-		let noteUserChange = event => {
-			if(event.isTrusted) userChangedPart = true;
-		};
-		part.addEventListener('click', noteUserChange, true);
-
-		try {
-			expander.click();
-			await this.waitForCorebridgeRequests();
-
-			// Restore the layout unless the user interacted while it was prefetched.
-			let closeExpander = part.querySelector('.partExpander.collapse');
-			if(!userChangedPart && closeExpander) closeExpander.click();
-		} finally {
-			part.removeEventListener('click', noteUserChange, true);
-		}
+		return parts.filter(state => state.wasOpened).length;
 	}
 
 	waitForCorebridgeRequests() {
@@ -100,5 +107,9 @@ class QuoteLoadAccelerator {
 			};
 			window.setTimeout(check, this.minimumOpenMs);
 		});
+	}
+
+	delay(milliseconds) {
+		return new Promise(resolve => window.setTimeout(resolve, milliseconds));
 	}
 }
