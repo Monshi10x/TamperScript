@@ -1,6 +1,6 @@
 class QuoteLoadAccelerator {
 	constructor(options = {}) {
-		this.batchSize = options.batchSize || 6;
+		this.concurrency = options.concurrency || 3;
 		this.minimumOpenMs = options.minimumOpenMs || 350;
 		this.maximumOpenMs = options.maximumOpenMs || 8000;
 		this.loadedExpanders = new WeakSet();
@@ -13,16 +13,29 @@ class QuoteLoadAccelerator {
 
 		let onProgress = typeof options.onProgress === 'function' ? options.onProgress : () => {};
 		let expanders = this.findUnloadedExpanders();
+		let nextIndex = 0;
 		let completed = 0;
 		onProgress({completed, total: expanders.length});
 
-		try {
-			for(let index = 0; index < expanders.length; index += this.batchSize) {
-				let batch = expanders.slice(index, index + this.batchSize);
-				completed += await this.hydrateBatch(batch);
+		let loadNext = async () => {
+			while(nextIndex < expanders.length) {
+				let expander = expanders[nextIndex];
+				nextIndex++;
+				try {
+					if(await this.hydratePart(expander)) completed++;
+				} catch(error) {
+					console.warn('[Corebridge preload] Could not preload a part.', error);
+				}
 				onProgress({completed, total: expanders.length});
 				await this.delay(100);
 			}
+		};
+
+		try {
+			let workers = [];
+			let workerCount = Math.min(this.concurrency, expanders.length);
+			for(let index = 0; index < workerCount; index++) workers.push(loadNext());
+			await Promise.all(workers);
 		} finally {
 			this.isLoading = false;
 		}
@@ -47,46 +60,27 @@ class QuoteLoadAccelerator {
 		return collapsedExpanders;
 	}
 
-	async hydrateBatch(expanders) {
-		let parts = [];
-		for(let index = 0; index < expanders.length; index++) {
-			let expander = expanders[index];
-			let part = expander.isConnected ? expander.closest('div[id^="ord_prod_part_"]') : null;
-			if(!part || expander.classList.contains('collapse')) continue;
+	async hydratePart(expander) {
+		let part = expander.isConnected ? expander.closest('div[id^="ord_prod_part_"]') : null;
+		if(!part || expander.classList.contains('collapse')) return false;
 
-			let state = {expander, part, userChangedPart: false, noteUserChange: null, wasOpened: false};
-			state.noteUserChange = event => {
-				if(event.isTrusted) state.userChangedPart = true;
-			};
-			part.addEventListener('click', state.noteUserChange, true);
-			parts.push(state);
-		}
+		let userChangedPart = false;
+		let noteUserChange = event => {
+			if(event.isTrusted) userChangedPart = true;
+		};
+		part.addEventListener('click', noteUserChange, true);
 
 		try {
-			// Clicking the complete batch first lets Chrome run several independent
-			// Corebridge requests in parallel without flooding the legacy page.
-			for(let index = 0; index < parts.length; index++) {
-				let state = parts[index];
-				state.expander.click();
-				state.wasOpened = true;
-			}
+			expander.click();
 			await this.waitForCorebridgeRequests();
-			for(let index = 0; index < parts.length; index++) {
-				let state = parts[index];
-				let closeExpander = state.part.querySelector('.partExpander.collapse');
-				if(!state.userChangedPart && closeExpander) closeExpander.click();
-			}
-		} finally {
-			for(let index = 0; index < parts.length; index++) {
-				let state = parts[index];
-				state.part.removeEventListener('click', state.noteUserChange, true);
-			}
-			for(let index = 0; index < parts.length; index++) {
-				if(parts[index].wasOpened) this.loadedExpanders.add(parts[index].expander);
-			}
-		}
 
-		return parts.filter(state => state.wasOpened).length;
+			let closeExpander = part.querySelector('.partExpander.collapse');
+			if(!userChangedPart && closeExpander) closeExpander.click();
+			this.loadedExpanders.add(expander);
+			return true;
+		} finally {
+			part.removeEventListener('click', noteUserChange, true);
+		}
 	}
 
 	waitForCorebridgeRequests() {
