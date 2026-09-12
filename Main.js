@@ -69,6 +69,7 @@ var saveReminder;
   createCopyPartModal();
   createCostAnalysisSummaryContainer();
   createTogglePartsContainer();
+  new QuoteLoadAccelerator().start();
   createSummaryHelper();
   installSummary = new InstallSummary();
   saveReminder = new SaveReminder();
