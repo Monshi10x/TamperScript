@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Corebridge Plugin (advanced) github
 // @namespace    http://tampermonkey.net/
-// @version      10.658
+// @version      10.660
 // @description  Corebridge Plugin
 // @author       Tristan Cargill
 // @match        https://sar10686.corebridge.net/SalesModule/Estimates/QuickPrice*
@@ -145,6 +145,7 @@
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Mouse/ContextMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/SaveReminder.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/ProductComponents.js
+// @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/QuoteLoadAccelerator.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/TogglePartsMenu.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/SummaryHelper.js
 // @require      https://github.com/Monshi10x/TamperScript/raw/main/Estimate_Supplementals/CostAnalysisSummary.js
