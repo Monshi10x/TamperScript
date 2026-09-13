@@ -1,4 +1,4 @@
-function createTogglePartsContainer() {
+function createTogglePartsContainer(options = {}) {
     sidePanel = document.getElementById('divLeftColumn');
     var newPanel = document.createElement('div');
     newPanel.className = "ord-box";
@@ -18,6 +18,60 @@ function createTogglePartsContainer() {
     togglePartsText.innerText = "Toggle All Parts";
 
     newPanelContent2.appendChild(togglePartsText);
+    let loadStatus = document.createElement('div');
+    loadStatus.style = "clear:both;width:190px;margin:0 5px 3px;text-align:center;font-size:11px;";
+    loadStatus.innerText = "Load full part details in advance";
+    let loadAllButton = createButton("Load all", "clear:both;width:190px;height:24px;font-size:12px;cursor:pointer;margin:2px 5px 5px;", async () => {
+        if(typeof options.onLoadAll !== "function" || loadAllButton.disabled) return;
+
+        loadAllButton.disabled = true;
+        loadAllButton.setAttribute("aria-busy", "true");
+        updateLoadButtonProgress({completed: 0, total: 0});
+        try {
+            let result = await options.onLoadAll({onProgress: progress => {
+                updateLoadButtonProgress(progress);
+                loadStatus.innerText = progress.total === 0
+                    ? "All parts are already loaded"
+                    : "Loading " + progress.completed + " of " + progress.total + " parts";
+            }});
+            loadStatus.innerText = result.total === 0
+                ? "All parts are already loaded"
+                : "Loaded " + result.completed + " parts";
+        } catch(error) {
+            console.warn("[Corebridge preload] Load all failed.", error);
+            loadStatus.innerText = "Some parts could not be loaded";
+        } finally {
+            loadAllButton.disabled = false;
+            loadAllButton.setAttribute("aria-busy", "false");
+            loadButtonLabel.innerText = "Load all";
+            loadButtonProgress.style.width = "0%";
+        }
+    }, newPanelContent2);
+    loadAllButton.style.position = "relative";
+    loadAllButton.style.overflow = "hidden";
+    loadAllButton.innerText = "";
+
+    let loadButtonProgress = document.createElement("span");
+    loadButtonProgress.style = "position:absolute;left:0;top:0;width:0%;height:100%;background:rgba(255,255,255,0.35);transition:width 150ms linear;pointer-events:none;";
+    loadButtonProgress.setAttribute("aria-hidden", "true");
+    loadAllButton.appendChild(loadButtonProgress);
+
+    let loadButtonLabel = document.createElement("span");
+    loadButtonLabel.style = "position:relative;z-index:1;pointer-events:none;";
+    loadButtonLabel.innerText = "Load all";
+    loadAllButton.appendChild(loadButtonLabel);
+
+    let updateLoadButtonProgress = progress => {
+        let percent = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0;
+        loadButtonProgress.style.width = percent + "%";
+        loadButtonLabel.innerText = progress.total > 0
+            ? "Loading " + progress.completed + "/" + progress.total
+            : "Loading...";
+        loadAllButton.setAttribute("aria-valuemin", "0");
+        loadAllButton.setAttribute("aria-valuemax", progress.total.toString());
+        loadAllButton.setAttribute("aria-valuenow", progress.completed.toString());
+    };
+    newPanelContent2.appendChild(loadStatus);
     var leftBtn = createButton("Open", "width: 90px; height: 20px;font-size:12px;cursor: pointer;margin:5px", togglePartsOpen, newPanelContent2);
     var rightBtn = createButton("Close", "width: 90px; height: 20px; font-size:12px;cursor: pointer;margin:5px", togglePartsClosed, newPanelContent2);
 

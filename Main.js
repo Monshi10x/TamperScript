@@ -68,7 +68,8 @@ var saveReminder;
 
   createCopyPartModal();
   createCostAnalysisSummaryContainer();
-  createTogglePartsContainer();
+  let quoteLoadAccelerator = new QuoteLoadAccelerator();
+  createTogglePartsContainer({onLoadAll: options => quoteLoadAccelerator.loadAll(options)});
   createSummaryHelper();
   installSummary = new InstallSummary();
   saveReminder = new SaveReminder();
