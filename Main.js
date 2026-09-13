@@ -66,6 +66,9 @@ var saveReminder;
   const myCss = GM_getResourceText("IMPORTED_CSS");
   GM_addStyle(myCss);
 
+  const atlasTheme = new CorebridgeAtlasTheme();
+  atlasTheme.init();
+
   createCopyPartModal();
   createCostAnalysisSummaryContainer();
   let quoteLoadAccelerator = new QuoteLoadAccelerator();

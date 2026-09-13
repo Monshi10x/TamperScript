@@ -1,0 +1,117 @@
+@media screen {
+  html[data-cb-atlas-editor][data-cb-atlas-theme="dark"] {
+    --cb-atlas-page: #070707;
+    --cb-atlas-surface: #111111;
+    --cb-atlas-surface-raised: #1b1b1b;
+    --cb-atlas-surface-hover: #252525;
+    --cb-atlas-input: #161616;
+    --cb-atlas-border: #383838;
+    --cb-atlas-control-border: #707070;
+    --cb-atlas-text: #f4f4f4;
+    --cb-atlas-text-muted: #b6b6b6;
+    --cb-atlas-accent: #f5a900;
+    --cb-atlas-accent-hover: #ffb300;
+    --cb-atlas-on-accent: #111111;
+    --cb-atlas-link: #ffc14d;
+    --cb-atlas-focus: #ffc14d;
+    --cb-atlas-danger: #ffaaaa;
+    --cb-atlas-success: #8cdeae;
+    color-scheme: dark;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme="light"] {
+    --cb-atlas-page: #f3f4f6;
+    --cb-atlas-surface: #ffffff;
+    --cb-atlas-surface-raised: #f8f9fa;
+    --cb-atlas-surface-hover: #eceff3;
+    --cb-atlas-input: #ffffff;
+    --cb-atlas-border: #d1d5db;
+    --cb-atlas-control-border: #737b87;
+    --cb-atlas-text: #181b20;
+    --cb-atlas-text-muted: #56606e;
+    --cb-atlas-accent: #f5a900;
+    --cb-atlas-accent-hover: #e49d00;
+    --cb-atlas-on-accent: #111111;
+    --cb-atlas-link: #825400;
+    --cb-atlas-focus: #825400;
+    --cb-atlas-danger: #a51d29;
+    --cb-atlas-success: #17683a;
+    color-scheme: light;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] body,
+  html[data-cb-atlas-editor][data-cb-atlas-theme] #MainContent,
+  html[data-cb-atlas-editor][data-cb-atlas-theme] #MainContentInner,
+  html[data-cb-atlas-editor][data-cb-atlas-theme] #createOrderEntry,
+  html[data-cb-atlas-editor][data-cb-atlas-theme] #innerOrderStep {
+    background: var(--cb-atlas-page) !important;
+    color: var(--cb-atlas-text);
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(#Header, #divLeftHeaderSection, #ctl00_RibbonsTabs, #ctl00_pnlSalesNav) {
+    background: var(--cb-atlas-surface) !important;
+    color: var(--cb-atlas-text) !important;
+    border-color: var(--cb-atlas-border) !important;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(#divLeftColumn, #orderHeader, #orderStepsBtn, #stepsInfos, #orderSummary, #orderSummaryBody, #orderDetailEntry, #companyPanel, #orderContactGroup, .ord-box, .ord-prod-header, .ord-prod-body, .ord-prod-footer, .ord-prod-part, .ord-prod-part-header, .ord-prod-part-body, .ord-prod-part-container, .ord-prod-part-footer, .pricing-panel-table, .pnlPricingAllViews, .ui-widget-content, .ui-tabs-panel, .modalSectionBg, .simplemodal-data) {
+    background-color: var(--cb-atlas-surface) !important;
+    color: var(--cb-atlas-text) !important;
+    border-color: var(--cb-atlas-border) !important;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(.ord-prod-header, .ord-prod-part-header, .ord-prod-header-tab, .ui-widget-header, .ui-tabs-nav, .sectionTitle) {
+    background-color: var(--cb-atlas-surface-raised) !important;
+    color: var(--cb-atlas-text) !important;
+    border-color: var(--cb-atlas-border) !important;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(input:not([type="color"]), select, textarea, .defaultInput, .txtStyle-2) {
+    background-color: var(--cb-atlas-input) !important;
+    color: var(--cb-atlas-text) !important;
+    border-color: var(--cb-atlas-control-border) !important;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(input, select, textarea)::placeholder { color: var(--cb-atlas-text-muted); }
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(input, select, textarea):disabled,
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(input, textarea)[readonly] { opacity: .72; background: var(--cb-atlas-surface-hover) !important; }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(a, .partNameBtn) { color: var(--cb-atlas-link) !important; }
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(#newSubtotal, #newtotal, .partPrice) { color: var(--cb-atlas-text) !important; font-weight: 700; }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(.buttonStyleSelected, .ui-state-active, .ui-tabs-selected, #orderStep1Btn.active, #orderStep2Btn.active, #orderStep3Btn.active) {
+    background: var(--cb-atlas-accent) !important;
+    border-color: var(--cb-atlas-accent) !important;
+    color: var(--cb-atlas-on-accent) !important;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(.defaultbutton, .defaultbutton-2, .buttonStyle, .lbSavePart, button):not(.cb-atlas-theme-toggle) {
+    border-radius: 4px;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] :is(button, a, input, select, textarea):focus-visible {
+    outline: 3px solid var(--cb-atlas-focus) !important;
+    outline-offset: 2px;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] .cb-atlas-theme-toggle {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    z-index: 1001;
+    min-width: 76px;
+    padding: 6px 10px;
+    border: 1px solid var(--cb-atlas-control-border);
+    border-radius: 5px;
+    background: var(--cb-atlas-accent);
+    color: var(--cb-atlas-on-accent);
+    font: 600 12px/1.2 Arial, sans-serif;
+    cursor: pointer;
+  }
+
+  html[data-cb-atlas-editor][data-cb-atlas-theme] .cb-atlas-theme-toggle:hover { background: var(--cb-atlas-accent-hover); }
+}
+
+@media print {
+  .cb-atlas-theme-toggle { display: none !important; }
+}
