@@ -1,6 +1,6 @@
 class QuoteLoadAccelerator {
 	constructor(options = {}) {
-		this.concurrency = options.concurrency || 3;
+		this.concurrency = options.concurrency || 6;
 		this.minimumOpenMs = options.minimumOpenMs || 350;
 		this.maximumOpenMs = options.maximumOpenMs || 8000;
 		this.loadedExpanders = new WeakSet();
@@ -27,7 +27,6 @@ class QuoteLoadAccelerator {
 					console.warn('[Corebridge preload] Could not preload a part.', error);
 				}
 				onProgress({completed, total: expanders.length});
-				await this.delay(100);
 			}
 		};
 
@@ -101,9 +100,5 @@ class QuoteLoadAccelerator {
 			};
 			window.setTimeout(check, this.minimumOpenMs);
 		});
-	}
-
-	delay(milliseconds) {
-		return new Promise(resolve => window.setTimeout(resolve, milliseconds));
 	}
 }
