@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Atlas Dimensions</title>
+  <style>
+    :root { font-family: ui-sans-serif,-apple-system,Segoe UI,Roboto,Arial; color:#eee; }
+    body { margin:0; background:#1f1f1f; }
+    header { padding:12px; font-weight:700; border-bottom:1px solid #333; }
+    .tabs { display:flex; gap:8px; padding:8px 12px; border-bottom:1px solid #333; background:#181818; position:sticky; top:0; z-index:2; }
+    .tab-btn { appearance:none; border:1px solid #333; background:#2a2a2a; color:#ccc; padding:6px 10px; border-radius:8px; cursor:pointer; font-size:12px; }
+	.tab-btn:hover{ background-color:#222;}
+    .tab-btn.active { background:blue; border-color:#3b82f6; color:#fff; }
+	.tab-btn.active:hover { background:#000099; border-color:#3b82f6; color:#fff; }
+    .wrap { padding:12px; display:grid; gap:10px; }
+    fieldset { border:1px solid #444; border-radius:8px; padding:10px;display:block;float:left; width:calc(100% - 24px);}
+    legend { padding:0 6px; color:#aaa; }
+    .grid-3 { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; }
+    .icon-btn { display:grid; place-items:center; background:blue; border:1px solid #444; border-radius:10px; padding:10px; cursor:pointer; height:70px; }
+    .icon-btn:hover { background-color:#000099; }
+    .icon-btn svg { width:50px; height:50px; }
+    .center-cell { display:grid; place-items:center; color:#bbb; border:1px dashed #444; border-radius:10px; background:#202020; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; }
+    button.plain { background:#2a2a2a; color:#eee; border:1px solid #444; border-radius:8px; padding:8px 10px; cursor:pointer; }
+	button.plain:hover{background-color:#222;};
+    .danger { background:#3a1e1e; border-color:#7a3b3b; }
+    .log { background:#0d0d0d; border:1px solid #222; padding:8px; min-height:90px; max-height:160px; overflow:auto; font:12px/1.35 ui-monospace,Consolas,monospace; }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+    label { display:flex; justify-content:space-between; margin:6px 0; font-size:12px; color:#ccc; gap:12px; align-items:center; }
+    label span { flex:1; }
+    input[type="number"] { width:140px; background:#111; color:#eee; border:1px solid #444; border-radius:6px; padding:4px 6px; }
+    input[type="checkbox"] { transform: scale(1.1); }
+    small.note { color:#9aa; }
+  </style>
+</head>
+<body>
+  <header>Atlas Dimensions</header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="dim">Dimensions</button>
+    <button class="tab-btn" data-tab="settings">Settings</button>
+  </div>
+
+  <div class="wrap">
+    <!-- Dimensions tab -->
+    <section id="tab-dim" class="tab-panel active">
+      <fieldset>
+        <legend>Quick Add</legend>
+        <div class="grid-3">
+          <button id="btnTop" class="icon-btn" title="Add Top">
+            <!-- top icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="6" y="7" width="12" height="10" rx="1" />
+              <path d="M3 5h18" />
+              <path d="M3 5l2 2M3 5l2-2" />
+              <path d="M21 5l-2 2M21 5l-2-2" />
+            </svg>
+          </button>
+          <button id="btnVBoth" class="icon-btn" title="Vertical Both">
+            <!-- vertical both icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="7" y="6" width="10" height="12" rx="1" />
+              <path d="M12 3v18" />
+              <path d="M12 3l-2 2M12 3l2 2" />
+              <path d="M12 21l-2-2M12 21l2-2" />
+            </svg>
+          </button>
+          <button id="btnBottom" class="icon-btn" title="Add Bottom">
+            <!-- bottom icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="6" y="7" width="12" height="10" rx="1" />
+              <path d="M3 19h18" />
+              <path d="M3 19l2 2M3 19l2-2" />
+              <path d="M21 19l-2 2M21 19l-2-2" />
+            </svg>
+          </button>
+
+          <button id="btnLeft" class="icon-btn" title="Add Left">
+            <!-- left icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="7" y="6" width="10" height="12" rx="1" />
+              <path d="M5 3v18" />
+              <path d="M5 3l-2 2M5 3l2 2" />
+              <path d="M5 21l-2-2M5 21l2-2" />
+            </svg>
+          </button>
+          <div class="center-cell" id="centerCell">
+            <div id="centerInfo">—</div>
+          </div>
+          <button id="btnRight" class="icon-btn" title="Add Right">
+            <!-- right icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="7" y="6" width="10" height="12" rx="1" />
+              <path d="M19 3v18" />
+              <path d="M19 3l-2 2M19 3l2 2" />
+              <path d="M19 21l-2-2M19 21l2-2" />
+            </svg>
+          </button>
+
+          <div></div>
+          <button id="btnHBoth" class="icon-btn" title="Horizontal Both">
+            <!-- horizontal both icon -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="6" y="7" width="12" height="10" rx="1" />
+              <path d="M3 12h18" />
+              <path d="M3 12l2-2M3 12l2 2" />
+              <path d="M21 12l-2-2M21 12l-2 2" />
+            </svg>
+          </button>
+          <div></div>
+        </div>
+      </fieldset>
+
+	<fieldset>
+        <legend>Actions</legend>
+      <div class="row">
+        <button id="btnClear" class="plain danger">Clear ‘Dimensions’ Layer</button>
+      </div>
+        <label><span>Scale Appearance (%)</span><input type="number" id="scaleAppearance" step="10" value="100"></label>
+	</fieldset>
+	<fieldset>
+	<legend>Log</legend>
+      <pre class="log" id="log"></pre>
+	</fieldset>
+    </section>
+
+    <!-- Settings tab -->
+    <section id="tab-settings" class="tab-panel">
+      <fieldset>
+        <legend>Offsets & Appearance</legend>
+        <label><span>Offset from object (mm)</span><input type="number" id="offsetMm" step="0.1" value="50"></label>
+        <label><span>Tick length (mm)</span><input type="number" id="ticLenMm" step="0.1" value="50"></label>
+        <label><span>Text size (pt)</span><input type="number" id="textPt" step="0.5" value="100"></label>
+        <label><span>Stroke width (pt)</span><input type="number" id="strokePt" step="0.25" value="2"></label>
+        <label><span>Label decimals</span><input type="number" id="decimals" step="1" value="1"></label>
+        <label><span>Label gap from line (mm)</span><input type="number" id="labelGapMm" step="0.1" value="20"></label>
+		<label><span>Text border thickness (pt)</span><input type="number" id="textBorderPt" step="0.1" value="0"></label>
+		</fieldset>
+    <fieldset>
+      <legend>Colours</legend>
+      <div class="grid-3">
+        <label>Text colour<br><input type="color" id="textColor" value="#ff00ff"></label>
+        <label>Line colour<br><input type="color" id="lineColor" value="#000000"></label>
+        <label>Text border colour<br><input type="color" id="textBorderColor" value="#00ffff"></label>
+      </div>
+    </fieldset>
+</label>
+      </fieldset>
+    </section>
+  </div>
+
+  <script>
+  (function(){
+    function qsa(sel){ return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+    function byId(id){ return document.getElementById(id); }
+    function hasClass(el,c){ return (' '+el.className+' ').indexOf(' '+c+' ')>-1; }
+    function addClass(el,c){ if(!hasClass(el,c)) el.className = (el.className?el.className+' ':'') + c; }
+    function removeClass(el,c){ el.className = el.className.replace(new RegExp('(^|\\s)'+c+'(\\s|$)','g'),' ').replace(/\s+/g,' ').replace(/^\s+|\s+$/g,''); }
+    var btns = qsa('.tab-btn');
+    var dim = byId('tab-dim');
+    var settings = byId('tab-settings');
+    function activate(name){
+      for (var i=0;i<btns.length;i++){
+        var b = btns[i];
+        if (b.getAttribute('data-tab') === name) addClass(b,'active'); else removeClass(b,'active');
+      }
+      if (name === 'dim'){ addClass(dim,'active'); removeClass(settings,'active'); }
+      else { addClass(settings,'active'); removeClass(dim,'active'); }
+    }
+    for (var i=0;i<btns.length;i++){
+      (function(b){
+        b.addEventListener('click', function(){ activate(b.getAttribute('data-tab')); }, false);
+      })(btns[i]);
+    }
+  })();
+</script>
+
+  <script src="js/CSInterface.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>
