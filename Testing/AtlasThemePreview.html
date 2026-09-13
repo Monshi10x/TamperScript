@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-cb-atlas-editor data-cb-atlas-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sanitised CoreBridge Atlas theme preview</title>
+  <link rel="stylesheet" href="../Styles/AtlasTheme.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 14px Arial, sans-serif; }
+    #Header { height: 54px; padding: 18px 28px; font-weight: 700; }
+    #ctl00_RibbonsTabs { position: relative; height: 44px; padding: 13px 28px; }
+    #MainContent { min-height: calc(100vh - 98px); padding: 24px; }
+    #createOrderEntry { display: grid; grid-template-columns: 230px 1fr; gap: 18px; max-width: 1180px; margin: auto; }
+    .ord-box, .ord-prod-header, .ord-prod-body, .ord-prod-part { border: 1px solid; border-radius: 5px; }
+    .ord-box { margin-bottom: 12px; overflow: hidden; }
+    .ord-title, .ord-body { display: block; padding: 10px; }
+    .ord-title { font-weight: 700; border-bottom: 1px solid; }
+    .summary-line { display: flex; justify-content: space-between; padding: 4px 0; }
+    .ts-reorder-products-button { display: block; width: calc(100% - 20px); margin: 10px auto; min-height: 32px; background: #f5a900; border: 0; }
+    .ord-prod-header { padding: 10px; font-weight: 700; }
+    .ord-prod-body { padding: 12px; }
+    .ord-prod-part { display: grid; grid-template-columns: 90px 1fr 90px; gap: 12px; margin: 8px 0; padding: 9px; }
+    input { width: 100%; padding: 6px; border: 1px solid; }
+    .partPrice { text-align: right; }
+    @media (max-width: 760px) { #createOrderEntry { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header id="Header">CoreBridge <span style="font-weight:400">Estimate Editor — sample data</span></header>
+  <nav id="ctl00_RibbonsTabs">Sales Home &nbsp;&nbsp; Estimates
+    <button id="cb-atlas-theme-toggle" class="cb-atlas-theme-toggle" type="button" aria-pressed="true" aria-label="Switch to light mode">☀ Light</button>
+  </nav>
+  <main id="MainContent">
+    <div id="createOrderEntry">
+      <aside id="divLeftColumn">
+        <section class="ord-box"><span class="ord-title">Order Summary</span><div class="ord-body"><div class="summary-line"><span>Subtotal</span><strong>$1,200.00</strong></div><div class="summary-line"><span>Tax</span><span>$120.00</span></div><div class="summary-line" id="newtotal"><span>Total</span><span>$1,320.00</span></div></div></section>
+        <section class="ord-box"><span class="ord-title">Install Analysis Summary</span><div class="ord-body"><div class="summary-line"><span>Install Costs</span><span>$250</span></div><div class="summary-line"><span>Install Profit</span><span>$300</span></div></div></section>
+        <button class="ts-reorder-products-button" type="button">Re-Order Products</button>
+      </aside>
+      <section id="innerOrderStep">
+        <div class="ord-prod-header">Product 1</div>
+        <div class="ord-prod-body">
+          <label>Product name <input value="Sanitised sample sign" readonly></label>
+          <div class="ord-prod-part"><strong>Part 1.A</strong><span>Printed aluminium panel</span><span class="partPrice">$700.00</span></div>
+          <div class="ord-prod-part"><strong>Part 1.B</strong><span>Installation</span><span class="partPrice">$500.00</span></div>
+          <button class="buttonStyleSelected" type="button">Update product</button>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script>
+    document.getElementById("cb-atlas-theme-toggle").addEventListener("click", event => {
+      event.preventDefault();
+      let root = document.documentElement;
+      let dark = root.getAttribute("data-cb-atlas-theme") === "dark";
+      root.setAttribute("data-cb-atlas-theme", dark ? "light" : "dark");
+      event.currentTarget.setAttribute("aria-pressed", String(!dark));
+      event.currentTarget.setAttribute("aria-label", dark ? "Switch to dark mode" : "Switch to light mode");
+      event.currentTarget.textContent = dark ? "● Dark" : "☀ Light";
+    });
+  </script>
+</body>
+</html>

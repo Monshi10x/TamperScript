@@ -63,9 +63,10 @@ class InstallSummary {
         this.newPanelContent_MarkupContainer_TotalMarkup.style = "text-align: right; float:right;width:100px;";
         this.newPanelContent_MarkupContainer_TotalMarkup.innerHTML = "0% / 0x";
 
-        this.reorderProductsBtn = createButton("Re-Order Products", "width:100%;background-color:" + COLOUR.Blue + ";color:white;min-height:32px;", () => {
+        this.reorderProductsBtn = createButton("Re-Order Products", "display:block;float:none;width:calc(100% - 20px);margin:10px auto;background-color:" + COLOUR.Blue + ";color:white;min-height:32px;", () => {
             this.openReorderProductsModal();
         });
+        this.reorderProductsBtn.classList.add("ts-reorder-products-button");
 
         //adds
         this.newPanel.appendChild(this.newPanelHeader);
@@ -81,7 +82,6 @@ class InstallSummary {
         this.newPanelContent_MarkupContainer.appendChild(this.newPanelContent_MarkupContainer_Header);
         this.newPanelContent_MarkupContainer.appendChild(this.newPanelContent_MarkupContainer_TotalMarkup);
         this.newPanelContent.appendChild(this.newPanelContent_MarkupContainer);
-        this.newPanelContent.appendChild(this.reorderProductsBtn);
         this.newPanel.appendChild(this.newPanelContent);
         this.sidePanel.appendChild(this.newPanel);
         this.sidePanel.appendChild(this.reorderProductsBtn);
