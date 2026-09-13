@@ -17,7 +17,11 @@
 			"path": "../Atlas-Tools-CRM"
 		},
 		{
-			"path": "../Signarama-Illustrator-Helper"
+			"name": "QuickbooksConnector",
+			"path": "../QuickbooksConnector"
+		},
+		{
+			"path": "../../../../Program Files (x86)/Common Files/Adobe/CEP/extensions/Signarama-Illustrator-Helper"
 		}
 	],
 	"settings": {
@@ -271,7 +275,7 @@
 		},
 		"editor.fontFamily": "Consolas, 'Courier New', monospace",
 		"editor.fontSize": 12,
-		"liveServer.settings.multiRootWorkspaceName": "TamperScript",
+		"liveServer.settings.multiRootWorkspaceName": "SignScheduler",
 		"chatgpt.openOnStartup": true
 	}
 }
