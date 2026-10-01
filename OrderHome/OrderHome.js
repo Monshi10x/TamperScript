@@ -119,10 +119,10 @@ class OrderHome {
             {name: "Capabilities One Page Window Graphics - Vinyl PRINT-01.jpg", isDefault: false},
             {name: "Vehicle Graphics - Spot Graphics - Basic (E).pdf", isDefault: false}
       ];
-      #defaultAttachmentBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/" + this.githubBranch + "/OrderHome/EmailAttachments/";
+      #defaultAttachmentBaseUrl = "https://github.com/Monshi10x/TamperScript/raw/" + this.githubBranch + "/OrderHome/EmailAttachments/";
 
       constructor() {
-            const defaultTemplateBaseUrl = "https://raw.githubusercontent.com/Monshi10x/TamperScript/" + this.githubBranch + "/OrderHome/EmailTemplates/";
+            const defaultTemplateBaseUrl = "https://github.com/Monshi10x/TamperScript/raw/" + this.githubBranch + "/OrderHome/EmailTemplates/";
             this.#templateBaseUrl = window.ORDER_HOME_TEMPLATE_BASE_URL
                   || defaultTemplateBaseUrl;
 
