@@ -5,7 +5,7 @@
 window.addEventListener("load", () => new OrderHome());
 
 class OrderHome {
-      githubBranch = "EmailTemplateChanges6-4-26";
+      githubBranch = "main";
       //known static info:
       //BSB: 014-218
       //Account: 3064-70312
@@ -1012,7 +1012,7 @@ class OrderHome {
       createPdfFooter() {
             const footer = document.createElement("div");
             footer.id = "order-home-pdf-footer";
-            footer.style = ["position:fixed","left:50%","bottom:14px","transform:translateX(-50%)","display:flex","gap:8px","padding:8px 10px","background:#111827","border:1px solid #374151","border-radius:10px","box-shadow:0 8px 24px rgba(0,0,0,0.25)","z-index:999999"].join(";");
+            footer.style = ["position:fixed", "left:50%", "bottom:14px", "transform:translateX(-50%)", "display:flex", "gap:8px", "padding:8px 10px", "background:#111827", "border:1px solid #374151", "border-radius:10px", "box-shadow:0 8px 24px rgba(0,0,0,0.25)", "z-index:999999"].join(";");
             const createCoverSheetButton = document.createElement("button");
             createCoverSheetButton.textContent = "Create Cover Sheet";
             createCoverSheetButton.style = "background:#2563eb;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:600;";
@@ -1117,7 +1117,7 @@ class OrderHome {
                   y += 42;
                   pdf.setFont(undefined, "normal");
                   pdf.setFontSize(11);
-                  [["Job Number", data.orderNumber],["Order Description", data.orderDescription],["Salesperson", data.salesperson]].forEach((row) => {
+                  [["Job Number", data.orderNumber], ["Order Description", data.orderDescription], ["Salesperson", data.salesperson]].forEach((row) => {
                         pdf.text(`${row[0]}: ${row[1] || ""}`, startX, y);
                         y += 18;
                   });
