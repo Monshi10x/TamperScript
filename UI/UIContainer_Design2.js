@@ -735,7 +735,7 @@ class UIContainer_Design2 {
 
             this.#f_designer = createDropdown_Infield("Designer", 2, "",
                   [createDropdownOption("Darren Frankish", "20"),
-                  createDropdownOption("Leandri Hayward", "31"),
+                  createDropdownOption("Michelly Bressan", "31"),
                   createDropdownOption("null", "")], async () => {
                         let loader = new Loader(this.#f_designer[0]);
 
@@ -1385,7 +1385,7 @@ class UIContainer_Design2 {
             let normalizedDesigner = resolvedDesignerSource.toLowerCase();
             let designerConfig = [
                   {key: "darren", label: "Darren", colour: "#00958f"},
-                  {key: "leandri", label: "Leandri", colour: "#17aa02"}
+                  {key: "michelly", label: "Michelly", colour: "#17aa02"}
             ];
 
             for(let i = 0; i < designerConfig.length; i++) {
