@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Production Board v2
 // @namespace    http://tampermonkey.net/
-// @version      2.802
+// @version      2.8021
 // @description  try to take over the world!
 // @author       You
 // @match        https://sar10686.corebridge.net/ProductionModule/WipQueue.aspx
